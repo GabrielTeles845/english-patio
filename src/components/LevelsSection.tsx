@@ -154,7 +154,7 @@ const LevelsSection = () => {
                 <p className="text-sm text-gray-600 mt-1">Prepare-se para certificações internacionalmente reconhecidas</p>
               </div>
               {/* Logo Cambridge - Versão Mobile */}
-              <div className="flex justify-center my-4">
+              <div className="md:hidden">
                 <img 
                   src="/english-patio/assets/cambridge-compact.png" 
                   alt="Cambridge Young Learners" 
@@ -162,7 +162,7 @@ const LevelsSection = () => {
                 />
               </div>
               {/* Logo Cambridge - Versão Desktop */}
-              <div className="flex justify-center my-4">
+              <div className="hidden md:block">
                 <img 
                   src="/english-patio/assets/cambridge.png" 
                   alt="Cambridge Assessment" 
