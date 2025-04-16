@@ -62,7 +62,7 @@ const PricingSection = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="text-center max-w-3xl mx-auto mb-12">
           <h2 className="text-4xl md:text-5xl font-bold text-primary">
-            Mensalidades <span className="text-secondary">2024</span>
+            Mensalidades <span className="text-secondary">2025</span>
           </h2>
           <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
             Escolha o plano que melhor se adapta às necessidades do seu filho
@@ -101,7 +101,7 @@ const PricingSection = () => {
 
         <div className="flex items-center justify-center mt-8">
           <span className="text-sm text-gray-500 bg-white px-4 py-2 rounded-full shadow-sm">
-            *Valores referentes ao ano de <span className="font-semibold">2024</span>
+            *Valores referentes ao ano de <span className="font-semibold">2025</span>
           </span>
         </div>
       </div>
