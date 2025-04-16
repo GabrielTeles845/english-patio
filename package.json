@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "homepage": "https://gabrielteles.github.io/english-patio",
+  "homepage": "https://GabrielTeles845.github.io/english-patio",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",

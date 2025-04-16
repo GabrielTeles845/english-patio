@@ -1,9 +1,13 @@
-const Logo = () => {
+interface LogoProps {
+  className?: string;
+}
+
+const Logo = ({ className = "h-12 w-auto" }: LogoProps) => {
   return (
     <img
-      src="/src/assets/logo-index.webp"
+      src="/english-patio/assets/logo-index.webp"
       alt="English Patio Logo"
-      className="h-12 w-auto"
+      className={className}
     />
   );
 };
