@@ -115,9 +115,6 @@ const Footer = () => {
             <p className="text-gray-600 text-sm">
               © {new Date().getFullYear()} English Patio. Todos os direitos reservados.
             </p>
-            <p className="text-gray-600 text-sm mt-2 md:mt-0">
-              Desenvolvido por Mega Jr.
-            </p>
           </div>
         </div>
       </div>
