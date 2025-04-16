@@ -158,7 +158,7 @@ const LevelsSection = () => {
                 <img 
                   src="/english-patio/assets/cambridge-compact.png" 
                   alt="Cambridge Young Learners" 
-                  className="h-12 object-contain" 
+                  className="h-16 object-contain" 
                 />
               </div>
               {/* Logo Cambridge - Versão Desktop */}
