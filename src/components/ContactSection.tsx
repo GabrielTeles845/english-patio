@@ -23,8 +23,8 @@ const ContactSection = () => {
               </div>
               <h3 className="mt-4 text-lg font-medium text-gray-900">Telefone</h3>
               <p className="mt-2 text-base text-gray-500">
-                <a href="tel:+551199999999" className="hover:text-primary">
-                  (11) 9999-9999
+                <a href="tel:+5562981953259" className="hover:text-primary">
+                  (62) 98195-3259
                 </a>
               </p>
             </div>
@@ -36,9 +36,17 @@ const ContactSection = () => {
               </div>
               <h3 className="mt-4 text-lg font-medium text-gray-900">Endereço</h3>
               <p className="mt-2 text-base text-gray-500 text-center">
-                Rua Example, 123
+                Av. F, 1541 - Quadra 01 Lote 12
                 <br />
-                São Paulo - SP
+                Água Branca, Goiânia - GO, 74723-100
+              </p>
+              <p className="mt-2 text-sm text-gray-500 text-center">
+                <span className="inline-flex items-center">
+                  <svg className="h-4 w-4 mr-1 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Horário: Aberto - Fecha às 19:00
+                </span>
               </p>
             </div>
 
@@ -56,10 +64,39 @@ const ContactSection = () => {
             </div>
           </div>
 
+          {/* Informação sobre aulas */}
+          <div className="mt-10 bg-white p-6 rounded-xl shadow-lg mx-auto max-w-3xl">
+            <h3 className="text-lg font-medium text-center text-gray-900 mb-4">Oferecemos Flexibilidade</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-primary/5 p-4 rounded-lg">
+                <h4 className="font-medium text-primary mb-2 flex items-center">
+                  <svg className="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                  Aulas em Nossa Sede
+                </h4>
+                <p className="text-sm text-gray-600">
+                  Venha para o nosso espaço especialmente projetado para o aprendizado dinâmico e imersivo do inglês.
+                </p>
+              </div>
+              <div className="bg-secondary/5 p-4 rounded-lg">
+                <h4 className="font-medium text-secondary mb-2 flex items-center">
+                  <svg className="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                  </svg>
+                  Aulas em Casa
+                </h4>
+                <p className="text-sm text-gray-600">
+                  Nossos professores podem ir até sua casa, proporcionando conforto e praticidade para o aprendizado do seu filho.
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* WhatsApp Button */}
           <div className="mt-12 text-center">
             <a
-              href="https://wa.me/5511999999999"
+              href="https://wa.me/5562981953259"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center px-8 py-4 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 transition duration-300"

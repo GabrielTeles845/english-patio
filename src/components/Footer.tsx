@@ -16,6 +16,7 @@ const Footer = () => {
             <p className="text-gray-600">
               Ensinamos inglês de forma lúdica, diferenciada e dinâmica, à crianças e adolescentes,
               organizados em pequenas turmas de no máximo 4 alunos ou individualmente.
+              Oferecemos aulas tanto em nossa sede quanto na casa dos alunos.
             </p>
           </div>
 
@@ -76,8 +77,16 @@ const Footer = () => {
               <li className="flex items-start space-x-3">
                 <MapPinIcon className="h-5 w-5 text-secondary flex-shrink-0" />
                 <span className="text-gray-600">
-                  Rua T-30, nº 2070, Setor Bueno<br />
-                  Goiânia - GO
+                  Av. F, 1541 - Quadra 01 Lote 12<br />
+                  Água Branca, Goiânia - GO, 74723-100
+                </span>
+              </li>
+              <li className="flex items-start space-x-3 mt-2">
+                <svg className="h-5 w-5 text-secondary flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="text-gray-600">
+                  Horário: Aberto - Fecha às 19:00
                 </span>
               </li>
             </ul>
