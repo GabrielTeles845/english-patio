@@ -62,7 +62,7 @@ const HeroSection = () => {
 
             {/* Cards de features */}
             <div className="mt-16 grid sm:grid-cols-2 gap-6">
-              {features.map((feature, index) => (
+              {features.map((feature) => (
                 <div 
                   key={feature.title}
                   className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow"
@@ -93,7 +93,7 @@ const HeroSection = () => {
               <div className="relative rounded-3xl overflow-hidden shadow-2xl transform hover:scale-[1.02] transition-transform duration-500">
                 <img
                   className="w-full h-auto"
-                  src="/src/assets/ao-vivo.jpeg"
+                  src="/english-patio/assets/ao-vivo.jpeg"
                   alt="Crianças aprendendo inglês de forma divertida"
                 />
                 

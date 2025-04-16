@@ -11,7 +11,8 @@ export interface Testimonial {
   name: string;
   role: string;
   content: string;
-  image: string;
+  image?: string;
+  rating: number;
 }
 
 export interface SocialLink {
