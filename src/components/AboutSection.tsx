@@ -50,7 +50,7 @@ const AboutSection = () => {
 
         <div className="mt-12 text-center">
           <img
-            src="/src/assets/vacation-classes.jpg"
+            src="/english-patio/assets/vacation-classes.jpg"
             alt="Crianças aprendendo inglês na English Patio"
             className="mx-auto rounded-2xl shadow-xl transform hover:scale-105 transition duration-300"
           />
