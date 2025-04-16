@@ -1,0 +1,82 @@
+@import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Fredoka+One&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply font-sans antialiased text-primary bg-background;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+
+  .btn-primary {
+    @apply inline-flex px-8 py-4 rounded-2xl text-white bg-primary hover:bg-primary-light transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg font-semibold text-lg;
+  }
+
+  .btn-secondary {
+    @apply inline-flex px-8 py-4 rounded-2xl text-primary bg-white hover:bg-secondary/10 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg border-2 border-secondary font-semibold text-lg;
+  }
+
+  .card {
+    @apply bg-white rounded-3xl shadow-xl p-8 transition-all duration-300 hover:shadow-2xl border border-secondary/10;
+  }
+
+  .pattern-bg {
+    @apply bg-secondary/10;
+    background-image: 
+      radial-gradient(circle at 100% 100%, #1E3765 0%, transparent 50%),
+      radial-gradient(circle at 0% 0%, #F5B700 0%, transparent 50%);
+  }
+
+  .checklist-item {
+    @apply flex items-center space-x-3 text-primary;
+  }
+
+  .checklist-item svg {
+    @apply h-6 w-6 text-secondary flex-shrink-0;
+  }
+
+  .section-title {
+    @apply text-4xl md:text-5xl font-bold text-primary mb-4;
+  }
+
+  .section-subtitle {
+    @apply text-xl text-primary/80 mb-12 max-w-3xl;
+  }
+
+  .highlight-box {
+    @apply bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-secondary/10;
+  }
+
+  .wave-pattern {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    background: linear-gradient(45deg, transparent 33.33%, #ffffff 33.33%, #ffffff 66.66%, transparent 66.66%),
+                linear-gradient(-45deg, transparent 33.33%, #ffffff 33.33%, #ffffff 66.66%, transparent 66.66%);
+    background-size: 30px 60px;
+    opacity: 0.1;
+  }
+
+  .glass-effect {
+    @apply bg-white/80 backdrop-blur-sm;
+  }
+
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary;
+  }
+  
+  .rounded-blob {
+    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+  }
+} 
