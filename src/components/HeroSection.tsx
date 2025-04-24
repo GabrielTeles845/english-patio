@@ -21,7 +21,7 @@ const features = [
 
 const HeroSection = () => {
   return (
-    <div className="relative pt-8 overflow-hidden bg-gradient-to-b from-white to-blue-50">
+    <div className="relative pt-12 md:pt-8 overflow-hidden bg-gradient-to-b from-white to-blue-50">
       {/* Elementos decorativos */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute -top-10 -right-10 w-72 h-72 bg-yellow-200 rounded-full opacity-20 blur-3xl"></div>

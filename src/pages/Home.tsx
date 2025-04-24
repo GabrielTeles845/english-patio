@@ -10,7 +10,7 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <div className="pt-8"> {/* Reduzido de pt-16 para pt-8 */}
+      <div className="pt-16 md:pt-8"> {/* Maior espaçamento no mobile, menor no desktop */}
         <main>
           <HeroSection />
           <AboutSection />
