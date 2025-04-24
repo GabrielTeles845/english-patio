@@ -17,6 +17,9 @@ const Navbar = () => {
   const location = useLocation();
   const submenuButtonRef = useRef<HTMLButtonElement>(null);
 
+  // Obter o caminho base da aplicação
+  const basePath = '/english-patio';
+
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
     // Fechar o submenu quando fechar o menu principal
@@ -47,7 +50,7 @@ const Navbar = () => {
     setIsMobileSubmenuOpen(false);
     
     // Se estiver na página inicial, fazer scroll suave
-    if (location.pathname === '/') {
+    if (location.pathname === '/' || location.pathname === basePath || location.pathname === `${basePath}/`) {
       if (sectionId === 'top') {
         // Scroll para o topo da página
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -61,9 +64,9 @@ const Navbar = () => {
     } else {
       // Se não estiver na página inicial, navegar para a página inicial e depois para a seção
       if (sectionId === 'top') {
-        window.location.href = '/';
+        window.location.href = `${basePath}/`;
       } else {
-        window.location.href = `/${sectionId}`;
+        window.location.href = `${basePath}/#${sectionId}`;
       }
     }
   };
@@ -152,7 +155,7 @@ const Navbar = () => {
               </a>
               
               <a
-                href="/#contact"
+                href={`${basePath}/#contact`}
                 className="inline-flex items-center px-4 py-2 rounded-xl bg-primary text-white hover:bg-primary-light transition-colors font-medium"
               >
                 Login
@@ -243,7 +246,7 @@ const Navbar = () => {
               </a>
               
               <a
-                href="/#contact"
+                href={`${basePath}/#contact`}
                 className="inline-flex items-center px-4 py-2 rounded-xl bg-primary text-white hover:bg-primary-light transition-colors font-medium"
                 onClick={toggleMenu}
               >
