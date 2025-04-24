@@ -48,7 +48,7 @@ const courses: Course[] = [
 
 const CoursesSection = () => {
   return (
-    <div className="bg-gradient-to-b from-background-light to-background py-12" id="courses">
+    <section id="courses" className="py-16 md:py-24 bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <h2 className="text-base text-primary font-semibold tracking-wide uppercase">Cursos</h2>
@@ -97,7 +97,7 @@ const CoursesSection = () => {
           ))}
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

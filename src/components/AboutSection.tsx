@@ -20,7 +20,7 @@ const features = [
 
 const AboutSection = () => {
   return (
-    <div className="py-12 bg-gradient-to-b from-background to-background-light" id="about">
+    <section id="about" className="py-16 md:py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="lg:text-center">
           <h2 className="text-base text-primary font-semibold tracking-wide uppercase">Sobre Nós</h2>
@@ -56,7 +56,7 @@ const AboutSection = () => {
           />
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

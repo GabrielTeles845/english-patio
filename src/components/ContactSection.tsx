@@ -2,7 +2,7 @@ import { PhoneIcon, MapPinIcon, EnvelopeIcon } from '@heroicons/react/24/outline
 
 const ContactSection = () => {
   return (
-    <div className="bg-gray-50 py-12" id="contact">
+    <section id="contact" className="py-16 md:py-24 bg-background-light">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <h2 className="text-base text-primary font-semibold tracking-wide uppercase">Contato</h2>
@@ -114,7 +114,7 @@ const ContactSection = () => {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 
