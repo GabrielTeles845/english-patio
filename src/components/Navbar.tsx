@@ -1,12 +1,18 @@
 import { useState } from 'react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { Link, useLocation } from 'react-router-dom';
 import Logo from './Logo';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const isActive = (path: string) => {
+    return location.pathname === path;
   };
 
   return (
@@ -26,25 +32,36 @@ const Navbar = () => {
           <div className="flex justify-between items-center h-20">
             {/* Logo */}
             <div className="flex items-center">
-              <Logo className="h-16 w-auto" />
+              <Link to="/">
+                <Logo className="h-16 w-auto" />
+              </Link>
             </div>
 
             {/* Links de navegação - Desktop */}
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#" className="text-primary hover:text-secondary transition-colors font-medium">
+              <Link 
+                to="/" 
+                className={`${isActive('/') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors font-medium`}
+              >
                 Início
-              </a>
-              <a href="#about" className="text-primary hover:text-secondary transition-colors font-medium">
+              </Link>
+              <Link 
+                to="/nossas-aulas" 
+                className={`${isActive('/nossas-aulas') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors font-medium`}
+              >
+                Nossas Aulas
+              </Link>
+              <a href="/#about" className="text-primary hover:text-secondary transition-colors font-medium">
                 Sobre
               </a>
-              <a href="#courses" className="text-primary hover:text-secondary transition-colors font-medium">
+              <a href="/#courses" className="text-primary hover:text-secondary transition-colors font-medium">
                 Cursos
               </a>
-              <a href="#testimonials" className="text-primary hover:text-secondary transition-colors font-medium">
+              <a href="/#testimonials" className="text-primary hover:text-secondary transition-colors font-medium">
                 Depoimentos
               </a>
               <a
-                href="#contact"
+                href="/#contact"
                 className="inline-flex items-center px-4 py-2 rounded-xl bg-primary text-white hover:bg-primary-light transition-colors font-medium"
               >
                 Login
@@ -74,36 +91,43 @@ const Navbar = () => {
         <div className="absolute top-full left-0 w-full bg-white/95 backdrop-blur-md shadow-lg border-t border-primary/10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex flex-col space-y-4">
-              <a
-                href="#"
-                className="text-primary hover:text-secondary transition-colors py-2 font-medium"
+              <Link
+                to="/"
+                className={`${isActive('/') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors py-2 font-medium`}
                 onClick={toggleMenu}
               >
                 Início
-              </a>
+              </Link>
+              <Link
+                to="/nossas-aulas"
+                className={`${isActive('/nossas-aulas') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors py-2 font-medium`}
+                onClick={toggleMenu}
+              >
+                Nossas Aulas
+              </Link>
               <a
-                href="#about"
+                href="/#about"
                 className="text-primary hover:text-secondary transition-colors py-2 font-medium"
                 onClick={toggleMenu}
               >
                 Sobre
               </a>
               <a
-                href="#courses"
+                href="/#courses"
                 className="text-primary hover:text-secondary transition-colors py-2 font-medium"
                 onClick={toggleMenu}
               >
                 Cursos
               </a>
               <a
-                href="#testimonials"
+                href="/#testimonials"
                 className="text-primary hover:text-secondary transition-colors py-2 font-medium"
                 onClick={toggleMenu}
               >
                 Depoimentos
               </a>
               <a
-                href="#contact"
+                href="/#contact"
                 className="inline-flex items-center px-4 py-2 rounded-xl bg-primary text-white hover:bg-primary-light transition-colors font-medium"
                 onClick={toggleMenu}
               >

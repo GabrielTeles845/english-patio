@@ -21,7 +21,7 @@ const features = [
 
 const HeroSection = () => {
   return (
-    <div className="relative pt-24 overflow-hidden bg-gradient-to-b from-white to-blue-50">
+    <div className="relative pt-8 overflow-hidden bg-gradient-to-b from-white to-blue-50">
       {/* Elementos decorativos */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute -top-10 -right-10 w-72 h-72 bg-yellow-200 rounded-full opacity-20 blur-3xl"></div>
@@ -30,7 +30,7 @@ const HeroSection = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative grid lg:grid-cols-2 gap-12 lg:gap-20 items-center py-16 lg:py-24">
+        <div className="relative grid lg:grid-cols-2 gap-12 lg:gap-20 items-center py-12 lg:py-16">
           {/* Conteúdo à esquerda */}
           <div className="text-center lg:text-left">
             <h1 className="text-4xl lg:text-6xl font-bold tracking-tight">
@@ -44,17 +44,17 @@ const HeroSection = () => {
               em ensino infantil.
             </p>
 
-            <div className="mt-12 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+            <div className="mt-12 flex flex-col sm:flex-row sm:w-full gap-4 justify-center lg:justify-start">
               <a
                 href="#contact"
-                className="btn-primary group"
+                className="btn-primary group flex-1 text-center"
               >
-                Agende uma Aula Grátis
+                Aula Experimental
                 <ArrowRightIcon className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
               </a>
               <a
                 href="#courses"
-                className="btn-secondary"
+                className="btn-secondary flex-1 text-center"
               >
                 Conheça Nossos Cursos
               </a>
@@ -65,15 +65,15 @@ const HeroSection = () => {
               {features.map((feature) => (
                 <div 
                   key={feature.title}
-                  className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow"
+                  className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow flex flex-col h-full"
                 >
-                  <div className="flex items-start gap-4">
+                  <div className="flex items-start gap-4 h-full">
                     <div className="flex-shrink-0">
                       <div className="bg-secondary/10 rounded-full p-2">
                         <CheckIcon className="h-6 w-6 text-secondary" />
                       </div>
                     </div>
-                    <div>
+                    <div className="flex-grow">
                       <h3 className="font-semibold text-primary">{feature.title}</h3>
                       <p className="mt-1 text-sm text-gray-600">{feature.description}</p>
                     </div>

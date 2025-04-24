@@ -64,25 +64,27 @@ const CoursesSection = () => {
           {courses.map((course) => (
             <div
               key={course.id}
-              className="card bg-background-light hover:shadow-2xl"
+              className="card bg-background-light hover:shadow-2xl flex flex-col h-full"
             >
-              <div className="px-6 py-8">
-                <h3 className="text-2xl font-semibold text-primary">{course.title}</h3>
-                <p className="mt-4 text-primary">{course.description}</p>
-                <p className="mt-8">
-                  <span className="text-4xl font-extrabold text-secondary">{course.price}</span>
-                </p>
-                <ul className="mt-8 space-y-4">
-                  {course.features.map((feature) => (
-                    <li key={feature} className="flex items-start">
-                      <div className="flex-shrink-0">
-                        <CheckIcon className="h-6 w-6 text-secondary" aria-hidden="true" />
-                      </div>
-                      <p className="ml-3 text-base text-primary">{feature}</p>
-                    </li>
-                  ))}
-                </ul>
-                <div className="mt-8">
+              <div className="px-6 py-8 flex flex-col flex-grow">
+                <div className="flex-grow">
+                  <h3 className="text-2xl font-semibold text-primary">{course.title}</h3>
+                  <p className="mt-4 text-primary">{course.description}</p>
+                  <p className="mt-8">
+                    <span className="text-4xl font-extrabold text-secondary">{course.price}</span>
+                  </p>
+                  <ul className="mt-8 space-y-4">
+                    {course.features.map((feature) => (
+                      <li key={feature} className="flex items-start">
+                        <div className="flex-shrink-0">
+                          <CheckIcon className="h-6 w-6 text-secondary" aria-hidden="true" />
+                        </div>
+                        <p className="ml-3 text-base text-primary">{feature}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="mt-8 pt-4">
                   <a
                     href="#contact"
                     className="btn-primary w-full text-center"

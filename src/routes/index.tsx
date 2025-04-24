@@ -1,9 +1,45 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Outlet } from 'react-router-dom';
 import Home from '../pages/Home';
+import OurClasses from '../pages/OurClasses';
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+
+// Componente que faz scroll para o topo quando muda de rota
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  
+  return null;
+};
+
+// Layout que contém o ScrollToTop e renderiza as rotas filhas
+const RootLayout = () => {
+  return (
+    <>
+      <ScrollToTop />
+      <Outlet />
+    </>
+  );
+};
 
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <Home />,
+    element: <RootLayout />,
+    children: [
+      {
+        index: true,
+        element: <Home />,
+      },
+      {
+        path: 'nossas-aulas',
+        element: <OurClasses />,
+      },
+    ],
   },
-]); 
+], {
+  basename: '/english-patio'
+}); 
