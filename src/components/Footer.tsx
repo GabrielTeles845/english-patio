@@ -1,7 +1,44 @@
 import { PhoneIcon, EnvelopeIcon, MapPinIcon } from '@heroicons/react/24/outline';
 
+// Reutilizando os mesmos itens do menu do Navbar para manter consistência
+const homeSubmenuItems = [
+  { title: 'Aprenda Inglês', href: '#', section: 'top' },
+  { title: 'Sobre Nós', href: '#about', section: 'about' },
+  { title: 'Cursos', href: '#courses', section: 'courses' },
+  { title: 'Depoimentos', href: '#testimonials', section: 'testimonials' },
+  { title: 'Contato', href: '#contact', section: 'contact' },
+];
+
 const Footer = () => {
   const basePath = '/english-patio';
+  
+  // Função para lidar com o scroll suave para as seções
+  const handleScrollToSection = (e: React.MouseEvent, sectionId: string) => {
+    e.preventDefault();
+    
+    // Se estiver na página inicial, fazer scroll suave
+    if (window.location.pathname === '/' || 
+        window.location.pathname === basePath || 
+        window.location.pathname === `${basePath}/`) {
+      if (sectionId === 'top') {
+        // Scroll para o topo da página
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        // Scroll para a seção específica
+        const section = document.getElementById(sectionId);
+        if (section) {
+          section.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    } else {
+      // Se não estiver na página inicial, navegar para a página inicial e depois para a seção
+      if (sectionId === 'top') {
+        window.location.href = `${basePath}/`;
+      } else {
+        window.location.href = `${basePath}/#${sectionId}`;
+      }
+    }
+  };
   
   return (
     <footer className="bg-white">
@@ -27,28 +64,79 @@ const Footer = () => {
             <h3 className="text-primary font-semibold mb-4">Links Rápidos</h3>
             <ul className="space-y-3">
               <li>
-                <a href={`${basePath}/`} className="text-gray-600 hover:text-secondary transition-colors">
+                <a href={`${basePath}/`} className="text-gray-600 hover:text-secondary transition-colors font-medium">
                   Início
                 </a>
+                {/* Subitens de Início */}
+                <ul className="ml-5 mt-2 space-y-2">
+                  {homeSubmenuItems.map((item) => (
+                    <li key={item.section}>
+                      <a
+                        href={item.href}
+                        className="text-gray-500 hover:text-secondary transition-colors text-sm"
+                        onClick={(e) => handleScrollToSection(e, item.section)}
+                      >
+                        {item.title}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
               </li>
+              
               <li>
-                <a href={`${basePath}/#about`} className="text-gray-600 hover:text-secondary transition-colors">
-                  Sobre Nós
-                </a>
-              </li>
-              <li>
-                <a href={`${basePath}/nossas-aulas`} className="text-gray-600 hover:text-secondary transition-colors">
+                <a href={`${basePath}/nossas-aulas`} className="text-gray-600 hover:text-secondary transition-colors font-medium">
                   Nossas Aulas
                 </a>
               </li>
+              
               <li>
-                <a href="#" className="text-gray-600 hover:text-secondary transition-colors">
+                <a 
+                  href="#" 
+                  className="text-gray-600 hover:text-secondary transition-colors font-medium"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    // Mostrar o modal de "Em desenvolvimento" - Reusa a mesma função da Navbar
+                    const event = new CustomEvent('showDevelopmentModal', { 
+                      detail: { feature: 'Foco e Ação' } 
+                    });
+                    document.dispatchEvent(event);
+                  }}
+                >
                   Foco e Ação
                 </a>
               </li>
+              
               <li>
-                <a href="#" className="text-gray-600 hover:text-secondary transition-colors">
+                <a 
+                  href="#" 
+                  className="text-gray-600 hover:text-secondary transition-colors font-medium"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    // Mostrar o modal de "Em desenvolvimento" - Reusa a mesma função da Navbar
+                    const event = new CustomEvent('showDevelopmentModal', { 
+                      detail: { feature: 'Vacation Classes' } 
+                    });
+                    document.dispatchEvent(event);
+                  }}
+                >
                   Vacation Classes
+                </a>
+              </li>
+              
+              <li>
+                <a 
+                  href="#" 
+                  className="text-gray-600 hover:text-secondary transition-colors font-medium"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    // Mostrar o modal de "Em desenvolvimento" - Reusa a mesma função da Navbar
+                    const event = new CustomEvent('showDevelopmentModal', { 
+                      detail: { feature: 'Login' } 
+                    });
+                    document.dispatchEvent(event);
+                  }}
+                >
+                  Login
                 </a>
               </li>
             </ul>

@@ -113,6 +113,25 @@ const Navbar = () => {
     };
   }, [isMobileSubmenuOpen]);
 
+  // Efeito para ouvir o evento personalizado do footer
+  useEffect(() => {
+    const handleShowDevelopmentModal = (e: CustomEvent) => {
+      const { feature } = e.detail;
+      setModalData({
+        title: 'Em Desenvolvimento',
+        message: `A funcionalidade "${feature}" está em desenvolvimento e estará disponível em breve!`
+      });
+      setModalOpen(true);
+    };
+
+    // Adiciona o listener para o evento personalizado
+    document.addEventListener('showDevelopmentModal', handleShowDevelopmentModal as EventListener);
+    
+    return () => {
+      document.removeEventListener('showDevelopmentModal', handleShowDevelopmentModal as EventListener);
+    };
+  }, []);
+
   return (
     <>
       <div className="fixed w-full top-0 z-50">
