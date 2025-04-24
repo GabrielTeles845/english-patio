@@ -1,5 +1,4 @@
-import React from 'react';
-import { AcademicCapIcon, ArrowRightIcon, BadgeCheckIcon } from '@heroicons/react/24/outline';
+import { ArrowRightIcon } from '@heroicons/react/24/outline';
 
 // Estrutura de dados para os níveis de curso
 const courseLevels = {
