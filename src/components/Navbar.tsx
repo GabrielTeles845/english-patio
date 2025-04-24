@@ -1,7 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
-import { Bars3Icon, XMarkIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
+import { Bars3Icon, XMarkIcon, ChevronDownIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import { Link, useLocation } from 'react-router-dom';
 import Logo from './Logo';
+import Modal from './Modal';
+
+// Tipos para o modal
+type ModalData = {
+  title: string;
+  message: string;
+};
 
 const homeSubmenuItems = [
   { title: 'Aprenda Inglês', href: '#', section: 'top' },
@@ -14,6 +21,9 @@ const homeSubmenuItems = [
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobileSubmenuOpen, setIsMobileSubmenuOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalData, setModalData] = useState<ModalData>({ title: '', message: '' });
+  
   const location = useLocation();
   const submenuButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -71,6 +81,19 @@ const Navbar = () => {
     }
   };
   
+  // Função para exibir o modal "Em desenvolvimento"
+  const showDevelopmentModal = (e: React.MouseEvent, feature: string) => {
+    e.preventDefault();
+    setModalData({
+      title: 'Em Desenvolvimento',
+      message: `A funcionalidade "${feature}" está em desenvolvimento e estará disponível em breve!`
+    });
+    setModalOpen(true);
+    
+    // Fechar os menus se estiverem abertos
+    setIsMenuOpen(false);
+  };
+  
   // Efeito para fechar o submenu ao clicar em qualquer lugar
   useEffect(() => {
     const handleClickOutside = (_: MouseEvent) => {
@@ -91,172 +114,192 @@ const Navbar = () => {
   }, [isMobileSubmenuOpen]);
 
   return (
-    <div className="fixed w-full top-0 z-50">
-      {/* Barra superior */}
-      <div className="bg-white border-b border-primary/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="py-2 text-sm text-center text-primary font-medium">
-            🎉 Matrículas abertas para o segundo semestre de 2025!
+    <>
+      <div className="fixed w-full top-0 z-50">
+        {/* Barra superior */}
+        <div className="bg-white border-b border-primary/10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="py-2 text-sm text-center text-primary font-medium">
+              🎉 Matrículas abertas para o segundo semestre de 2025!
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Navbar principal */}
-      <div className="bg-white/95 backdrop-blur-md border-b border-primary/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
-            {/* Logo */}
-            <div className="flex items-center">
-              <Link to="/">
-                <Logo className="h-16 w-auto" />
-              </Link>
-            </div>
-
-            {/* Links de navegação - Desktop */}
-            <div className="hidden md:flex items-center space-x-8">
-              {/* Item Início com Submenu */}
-              <div className="relative group">
-                <Link 
-                  to="/"
-                  className={`flex items-center ${isActive('/') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors font-medium`}
-                >
-                  Início
-                  <ChevronDownIcon className="ml-1 h-4 w-4 transition-transform group-hover:rotate-180" />
+        {/* Navbar principal */}
+        <div className="bg-white/95 backdrop-blur-md border-b border-primary/10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center h-20">
+              {/* Logo */}
+              <div className="flex items-center">
+                <Link to="/">
+                  <Logo className="h-16 w-auto" />
                 </Link>
-                
-                {/* Submenu para Início - aparece no hover */}
-                <div className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-lg py-2 w-48 z-10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
-                  {homeSubmenuItems.map((item) => (
-                    <a
-                      key={item.href}
-                      href={item.href}
-                      className="block px-4 py-2 text-primary hover:bg-primary/5 hover:text-secondary"
-                      onClick={(e) => handleScrollToSection(e, item.section)}
-                    >
-                      {item.title}
-                    </a>
-                  ))}
-                </div>
               </div>
-              
-              <Link 
-                to="/nossas-aulas" 
-                className={`${isActive('/nossas-aulas') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors font-medium`}
-              >
-                Nossas Aulas
-              </Link>
-              
-              <a href="#" className="text-primary hover:text-secondary transition-colors font-medium">
-                Foco e Ação
-              </a>
-              
-              <a href="#" className="text-primary hover:text-secondary transition-colors font-medium">
-                Vacation Classes
-              </a>
-              
-              <a
-                href={`${basePath}/#contact`}
-                className="inline-flex items-center px-4 py-2 rounded-xl bg-primary text-white hover:bg-primary-light transition-colors font-medium"
-              >
-                Login
-              </a>
-            </div>
 
-            {/* Botão do menu - Mobile */}
-            <div className="md:hidden">
-              <button
-                onClick={toggleMenu}
-                className="p-2 rounded-lg hover:bg-primary/5 transition-colors"
-                aria-label="Menu"
-              >
-                {isMenuOpen ? (
-                  <XMarkIcon className="h-6 w-6 text-primary" />
-                ) : (
-                  <Bars3Icon className="h-6 w-6 text-primary" />
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Menu Mobile */}
-      {isMenuOpen && (
-        <div className="absolute top-full left-0 w-full bg-white/95 backdrop-blur-md shadow-lg border-t border-primary/10">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className="flex flex-col space-y-4">
-              {/* Menu Início para Mobile */}
-              <div>
-                <div className="flex justify-between items-center">
-                  <Link
+              {/* Links de navegação - Desktop */}
+              <div className="hidden md:flex items-center space-x-8">
+                {/* Item Início com Submenu */}
+                <div className="relative group">
+                  <Link 
                     to="/"
-                    className={`${isActive('/') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors py-2 font-medium`}
-                    onClick={() => setIsMenuOpen(false)}
+                    className={`flex items-center ${isActive('/') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors font-medium`}
                   >
                     Início
+                    <ChevronDownIcon className="ml-1 h-4 w-4 transition-transform group-hover:rotate-180" />
                   </Link>
-                  <button
-                    ref={submenuButtonRef}
-                    onClick={toggleMobileSubmenu}
-                    className="p-2 rounded-lg hover:bg-primary/5 transition-colors"
-                    aria-label={isMobileSubmenuOpen ? "Fechar submenu" : "Abrir submenu"}
-                  >
-                    <ChevronDownIcon className={`h-5 w-5 transition-transform ${isMobileSubmenuOpen ? 'rotate-180' : ''}`} />
-                  </button>
-                </div>
-                
-                {isMobileSubmenuOpen && (
-                  <div className="pl-4 mt-2 border-l-2 border-primary/10">
+                  
+                  {/* Submenu para Início - aparece no hover */}
+                  <div className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-lg py-2 w-48 z-10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
                     {homeSubmenuItems.map((item) => (
                       <a
                         key={item.href}
                         href={item.href}
-                        className="block py-2 text-primary hover:text-secondary"
+                        className="block px-4 py-2 text-primary hover:bg-primary/5 hover:text-secondary"
                         onClick={(e) => handleScrollToSection(e, item.section)}
                       >
                         {item.title}
                       </a>
                     ))}
                   </div>
-                )}
+                </div>
+                
+                <Link 
+                  to="/nossas-aulas" 
+                  className={`${isActive('/nossas-aulas') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors font-medium`}
+                >
+                  Nossas Aulas
+                </Link>
+                
+                <a 
+                  href="#" 
+                  className="text-primary hover:text-secondary transition-colors font-medium"
+                  onClick={(e) => showDevelopmentModal(e, "Foco e Ação")}
+                >
+                  Foco e Ação
+                </a>
+                
+                <a 
+                  href="#" 
+                  className="text-primary hover:text-secondary transition-colors font-medium"
+                  onClick={(e) => showDevelopmentModal(e, "Vacation Classes")}
+                >
+                  Vacation Classes
+                </a>
+                
+                <a
+                  href="#"
+                  className="inline-flex items-center px-4 py-2 rounded-xl bg-primary text-white hover:bg-primary-light transition-colors font-medium"
+                  onClick={(e) => showDevelopmentModal(e, "Login")}
+                >
+                  Login
+                </a>
               </div>
-              
-              <Link
-                to="/nossas-aulas"
-                className={`${isActive('/nossas-aulas') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors py-2 font-medium`}
-                onClick={toggleMenu}
-              >
-                Nossas Aulas
-              </Link>
-              
-              <a
-                href="#"
-                className="text-primary hover:text-secondary transition-colors py-2 font-medium"
-                onClick={toggleMenu}
-              >
-                Foco e Ação
-              </a>
-              
-              <a
-                href="#"
-                className="text-primary hover:text-secondary transition-colors py-2 font-medium"
-                onClick={toggleMenu}
-              >
-                Vacation Classes
-              </a>
-              
-              <a
-                href={`${basePath}/#contact`}
-                className="inline-flex items-center px-4 py-2 rounded-xl bg-primary text-white hover:bg-primary-light transition-colors font-medium"
-                onClick={toggleMenu}
-              >
-                Login
-              </a>
+
+              {/* Botão do menu - Mobile */}
+              <div className="md:hidden">
+                <button
+                  onClick={toggleMenu}
+                  className="p-2 rounded-lg hover:bg-primary/5 transition-colors"
+                  aria-label="Menu"
+                >
+                  {isMenuOpen ? (
+                    <XMarkIcon className="h-6 w-6 text-primary" />
+                  ) : (
+                    <Bars3Icon className="h-6 w-6 text-primary" />
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      )}
-    </div>
+
+        {/* Menu Mobile */}
+        {isMenuOpen && (
+          <div className="absolute top-full left-0 w-full bg-white/95 backdrop-blur-md shadow-lg border-t border-primary/10">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+              <div className="flex flex-col space-y-4">
+                {/* Menu Início para Mobile */}
+                <div>
+                  <div className="flex justify-between items-center">
+                    <Link
+                      to="/"
+                      className={`${isActive('/') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors py-2 font-medium`}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Início
+                    </Link>
+                    <button
+                      ref={submenuButtonRef}
+                      onClick={toggleMobileSubmenu}
+                      className="p-2 rounded-lg hover:bg-primary/5 transition-colors"
+                      aria-label={isMobileSubmenuOpen ? "Fechar submenu" : "Abrir submenu"}
+                    >
+                      <ChevronDownIcon className={`h-5 w-5 transition-transform ${isMobileSubmenuOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                  </div>
+                  
+                  {isMobileSubmenuOpen && (
+                    <div className="pl-4 mt-2 border-l-2 border-primary/10">
+                      {homeSubmenuItems.map((item) => (
+                        <a
+                          key={item.href}
+                          href={item.href}
+                          className="block py-2 text-primary hover:text-secondary"
+                          onClick={(e) => handleScrollToSection(e, item.section)}
+                        >
+                          {item.title}
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                
+                <Link
+                  to="/nossas-aulas"
+                  className={`${isActive('/nossas-aulas') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors py-2 font-medium`}
+                  onClick={toggleMenu}
+                >
+                  Nossas Aulas
+                </Link>
+                
+                <a
+                  href="#"
+                  className="text-primary hover:text-secondary transition-colors py-2 font-medium"
+                  onClick={(e) => showDevelopmentModal(e, "Foco e Ação")}
+                >
+                  Foco e Ação
+                </a>
+                
+                <a
+                  href="#"
+                  className="text-primary hover:text-secondary transition-colors py-2 font-medium"
+                  onClick={(e) => showDevelopmentModal(e, "Vacation Classes")}
+                >
+                  Vacation Classes
+                </a>
+                
+                <a
+                  href="#"
+                  className="inline-flex items-center px-4 py-2 rounded-xl bg-primary text-white hover:bg-primary-light transition-colors font-medium"
+                  onClick={(e) => showDevelopmentModal(e, "Login")}
+                >
+                  Login
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Modal de funcionalidade em desenvolvimento */}
+      <Modal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        title={modalData.title}
+        message={modalData.message}
+        icon={<ExclamationTriangleIcon className="h-12 w-12 text-secondary" />}
+      />
+    </>
   );
 };
 
