@@ -1,15 +1,8 @@
 const plans = [
   {
-    id: 'online',
-    title: 'Online',
-    description: 'Disponível apenas para antigos alunos',
-    price: 'R$ 360,00',
-    color: 'bg-yellow-400'
-  },
-  {
-    id: 'quarteto',
-    title: 'Quarteto',
-    description: 'Até 4 alunos por turma',
+    id: 'hexeto',
+    title: 'Hexeto',
+    description: 'Até 6 alunos por turma',
     price: 'R$ 420,00',
     color: 'bg-primary'
   },

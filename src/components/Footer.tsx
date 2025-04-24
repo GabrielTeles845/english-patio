@@ -54,7 +54,7 @@ const Footer = () => {
             </p>
             <p className="text-gray-600">
               Ensinamos inglês de forma lúdica, diferenciada e dinâmica, à crianças e adolescentes,
-              organizados em pequenas turmas de no máximo 4 alunos ou individualmente.
+              organizados em pequenas turmas de no máximo 6 alunos.
               Oferecemos aulas tanto em nossa sede quanto na casa dos alunos.
             </p>
           </div>
