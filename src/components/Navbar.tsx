@@ -70,7 +70,7 @@ const Navbar = () => {
   
   // Efeito para fechar o submenu ao clicar em qualquer lugar
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (_: MouseEvent) => {
       // Fecha o submenu em qualquer clique fora ou mesmo no botão quando estiver aberto
       if (isMobileSubmenuOpen) {
         setIsMobileSubmenuOpen(false);
