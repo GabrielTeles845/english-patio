@@ -25,7 +25,6 @@ const Navbar = () => {
   const [modalData, setModalData] = useState<ModalData>({ title: '', message: '' });
   const [isMenuClosing, setIsMenuClosing] = useState(false);
   const [isSubmenuClosing, setIsSubmenuClosing] = useState(false);
-  const [isOverlayVisible, setIsOverlayVisible] = useState(false);
   
   const location = useLocation();
   const submenuButtonRef = useRef<HTMLButtonElement>(null);
@@ -40,13 +39,11 @@ const Navbar = () => {
   useEffect(() => {
     if (isMenuOpen) {
       document.body.style.overflow = 'hidden';
-      setIsOverlayVisible(true);
     } else {
       // Pequeno timeout para esperar a animação do menu terminar
       setTimeout(() => {
         if (!isMenuOpen && !isMenuClosing) {
           document.body.style.overflow = '';
-          setIsOverlayVisible(false);
         }
       }, 300);
     }
