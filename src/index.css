@@ -79,4 +79,96 @@
   .rounded-blob {
     border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
   }
+  
+  /* Animações para a Navbar */
+  .mobile-menu-enter {
+    animation: slideInDown 0.3s ease-in-out forwards;
+  }
+  
+  .mobile-menu-exit {
+    animation: slideOutUp 0.3s ease-in-out forwards;
+  }
+
+  .nav-item-hover {
+    @apply relative;
+  }
+
+  .nav-item-hover::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all duration-300;
+  }
+
+  .nav-item-hover:hover::after {
+    @apply w-full;
+  }
+
+  .submenu-item-enter {
+    animation: fadeInDown 0.2s ease-out forwards;
+    opacity: 0;
+  }
+  
+  .submenu-container-enter {
+    animation: expandDown 0.3s ease-out forwards;
+    transform-origin: top center;
+  }
+  
+  .submenu-container-exit {
+    animation: collapseUp 0.3s ease-out forwards;
+    transform-origin: top center;
+  }
+
+  @keyframes slideInDown {
+    0% {
+      transform: translateY(-20px);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slideOutUp {
+    0% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(-20px);
+      opacity: 0;
+    }
+  }
+
+  @keyframes fadeInDown {
+    0% {
+      transform: translateY(-10px);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes expandDown {
+    0% {
+      max-height: 0;
+      opacity: 0;
+    }
+    100% {
+      max-height: 200px;
+      opacity: 1;
+    }
+  }
+  
+  @keyframes collapseUp {
+    0% {
+      max-height: 200px;
+      opacity: 1;
+    }
+    100% {
+      max-height: 0;
+      opacity: 0;
+    }
+  }
 } 

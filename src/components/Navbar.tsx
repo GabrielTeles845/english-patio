@@ -23,18 +23,51 @@ const Navbar = () => {
   const [isMobileSubmenuOpen, setIsMobileSubmenuOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalData, setModalData] = useState<ModalData>({ title: '', message: '' });
+  const [isMenuClosing, setIsMenuClosing] = useState(false);
+  const [isSubmenuClosing, setIsSubmenuClosing] = useState(false);
+  const [isOverlayVisible, setIsOverlayVisible] = useState(false);
   
   const location = useLocation();
   const submenuButtonRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const submenuRef = useRef<HTMLDivElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
 
   // Obter o caminho base da aplicação
   const basePath = '/english-patio';
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-    // Fechar o submenu quando fechar o menu principal
+  // Bloquear scroll quando menu estiver aberto
+  useEffect(() => {
     if (isMenuOpen) {
-      setIsMobileSubmenuOpen(false);
+      document.body.style.overflow = 'hidden';
+      setIsOverlayVisible(true);
+    } else {
+      // Pequeno timeout para esperar a animação do menu terminar
+      setTimeout(() => {
+        if (!isMenuOpen && !isMenuClosing) {
+          document.body.style.overflow = '';
+          setIsOverlayVisible(false);
+        }
+      }, 300);
+    }
+    
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMenuOpen, isMenuClosing]);
+
+  const toggleMenu = () => {
+    if (isMenuOpen) {
+      // Animação de fechamento
+      setIsMenuClosing(true);
+      setTimeout(() => {
+        setIsMenuOpen(false);
+        setIsMenuClosing(false);
+        setIsMobileSubmenuOpen(false);
+        setIsSubmenuClosing(false);
+      }, 280); // Tempo um pouco menor que a duração da animação
+    } else {
+      setIsMenuOpen(true);
     }
   };
 
@@ -43,8 +76,15 @@ const Navbar = () => {
     // para que o evento de clique global possa fechar o menu
     if (!isMobileSubmenuOpen) {
       e.stopPropagation();
+      setIsMobileSubmenuOpen(true);
+    } else {
+      // Animação de fechamento do submenu
+      setIsSubmenuClosing(true);
+      setTimeout(() => {
+        setIsMobileSubmenuOpen(false);
+        setIsSubmenuClosing(false);
+      }, 280); // Tempo um pouco menor que a duração da animação
     }
-    setIsMobileSubmenuOpen(!isMobileSubmenuOpen);
   };
 
   const isActive = (path: string) => {
@@ -55,30 +95,32 @@ const Navbar = () => {
   const handleScrollToSection = (e: React.MouseEvent, sectionId: string) => {
     e.preventDefault();
     
-    // Fechar menus
-    setIsMenuOpen(false);
-    setIsMobileSubmenuOpen(false);
-    
-    // Se estiver na página inicial, fazer scroll suave
-    if (location.pathname === '/' || location.pathname === basePath || location.pathname === `${basePath}/`) {
-      if (sectionId === 'top') {
-        // Scroll para o topo da página
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Animação de fechamento
+    setIsMenuClosing(true);
+    setTimeout(() => {
+      setIsMenuOpen(false);
+      setIsMenuClosing(false);
+      setIsMobileSubmenuOpen(false);
+      setIsSubmenuClosing(false);
+      
+      // Continua com o scroll após a animação
+      if (location.pathname === '/' || location.pathname === basePath || location.pathname === `${basePath}/`) {
+        if (sectionId === 'top') {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          const section = document.getElementById(sectionId);
+          if (section) {
+            section.scrollIntoView({ behavior: 'smooth' });
+          }
+        }
       } else {
-        // Scroll para a seção específica
-        const section = document.getElementById(sectionId);
-        if (section) {
-          section.scrollIntoView({ behavior: 'smooth' });
+        if (sectionId === 'top') {
+          window.location.href = `${basePath}/`;
+        } else {
+          window.location.href = `${basePath}/#${sectionId}`;
         }
       }
-    } else {
-      // Se não estiver na página inicial, navegar para a página inicial e depois para a seção
-      if (sectionId === 'top') {
-        window.location.href = `${basePath}/`;
-      } else {
-        window.location.href = `${basePath}/#${sectionId}`;
-      }
-    }
+    }, 280);
   };
   
   // Função para exibir o modal "Em desenvolvimento"
@@ -90,8 +132,16 @@ const Navbar = () => {
     });
     setModalOpen(true);
     
-    // Fechar os menus se estiverem abertos
-    setIsMenuOpen(false);
+    // Fechar os menus com animação
+    if (isMenuOpen) {
+      setIsMenuClosing(true);
+      setTimeout(() => {
+        setIsMenuOpen(false);
+        setIsMenuClosing(false);
+        setIsMobileSubmenuOpen(false);
+        setIsSubmenuClosing(false);
+      }, 280);
+    }
   };
   
   // Efeito para fechar o submenu ao clicar em qualquer lugar
@@ -99,7 +149,11 @@ const Navbar = () => {
     const handleClickOutside = (_: MouseEvent) => {
       // Fecha o submenu em qualquer clique fora ou mesmo no botão quando estiver aberto
       if (isMobileSubmenuOpen) {
-        setIsMobileSubmenuOpen(false);
+        setIsSubmenuClosing(true);
+        setTimeout(() => {
+          setIsMobileSubmenuOpen(false);
+          setIsSubmenuClosing(false);
+        }, 280);
       }
     };
 
@@ -134,6 +188,16 @@ const Navbar = () => {
 
   return (
     <>
+      {/* Overlay com blur para o fundo quando o menu mobile estiver aberto */}
+      {(isMenuOpen || isMenuClosing) && (
+        <div 
+          ref={overlayRef}
+          className={`fixed inset-0 bg-primary/10 backdrop-blur-sm z-40 transition-opacity duration-300 ${isMenuClosing ? 'opacity-0' : 'opacity-100'}`}
+          style={{ pointerEvents: 'all' }}
+          onClick={toggleMenu}
+        />
+      )}
+      
       <div className="fixed w-full top-0 z-50">
         {/* Barra superior */}
         <div className="bg-white border-b border-primary/10">
@@ -145,13 +209,13 @@ const Navbar = () => {
         </div>
 
         {/* Navbar principal */}
-        <div className="bg-white/95 backdrop-blur-md border-b border-primary/10">
+        <div className="bg-white/95 backdrop-blur-md border-b border-primary/10 shadow-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-20">
               {/* Logo */}
               <div className="flex items-center">
                 <Link to="/">
-                  <Logo className="h-16 w-auto" />
+                  <Logo className="h-16 w-auto transform hover:scale-105 transition-transform duration-300" />
                 </Link>
               </div>
 
@@ -161,19 +225,20 @@ const Navbar = () => {
                 <div className="relative group">
                   <Link 
                     to="/"
-                    className={`flex items-center ${isActive('/') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors font-medium`}
+                    className={`nav-item-hover flex items-center ${isActive('/') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors font-medium`}
                   >
                     Início
-                    <ChevronDownIcon className="ml-1 h-4 w-4 transition-transform group-hover:rotate-180" />
+                    <ChevronDownIcon className="ml-1 h-4 w-4 transition-transform group-hover:rotate-180 duration-300" />
                   </Link>
                   
                   {/* Submenu para Início - aparece no hover */}
                   <div className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-lg py-2 w-48 z-10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
-                    {homeSubmenuItems.map((item) => (
+                    {homeSubmenuItems.map((item, index) => (
                       <a
                         key={item.href}
                         href={item.href}
-                        className="block px-4 py-2 text-primary hover:bg-primary/5 hover:text-secondary"
+                        style={{ animationDelay: `${index * 50}ms` }} 
+                        className="submenu-item-enter block px-4 py-2 text-primary hover:bg-primary/5 hover:text-secondary"
                         onClick={(e) => handleScrollToSection(e, item.section)}
                       >
                         {item.title}
@@ -184,14 +249,14 @@ const Navbar = () => {
                 
                 <Link 
                   to="/nossas-aulas" 
-                  className={`${isActive('/nossas-aulas') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors font-medium`}
+                  className={`nav-item-hover ${isActive('/nossas-aulas') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors font-medium`}
                 >
                   Nossas Aulas
                 </Link>
                 
                 <a 
                   href="#" 
-                  className="text-primary hover:text-secondary transition-colors font-medium"
+                  className="nav-item-hover text-primary hover:text-secondary transition-colors font-medium"
                   onClick={(e) => showDevelopmentModal(e, "Foco e Ação")}
                 >
                   Foco e Ação
@@ -199,7 +264,7 @@ const Navbar = () => {
                 
                 <a 
                   href="#" 
-                  className="text-primary hover:text-secondary transition-colors font-medium"
+                  className="nav-item-hover text-primary hover:text-secondary transition-colors font-medium"
                   onClick={(e) => showDevelopmentModal(e, "Vacation Classes")}
                 >
                   Vacation Classes
@@ -207,7 +272,7 @@ const Navbar = () => {
                 
                 <a
                   href="#"
-                  className="inline-flex items-center px-4 py-2 rounded-xl bg-primary text-white hover:bg-primary-light transition-colors font-medium"
+                  className="inline-flex items-center px-4 py-2 rounded-xl bg-primary text-white hover:bg-primary-light transition-all duration-300 transform hover:scale-105 hover:shadow-lg font-medium"
                   onClick={(e) => showDevelopmentModal(e, "Login")}
                 >
                   Login
@@ -222,7 +287,7 @@ const Navbar = () => {
                   aria-label="Menu"
                 >
                   {isMenuOpen ? (
-                    <XMarkIcon className="h-6 w-6 text-primary" />
+                    <XMarkIcon className="h-6 w-6 text-primary transform rotate-90 animate-[spin_0.3s_ease-in-out]" />
                   ) : (
                     <Bars3Icon className="h-6 w-6 text-primary" />
                   )}
@@ -233,8 +298,17 @@ const Navbar = () => {
         </div>
 
         {/* Menu Mobile */}
-        {isMenuOpen && (
-          <div className="absolute top-full left-0 w-full bg-white/95 backdrop-blur-md shadow-lg border-t border-primary/10">
+        {(isMenuOpen || isMenuClosing) && (
+          <div 
+            ref={menuRef}
+            className={`absolute top-full left-0 w-full bg-white/95 backdrop-blur-md shadow-lg border-t border-primary/10 ${isMenuClosing ? 'mobile-menu-exit' : 'mobile-menu-enter'}`}
+            style={{
+              overflow: 'hidden',
+              visibility: isMenuClosing && !isMenuOpen ? 'hidden' : 'visible',
+              opacity: isMenuClosing && !isMenuOpen ? '0' : '1', 
+              zIndex: 50
+            }}
+          >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
               <div className="flex flex-col space-y-4">
                 {/* Menu Início para Mobile */}
@@ -243,7 +317,7 @@ const Navbar = () => {
                     <Link
                       to="/"
                       className={`${isActive('/') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors py-2 font-medium`}
-                      onClick={() => setIsMenuOpen(false)}
+                      onClick={() => toggleMenu()}
                     >
                       Início
                     </Link>
@@ -253,17 +327,26 @@ const Navbar = () => {
                       className="p-2 rounded-lg hover:bg-primary/5 transition-colors"
                       aria-label={isMobileSubmenuOpen ? "Fechar submenu" : "Abrir submenu"}
                     >
-                      <ChevronDownIcon className={`h-5 w-5 transition-transform ${isMobileSubmenuOpen ? 'rotate-180' : ''}`} />
+                      <ChevronDownIcon className={`h-5 w-5 transition-transform duration-300 ${isMobileSubmenuOpen ? 'rotate-180' : ''}`} />
                     </button>
                   </div>
                   
-                  {isMobileSubmenuOpen && (
-                    <div className="pl-4 mt-2 border-l-2 border-primary/10">
-                      {homeSubmenuItems.map((item) => (
+                  {(isMobileSubmenuOpen || isSubmenuClosing) && (
+                    <div 
+                      ref={submenuRef}
+                      className={`pl-4 mt-2 border-l-2 border-primary/10 ${isSubmenuClosing ? 'submenu-container-exit' : 'submenu-container-enter'}`}
+                      style={{ 
+                        overflow: 'hidden', 
+                        visibility: isSubmenuClosing && !isMobileSubmenuOpen ? 'hidden' : 'visible',
+                        opacity: isSubmenuClosing && !isMobileSubmenuOpen ? '0' : '1'
+                      }}
+                    >
+                      {homeSubmenuItems.map((item, index) => (
                         <a
                           key={item.href}
                           href={item.href}
-                          className="block py-2 text-primary hover:text-secondary"
+                          style={{ animationDelay: `${index * 50}ms` }}
+                          className="submenu-item-enter block py-2 text-primary hover:text-secondary"
                           onClick={(e) => handleScrollToSection(e, item.section)}
                         >
                           {item.title}
@@ -276,7 +359,7 @@ const Navbar = () => {
                 <Link
                   to="/nossas-aulas"
                   className={`${isActive('/nossas-aulas') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors py-2 font-medium`}
-                  onClick={toggleMenu}
+                  onClick={() => toggleMenu()}
                 >
                   Nossas Aulas
                 </Link>
@@ -299,7 +382,7 @@ const Navbar = () => {
                 
                 <a
                   href="#"
-                  className="inline-flex items-center px-4 py-2 rounded-xl bg-primary text-white hover:bg-primary-light transition-colors font-medium"
+                  className="inline-flex items-center px-4 py-2 rounded-xl bg-primary text-white hover:bg-primary-light transition-colors font-medium transform hover:scale-105 transition-transform duration-300"
                   onClick={(e) => showDevelopmentModal(e, "Login")}
                 >
                   Login
