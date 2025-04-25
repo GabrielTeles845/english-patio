@@ -1,7 +1,78 @@
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
+import React from 'react';
+
+// Tipos para os níveis
+type BaseLevel = {
+  name: string;
+  color: string;
+  subtext?: string;
+};
+
+type LevelGroup = {
+  id: string;
+  title: string;
+  icon: string;
+  description: string;
+  levels: BaseLevel[];
+};
+
+// Componente de cartão reutilizável
+const CourseCard: React.FC<{
+  title: string;
+  icon: string;
+  description: string;
+  isRed?: boolean;
+  extraHeader?: React.ReactNode;
+  children: React.ReactNode;
+}> = ({ title, icon, description, isRed = false, extraHeader, children }) => {
+  return (
+    <div className={`overflow-hidden rounded-lg ${isRed ? 'border border-red-300' : ''}`}>
+      <div className={`p-6 pb-5 ${isRed ? 'bg-[#FFF2F2]' : 'bg-[#F3F3F3]'} rounded-t-lg ${extraHeader ? 'flex justify-between items-start' : ''}`}>
+        {extraHeader ? (
+          <>
+            <div>
+              <h3 className="text-xl font-bold text-primary">{title}</h3>
+              <p className="text-sm text-gray-600 mt-1 mb-0">{description}</p>
+            </div>
+            {extraHeader}
+          </>
+        ) : (
+          <>
+            <div className="flex items-center gap-3 mb-1">
+              <span className="text-3xl">{icon}</span>
+              <h3 className="text-xl font-bold text-primary">{title}</h3>
+            </div>
+            <p className="text-sm text-gray-600 mb-0">{description}</p>
+          </>
+        )}
+      </div>
+      
+      <div className="p-5 bg-white rounded-b-lg">
+        {children}
+      </div>
+    </div>
+  );
+};
+
+// Botão de nível reutilizável
+const LevelButton: React.FC<{ 
+  color: string; 
+  name: string; 
+  subtext?: string;
+  small?: boolean;
+}> = ({ color, name, subtext, small = false }) => {
+  return (
+    <div 
+      className={`${color} ${small ? 'px-2.5 py-1' : 'px-3 py-1.5'} rounded text-center text-sm`}
+    >
+      <span className="font-medium">{name}</span>
+      {subtext && <span className="text-xs block">{subtext}</span>}
+    </div>
+  );
+};
 
 // Dados dos níveis
-const levelGroups = [
+const levelGroups: LevelGroup[] = [
   {
     id: 'iniciantes',
     title: 'INICIANTES',
@@ -42,15 +113,17 @@ const levelGroups = [
     icon: '🏃',
     description: 'Desenvolvimento de fluência',
     levels: [
-      { name: 'SPRINT 1', subtext: 'A - B', color: 'bg-amber-300' },
-      { name: 'SPRINT 2', subtext: 'A - B', color: 'bg-blue-300' },
-      { name: 'SPRINT 3', subtext: 'A - B', color: 'bg-pink-300' },
-      { name: 'SPRINT 4', subtext: 'A - B', color: 'bg-green-300' }
+      { name: 'SPRINT 1', color: 'bg-amber-400' },
+      { name: 'SPRINT 2', color: 'bg-blue-300' },
+      { name: 'SPRINT 3', color: 'bg-pink-300' },
+      { name: 'SPRINT 4', color: 'bg-green-300' }
     ]
   }
 ];
 
-const cambridgeExams = [
+type CambridgeExam = BaseLevel;
+
+const cambridgeExams: CambridgeExam[] = [
   { name: 'KET', color: 'bg-teal-400' },
   { name: 'PET', color: 'bg-red-600 text-white' },
   { name: 'FCE', color: 'bg-green-600 text-white' },
@@ -60,137 +133,119 @@ const cambridgeExams = [
 
 const CoursesSection = () => {
   return (
-    <section id="courses" className="py-16 md:py-24 bg-blue-50">
+    <section id="courses" className="py-16 md:py-24 bg-gradient-to-b from-[#F0F6FF] to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-primary">
             Nossos Níveis
           </h2>
-          <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="mt-4 text-gray-500 max-w-2xl mx-auto">
             Programa estruturado em níveis progressivos para o desenvolvimento contínuo do aluno
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           {/* Iniciantes */}
-          <div className="bg-gray-100 rounded-lg shadow-sm overflow-hidden">
-            <div className="p-6">
-              <div className="flex items-center gap-3 mb-2">
-                <span className="text-3xl">{levelGroups[0].icon}</span>
-                <h3 className="text-xl font-bold text-primary">{levelGroups[0].title}</h3>
-              </div>
-              <p className="text-sm text-gray-600 mb-4">{levelGroups[0].description}</p>
-              
-              <div className="flex gap-3">
-                {levelGroups[0].levels.map((level, idx) => (
-                  <div 
-                    key={idx} 
-                    className={`${level.color} px-4 py-2 rounded-full text-center`}
-                  >
-                    <span className="font-medium">{level.name}</span>
-                  </div>
-                ))}
-              </div>
+          <CourseCard 
+            title={levelGroups[0].title}
+            icon={levelGroups[0].icon}
+            description={levelGroups[0].description}
+          >
+            <div className="flex gap-2">
+              {levelGroups[0].levels.map((level, idx) => (
+                <LevelButton
+                  key={idx}
+                  color={level.color}
+                  name={level.name}
+                  subtext={level.subtext}
+                />
+              ))}
             </div>
-          </div>
+          </CourseCard>
 
           {/* Iniciantes+ */}
-          <div className="bg-gray-100 rounded-lg shadow-sm overflow-hidden">
-            <div className="p-6">
-              <div className="flex items-center gap-3 mb-2">
-                <span className="text-3xl">{levelGroups[1].icon}</span>
-                <h3 className="text-xl font-bold text-primary">{levelGroups[1].title}</h3>
-              </div>
-              <p className="text-sm text-gray-600 mb-4">{levelGroups[1].description}</p>
-              
-              <div className="flex flex-wrap gap-3">
-                {levelGroups[1].levels.map((level, idx) => (
-                  <div 
-                    key={idx} 
-                    className={`${level.color} px-4 py-2 rounded-full text-center`}
-                  >
-                    <span className="font-medium">{level.name}</span>
-                  </div>
-                ))}
-              </div>
+          <CourseCard 
+            title={levelGroups[1].title}
+            icon={levelGroups[1].icon}
+            description={levelGroups[1].description}
+          >
+            <div className="flex flex-wrap gap-2">
+              {levelGroups[1].levels.map((level, idx) => (
+                <LevelButton
+                  key={idx}
+                  color={level.color}
+                  name={level.name}
+                  subtext={level.subtext}
+                />
+              ))}
             </div>
-          </div>
+          </CourseCard>
 
           {/* Intermediário */}
-          <div className="bg-gray-100 rounded-lg shadow-sm overflow-hidden">
-            <div className="p-6">
-              <div className="flex items-center gap-3 mb-2">
-                <span className="text-3xl">{levelGroups[2].icon}</span>
-                <h3 className="text-xl font-bold text-primary">{levelGroups[2].title}</h3>
-              </div>
-              <p className="text-sm text-gray-600 mb-4">{levelGroups[2].description}</p>
-              
-              <div className="flex flex-wrap gap-3">
-                {levelGroups[2].levels.map((level, idx) => (
-                  <div 
-                    key={idx} 
-                    className={`${level.color} px-4 py-2 rounded-full text-center`}
-                  >
-                    <span className="font-medium">{level.name}</span>
-                  </div>
-                ))}
-              </div>
+          <CourseCard 
+            title={levelGroups[2].title}
+            icon={levelGroups[2].icon}
+            description={levelGroups[2].description}
+          >
+            <div className="flex flex-wrap gap-2">
+              {levelGroups[2].levels.map((level, idx) => (
+                <LevelButton
+                  key={idx}
+                  color={level.color}
+                  name={level.name}
+                  subtext={level.subtext}
+                  small={true}
+                />
+              ))}
             </div>
-          </div>
+          </CourseCard>
 
           {/* Avançado */}
-          <div className="bg-gray-100 rounded-lg shadow-sm overflow-hidden">
-            <div className="p-6">
-              <div className="flex items-center gap-3 mb-2">
-                <span className="text-3xl">{levelGroups[3].icon}</span>
-                <h3 className="text-xl font-bold text-primary">{levelGroups[3].title}</h3>
-              </div>
-              <p className="text-sm text-gray-600 mb-4">{levelGroups[3].description}</p>
-              
-              <div className="flex flex-wrap gap-3">
-                {levelGroups[3].levels.map((level, idx) => (
-                  <div 
-                    key={idx} 
-                    className={`${level.color} px-4 py-2 rounded-lg text-center`}
-                  >
-                    <span className="font-medium">{level.name}</span>
-                    {level.subtext && (
-                      <span className="text-xs block">{level.subtext}</span>
-                    )}
-                  </div>
-                ))}
-              </div>
+          <CourseCard 
+            title={levelGroups[3].title}
+            icon={levelGroups[3].icon}
+            description={levelGroups[3].description}
+          >
+            <div className="flex flex-wrap gap-2">
+              {levelGroups[3].levels.map((level, idx) => (
+                <LevelButton
+                  key={idx}
+                  color={level.color}
+                  name={level.name}
+                  subtext={level.subtext}
+                />
+              ))}
             </div>
-          </div>
+          </CourseCard>
         </div>
 
         {/* Cambridge Preparation */}
-        <div className="bg-red-50 rounded-lg border border-red-200 p-6 mb-8 relative">
-          <div className="flex justify-between items-center mb-4">
-            <div>
-              <h3 className="text-xl font-bold text-primary">CAMBRIDGE PREPARATION</h3>
-              <p className="text-sm text-gray-600 mt-1">Prepare-se para certificações internacionalmente reconhecidas</p>
-            </div>
+        <CourseCard 
+          title="CAMBRIDGE PREPARATION"
+          icon=""
+          description="Prepare-se para certificações internacionalmente reconhecidas"
+          isRed={true}
+          extraHeader={
             <img 
               src="/english-patio/assets/cambridge-compact.png" 
               alt="Cambridge Assessment" 
-              className="h-10 object-contain" 
+              className="h-12 object-contain" 
             />
-          </div>
-          
-          <div className="flex flex-wrap gap-3">
+          }
+        >
+          <div className="flex flex-wrap gap-2">
             {cambridgeExams.map((exam, idx) => (
-              <div 
-                key={idx} 
-                className={`${exam.color} px-4 py-2 rounded-lg text-center`}
-              >
-                <span className="font-medium">{exam.name}</span>
-              </div>
+              <LevelButton
+                key={idx}
+                color={exam.color}
+                name={exam.name}
+                subtext={exam.subtext}
+              />
             ))}
           </div>
-        </div>
+        </CourseCard>
 
-        <div className="text-center">
+        <div className="text-center mt-12">
           <a 
             href="#contact" 
             className="inline-flex items-center text-primary hover:text-secondary transition-colors"
