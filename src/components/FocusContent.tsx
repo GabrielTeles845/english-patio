@@ -1,4 +1,4 @@
-import { LightBulbIcon, UserGroupIcon, AcademicCapIcon, SparklesIcon } from '@heroicons/react/24/outline';
+import { LightBulbIcon, SparklesIcon } from '@heroicons/react/24/outline';
 import image2 from '../assets/foco-e-acao/2.webp';
 import image3 from '../assets/foco-e-acao/3.webp';
 import image4 from '../assets/foco-e-acao/4.webp';
