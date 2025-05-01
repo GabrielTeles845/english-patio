@@ -251,13 +251,12 @@ const Navbar = () => {
                   Nossas Aulas
                 </Link>
                 
-                <a 
-                  href="#" 
-                  className="nav-item-hover text-primary hover:text-secondary transition-colors font-medium"
-                  onClick={(e) => showDevelopmentModal(e, "Foco e Ação")}
+                <Link 
+                  to="/foco-e-acao" 
+                  className={`nav-item-hover ${isActive('/foco-e-acao') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors font-medium`}
                 >
                   Foco e Ação
-                </a>
+                </Link>
                 
                 <a 
                   href="#" 
@@ -361,13 +360,13 @@ const Navbar = () => {
                   Nossas Aulas
                 </Link>
                 
-                <a
-                  href="#"
-                  className="text-primary hover:text-secondary transition-colors py-2 font-medium"
-                  onClick={(e) => showDevelopmentModal(e, "Foco e Ação")}
+                <Link
+                  to="/foco-e-acao"
+                  className={`${isActive('/foco-e-acao') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors py-2 font-medium`}
+                  onClick={() => toggleMenu()}
                 >
                   Foco e Ação
-                </a>
+                </Link>
                 
                 <a
                   href="#"
