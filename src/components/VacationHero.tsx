@@ -1,4 +1,4 @@
-import heroImage from '../assets/vacation-classes/6.webp';
+import heroImage from '../assets/vacation-classes/88dd5f0a-e2ee-4129-9a0a-ffc6523a5a9b.jpg';
 
 const VacationHero = () => {
   return (
@@ -30,7 +30,7 @@ const VacationHero = () => {
           <div className="mt-12 lg:mt-0">
             <div className="relative">
               <img
-                className="w-full rounded-xl shadow-xl"
+                className="w-full h-[400px] object-cover rounded-xl shadow-xl"
                 src={heroImage}
                 alt="Vacation Classes na English Patio"
               />

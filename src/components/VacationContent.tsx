@@ -5,14 +5,20 @@ import image4 from '../assets/vacation-classes/4.webp';
 import image5 from '../assets/vacation-classes/5.webp';
 import image7 from '../assets/vacation-classes/7.webp';
 import image8 from '../assets/vacation-classes/8.webp';
+import imagePark from '../assets/vacation-classes/88dd5f0a-e2ee-4129-9a0a-ffc6523a5a9b.jpg';
+import imageCooking from '../assets/vacation-classes/227c9b0a-e790-46d4-be80-b7a85ca6cd8f.jpg';
+import imageActivity from '../assets/vacation-classes/3341bfed-e291-4ef7-b431-8070c4967f2d.jpg';
+import imageNature from '../assets/vacation-classes/0582aaf3-1fa8-4555-a88f-b7ea60d75385.jpg';
+import imageExperience from '../assets/vacation-classes/733d1dd1-7481-4550-ab67-81374e2263ec.jpg';
+import imageWhatsapp from '../assets/vacation-classes/WhatsApp Image 2025-05-01 at 21.47.12.jpeg';
 
-// Imagens para o carrossel
+// Imagens para o carrossel - usando uma mistura de formatos para melhor qualidade visual
 const carouselImages = [
-  { src: image3, alt: 'Vacation Classes 1' },
-  { src: image4, alt: 'Vacation Classes 2' },
-  { src: image5, alt: 'Vacation Classes 3' },
-  { src: image7, alt: 'Vacation Classes 4' },
-  { src: image8, alt: 'Vacation Classes 5' },
+  { src: image8, alt: 'Alunos se divertindo nas Vacation Classes' },
+  { src: imageNature, alt: 'Experiência com a natureza' },
+  { src: image5, alt: 'Atividades em grupo' },
+  { src: imageCooking, alt: 'Atividades culinárias' },
+  { src: imageWhatsapp, alt: 'Brincadeiras educativas' },
 ];
 
 const VacationContent = () => {
@@ -43,7 +49,7 @@ const VacationContent = () => {
 
           <div className="relative">
             {/* Carrossel */}
-            <div className="relative overflow-hidden rounded-xl shadow-lg h-96">
+            <div className="relative overflow-hidden rounded-xl shadow-lg h-[500px]">
               {carouselImages.map((image, index) => (
                 <div
                   key={index}
@@ -58,6 +64,9 @@ const VacationContent = () => {
                     className="w-full h-full object-cover rounded-xl"
                   />
                   <div className="absolute inset-0 bg-primary/5 rounded-xl"></div>
+                  <div className="absolute bottom-4 left-4 bg-white/80 backdrop-blur-sm p-3 rounded-lg shadow-md max-w-xs">
+                    <p className="text-primary font-medium">{image.alt}</p>
+                  </div>
                 </div>
               ))}
 
@@ -141,9 +150,9 @@ const VacationContent = () => {
 
             <div className="relative">
               <img
-                src={image8}
+                src={imagePark}
                 alt="Locais das Vacation Classes"
-                className="rounded-xl shadow-lg"
+                className="rounded-xl shadow-lg object-cover h-[400px] w-full"
               />
               <div className="absolute -bottom-6 -right-6 bg-primary p-4 rounded-xl text-white shadow-lg">
                 <div className="font-bold text-xl">Ambientes Reais</div>
@@ -157,11 +166,23 @@ const VacationContent = () => {
         <div className="mb-20">
           <div className="grid md:grid-cols-2 gap-10 items-center">
             <div className="order-2 md:order-1">
-              <img
-                src={image4}
-                alt="Atividades das Vacation Classes"
-                className="rounded-xl shadow-lg"
-              />
+              <div className="grid grid-cols-2 gap-4">
+                <img
+                  src={imageActivity}
+                  alt="Atividades criativas"
+                  className="rounded-xl shadow-lg object-cover h-[250px] w-full"
+                />
+                <img
+                  src={image7}
+                  alt="Atividades ao ar livre"
+                  className="rounded-xl shadow-lg object-cover h-[250px] w-full"
+                />
+                <img
+                  src={image4}
+                  alt="Atividades em grupo"
+                  className="rounded-xl shadow-lg object-cover h-[200px] w-full col-span-2"
+                />
+              </div>
             </div>
 
             <div className="order-1 md:order-2">
@@ -198,6 +219,11 @@ const VacationContent = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white p-6 rounded-xl shadow-sm">
+              <img 
+                src={image3}
+                alt="Experiência de aprendizado"
+                className="rounded-lg w-full h-48 object-cover mb-4"
+              />
               <h3 className="text-xl font-semibold text-primary mb-3">
                 Compensamos os pais
               </h3>
@@ -208,6 +234,11 @@ const VacationContent = () => {
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm">
+              <img 
+                src={imageExperience}
+                alt="Aprendizado com diversão"
+                className="rounded-lg w-full h-48 object-cover mb-4"
+              />
               <h3 className="text-xl font-semibold text-primary mb-3">
                 Valorizamos seu investimento
               </h3>
@@ -218,6 +249,11 @@ const VacationContent = () => {
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm">
+              <img 
+                src={image6}
+                alt="Crianças aprendendo inglês"
+                className="rounded-lg w-full h-48 object-cover mb-4"
+              />
               <h3 className="text-xl font-semibold text-primary mb-3">
                 Nosso grande objetivo
               </h3>
