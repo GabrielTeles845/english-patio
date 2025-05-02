@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon, MapPinIcon, SparklesIcon } from '@heroicons/react/24/outline';
-import image3 from '../assets/vacation-classes/3.webp';
-import image4 from '../assets/vacation-classes/4.webp';
-import image5 from '../assets/vacation-classes/5.webp';
+// Separando os ícones das fotos para melhor organização
+import iconVacation from '../assets/vacation-classes/3.webp'; // Ícone de férias
+import iconBook from '../assets/vacation-classes/4.webp'; // Ícone de livro com coisas saindo
+import iconHeart from '../assets/vacation-classes/5.webp'; // Ícone de coração com "we love it"
 import image6 from '../assets/vacation-classes/6.webp';
 import image7 from '../assets/vacation-classes/7.webp';
 import image8 from '../assets/vacation-classes/8.webp';
@@ -13,11 +14,11 @@ import imageNature from '../assets/vacation-classes/0582aaf3-1fa8-4555-a88f-b7ea
 import imageExperience from '../assets/vacation-classes/733d1dd1-7481-4550-ab67-81374e2263ec.jpg';
 import imageWhatsapp from '../assets/vacation-classes/WhatsApp Image 2025-05-01 at 21.47.12.jpeg';
 
-// Imagens para o carrossel - usando uma mistura de formatos para melhor qualidade visual
+// Imagens para o carrossel - usando apenas fotos reais para o carrossel
 const carouselImages = [
   { src: image8, alt: 'Alunos se divertindo nas Vacation Classes' },
   { src: imageNature, alt: 'Experiência com a natureza' },
-  { src: image5, alt: 'Atividades em grupo' },
+  { src: imagePark, alt: 'Atividades em grupo' },
   { src: imageCooking, alt: 'Atividades culinárias' },
   { src: imageWhatsapp, alt: 'Brincadeiras educativas' },
 ];
@@ -108,7 +109,14 @@ const VacationContent = () => {
         <div className="mb-20">
           <div className="grid md:grid-cols-2 gap-10 items-center">
             <div>
-              <h2 className="text-3xl font-extrabold text-primary mb-6">
+              <div className="flex justify-center mb-6">
+                <img 
+                  src={iconVacation} 
+                  alt="Ícone de Férias" 
+                  className="h-32 w-auto"
+                />
+              </div>
+              <h2 className="text-3xl font-extrabold text-primary mb-6 text-center">
                 Onde são nossas queridas e esperadas Vacation Classes?
               </h2>
               <p className="text-lg text-primary/80">
@@ -179,7 +187,7 @@ const VacationContent = () => {
                   className="rounded-xl shadow-lg object-cover h-[250px] w-full"
                 />
                 <img
-                  src={image4}
+                  src={image6}
                   alt="Atividades em grupo"
                   className="rounded-xl shadow-lg object-cover h-[200px] w-full col-span-2"
                 />
@@ -187,7 +195,14 @@ const VacationContent = () => {
             </div>
 
             <div className="order-1 md:order-2">
-              <h2 className="text-3xl font-extrabold text-primary mb-6">
+              <div className="flex justify-center mb-6">
+                <img 
+                  src={iconBook} 
+                  alt="Ícone de Livro com Ideias" 
+                  className="h-32 w-auto"
+                />
+              </div>
+              <h2 className="text-3xl font-extrabold text-primary mb-6 text-center">
                 O que fazemos lá?
               </h2>
               <p className="text-lg text-primary/80 mb-4">
@@ -213,6 +228,11 @@ const VacationContent = () => {
         {/* Seção Valor Agregado */}
         <div className="mb-20 bg-background-light p-8 rounded-2xl shadow-sm">
           <div className="text-center mb-10">
+            <img 
+              src={iconHeart} 
+              alt="We Love It" 
+              className="h-32 w-auto mx-auto mb-4"
+            />
             <h2 className="text-3xl font-extrabold text-primary">
               Valor Agregado para Toda a Família
             </h2>
@@ -221,7 +241,7 @@ const VacationContent = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white p-6 rounded-xl shadow-sm">
               <img 
-                src={image3}
+                src={imageExperience}
                 alt="Experiência de aprendizado"
                 className="rounded-lg w-full h-48 object-cover mb-4"
               />
@@ -236,7 +256,7 @@ const VacationContent = () => {
 
             <div className="bg-white p-6 rounded-xl shadow-sm">
               <img 
-                src={imageExperience}
+                src={imageCooking}
                 alt="Aprendizado com diversão"
                 className="rounded-lg w-full h-48 object-cover mb-4"
               />
@@ -251,7 +271,7 @@ const VacationContent = () => {
 
             <div className="bg-white p-6 rounded-xl shadow-sm">
               <img 
-                src={image6}
+                src={imageWhatsapp}
                 alt="Crianças aprendendo inglês"
                 className="rounded-lg w-full h-48 object-cover mb-4"
               />
