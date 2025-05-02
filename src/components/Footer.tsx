@@ -100,16 +100,8 @@ const Footer = () => {
               
               <li>
                 <a 
-                  href="#" 
+                  href={`${basePath}/vacation-classes`} 
                   className="text-gray-600 hover:text-secondary transition-colors font-medium"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    // Mostrar o modal de "Em desenvolvimento" - Reusa a mesma função da Navbar
-                    const event = new CustomEvent('showDevelopmentModal', { 
-                      detail: { feature: 'Vacation Classes' } 
-                    });
-                    document.dispatchEvent(event);
-                  }}
                 >
                   Vacation Classes
                 </a>

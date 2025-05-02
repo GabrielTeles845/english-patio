@@ -258,13 +258,12 @@ const Navbar = () => {
                   Foco e Ação
                 </Link>
                 
-                <a 
-                  href="#" 
-                  className="nav-item-hover text-primary hover:text-secondary transition-colors font-medium"
-                  onClick={(e) => showDevelopmentModal(e, "Vacation Classes")}
+                <Link 
+                  to="/vacation-classes" 
+                  className={`nav-item-hover ${isActive('/vacation-classes') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors font-medium`}
                 >
                   Vacation Classes
-                </a>
+                </Link>
                 
                 <a
                   href="#"
@@ -368,13 +367,13 @@ const Navbar = () => {
                   Foco e Ação
                 </Link>
                 
-                <a
-                  href="#"
-                  className="text-primary hover:text-secondary transition-colors py-2 font-medium"
-                  onClick={(e) => showDevelopmentModal(e, "Vacation Classes")}
+                <Link
+                  to="/vacation-classes"
+                  className={`${isActive('/vacation-classes') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors py-2 font-medium`}
+                  onClick={() => toggleMenu()}
                 >
                   Vacation Classes
-                </a>
+                </Link>
                 
                 <a
                   href="#"

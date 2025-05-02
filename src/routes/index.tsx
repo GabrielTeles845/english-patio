@@ -2,6 +2,7 @@ import { createBrowserRouter, Outlet } from 'react-router-dom';
 import Home from '../pages/Home';
 import OurClasses from '../pages/OurClasses';
 import FocusAndAction from '../pages/FocusAndAction';
+import VacationClasses from '../pages/VacationClasses';
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
@@ -42,6 +43,10 @@ export const router = createBrowserRouter([
       {
         path: 'foco-e-acao',
         element: <FocusAndAction />,
+      },
+      {
+        path: 'vacation-classes',
+        element: <VacationClasses />,
       },
     ],
   },
