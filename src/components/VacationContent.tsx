@@ -66,9 +66,6 @@ const VacationContent = () => {
                     className="w-full h-full object-cover rounded-xl"
                   />
                   <div className="absolute inset-0 bg-primary/5 rounded-xl"></div>
-                  <div className="absolute bottom-4 left-4 bg-white/80 backdrop-blur-sm p-3 rounded-lg shadow-md max-w-xs">
-                    <p className="text-primary font-medium">{image.alt}</p>
-                  </div>
                 </div>
               ))}
 
