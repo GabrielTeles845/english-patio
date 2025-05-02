@@ -3,6 +3,7 @@ import { ChevronLeftIcon, ChevronRightIcon, MapPinIcon, SparklesIcon } from '@he
 import image3 from '../assets/vacation-classes/3.webp';
 import image4 from '../assets/vacation-classes/4.webp';
 import image5 from '../assets/vacation-classes/5.webp';
+import image6 from '../assets/vacation-classes/6.webp';
 import image7 from '../assets/vacation-classes/7.webp';
 import image8 from '../assets/vacation-classes/8.webp';
 import imagePark from '../assets/vacation-classes/88dd5f0a-e2ee-4129-9a0a-ffc6523a5a9b.jpg';
