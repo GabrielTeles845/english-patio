@@ -1,4 +1,4 @@
-import { PhoneIcon, MapPinIcon, EnvelopeIcon } from '@heroicons/react/24/outline';
+import { PhoneIcon, MapPinIcon } from '@heroicons/react/24/outline';
 
 const ContactSection = () => {
   return (

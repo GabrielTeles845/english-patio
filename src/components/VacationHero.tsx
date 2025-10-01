@@ -1,5 +1,3 @@
-import { SparklesIcon } from '@heroicons/react/24/outline';
-
 const VacationHero = () => {
   return (
     <section className="relative pt-48 pb-20 bg-gradient-to-br from-slate-50 via-blue-50/30 to-white overflow-hidden">

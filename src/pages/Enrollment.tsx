@@ -1,13 +1,8 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import {
   UserIcon,
-  CalendarIcon,
-  PhoneIcon,
-  EnvelopeIcon,
-  MapPinIcon,
-  CreditCardIcon,
   DocumentTextIcon,
   CheckCircleIcon
 } from '@heroicons/react/24/outline';

@@ -1,38 +1,6 @@
-import { useState } from 'react';
-import { ChevronLeftIcon, ChevronRightIcon, MapPinIcon, SparklesIcon, CalendarIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
-// Separando os ícones das fotos para melhor organização
-import iconVacation from '../assets/vacation-classes/3.webp'; // Ícone de férias
-import iconBook from '../assets/vacation-classes/4.webp'; // Ícone de livro com coisas saindo
-import iconHeart from '../assets/vacation-classes/5.webp'; // Ícone de coração com "we love it"
-import image6 from '../assets/vacation-classes/6.webp';
-import image7 from '../assets/vacation-classes/7.webp';
-import image8 from '../assets/vacation-classes/8.webp';
-import imagePark from '../assets/vacation-classes/88dd5f0a-e2ee-4129-9a0a-ffc6523a5a9b.jpg';
-import imageCooking from '../assets/vacation-classes/227c9b0a-e790-46d4-be80-b7a85ca6cd8f.jpg';
-import imageActivity from '../assets/vacation-classes/3341bfed-e291-4ef7-b431-8070c4967f2d.jpg';
-import imageNature from '../assets/vacation-classes/0582aaf3-1fa8-4555-a88f-b7ea60d75385.jpg';
-import imageExperience from '../assets/vacation-classes/733d1dd1-7481-4550-ab67-81374e2263ec.jpg';
-import imageWhatsapp from '../assets/vacation-classes/WhatsApp Image 2025-05-01 at 21.47.12.jpeg';
-
-// Imagens para o carrossel - usando apenas fotos reais para o carrossel
-const carouselImages = [
-  { src: image8, alt: 'Alunos se divertindo nas Vacation Classes' },
-  { src: imageNature, alt: 'Experiência com a natureza' },
-  { src: imagePark, alt: 'Atividades em grupo' },
-  { src: imageCooking, alt: 'Atividades culinárias' },
-  { src: imageWhatsapp, alt: 'Brincadeiras educativas' },
-];
+import { MapPinIcon, SparklesIcon, CalendarIcon } from '@heroicons/react/24/outline';
 
 const VacationContent = () => {
-  const [currentSlide, setCurrentSlide] = useState(0);
-
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev === carouselImages.length - 1 ? 0 : prev + 1));
-  };
-
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev === 0 ? carouselImages.length - 1 : prev - 1));
-  };
 
   return (
     <div>

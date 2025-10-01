@@ -145,7 +145,7 @@ const CoursesSection = () => {
         </div>
 
         <div className="flex flex-col gap-6 mb-6 max-w-4xl mx-auto">
-          {levelGroups.map((group, groupIdx) => (
+          {levelGroups.map((group) => (
             <CourseCard
               key={group.id}
               title={group.title}

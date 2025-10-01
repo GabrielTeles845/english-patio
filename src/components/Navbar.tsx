@@ -123,25 +123,25 @@ const Navbar = () => {
   };
   
   // Função para exibir o modal "Em desenvolvimento"
-  const showDevelopmentModal = (e: React.MouseEvent, feature: string) => {
-    e.preventDefault();
-    setModalData({
-      title: 'Em Desenvolvimento',
-      message: `A funcionalidade "${feature}" está em desenvolvimento e estará disponível em breve!`
-    });
-    setModalOpen(true);
-    
-    // Fechar os menus com animação
-    if (isMenuOpen) {
-      setIsMenuClosing(true);
-      setTimeout(() => {
-        setIsMenuOpen(false);
-        setIsMenuClosing(false);
-        setIsMobileSubmenuOpen(false);
-        setIsSubmenuClosing(false);
-      }, 280);
-    }
-  };
+  // const showDevelopmentModal = (e: React.MouseEvent, feature: string) => {
+  //   e.preventDefault();
+  //   setModalData({
+  //     title: 'Em Desenvolvimento',
+  //     message: `A funcionalidade "${feature}" está em desenvolvimento e estará disponível em breve!`
+  //   });
+  //   setModalOpen(true);
+
+  //   // Fechar os menus com animação
+  //   if (isMenuOpen) {
+  //     setIsMenuClosing(true);
+  //     setTimeout(() => {
+  //       setIsMenuOpen(false);
+  //       setIsMenuClosing(false);
+  //       setIsMobileSubmenuOpen(false);
+  //       setIsSubmenuClosing(false);
+  //     }, 280);
+  //   }
+  // };
   
   // Efeito para fechar o submenu ao clicar em qualquer lugar
   useEffect(() => {
