@@ -67,6 +67,4 @@ export const router = createBrowserRouter([
       },
     ],
   },
-], {
-  basename: '/english-patio'
-}); 
+]); 
