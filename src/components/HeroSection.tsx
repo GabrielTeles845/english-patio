@@ -11,17 +11,17 @@ const features = [
   },
   {
     title: 'Metodologia ativa',
-    description: 'Aprendizado através de jogos e atividades práticas'
+    description: 'Práticas interativas que priorizam a conversação.'
   },
   {
-    title: 'Fun Space',
-    description: 'Ambiente especialmente projetado para crianças'
+    title: 'Espaço que Inspira',
+    description: 'Infraestrutura que integra conforto, funcionalidade e foco no aprendizado.'
   },
 ];
 
 const HeroSection = () => {
   return (
-    <div className="relative pt-12 md:pt-8 overflow-hidden bg-gradient-to-b from-white to-blue-50">
+    <div className="relative pb-12 md:pt-8 md:pb-16 overflow-hidden bg-white">
       {/* Elementos decorativos */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute -top-10 -right-10 w-72 h-72 bg-yellow-200 rounded-full opacity-20 blur-3xl"></div>
@@ -30,52 +30,59 @@ const HeroSection = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative grid lg:grid-cols-2 gap-12 lg:gap-20 items-center py-12 lg:py-16">
+        <div className="relative grid lg:grid-cols-2 gap-8 lg:gap-20 items-start lg:items-center py-8 lg:py-16">
           {/* Conteúdo à esquerda */}
-          <div className="text-center lg:text-left">
-            <h1 className="text-4xl lg:text-6xl font-bold tracking-tight">
-              <span className="block text-primary">Aprenda inglês</span>
-              <span className="block text-secondary -mt-1">de forma divertida!</span>
+          <div className="text-center lg:text-left order-1">
+            <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold tracking-tight leading-tight">
+              <span className="block text-primary">
+                Inglês com <span className="text-secondary">confiança</span>
+              </span>
+              <span className="block mt-1 lg:-mt-1 lg:whitespace-nowrap">
+                <span className="text-primary">e </span>
+                <span className="text-secondary">naturalidade!</span>
+              </span>
             </h1>
-            
-            <p className="mt-8 text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto lg:mx-0">
-              Na English Patio, seu filho aprende inglês naturalmente através de 
-              brincadeiras e atividades interativas, com professores especializados 
-              em ensino infantil.
+
+            <p className="mt-6 lg:mt-8 text-base sm:text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+              Na English Patio, seu filho aprende inglês de forma natural por meio de dinâmicas e atividades interativas,
+              conduzidas por professores treinados em Metodologias Ativas.
+            </p>
+            <p className="mt-3 lg:mt-4 text-base sm:text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+              Nossas turmas reduzidas garantem atenção individualizada e personalização do aprendizado, respeitando o ritmo de cada aluno.
             </p>
 
-            <div className="mt-12 flex flex-col sm:flex-row sm:w-full gap-4 justify-center lg:justify-start">
+            <div className="mt-8 lg:mt-12 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
               <a
                 href="#contact"
-                className="btn-primary group flex-1 text-center"
+                className="btn-primary group text-center inline-flex items-center justify-center"
               >
-                Aula Experimental
+                Fale Conosco
                 <ArrowRightIcon className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
               </a>
               <a
                 href="#courses"
-                className="btn-secondary flex-1 text-center"
+                className="btn-secondary text-center inline-flex items-center justify-center"
               >
-                Conheça Nossos Cursos
+                Conheça Nosso Curso
               </a>
             </div>
 
             {/* Cards de features */}
-            <div className="mt-16 grid sm:grid-cols-2 gap-6">
+            <div className="mt-10 lg:mt-16 grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
               {features.map((feature) => (
-                <div 
+                <div
                   key={feature.title}
-                  className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow flex flex-col h-full"
+                  className="bg-white/70 backdrop-blur-sm rounded-xl lg:rounded-2xl p-4 lg:p-6 shadow-lg hover:shadow-xl transition-shadow"
                 >
-                  <div className="flex items-start gap-4 h-full">
+                  <div className="flex items-start gap-3 lg:gap-4">
                     <div className="flex-shrink-0">
-                      <div className="bg-secondary/10 rounded-full p-2">
-                        <CheckIcon className="h-6 w-6 text-secondary" />
+                      <div className="bg-secondary/10 rounded-full p-1.5 lg:p-2">
+                        <CheckIcon className="h-5 w-5 lg:h-6 lg:w-6 text-secondary" />
                       </div>
                     </div>
-                    <div className="flex-grow">
-                      <h3 className="font-semibold text-primary">{feature.title}</h3>
-                      <p className="mt-1 text-sm text-gray-600">{feature.description}</p>
+                    <div className="flex-grow min-w-0">
+                      <h3 className="font-semibold text-primary text-sm lg:text-base">{feature.title}</h3>
+                      <p className="mt-1 text-xs lg:text-sm text-gray-600 leading-relaxed">{feature.description}</p>
                     </div>
                   </div>
                 </div>
@@ -84,30 +91,35 @@ const HeroSection = () => {
           </div>
 
           {/* Imagem à direita */}
-          <div className="relative lg:ml-8">
+          <div className="relative lg:ml-8 order-2">
             <div className="relative">
-              {/* Círculo decorativo */}
-              <div className="absolute -top-8 -right-8 w-64 h-64 bg-secondary/10 rounded-full"></div>
-              
+              {/* Círculo decorativo - escondido no mobile */}
+              <div className="hidden lg:block absolute -top-8 -right-8 w-64 h-64 bg-secondary/10 rounded-full"></div>
+
               {/* Container da imagem com efeitos */}
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl transform hover:scale-[1.02] transition-transform duration-500">
+              <div className="relative rounded-2xl lg:rounded-3xl overflow-hidden shadow-xl lg:shadow-2xl transform hover:scale-[1.02] transition-transform duration-500">
                 <img
                   className="w-full h-auto"
                   src="/english-patio/assets/ao-vivo.jpeg"
                   alt="Crianças aprendendo inglês de forma divertida"
                 />
-                
+
                 {/* Overlay gradiente */}
                 <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent mix-blend-overlay"></div>
               </div>
 
-              {/* Elemento decorativo */}
-              <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-primary/10 rounded-full"></div>
+              {/* Elemento decorativo - escondido no mobile */}
+              <div className="hidden lg:block absolute -bottom-6 -left-6 w-32 h-32 bg-primary/10 rounded-full"></div>
             </div>
 
-            {/* Badge flutuante */}
-            <div className="absolute -right-4 top-1/2 transform -translate-y-1/2 bg-white rounded-2xl shadow-xl p-4 max-w-[200px]">
-              <p className="text-sm font-semibold text-primary">Mais de 500 alunos já aprenderam conosco!</p>
+            {/* Badge flutuante - ajustado para mobile */}
+            <div className="hidden lg:block absolute -right-4 top-1/2 transform -translate-y-1/2 bg-white rounded-2xl shadow-xl p-4 max-w-[200px]">
+              <p className="text-sm font-semibold text-primary">Aulas em Casa disponíveis na região dos setores Bueno e Marista</p>
+            </div>
+
+            {/* Badge embaixo no mobile */}
+            <div className="lg:hidden mt-4 bg-white rounded-xl shadow-lg p-4 text-center">
+              <p className="text-sm font-semibold text-primary">Aulas em Casa disponíveis na região dos setores Bueno e Marista</p>
             </div>
           </div>
         </div>
@@ -116,4 +128,4 @@ const HeroSection = () => {
   );
 };
 
-export default HeroSection; 
+export default HeroSection;

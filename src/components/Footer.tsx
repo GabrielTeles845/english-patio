@@ -41,7 +41,7 @@ const Footer = () => {
   };
   
   return (
-    <footer className="bg-white">
+    <footer className="bg-slate-50">
       {/* Seção principal do footer */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -84,43 +84,38 @@ const Footer = () => {
               </li>
               
               <li>
-                <a href={`${basePath}/nossas-aulas`} className="text-gray-600 hover:text-secondary transition-colors font-medium">
-                  Nossas Aulas
-                </a>
-              </li>
-              
-              <li>
-                <a 
-                  href={`${basePath}/foco-e-acao`} 
+                <a
+                  href={`${basePath}/metodologia`}
                   className="text-gray-600 hover:text-secondary transition-colors font-medium"
                 >
-                  Foco e Ação
+                  Metodologia
                 </a>
               </li>
-              
+
               <li>
-                <a 
-                  href={`${basePath}/vacation-classes`} 
+                <a
+                  href={`${basePath}/vacation-classes`}
                   className="text-gray-600 hover:text-secondary transition-colors font-medium"
                 >
                   Vacation Classes
                 </a>
               </li>
-              
+
               <li>
-                <a 
-                  href="#" 
+                <a
+                  href={`${basePath}/infraestrutura`}
                   className="text-gray-600 hover:text-secondary transition-colors font-medium"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    // Mostrar o modal de "Em desenvolvimento" - Reusa a mesma função da Navbar
-                    const event = new CustomEvent('showDevelopmentModal', { 
-                      detail: { feature: 'Login' } 
-                    });
-                    document.dispatchEvent(event);
-                  }}
                 >
-                  Login
+                  Infraestrutura
+                </a>
+              </li>
+
+              <li>
+                <a
+                  href={`${basePath}/matriculas`}
+                  className="text-gray-600 hover:text-secondary transition-colors font-medium"
+                >
+                  Matrículas
                 </a>
               </li>
             </ul>
@@ -132,11 +127,11 @@ const Footer = () => {
             <ul className="space-y-3">
               <li className="flex items-center space-x-3">
                 <PhoneIcon className="h-5 w-5 text-secondary" />
-                <a 
-                  href="tel:+556281953259" 
+                <a
+                  href="tel:+556236367775"
                   className="text-gray-600 hover:text-secondary transition-colors"
                 >
-                  (62) 98195-3259
+                  (62) 3636-7775
                 </a>
               </li>
               <li className="flex items-center space-x-3">
@@ -160,7 +155,7 @@ const Footer = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <span className="text-gray-600">
-                  Horário: Aberto - Fecha às 19:00
+                  Segunda a Sexta<br/>8:00 às 18:30
                 </span>
               </li>
             </ul>

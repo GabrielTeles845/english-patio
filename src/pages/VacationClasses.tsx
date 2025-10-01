@@ -5,13 +5,11 @@ import VacationContent from '../components/VacationContent';
 
 const VacationClasses = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen flex flex-col">
       <Navbar />
-      <div className="pt-28 md:pt-16"> {/* Espaço para o navbar fixo, ajustado para mobile */}
-        <VacationHero />
-        <VacationContent />
-        <Footer />
-      </div>
+      <VacationHero />
+      <VacationContent />
+      <Footer />
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronLeftIcon, ChevronRightIcon, MapPinIcon, SparklesIcon } from '@heroicons/react/24/outline';
+import { ChevronLeftIcon, ChevronRightIcon, MapPinIcon, SparklesIcon, CalendarIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 // Separando os ícones das fotos para melhor organização
 import iconVacation from '../assets/vacation-classes/3.webp'; // Ícone de férias
 import iconBook from '../assets/vacation-classes/4.webp'; // Ícone de livro com coisas saindo
@@ -35,273 +35,161 @@ const VacationContent = () => {
   };
 
   return (
-    <div className="bg-white py-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Carrossel de Imagens */}
-        <div className="mb-20">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-extrabold text-primary sm:text-4xl">
-              Conheça Nossas Vacation Classes
-            </h2>
-            <p className="mt-4 text-xl text-primary/80 max-w-3xl mx-auto">
-              A cada semestre, em 4 oportunidades e locais distintos, propomos situações 
-              do cotidiano e levamos nossos alunos para vivenciá-las.
-            </p>
-          </div>
-
-          <div className="relative">
-            {/* Carrossel */}
-            <div className="relative overflow-hidden rounded-xl shadow-lg h-[500px]">
-              {carouselImages.map((image, index) => (
-                <div
-                  key={index}
-                  className={`absolute w-full h-full transition-opacity duration-500 ${
-                    index === currentSlide ? 'opacity-100' : 'opacity-0'
-                  }`}
-                  style={{ pointerEvents: index === currentSlide ? 'auto' : 'none' }}
-                >
-                  <img
-                    src={image.src}
-                    alt={image.alt}
-                    className="w-full h-full object-cover rounded-xl"
-                  />
-                  <div className="absolute inset-0 bg-primary/5 rounded-xl"></div>
-                </div>
-              ))}
-
-              {/* Controles do carrossel */}
-              <button
-                onClick={prevSlide}
-                className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-md transition-colors"
-                aria-label="Imagem anterior"
-              >
-                <ChevronLeftIcon className="h-6 w-6 text-primary" />
-              </button>
-              <button
-                onClick={nextSlide}
-                className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-md transition-colors"
-                aria-label="Próxima imagem"
-              >
-                <ChevronRightIcon className="h-6 w-6 text-primary" />
-              </button>
-
-              {/* Indicadores */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
-                {carouselImages.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentSlide(index)}
-                    className={`w-3 h-3 rounded-full transition-colors ${
-                      index === currentSlide ? 'bg-primary' : 'bg-white/70'
-                    }`}
-                    aria-label={`Ir para slide ${index + 1}`}
-                  ></button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Seção Onde são realizadas */}
-        <div className="mb-20">
-          <div className="grid md:grid-cols-2 gap-10 items-center">
+    <div>
+      {/* Seção 1: Introdução com imagem */}
+      <section className="py-16 md:py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <div className="flex justify-center mb-6">
-                <img 
-                  src={iconVacation} 
-                  alt="Ícone de Férias" 
-                  className="h-32 w-auto"
-                />
-              </div>
-              <h2 className="text-3xl font-extrabold text-primary mb-6 text-center">
-                Onde são nossas queridas e esperadas Vacation Classes?
+              <h2 className="text-3xl md:text-4xl font-bold mb-6">
+                <span className="text-primary">Imersão e Aprendizado</span>{' '}
+                <span className="text-secondary">Além da Sala de Aula</span>
               </h2>
-              <p className="text-lg text-primary/80">
-                Onde nossa imaginação e o interesse das turminhas nos levar! Parques, supermercados, 
-                shoppings, floriculturas, zoológico, clubes...
+              <p className="text-lg text-gray-700 leading-relaxed mb-6">
+                Ao longo do ano, a English Patio realiza as <strong>Vacation Classes</strong>: experiências externas que
+                proporcionam aos alunos o uso real e prático do inglês em ambientes do cotidiano.
               </p>
-              
-              <div className="mt-8 space-y-4">
-                <div className="flex items-start space-x-3">
-                  <MapPinIcon className="h-6 w-6 text-secondary flex-shrink-0 mt-1" />
-                  <div>
-                    <h3 className="text-lg font-semibold text-primary">Parques e Praças</h3>
-                    <p className="text-primary/80">
-                      Atividades ao ar livre, jogos e brincadeiras em inglês.
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start space-x-3">
-                  <MapPinIcon className="h-6 w-6 text-secondary flex-shrink-0 mt-1" />
-                  <div>
-                    <h3 className="text-lg font-semibold text-primary">Shoppings e Supermercados</h3>
-                    <p className="text-primary/80">
-                      Compras simuladas, identificação de produtos e interações práticas.
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start space-x-3">
-                  <MapPinIcon className="h-6 w-6 text-secondary flex-shrink-0 mt-1" />
-                  <div>
-                    <h3 className="text-lg font-semibold text-primary">Zoológico e Áreas Naturais</h3>
-                    <p className="text-primary/80">
-                      Aprendizado sobre animais e natureza com vocabulário específico.
-                    </p>
-                  </div>
-                </div>
-              </div>
+              <p className="text-lg text-gray-700 leading-relaxed">
+                São <strong>8 encontros anuais</strong>, com duas horas de duração cada, distribuídos ao longo do semestre letivo,
+                aproximadamente um por mês.
+              </p>
             </div>
-
-            <div className="relative">
-              <img
-                src={imagePark}
-                alt="Locais das Vacation Classes"
-                className="rounded-xl shadow-lg object-cover h-[400px] w-full"
-              />
-              <div className="absolute -bottom-6 -right-6 bg-primary p-4 rounded-xl text-white shadow-lg">
-                <div className="font-bold text-xl">Ambientes Reais</div>
-                <div className="text-sm mt-1">Diversão e aprendizado</div>
+            <div className="relative aspect-[4/3] bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl overflow-hidden shadow-lg">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center p-6">
+                  <MapPinIcon className="h-12 w-12 text-primary/40 mx-auto mb-2" />
+                  <p className="text-gray-500 font-medium text-sm">📸 TODO: Alunos em atividade externa</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
+      </section>
 
-        {/* Seção O que fazemos */}
-        <div className="mb-20">
-          <div className="grid md:grid-cols-2 gap-10 items-center">
-            <div className="order-2 md:order-1">
-              <div className="grid grid-cols-2 gap-4">
-                <img
-                  src={imageActivity}
-                  alt="Atividades criativas"
-                  className="rounded-xl shadow-lg object-cover h-[250px] w-full"
-                />
-                <img
-                  src={image7}
-                  alt="Atividades ao ar livre"
-                  className="rounded-xl shadow-lg object-cover h-[250px] w-full"
-                />
-                <img
-                  src={image6}
-                  alt="Atividades em grupo"
-                  className="rounded-xl shadow-lg object-cover h-[200px] w-full col-span-2"
-                />
+      {/* Seção 2: Onde acontecem (invertido) */}
+      <section className="py-16 md:py-20 bg-blue-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="order-2 md:order-1 relative aspect-[4/3] bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl overflow-hidden shadow-lg">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center p-6">
+                  <MapPinIcon className="h-12 w-12 text-primary/40 mx-auto mb-2" />
+                  <p className="text-gray-500 font-medium text-sm">📸 TODO: Visita ao parque ou local público</p>
+                </div>
               </div>
             </div>
-
             <div className="order-1 md:order-2">
-              <div className="flex justify-center mb-6">
-                <img 
-                  src={iconBook} 
-                  alt="Ícone de Livro com Ideias" 
-                  className="h-32 w-auto"
-                />
-              </div>
-              <h2 className="text-3xl font-extrabold text-primary mb-6 text-center">
-                O que fazemos lá?
+              <h2 className="text-3xl md:text-4xl font-bold mb-6">
+                <span className="text-primary">Vivências</span>{' '}
+                <span className="text-secondary">em Locais Reais</span>
               </h2>
-              <p className="text-lg text-primary/80 mb-4">
-                O que nossa criatividade permitir! Culinária, artesanato, teatro, pintura, 
-                passeios de bicicleta, picnic, gincanas, oficinas, tours...
+              <p className="text-lg text-gray-700 leading-relaxed">
+                Levamos as turmas para vivências reais em locais como <strong>parques, supermercados, floriculturas, shoppings,
+                clubes</strong> e outros espaços públicos, sempre com atividades conduzidas <strong>100% em inglês</strong>.
               </p>
-              
-              <div className="mt-8 bg-background-light p-6 rounded-xl shadow-sm">
-                <div className="flex items-center mb-4">
-                  <SparklesIcon className="h-8 w-8 text-secondary mr-3" />
-                  <h3 className="text-xl font-semibold text-primary">Atividades Práticas</h3>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Seção 3: Atividades */}
+      <section className="py-16 md:py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold mb-6">
+                <span className="text-primary">Atividades</span>{' '}
+                <span className="text-secondary">Criativas</span>
+              </h2>
+              <p className="text-lg text-gray-700 leading-relaxed">
+                A proposta é criar oportunidades significativas de uso do idioma por meio de atividades como <strong>culinária,
+                teatro, artesanato, pintura, oficinas, passeios de bicicleta, piqueniques e gincanas</strong>, entre outras
+                possibilidades criativas.
+              </p>
+            </div>
+            <div className="relative aspect-[4/3] bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl overflow-hidden shadow-lg">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center p-6">
+                  <SparklesIcon className="h-12 w-12 text-primary/40 mx-auto mb-2" />
+                  <p className="text-gray-500 font-medium text-sm">📸 TODO: Crianças em atividade de culinária ou arte</p>
                 </div>
-                <p className="text-primary/80">
-                  Todas as atividades são planejadas para garantir que as crianças usem o 
-                  inglês em situações reais de comunicação, ampliando seu vocabulário e 
-                  desenvolvendo confiança no uso do idioma.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Seção 4: Compromisso com investimento (invertido) */}
+      <section className="py-16 md:py-20 bg-blue-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="order-2 md:order-1 relative aspect-[4/3] bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl overflow-hidden shadow-lg">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center p-6">
+                  <CalendarIcon className="h-12 w-12 text-primary/40 mx-auto mb-2" />
+                  <p className="text-gray-500 font-medium text-sm">📸 TODO: Grupo de alunos em atividade</p>
+                </div>
+              </div>
+            </div>
+            <div className="order-1 md:order-2">
+              <h2 className="text-3xl md:text-4xl font-bold mb-6">
+                <span className="text-primary">Valorização do</span>{' '}
+                <span className="text-secondary">Investimento</span>
+              </h2>
+              <p className="text-lg text-gray-700 leading-relaxed mb-6">
+                Além de ampliar a exposição ao inglês e fortalecer a imersão linguística, as Vacation Classes também refletem o
+                compromisso da escola com a valorização do investimento das famílias.
+              </p>
+              <div className="bg-white rounded-xl p-6 shadow-md border-l-4 border-secondary mb-6">
+                <p className="text-lg text-gray-700 font-semibold">
+                  As mensalidades dos meses de <strong>janeiro e julho</strong> são convertidas integralmente nessas vivências
+                  pedagógicas realizadas ao longo do ano.
                 </p>
               </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Seção Valor Agregado */}
-        <div className="mb-20 bg-background-light p-8 rounded-2xl shadow-sm">
-          <div className="text-center mb-10">
-            <img 
-              src={iconHeart} 
-              alt="We Love It" 
-              className="h-32 w-auto mx-auto mb-4"
-            />
-            <h2 className="text-3xl font-extrabold text-primary">
-              Valor Agregado para Toda a Família
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white p-6 rounded-xl shadow-sm">
-              <img 
-                src={imageExperience}
-                alt="Experiência de aprendizado"
-                className="rounded-lg w-full h-48 object-cover mb-4"
-              />
-              <h3 className="text-xl font-semibold text-primary mb-3">
-                Compensamos os pais
-              </h3>
-              <p className="text-primary/80">
-                Além de proporcionar uma maior vivência do idioma para nossos alunos, 
-                compensamos os papais e mamães pelas mensalidades pagas nas férias!
-              </p>
-            </div>
-
-            <div className="bg-white p-6 rounded-xl shadow-sm">
-              <img 
-                src={imageCooking}
-                alt="Aprendizado com diversão"
-                className="rounded-lg w-full h-48 object-cover mb-4"
-              />
-              <h3 className="text-xl font-semibold text-primary mb-3">
-                Valorizamos seu investimento
-              </h3>
-              <p className="text-primary/80">
-                Desse modo, valorizamos seu dinheiro, agregamos valor ao aprendizado 
-                de seu filho e fazemos o que mais amamos!
-              </p>
-            </div>
-
-            <div className="bg-white p-6 rounded-xl shadow-sm">
-              <img 
-                src={imageWhatsapp}
-                alt="Crianças aprendendo inglês"
-                className="rounded-lg w-full h-48 object-cover mb-4"
-              />
-              <h3 className="text-xl font-semibold text-primary mb-3">
-                Nosso grande objetivo
-              </h3>
-              <p className="text-primary/80 font-medium">
-                FORMAMOS CRIANÇAS FLUENTES EM INGLÊS
+              <p className="text-lg text-gray-700 leading-relaxed">
+                Dessa forma, os alunos permanecem ativos e engajados, mesmo nos períodos sem aulas regulares, garantindo
+                continuidade no aprendizado com propósito e significado.
               </p>
             </div>
           </div>
         </div>
+      </section>
 
-        {/* CTA */}
-        <div className="mt-20 text-center">
-          <h2 className="text-3xl font-extrabold text-primary sm:text-4xl mb-8">
-            Descubra as Próximas Vacation Classes
+      {/* Compromisso Final - Quote destacado */}
+      <section className="py-16 md:py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="bg-gradient-to-br from-primary/5 to-secondary/5 rounded-2xl p-10 md:p-12 shadow-xl">
+              <SparklesIcon className="h-16 w-16 text-secondary mx-auto mb-6" />
+              <p className="text-2xl md:text-3xl text-primary font-bold leading-relaxed">
+                "Na English Patio, formar crianças fluentes em inglês vai muito além da sala de aula — é um compromisso que
+                levamos para cada detalhe da jornada do aluno."
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-16 md:py-20 bg-blue-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            <span className="text-primary">Faça Parte das</span>{' '}
+            <span className="text-secondary">Vacation Classes!</span>
           </h2>
-          <div className="inline-flex rounded-md shadow">
-            <a
-              href="#contact"
-              className="inline-flex items-center justify-center px-6 py-4 border border-transparent text-lg font-medium rounded-xl text-white bg-primary hover:bg-primary-light transition-colors"
-            >
-              Fale Conosco
-            </a>
-          </div>
-          <p className="mt-4 text-sm text-primary/70">
-            Nossas Vacation Classes são exclusivas para alunos matriculados. Entre em contato para saber mais!
+          <p className="text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
+            As Vacation Classes são exclusivas para alunos matriculados. Entre em contato para conhecer nossa escola!
           </p>
+          <a
+            href="/#contact"
+            className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold rounded-lg text-white bg-primary hover:bg-primary/90 transition-all shadow-lg hover:shadow-xl"
+          >
+            Fale Conosco
+          </a>
         </div>
-      </div>
+      </section>
     </div>
   );
 };
 
-export default VacationContent; 
+export default VacationContent;

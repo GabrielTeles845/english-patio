@@ -12,9 +12,9 @@ type ModalData = {
 
 const homeSubmenuItems = [
   { title: 'Aprenda Inglês', href: '#', section: 'top' },
-  { title: 'Sobre Nós', href: '#about', section: 'about' },
+  { title: 'Infraestrutura', href: '#about', section: 'about' },
   { title: 'Cursos', href: '#courses', section: 'courses' },
-  { title: 'Depoimentos', href: '#testimonials', section: 'testimonials' },
+  { title: 'Feedbacks', href: '#testimonials', section: 'testimonials' },
   { title: 'Contato', href: '#contact', section: 'contact' },
 ];
 
@@ -25,7 +25,9 @@ const Navbar = () => {
   const [modalData, setModalData] = useState<ModalData>({ title: '', message: '' });
   const [isMenuClosing, setIsMenuClosing] = useState(false);
   const [isSubmenuClosing, setIsSubmenuClosing] = useState(false);
-  
+  const [isTopBarVisible, setIsTopBarVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
   const location = useLocation();
   const submenuButtonRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -177,11 +179,38 @@ const Navbar = () => {
 
     // Adiciona o listener para o evento personalizado
     document.addEventListener('showDevelopmentModal', handleShowDevelopmentModal as EventListener);
-    
+
     return () => {
       document.removeEventListener('showDevelopmentModal', handleShowDevelopmentModal as EventListener);
     };
   }, []);
+
+  // Auto-hide da navbar inteira ao fazer scroll
+  const [isNavbarVisible, setIsNavbarVisible] = useState(true);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        // Scrolling down - esconde a navbar inteira
+        setIsNavbarVisible(false);
+        setIsTopBarVisible(false);
+      } else {
+        // Scrolling up - mostra a navbar
+        setIsNavbarVisible(true);
+        setIsTopBarVisible(true);
+      }
+
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [lastScrollY]);
 
   return (
     <>
@@ -195,18 +224,24 @@ const Navbar = () => {
         />
       )}
       
-      <div className="fixed w-full top-0 z-50">
+      <div className={`fixed w-full top-0 z-50 bg-white shadow-sm transition-transform duration-300 ${
+        isNavbarVisible ? 'translate-y-0' : '-translate-y-full'
+      }`}>
         {/* Barra superior */}
-        <div className="bg-white border-b border-primary/10">
+        <div
+          className={`bg-primary/5 border-b border-primary/10 transition-all duration-300 overflow-hidden ${
+            isTopBarVisible ? 'max-h-12 opacity-100' : 'max-h-0 opacity-0'
+          }`}
+        >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="py-2 text-sm text-center text-primary font-medium">
-              🎉 Matrículas abertas para o segundo semestre de 2025!
+              Matrículas abertas para o primeiro semestre de 2026!
             </div>
           </div>
         </div>
 
         {/* Navbar principal */}
-        <div className="bg-white/95 backdrop-blur-md border-b border-primary/10 shadow-sm">
+        <div className="bg-white border-b border-primary/10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-20">
               {/* Logo */}
@@ -244,34 +279,33 @@ const Navbar = () => {
                   </div>
                 </div>
                 
-                <Link 
-                  to="/nossas-aulas" 
-                  className={`nav-item-hover ${isActive('/nossas-aulas') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors font-medium`}
+                <Link
+                  to="/metodologia"
+                  className={`nav-item-hover ${isActive('/metodologia') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors font-medium`}
                 >
-                  Nossas Aulas
+                  Metodologia
                 </Link>
-                
-                <Link 
-                  to="/foco-e-acao" 
-                  className={`nav-item-hover ${isActive('/foco-e-acao') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors font-medium`}
-                >
-                  Foco e Ação
-                </Link>
-                
-                <Link 
-                  to="/vacation-classes" 
+
+                <Link
+                  to="/vacation-classes"
                   className={`nav-item-hover ${isActive('/vacation-classes') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors font-medium`}
                 >
                   Vacation Classes
                 </Link>
-                
-                <a
-                  href="#"
-                  className="inline-flex items-center px-4 py-2 rounded-xl bg-primary text-white hover:bg-primary-light transition-all duration-300 transform hover:scale-105 hover:shadow-lg font-medium"
-                  onClick={(e) => showDevelopmentModal(e, "Login")}
+
+                <Link
+                  to="/infraestrutura"
+                  className={`nav-item-hover ${isActive('/infraestrutura') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors font-medium`}
                 >
-                  Login
-                </a>
+                  Infraestrutura
+                </Link>
+
+                <Link
+                  to="/matriculas"
+                  className={`inline-flex items-center px-4 py-2 rounded-xl bg-primary text-white hover:bg-primary-light transition-all duration-300 transform hover:scale-105 hover:shadow-lg font-medium ${isActive('/matriculas') ? 'ring-2 ring-secondary' : ''}`}
+                >
+                  Matrículas
+                </Link>
               </div>
 
               {/* Botão do menu - Mobile */}
@@ -352,21 +386,13 @@ const Navbar = () => {
                 </div>
                 
                 <Link
-                  to="/nossas-aulas"
-                  className={`${isActive('/nossas-aulas') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors py-2 font-medium`}
+                  to="/metodologia"
+                  className={`${isActive('/metodologia') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors py-2 font-medium`}
                   onClick={() => toggleMenu()}
                 >
-                  Nossas Aulas
+                  Metodologia
                 </Link>
-                
-                <Link
-                  to="/foco-e-acao"
-                  className={`${isActive('/foco-e-acao') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors py-2 font-medium`}
-                  onClick={() => toggleMenu()}
-                >
-                  Foco e Ação
-                </Link>
-                
+
                 <Link
                   to="/vacation-classes"
                   className={`${isActive('/vacation-classes') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors py-2 font-medium`}
@@ -374,14 +400,22 @@ const Navbar = () => {
                 >
                   Vacation Classes
                 </Link>
-                
-                <a
-                  href="#"
-                  className="inline-flex items-center px-4 py-2 rounded-xl bg-primary text-white hover:bg-primary-light transition-colors font-medium transform hover:scale-105 transition-transform duration-300"
-                  onClick={(e) => showDevelopmentModal(e, "Login")}
+
+                <Link
+                  to="/infraestrutura"
+                  className={`${isActive('/infraestrutura') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors py-2 font-medium`}
+                  onClick={() => toggleMenu()}
                 >
-                  Login
-                </a>
+                  Infraestrutura
+                </Link>
+
+                <Link
+                  to="/matriculas"
+                  className={`inline-flex items-center px-4 py-2 rounded-xl bg-primary text-white hover:bg-primary-light transition-colors font-medium transform hover:scale-105 transition-transform duration-300 ${isActive('/matriculas') ? 'ring-2 ring-secondary' : ''}`}
+                  onClick={toggleMenu}
+                >
+                  Matrículas
+                </Link>
               </div>
             </div>
           </div>

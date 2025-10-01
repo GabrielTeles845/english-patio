@@ -17,6 +17,10 @@
     @apply font-heading;
   }
 
+  .font-heading {
+    letter-spacing: 0.025em;
+  }
+
   .btn-primary {
     @apply inline-flex px-8 py-3 rounded-2xl text-white bg-primary hover:bg-primary-light transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg font-semibold text-lg;
   }
