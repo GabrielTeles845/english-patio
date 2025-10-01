@@ -25,9 +25,9 @@ Este arquivo contém todas as alterações solicitadas para o site, organizadas 
 **DETALHAMENTO**:
 - ✅ Texto atual: "Aprenda inglês de forma divertida!"
 - ✅ Novo texto: "Inglês com confiança e naturalidade!"
-- ✅ Estilização:
-  - "Inglês com" = cor azul (primary)
-  - "confiança e naturalidade" = manter cor original (sem azul)
+- ✅ Estilização (2 linhas):
+  - **Linha 1**: "Inglês com" → Azul (primary)
+  - **Linha 2**: "confiança e naturalidade!" → "confiança" (amarelo/secondary), "**e**" (azul/primary), "naturalidade!" (amarelo/secondary)
 
 ---
 
@@ -143,7 +143,7 @@ Infraestrutura que integra conforto, funcionalidade e foco no aprendizado.
   - "Depoimentos" (será "Feedbacks")
   - "Flexibilidade para sua Família"
   - Todos os h1, h2, h3, etc que usam `font-heading`
-- ✅ Sugestão: adicionar `letter-spacing: 0.05em` na classe `.font-heading`
+- ✅ **CONFIRMADO**: adicionar `letter-spacing: 0.025em` (leve) na classe `.font-heading`
 
 ---
 
@@ -157,11 +157,16 @@ Infraestrutura que integra conforto, funcionalidade e foco no aprendizado.
 **ESTRUTURA DUPLA**:
 
 ### 2.1 Seção na Home (Resumo)
-- 📍 Arquivo: `AboutSection.tsx` (reescrever)
+- 📍 Arquivo: `AboutSection.tsx` (reescrever completamente)
 - 📍 Posição: Entre Hero Section e Cursos
-- 📍 Conteúdo: **Resumo** da infraestrutura
-- 📍 Fotos: 2-3 imagens destaque
-- 📍 Botão: "Conheça Nossa Estrutura" → link para `/infraestrutura`
+- 📍 Conteúdo: **Resumo criativo** da infraestrutura
+- 📍 **LIBERDADE CRIATIVA** para escolher melhor design:
+  - Opção A: Carrossel automático de imagens + texto resumido
+  - Opção B: 3 cards destacando principais pontos (Fun Space, Pátio, Salas)
+  - Opção C: Outro layout moderno que funcione bem
+- 📍 Fotos: Carrossel lateral automático OU cards com imagens
+- 📍 **OBRIGATÓRIO**: Botão "Conheça Nossa Infraestrutura" → link para `/infraestrutura`
+- 📍 Texto: Improvisar resumo atrativo baseado no conteúdo completo abaixo
 
 ### 2.2 Página Dedicada (Completa)
 - 📍 Nova página: `/infraestrutura`
