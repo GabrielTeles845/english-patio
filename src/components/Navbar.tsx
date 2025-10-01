@@ -35,7 +35,7 @@ const Navbar = () => {
   const overlayRef = useRef<HTMLDivElement>(null);
 
   // Obter o caminho base da aplicação
-  const basePath = '/english-patio';
+  const basePath = '';
 
   // Bloquear scroll quando menu estiver aberto
   useEffect(() => {

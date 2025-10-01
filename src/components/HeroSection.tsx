@@ -100,7 +100,7 @@ const HeroSection = () => {
               <div className="relative rounded-2xl lg:rounded-3xl overflow-hidden shadow-xl lg:shadow-2xl transform hover:scale-[1.02] transition-transform duration-500">
                 <img
                   className="w-full h-auto"
-                  src="/english-patio/assets/ao-vivo.jpeg"
+                  src="/assets/ao-vivo.jpeg"
                   alt="Crianças aprendendo inglês de forma divertida"
                 />
 

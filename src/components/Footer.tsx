@@ -10,7 +10,7 @@ const homeSubmenuItems = [
 ];
 
 const Footer = () => {
-  const basePath = '/english-patio';
+  const basePath = '';
   
   // Função para lidar com o scroll suave para as seções
   const handleScrollToSection = (e: React.MouseEvent, sectionId: string) => {
@@ -47,7 +47,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo e descrição */}
           <div className="col-span-1 md:col-span-2">
-            <img src="/english-patio/assets/logo-index.webp" alt="English Patio" className="h-12 w-auto mb-4" />
+            <img src="/assets/logo-index.webp" alt="English Patio" className="h-12 w-auto mb-4" />
             <p className="text-gray-600 mb-6">
               Somos a English Patio, uma escola de inglês que vai onde você está!
               Nosso maior compromisso? Tornar o inglês parte do cotidiano dos nossos alunos.

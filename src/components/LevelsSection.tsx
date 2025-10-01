@@ -156,7 +156,7 @@ const LevelsSection = () => {
               {/* Logo Cambridge - Versão Mobile */}
               <div className="md:hidden">
                 <img 
-                  src="/english-patio/assets/cambridge-compact.png" 
+                  src="/assets/cambridge-compact.png" 
                   alt="Cambridge Young Learners" 
                   className="h-16 object-contain" 
                 />
@@ -164,7 +164,7 @@ const LevelsSection = () => {
               {/* Logo Cambridge - Versão Desktop */}
               <div className="hidden md:block">
                 <img 
-                  src="/english-patio/assets/cambridge.png" 
+                  src="/assets/cambridge.png" 
                   alt="Cambridge Assessment" 
                   className="h-10 object-contain" 
                 />
