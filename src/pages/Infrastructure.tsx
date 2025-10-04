@@ -1,6 +1,11 @@
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { BuildingOffice2Icon, SparklesIcon, UserGroupIcon, HomeIcon } from '@heroicons/react/24/outline';
+import FadeCarousel from '../components/FadeCarousel';
+import ImageCollage from '../components/ImageCollage';
+import ScrollingBackground from '../components/ScrollingBackground';
+import { SparklesIcon, UserGroupIcon } from '@heroicons/react/24/outline';
+import img from '../config/cloudinary';
+import OptimizedImage from '../components/OptimizedImage';
 
 const Infrastructure = () => {
   return (
@@ -35,23 +40,20 @@ const Infrastructure = () => {
         </div>
       </section>
 
-      {/* Card 1: Salas de Aula - Layout Full Width com imagem de fundo */}
+      {/* Card 1: Salas de Aula */}
       <section className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative overflow-hidden rounded-2xl shadow-2xl">
-            {/* Placeholder de imagem como background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <BuildingOffice2Icon className="h-32 w-32 text-primary/30" />
-                <span className="absolute bottom-4 right-4 text-gray-500 font-medium text-sm bg-white/80 px-3 py-1 rounded">
-                  📸 TODO: Sala de aula com mesas redondas
-                </span>
-              </div>
+            <div className="absolute inset-0">
+              <OptimizedImage
+                src="DSC06842.jpg"
+                alt="Sala de aula com mesas redondas e decoração temática"
+                className="h-full"
+              />
             </div>
-            {/* Conteúdo sobreposto */}
             <div className="relative bg-white/95 backdrop-blur-sm p-8 md:p-12 md:w-2/3">
               <div className="inline-block bg-secondary text-primary px-4 py-1 rounded-full text-sm font-semibold mb-4">
-                01. Salas de Aula
+                Salas de Aula
               </div>
               <h3 className="text-3xl md:text-4xl font-bold text-primary mb-4">
                 Mais de 10 Salas Interativas
@@ -64,13 +66,13 @@ const Infrastructure = () => {
         </div>
       </section>
 
-      {/* Card 2: Ambiente Temático - Layout com imagem grande ao lado */}
+      {/* Card 2: Ambiente Temático */}
       <section className="py-12 bg-blue-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-5 gap-8 items-stretch">
             <div className="md:col-span-3 bg-white rounded-2xl shadow-xl p-8 md:p-10 flex flex-col justify-center">
               <div className="inline-block bg-primary text-white px-4 py-1 rounded-full text-sm font-semibold mb-4 self-start">
-                02. Decoração
+                Decoração
               </div>
               <h3 className="text-3xl md:text-4xl font-bold text-primary mb-4">
                 Ambiente Imersivo
@@ -79,26 +81,31 @@ const Infrastructure = () => {
                 Os ambientes da escola são decorados com murais artísticos e elementos visuais que remetem à cultura de países de língua inglesa, criando uma atmosfera temática que contribui para a imersão no idioma desde o primeiro contato.
               </p>
             </div>
-            <div className="md:col-span-2 relative aspect-[3/4] md:aspect-auto bg-gradient-to-br from-primary/10 to-secondary/10 rounded-2xl overflow-hidden shadow-xl">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center p-6">
-                  <BuildingOffice2Icon className="h-16 w-16 text-primary/40 mx-auto mb-2" />
-                  <p className="text-gray-500 font-medium text-sm">📸 TODO: Murais ou decoração temática</p>
-                </div>
-              </div>
+            <div className="md:col-span-2">
+              <FadeCarousel
+                images={[
+                  { src: 'DSC06856.jpg', alt: 'Infrastructure image' },
+                  { src: 'DSC07744.jpg', alt: 'Infrastructure image' },
+                  { src: 'DSC07759.jpg', alt: 'Infrastructure image' }
+                ]}
+                autoPlayInterval={4000}
+                showIndicators={true}
+                showControls={true}
+                aspectRatio="aspect-[3/4] md:aspect-auto md:h-full"
+              />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Card 3: Fun Space - Card destacado centralizado */}
+      {/* Card 3: Fun Space */}
       <section className="py-12 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-3xl shadow-2xl overflow-hidden border-4 border-secondary">
             <div className="p-8 md:p-12 text-center">
               <SparklesIcon className="h-16 w-16 text-secondary mx-auto mb-6" />
               <div className="inline-block bg-secondary text-primary px-4 py-1 rounded-full text-sm font-semibold mb-4">
-                03. Destaque Especial
+                Destaque Especial
               </div>
               <h3 className="text-4xl md:text-5xl font-bold text-primary mb-6">
                 Fun Space
@@ -106,55 +113,85 @@ const Infrastructure = () => {
               <p className="text-lg text-gray-700 leading-relaxed mb-8 max-w-3xl mx-auto">
                 Sala multiuso equipada com karaokê, cozinha completa e palco. Espaço criativo onde os alunos são incentivados a atuar em apresentações, dramatizações e atividades práticas em inglês, desenvolvendo a fluência de forma natural e divertida.
               </p>
-              {/* Placeholder de imagem */}
-              <div className="relative aspect-video bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl overflow-hidden shadow-lg">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center p-6">
-                    <SparklesIcon className="h-16 w-16 text-primary/40 mx-auto mb-2" />
-                    <p className="text-gray-500 font-medium text-sm">📸 TODO: Fun Space com palco e karaokê</p>
-                  </div>
-                </div>
-              </div>
+              <FadeCarousel
+                images={[
+                  { src: 'DSC07521.jpg', alt: 'Infrastructure image' },
+                  { src: 'DSC07522.jpg', alt: 'Infrastructure image' },
+                  { src: 'DSC07524.jpg', alt: 'Infrastructure image' },
+                  { src: 'DSC07677.jpg', alt: 'Infrastructure image' },
+                  { src: 'DSC07678.jpg', alt: 'Infrastructure image' },
+                  { src: 'DSC07681.jpg', alt: 'Infrastructure image' }
+                ]}
+                autoPlayInterval={4000}
+                showIndicators={true}
+                showControls={true}
+                aspectRatio="aspect-video"
+                className="rounded-xl overflow-hidden shadow-lg"
+              />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Card 4: Pátio - Layout em colunas assimétricas */}
+      {/* Card 4: Pátio Amplo */}
       <section className="py-12 bg-blue-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-5 gap-8 items-stretch">
-            <div className="md:col-span-2 relative aspect-[3/4] md:aspect-auto bg-gradient-to-br from-primary/10 to-secondary/10 rounded-2xl overflow-hidden shadow-xl">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center p-6">
-                  <HomeIcon className="h-16 w-16 text-primary/40 mx-auto mb-2" />
-                  <p className="text-gray-500 font-medium text-sm">📸 TODO: Pátio com pergolado</p>
-                </div>
-              </div>
-            </div>
-            <div className="md:col-span-3 bg-white rounded-2xl shadow-xl p-8 md:p-10 flex flex-col justify-center">
-              <div className="inline-block bg-green-100 text-green-700 px-4 py-1 rounded-full text-sm font-semibold mb-4 self-start">
-                04. Área Externa
+          <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12">
+            <div className="text-center mb-8">
+              <div className="inline-block bg-green-100 text-green-700 px-4 py-1 rounded-full text-sm font-semibold mb-4">
+                Área Externa
               </div>
               <h3 className="text-3xl md:text-4xl font-bold text-primary mb-4">
                 Pátio Amplo e Acolhedor
               </h3>
-              <p className="text-lg text-gray-700 leading-relaxed">
+              <p className="text-lg text-gray-700 leading-relaxed max-w-3xl mx-auto">
                 Espaço planejado para promover o convívio e o bem-estar dos alunos, com bancos, música ambiente, cesta de basquete e um pergolado com mesas que acolhem momentos de lanche, atividades artísticas e os responsáveis durante o período de espera.
               </p>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+              {[
+                { src: 'DSC07432.jpg', alt: 'Infrastructure image' },
+                { src: 'DSC07447.jpg', alt: 'Infrastructure image' },
+                { src: 'DSC07569.jpg', alt: 'Infrastructure image' },
+                { src: 'DSC07617.jpg', alt: 'Infrastructure image' },
+                { src: 'DSC07621.jpg', alt: 'Infrastructure image' },
+                { src: 'DSC07744.jpg', alt: 'Infrastructure image' },
+                { src: 'DSC07759.jpg', alt: 'Infrastructure image' },
+                { src: 'DSC07761.jpg', alt: 'Infrastructure image' },
+                { src: 'DSC07779.jpg', alt: 'Infrastructure image' },
+                { src: 'DSC07801.jpg', alt: 'Infrastructure image' }
+              ].map((image, index) => (
+                <div
+                  key={index}
+                  className="relative aspect-square rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-zoom-in group"
+                  onClick={() => {
+                    const event = new CustomEvent('openImageZoom', {
+                      detail: { src: img(image.src), alt: image.alt }
+                    });
+                    window.dispatchEvent(event);
+                  }}
+                >
+                  <OptimizedImage
+                    src={image.src}
+                    alt={image.alt}
+                    className="transition-transform duration-500 group-hover:scale-110 h-full"
+                  />
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* Card 5: Equipe - Layout em grid com múltiplas informações */}
+      {/* Card 5: Equipe */}
       <section className="py-12 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-2xl shadow-xl overflow-hidden p-8 md:p-12">
             <div className="grid md:grid-cols-2 gap-10 items-center">
               <div>
                 <div className="inline-block bg-indigo-100 text-indigo-700 px-4 py-1 rounded-full text-sm font-semibold mb-4">
-                  05. Nosso Time
+                  Nosso Time
                 </div>
                 <h3 className="text-3xl md:text-4xl font-bold text-primary mb-6">
                   Equipe Solícita e Dedicada
@@ -183,32 +220,67 @@ const Infrastructure = () => {
                   </div>
                 </div>
               </div>
-              <div className="relative aspect-[4/3] bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl overflow-hidden shadow-lg">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center p-6">
-                    <UserGroupIcon className="h-16 w-16 text-primary/40 mx-auto mb-2" />
-                    <p className="text-gray-500 font-medium text-sm">📸 TODO: Equipe ou professores com alunos</p>
-                  </div>
-                </div>
-              </div>
+              <ImageCollage
+                images={[
+                  { src: 'DSC07209.jpg', alt: 'Infrastructure image' },
+                  { src: 'DSC07218.jpg', alt: 'Infrastructure image' },
+                  { src: 'DSC07318.jpg', alt: 'Infrastructure image' },
+                  { src: 'DSC07335.jpg', alt: 'Infrastructure image' },
+                  { src: 'DSC07402.jpg', alt: 'Infrastructure image' }
+                ]}
+              />
             </div>
           </div>
         </div>
       </section>
 
       {/* CTA Final */}
-      <section className="py-20 bg-white">
+      <ScrollingBackground
+        images={[
+          { src: 'DSC06844.jpg', alt: 'Infrastructure image' },
+          { src: 'DSC06852.jpg', alt: 'Infrastructure image' },
+          { src: 'DSC06856.jpg', alt: 'Infrastructure image' },
+          { src: 'DSC06859.jpg', alt: 'Infrastructure image' },
+          { src: 'DSC06862.jpg', alt: 'Infrastructure image' },
+          { src: 'DSC06867.jpg', alt: 'Infrastructure image' },
+          { src: 'DSC06877.jpg', alt: 'Infrastructure image' },
+          { src: 'DSC07140.jpg', alt: 'Infrastructure image' },
+          { src: 'DSC07398.jpg', alt: 'Infrastructure image' },
+          { src: 'DSC07432.jpg', alt: 'Infrastructure image' },
+          { src: 'DSC07447.jpg', alt: 'Infrastructure image' },
+          { src: 'DSC07559.jpg', alt: 'Infrastructure image' },
+          { src: 'DSC07612.jpg', alt: 'Infrastructure image' },
+          { src: 'DSC07617.jpg', alt: 'Infrastructure image' },
+          { src: 'DSC07621.jpg', alt: 'Infrastructure image' },
+          { src: 'DSC07644.jpg', alt: 'Infrastructure image' },
+          { src: 'DSC07649.jpg', alt: 'Infrastructure image' },
+          { src: 'DSC07677.jpg', alt: 'Infrastructure image' },
+          { src: 'DSC07678.jpg', alt: 'Infrastructure image' },
+          { src: 'DSC07681.jpg', alt: 'Infrastructure image' },
+          { src: 'DSC07728.jpg', alt: 'Infrastructure image' },
+          { src: 'DSC07733.jpg', alt: 'Infrastructure image' },
+          { src: 'DSC07741.jpg', alt: 'Infrastructure image' },
+          { src: 'DSC07744.jpg', alt: 'Infrastructure image' },
+          { src: 'DSC07759.jpg', alt: 'Infrastructure image' },
+          { src: 'DSC07767.jpg', alt: 'Infrastructure image' },
+          { src: 'DSC07779.jpg', alt: 'Infrastructure image' },
+          { src: 'DSC07785.jpg', alt: 'Infrastructure image' },
+          { src: 'DSC07794.jpg', alt: 'Infrastructure image' },
+          { src: 'DSC07797.jpg', alt: 'Infrastructure image' },
+          { src: 'DSC07801.jpg', alt: 'Infrastructure image' },
+          { src: 'DSC07807.jpg', alt: 'Infrastructure image' }
+        ]}
+      >
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold mb-6">
-            <span className="text-primary">Venha Conhecer</span>{' '}
-            <span className="text-secondary">Pessoalmente!</span>
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white drop-shadow-lg">
+            Venha Conhecer Pessoalmente!
           </h2>
-          <p className="text-xl text-gray-700 mb-8">
+          <p className="text-xl md:text-2xl text-white mb-8 drop-shadow-md">
             Agende uma visita e veja de perto toda a nossa estrutura pensada para o seu filho
           </p>
           <a
             href="#contact"
-            className="inline-flex items-center px-8 py-4 bg-primary hover:bg-primary/90 text-white font-semibold rounded-lg transition-all shadow-lg hover:shadow-xl text-lg"
+            className="inline-flex items-center px-8 py-4 bg-secondary hover:bg-secondary/90 text-primary font-bold rounded-lg transition-all shadow-2xl hover:shadow-xl text-lg"
             onClick={(e) => {
               e.preventDefault();
               window.location.href = '/#contact';
@@ -217,7 +289,7 @@ const Infrastructure = () => {
             Agende Sua Visita
           </a>
         </div>
-      </section>
+      </ScrollingBackground>
 
       <Footer />
     </div>

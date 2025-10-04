@@ -1,6 +1,8 @@
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import PinterestGallery from '../components/PinterestGallery';
 import { SparklesIcon, LightBulbIcon, HeartIcon } from '@heroicons/react/24/outline';
+import OptimizedImage from '../components/OptimizedImage';
 
 const Methodology = () => {
   return (
@@ -175,20 +177,72 @@ const Methodology = () => {
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
-            {['Atividades Práticas', 'Jogos Interativos', 'Projetos em Grupo'].map((title, idx) => (
+            {[
+              { title: 'Atividades Práticas', image: 'DSC07250.jpg', alt: 'Alunos em atividade prática com materiais educativos' },
+              { title: 'Jogos Interativos', image: 'DSC07076.jpg', alt: 'Alunos jogando e aprendendo de forma interativa' },
+              { title: 'Projetos em Grupo', image: 'DSC07185.jpg', alt: 'Alunos trabalhando em projetos colaborativos' }
+            ].map((item, idx) => (
               <div
                 key={idx}
-                className="relative aspect-[4/3] bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl overflow-hidden shadow-lg"
+                className="relative aspect-[4/3] rounded-xl overflow-hidden shadow-lg group"
               >
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center p-6">
-                    <SparklesIcon className="h-12 w-12 text-primary/40 mx-auto mb-2" />
-                    <p className="text-gray-500 font-medium text-sm">📸 TODO: {title}</p>
-                  </div>
+                <OptimizedImage
+                  src={item.image}
+                  alt={item.alt}
+                  className="transition-transform duration-500 group-hover:scale-110 h-full"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
+                  <p className="text-white font-bold text-lg p-4">{item.title}</p>
                 </div>
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Galeria de Momentos - Estilo Pinterest */}
+      <section className="py-16 bg-blue-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              <span className="text-primary">Momentos de</span>{' '}
+              <span className="text-secondary">Aprendizado Real</span>
+            </h2>
+            <p className="text-lg text-gray-600">
+              Veja nossos alunos em ação, aprendendo inglês de forma natural e divertida
+            </p>
+          </div>
+
+          <PinterestGallery
+            images={[
+              { src: 'DSC07154.jpg', alt: 'Alunos colaborando em atividade', orientation: '16x9' },
+              { src: 'DSC07166.jpg', alt: 'Momento de aprendizado interativo', orientation: '9x16' },
+              { src: 'DSC07171.jpg', alt: 'Atividade em grupo', orientation: '16x9' },
+              { src: 'DSC07189.jpg', alt: 'Aprendizado prático', orientation: '9x16' },
+              { src: 'DSC07195.jpg', alt: 'Trabalho colaborativo', orientation: '16x9' },
+              { src: 'DSC07199.jpg', alt: 'Professora com turma', orientation: '9x16' },
+              { src: 'DSC07202.jpg', alt: 'Atividade lúdica', orientation: '16x9' },
+              { src: 'DSC07209.jpg', alt: 'Momento de concentração', orientation: '9x16' },
+              { src: 'DSC07218.jpg', alt: 'Aprendizado divertido', orientation: '16x9' },
+              { src: 'DSC07222.jpg', alt: 'Trabalho em equipe', orientation: '16x9' },
+              { src: 'DSC07224.jpg', alt: 'Atividade criativa', orientation: '9x16' },
+              { src: 'DSC07276.jpg', alt: 'Momento de interação', orientation: '16x9' },
+              { src: 'DSC07282.jpg', alt: 'Aprendizado natural', orientation: '9x16' },
+              { src: 'DSC07285.jpg', alt: 'Atividade colaborativa', orientation: '16x9' },
+              { src: 'DSC07301.jpg', alt: 'Experiência educativa', orientation: '9x16' },
+              { src: 'DSC07304.jpg', alt: 'Momento especial', orientation: '16x9' },
+              { src: 'DSC07311.jpg', alt: 'Aprendizado ativo', orientation: '9x16' },
+              { src: 'DSC07314.jpg', alt: 'Atividade interativa', orientation: '16x9' },
+              { src: 'DSC07329.jpg', alt: 'Trabalho em dupla', orientation: '9x16' },
+              { src: 'DSC07335.jpg', alt: 'Momento de diversão', orientation: '16x9' },
+              { src: 'DSC07355.jpg', alt: 'Aprendizado lúdico', orientation: '9x16' },
+              { src: 'DSC07357.jpg', alt: 'Atividade prática', orientation: '16x9' },
+              { src: 'DSC07363.jpg', alt: 'Momento educativo', orientation: '9x16' },
+              { src: 'DSC07370.jpg', alt: 'Experiência de aprendizado', orientation: '16x9' },
+              { src: 'DSC07402.jpg', alt: 'Atividade engajadora', orientation: '9x16' },
+              { src: 'DSC07557.jpg', alt: 'Momento de descoberta', orientation: '16x9' },
+            ]}
+          />
         </div>
       </section>
 

@@ -1,7 +1,5 @@
 import { createBrowserRouter, Outlet } from 'react-router-dom';
 import Home from '../pages/Home';
-import OurClasses from '../pages/OurClasses';
-import FocusAndAction from '../pages/FocusAndAction';
 import VacationClasses from '../pages/VacationClasses';
 import Infrastructure from '../pages/Infrastructure';
 import Methodology from '../pages/Methodology';
@@ -40,14 +38,6 @@ export const router = createBrowserRouter([
       {
         index: true,
         element: <Home />,
-      },
-      {
-        path: 'nossas-aulas',
-        element: <OurClasses />,
-      },
-      {
-        path: 'foco-e-acao',
-        element: <FocusAndAction />,
       },
       {
         path: 'vacation-classes',

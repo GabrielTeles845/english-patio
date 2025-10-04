@@ -1,4 +1,6 @@
 import { ArrowRightIcon, CheckIcon } from '@heroicons/react/24/outline';
+import img from '../config/cloudinary';
+import OptimizedImage from './OptimizedImage';
 
 const features = [
   {
@@ -90,30 +92,63 @@ const HeroSection = () => {
             </div>
           </div>
 
-          {/* Imagem à direita */}
+          {/* Grid de 3 imagens criativo à direita */}
           <div className="relative lg:ml-8 order-2">
-            <div className="relative">
+            <div className="relative grid grid-cols-2 gap-3 lg:gap-4">
               {/* Círculo decorativo - escondido no mobile */}
-              <div className="hidden lg:block absolute -top-8 -right-8 w-64 h-64 bg-secondary/10 rounded-full"></div>
+              <div className="hidden lg:block absolute -top-8 -right-8 w-64 h-64 bg-secondary/10 rounded-full -z-10"></div>
 
-              {/* Container da imagem com efeitos */}
-              <div className="relative rounded-2xl lg:rounded-3xl overflow-hidden shadow-xl lg:shadow-2xl transform hover:scale-[1.02] transition-transform duration-500">
-                <img
-                  className="w-full h-auto"
-                  src="/assets/ao-vivo.jpeg"
-                  alt="Crianças aprendendo inglês de forma divertida"
+              {/* Imagem 1 - Grande no topo esquerdo */}
+              <div className="col-span-2 relative rounded-2xl lg:rounded-3xl overflow-hidden shadow-xl lg:shadow-2xl transform hover:scale-[1.02] transition-transform duration-500">
+                <OptimizedImage
+                  src="DSC06890.jpg"
+                  alt="Alunos da English Patio aprendendo de forma interativa"
+                  className="cursor-zoom-in h-64 lg:h-80"
+                  onClick={() => {
+                    const event = new CustomEvent('openImageZoom', {
+                      detail: { src: img('DSC06890.jpg'), alt: 'Alunos da English Patio aprendendo de forma interativa' }
+                    });
+                    window.dispatchEvent(event);
+                  }}
                 />
+              </div>
 
-                {/* Overlay gradiente */}
-                <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent mix-blend-overlay"></div>
+              {/* Imagem 2 - Pequena embaixo esquerda */}
+              <div className="relative rounded-xl lg:rounded-2xl overflow-hidden shadow-lg lg:shadow-xl transform hover:scale-[1.02] transition-transform duration-500">
+                <OptimizedImage
+                  src="DSC07227.jpg"
+                  alt="Momento de leitura na English Patio"
+                  className="cursor-zoom-in h-48 lg:h-64"
+                  onClick={() => {
+                    const event = new CustomEvent('openImageZoom', {
+                      detail: { src: img('DSC07227.jpg'), alt: 'Momento de leitura na English Patio' }
+                    });
+                    window.dispatchEvent(event);
+                  }}
+                />
+              </div>
+
+              {/* Imagem 3 - Pequena embaixo direita */}
+              <div className="relative rounded-xl lg:rounded-2xl overflow-hidden shadow-lg lg:shadow-xl transform hover:scale-[1.02] transition-transform duration-500">
+                <OptimizedImage
+                  src="DSC07547.jpg"
+                  alt="Atividades práticas e divertidas"
+                  className="cursor-zoom-in h-48 lg:h-64"
+                  onClick={() => {
+                    const event = new CustomEvent('openImageZoom', {
+                      detail: { src: img('DSC07547.jpg'), alt: 'Atividades práticas e divertidas' }
+                    });
+                    window.dispatchEvent(event);
+                  }}
+                />
               </div>
 
               {/* Elemento decorativo - escondido no mobile */}
-              <div className="hidden lg:block absolute -bottom-6 -left-6 w-32 h-32 bg-primary/10 rounded-full"></div>
+              <div className="hidden lg:block absolute -bottom-6 -left-6 w-32 h-32 bg-primary/10 rounded-full -z-10"></div>
             </div>
 
             {/* Badge flutuante - ajustado para mobile */}
-            <div className="hidden lg:block absolute -right-4 top-1/2 transform -translate-y-1/2 bg-white rounded-2xl shadow-xl p-4 max-w-[200px]">
+            <div className="hidden lg:block absolute -right-4 top-8 bg-white rounded-2xl shadow-xl p-4 max-w-[200px] z-10">
               <p className="text-sm font-semibold text-primary">Aulas em Casa disponíveis na região dos setores Bueno e Marista</p>
             </div>
 

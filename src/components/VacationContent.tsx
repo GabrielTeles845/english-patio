@@ -1,10 +1,53 @@
-import { MapPinIcon, SparklesIcon, CalendarIcon } from '@heroicons/react/24/outline';
+import { SparklesIcon } from '@heroicons/react/24/outline';
+import FadeCarousel from './FadeCarousel';
+import FlippingCards from './FlippingCards';
+import img from '../config/cloudinary';
+import OptimizedImage from './OptimizedImage';
+
+// Imagens para carrossel "Imersão e Aprendizado"
+const immersionImages = [
+  { src: 'DSC07695.jpg', alt: 'Atividade de imersão e aprendizado' },
+];
+
+// Imagens para carrossel final "Momentos das Nossas Atividades"
+const activityImages = [
+  { src: 'DSC06943.jpg', alt: 'Momento de atividade' },
+  { src: 'DSC06950.jpg', alt: 'Alunos em ação' },
+  { src: 'DSC06956.jpg', alt: 'Atividade criativa' },
+  { src: 'DSC06976.jpg', alt: 'Trabalho em grupo' },
+  { src: 'DSC07007.jpg', alt: 'Momento de aprendizado' },
+  { src: 'DSC07013.jpg', alt: 'Atividade lúdica' },
+  { src: 'DSC07016.jpg', alt: 'Jogos educativos' },
+  { src: 'DSC07025.jpg', alt: 'Diversão e aprendizado' },
+  { src: 'DSC07031.jpg', alt: 'Trabalho colaborativo' },
+  { src: 'DSC07045.jpg', alt: 'Grupo em ação' },
+  { src: 'DSC07076.jpg', alt: 'Atividade interativa' },
+  { src: 'DSC07077.jpg', alt: 'Momento especial' },
+  { src: 'DSC07081.jpg', alt: 'Aprendizado divertido' },
+  { src: 'DSC07088.jpg', alt: 'Atividade prática' },
+  { src: 'DSC07098.jpg', alt: 'Experiência educativa' },
+  { src: 'DSC07112.jpg', alt: 'Grupo se divertindo' },
+  { src: 'DSC07115.jpg', alt: 'Interação entre alunos' },
+  { src: 'DSC07240.jpg', alt: 'Atividade artística' },
+  { src: 'DSC07244.jpg', alt: 'Momento criativo' },
+  { src: 'DSC07247.jpg', alt: 'Arte e diversão' },
+  { src: 'DSC07250.jpg', alt: 'Trabalho artístico' },
+  { src: 'DSC07255.jpg', alt: 'Atividade de arte' },
+  { src: 'DSC07260.jpg', alt: 'Criatividade em ação' },
+  { src: 'DSC07265.jpg', alt: 'Momento artístico' },
+  { src: 'DSC07268.jpg', alt: 'Arte e aprendizado' },
+  { src: 'DSC07432.jpg', alt: 'Atividade especial' },
+  { src: 'DSC07447.jpg', alt: 'Experiência única' },
+  { src: 'DSC07657.jpg', alt: 'Ambiente de aprendizado' },
+  { src: 'DSC07662.jpg', alt: 'Momento educativo' },
+  { src: 'DSC07688.jpg', alt: 'Atividade engajadora' },
+  { src: 'DSC07695.jpg', alt: 'Aprendizado ativo' },
+];
 
 const VacationContent = () => {
-
   return (
     <div>
-      {/* Seção 1: Introdução com imagem */}
+      {/* Seção 1: Introdução com carrossel */}
       <section className="py-16 md:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -22,14 +65,13 @@ const VacationContent = () => {
                 aproximadamente um por mês.
               </p>
             </div>
-            <div className="relative aspect-[4/3] bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl overflow-hidden shadow-lg">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center p-6">
-                  <MapPinIcon className="h-12 w-12 text-primary/40 mx-auto mb-2" />
-                  <p className="text-gray-500 font-medium text-sm">📸 TODO: Alunos em atividade externa</p>
-                </div>
-              </div>
-            </div>
+            <FadeCarousel
+              images={immersionImages}
+              autoPlayInterval={0}
+              showIndicators={false}
+              showControls={false}
+              aspectRatio="aspect-[4/3]"
+            />
           </div>
         </div>
       </section>
@@ -38,13 +80,18 @@ const VacationContent = () => {
       <section className="py-16 md:py-20 bg-blue-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="order-2 md:order-1 relative aspect-[4/3] bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl overflow-hidden shadow-lg">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center p-6">
-                  <MapPinIcon className="h-12 w-12 text-primary/40 mx-auto mb-2" />
-                  <p className="text-gray-500 font-medium text-sm">📸 TODO: Visita ao parque ou local público</p>
-                </div>
-              </div>
+            <div className="order-2 md:order-1 relative aspect-[4/3] rounded-xl overflow-hidden shadow-lg cursor-zoom-in group">
+              <OptimizedImage
+                src="DSC02760.jpg"
+                alt="Vivências em locais reais"
+                className="transition-transform duration-500 group-hover:scale-110 h-full"
+                onClick={() => {
+                  const event = new CustomEvent('openImageZoom', {
+                    detail: { src: img('DSC02760.jpg'), alt: 'Vivências em locais reais' }
+                  });
+                  window.dispatchEvent(event);
+                }}
+              />
             </div>
             <div className="order-1 md:order-2">
               <h2 className="text-3xl md:text-4xl font-bold mb-6">
@@ -60,7 +107,7 @@ const VacationContent = () => {
         </div>
       </section>
 
-      {/* Seção 3: Atividades */}
+      {/* Seção 3: Atividades Criativas - Cards Empilhados */}
       <section className="py-16 md:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -75,14 +122,12 @@ const VacationContent = () => {
                 possibilidades criativas.
               </p>
             </div>
-            <div className="relative aspect-[4/3] bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl overflow-hidden shadow-lg">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center p-6">
-                  <SparklesIcon className="h-12 w-12 text-primary/40 mx-auto mb-2" />
-                  <p className="text-gray-500 font-medium text-sm">📸 TODO: Crianças em atividade de culinária ou arte</p>
-                </div>
-              </div>
-            </div>
+            <FlippingCards
+              images={[
+                { src: 'DSC07276.jpg', alt: 'Atividade criativa 1' },
+                { src: 'DSC07463.jpg', alt: 'Atividade criativa 2' },
+              ]}
+            />
           </div>
         </div>
       </section>
@@ -91,13 +136,18 @@ const VacationContent = () => {
       <section className="py-16 md:py-20 bg-blue-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="order-2 md:order-1 relative aspect-[4/3] bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl overflow-hidden shadow-lg">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center p-6">
-                  <CalendarIcon className="h-12 w-12 text-primary/40 mx-auto mb-2" />
-                  <p className="text-gray-500 font-medium text-sm">📸 TODO: Grupo de alunos em atividade</p>
-                </div>
-              </div>
+            <div className="order-2 md:order-1 relative aspect-[4/3] rounded-xl overflow-hidden shadow-lg cursor-zoom-in group">
+              <OptimizedImage
+                src="DSC07396.jpg"
+                alt="Valorização do investimento"
+                className="transition-transform duration-500 group-hover:scale-110 h-full"
+                onClick={() => {
+                  const event = new CustomEvent('openImageZoom', {
+                    detail: { src: img('DSC07396.jpg'), alt: 'Valorização do investimento' }
+                  });
+                  window.dispatchEvent(event);
+                }}
+              />
             </div>
             <div className="order-1 md:order-2">
               <h2 className="text-3xl md:text-4xl font-bold mb-6">
@@ -123,11 +173,36 @@ const VacationContent = () => {
         </div>
       </section>
 
-      {/* Compromisso Final - Quote destacado */}
+      {/* Galeria de Atividades - Carrossel */}
       <section className="py-16 md:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              <span className="text-primary">Momentos das</span>{' '}
+              <span className="text-secondary">Nossas Atividades</span>
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Veja algumas das experiências que nossos alunos vivenciam nas Vacation Classes
+            </p>
+          </div>
+
+          <div className="max-w-5xl mx-auto">
+            <FadeCarousel
+              images={activityImages}
+              autoPlayInterval={4000}
+              showIndicators={true}
+              showControls={true}
+              aspectRatio="aspect-[16/10]"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Compromisso Final - Quote destacado */}
+      <section className="py-16 md:py-20 bg-blue-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto text-center">
-            <div className="bg-gradient-to-br from-primary/5 to-secondary/5 rounded-2xl p-10 md:p-12 shadow-xl">
+            <div className="bg-white rounded-2xl p-10 md:p-12 shadow-xl">
               <SparklesIcon className="h-16 w-16 text-secondary mx-auto mb-6" />
               <p className="text-2xl md:text-3xl text-primary font-bold leading-relaxed">
                 "Na English Patio, formar crianças fluentes em inglês vai muito além da sala de aula — é um compromisso que
