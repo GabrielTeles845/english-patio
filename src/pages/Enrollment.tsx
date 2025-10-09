@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import InputMask from 'react-input-mask';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import ContractModal from '../components/ContractModal';
 import {
   UserIcon,
-  CheckCircleIcon,
-  ClockIcon
+  CheckCircleIcon
 } from '@heroicons/react/24/outline';
 import { fillContractPDF } from '../services/pdfService';
 import { sendContractEmails } from '../services/emailService';
@@ -61,10 +61,12 @@ interface FormData {
   // Autorizações
   authorizationMedia: boolean;
   authorizationContract: boolean;
+  scheduleConfirmed: boolean;
 }
 
 const Enrollment = () => {
   const [currentStep, setCurrentStep] = useState(1);
+  const [isScrolled, setIsScrolled] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     student1Name: '',
     student1BirthDate: '',
@@ -92,7 +94,7 @@ const Enrollment = () => {
     neighborhood: '',
     city: '',
     state: '',
-    paymentMethod: '',
+    paymentMethod: 'boleto',
     classFormat: 'sede',
     schedule: 'seg-qua',
     scheduleDay1Start: '',
@@ -101,6 +103,7 @@ const Enrollment = () => {
     scheduleDay2End: '',
     authorizationMedia: false,
     authorizationContract: false,
+    scheduleConfirmed: false,
   });
 
   const calculateAge = (birthDate: string): string => {
@@ -208,6 +211,18 @@ const Enrollment = () => {
   };
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isContractModalOpen, setIsContractModalOpen] = useState(false);
+
+  // Detectar scroll para compactar os steps
+  useEffect(() => {
+    const handleScroll = () => {
+      // Considera scrollado se passou de 200px
+      setIsScrolled(window.scrollY > 200);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -272,66 +287,117 @@ const Enrollment = () => {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative pt-40 pb-20 bg-gradient-to-br from-slate-50 via-blue-50/30 to-white overflow-hidden">
+      <section className="relative pt-32 pb-4 md:pt-40 md:pb-8 bg-gradient-to-br from-slate-50 via-blue-50/30 to-white overflow-hidden">
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6">
             <span className="text-primary">Matrícula</span>{' '}
             <span className="text-secondary">Online</span>
           </h1>
-          <p className="text-xl md:text-2xl text-gray-700">
+          <p className="text-lg sm:text-xl md:text-2xl text-gray-700">
             Preencha o formulário e faça parte da English Patio!
           </p>
         </div>
       </section>
 
       {/* Progress Steps */}
-      <section className="py-8 bg-white border-b">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
-            {[
-              { num: 1, title: 'Dados dos Alunos' },
-              { num: 2, title: 'Responsável Legal' },
-              { num: 3, title: 'Pagamento e Aulas' },
-              { num: 4, title: 'Revisão' },
-            ].map((step, index) => (
-              <div key={step.num} className="flex items-center flex-1">
-                <div className="flex flex-col items-center flex-1">
+      <section className={`sticky top-[106px] z-40 transition-all duration-300 ${
+        isScrolled
+          ? 'pt-2 pb-1 md:pt-3 md:pb-2 shadow-md bg-white'
+          : 'pt-4 pb-2 md:pt-6 md:pb-3 bg-gradient-to-br from-slate-50 via-blue-50/30 to-white'
+      }`}>
+        <div className="max-w-5xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8">
+          <div className="relative">
+            {/* Background Line - Desktop and Mobile */}
+            <div className={`absolute left-0 right-0 h-1 bg-gray-200 transition-all duration-300 ${
+              isScrolled ? 'top-4 sm:top-5 md:top-6' : 'top-5 sm:top-6 md:top-8'
+            }`} style={{ zIndex: 0 }}></div>
+            <div
+              className={`absolute left-0 h-1 bg-primary transition-all duration-300 ${
+                isScrolled ? 'top-4 sm:top-5 md:top-6' : 'top-5 sm:top-6 md:top-8'
+              }`}
+              style={{
+                width: `${((currentStep - 1) / 3) * 100}%`,
+                zIndex: 1
+              }}
+            ></div>
+
+            {/* Steps */}
+            <div className="relative flex justify-between gap-1" style={{ zIndex: 2 }}>
+              {[
+                { num: 1, title: 'Dados do Aluno', icon: '🎒' },
+                { num: 2, title: 'Responsável Legal', icon: '👨‍👩‍👦' },
+                { num: 3, title: 'Pagamento', icon: '💳' },
+                { num: 4, title: 'Confirmação', icon: '📋' },
+              ].map((step) => (
+                <div key={step.num} className="flex flex-col items-center relative flex-1">
                   <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-colors ${
+                    className={`rounded-full flex items-center justify-center font-bold transition-all duration-300 border-2 ${
+                      isScrolled
+                        ? 'w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12'
+                        : 'w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14'
+                    } ${
                       currentStep >= step.num
-                        ? 'bg-primary text-white'
-                        : 'bg-gray-200 text-gray-500'
+                        ? 'bg-primary text-white border-primary shadow-lg scale-110'
+                        : currentStep === step.num - 1
+                        ? 'bg-white text-primary border-primary/30 shadow-md'
+                        : 'bg-white text-gray-400 border-gray-200'
                     }`}
                   >
                     {currentStep > step.num ? (
-                      <CheckCircleIcon className="h-6 w-6" />
+                      <CheckCircleIcon className={`text-white drop-shadow-md transition-all duration-300 ${
+                        isScrolled
+                          ? 'h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5'
+                          : 'h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6'
+                      }`} />
                     ) : (
-                      step.num
+                      <span
+                        className={`transition-all duration-300 ${
+                          isScrolled
+                            ? 'text-sm sm:text-base md:text-lg'
+                            : 'text-base sm:text-lg md:text-xl'
+                        } ${currentStep >= step.num ? 'drop-shadow-md' : ''}`}
+                        style={currentStep >= step.num ? {
+                          filter: 'brightness(1.5) contrast(1.2)',
+                          textShadow: '0 1px 2px rgba(0,0,0,0.3)'
+                        } : {}}
+                      >
+                        {step.icon}
+                      </span>
                     )}
                   </div>
-                  <span className="text-xs mt-2 text-center hidden sm:block">{step.title}</span>
+                  <div className={`text-center max-w-[70px] sm:max-w-[90px] md:max-w-[110px] transition-all duration-300 ${
+                    isScrolled ? 'mt-1' : 'mt-1.5 md:mt-2'
+                  }`}>
+                    {!isScrolled && (
+                      <p className={`font-semibold transition-all duration-300 text-[10px] sm:text-xs ${
+                        currentStep >= step.num ? 'text-primary' : 'text-gray-500'
+                      }`}>
+                        Etapa {step.num}
+                      </p>
+                    )}
+                    <p className={`leading-tight transition-all duration-300 ${
+                      isScrolled
+                        ? 'text-[10px] sm:text-xs mt-0'
+                        : 'text-xs sm:text-sm mt-0.5'
+                    } ${currentStep >= step.num ? 'text-gray-700' : 'text-gray-400'}`}>
+                      {step.title}
+                    </p>
+                  </div>
                 </div>
-                {index < 3 && (
-                  <div
-                    className={`h-1 flex-1 mx-2 transition-colors ${
-                      currentStep > step.num ? 'bg-primary' : 'bg-gray-200'
-                    }`}
-                  ></div>
-                )}
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
       {/* Form Content */}
-      <section className="py-16 flex-1">
+      <section className="py-8 md:py-16 flex-1">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <form onSubmit={handleSubmit}>
-            {/* Step 1: Dados dos Alunos */}
+            {/* Step 1: Dados do Aluno */}
             {currentStep === 1 && (
-              <div className="bg-white rounded-2xl shadow-xl p-8">
-                <h2 className="text-3xl font-bold text-primary mb-8">Dados dos Alunos</h2>
+              <div className="bg-white rounded-xl md:rounded-2xl shadow-xl p-4 sm:p-6 md:p-8">
+                <h2 className="text-2xl sm:text-3xl font-bold text-primary mb-6 md:mb-8">Dados do Aluno</h2>
 
                 {/* Aluno 1 */}
                 <div className="mb-8">
@@ -351,7 +417,7 @@ const Enrollment = () => {
                         onChange={handleInputChange}
                         required
                         className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
-                        placeholder="Nome completo do aluno"
+                        placeholder="Nome completo"
                       />
                     </div>
                     <div>
@@ -394,14 +460,14 @@ const Enrollment = () => {
                       className="w-5 h-5 text-primary rounded focus:ring-2 focus:ring-primary"
                     />
                     <span className="ml-3 text-gray-700 font-medium">
-                      Adicionar segundo aluno (irmão/irmã)
+                      Adicionar segundo(a) aluno(a)
                     </span>
                   </label>
                 </div>
 
                 {/* Aluno 2 (condicional) */}
                 {formData.hasStudent2 && (
-                  <div className="mb-8 p-6 bg-blue-50/50 rounded-xl">
+                  <div className="mb-8 p-6 bg-blue-50/50 rounded-xl animate-slide-down">
                     <h3 className="text-xl font-semibold text-primary mb-4 flex items-center">
                       <UserIcon className="h-6 w-6 mr-2" />
                       Aluno 2
@@ -418,7 +484,7 @@ const Enrollment = () => {
                           onChange={handleInputChange}
                           required={formData.hasStudent2}
                           className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
-                          placeholder="Nome completo do segundo aluno"
+                          placeholder="Nome completo"
                         />
                       </div>
                       <div>
@@ -451,11 +517,11 @@ const Enrollment = () => {
                   </div>
                 )}
 
-                <div className="flex justify-end mt-8">
+                <div className="flex justify-end mt-6 md:mt-8">
                   <button
                     type="button"
                     onClick={nextStep}
-                    className="px-8 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-colors shadow-lg"
+                    className="w-full sm:w-auto px-6 sm:px-8 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-colors shadow-lg"
                   >
                     Próximo
                   </button>
@@ -465,15 +531,18 @@ const Enrollment = () => {
 
             {/* Step 2: Dados do Responsável Legal */}
             {currentStep === 2 && (
-              <div className="bg-white rounded-2xl shadow-xl p-8">
-                <h2 className="text-3xl font-bold text-primary mb-8">Dados do Responsável Legal</h2>
+              <div className="bg-white rounded-xl md:rounded-2xl shadow-xl p-4 sm:p-6 md:p-8">
+                <h2 className="text-2xl sm:text-3xl font-bold text-primary mb-6 md:mb-8">Dados do Responsável Legal</h2>
 
                 {/* Responsável Principal */}
                 <div className="mb-8">
-                  <h3 className="text-xl font-semibold text-primary mb-4 flex items-center">
-                    <UserIcon className="h-6 w-6 mr-2" />
-                    Responsável Legal (quem assinará o contrato)
-                  </h3>
+                  <div className="mb-4">
+                    <h3 className="text-lg sm:text-xl font-semibold text-primary flex items-center">
+                      <UserIcon className="h-5 w-5 sm:h-6 sm:w-6 mr-2 flex-shrink-0" />
+                      Responsável Legal
+                    </h3>
+                    <p className="text-sm text-gray-600 mt-1 ml-7 sm:ml-8">quem assinará o contrato</p>
+                  </div>
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="md:col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -575,7 +644,7 @@ const Enrollment = () => {
 
                 {/* Segundo Responsável (opcional) */}
                 {formData.hasSecondResponsible && (
-                  <div className="mb-8 p-6 bg-blue-50/50 rounded-xl">
+                  <div className="mb-8 p-6 bg-blue-50/50 rounded-xl animate-slide-down">
                     <h3 className="text-xl font-semibold text-primary mb-4 flex items-center">
                       <UserIcon className="h-6 w-6 mr-2" />
                       Segundo Responsável (Contato Adicional)
@@ -636,18 +705,18 @@ const Enrollment = () => {
                   </div>
                 )}
 
-                <div className="flex justify-between mt-8">
+                <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0 mt-6 md:mt-8">
                   <button
                     type="button"
                     onClick={prevStep}
-                    className="px-8 py-3 bg-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-300 transition-colors"
+                    className="w-full sm:w-auto px-6 sm:px-8 py-3 bg-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-300 transition-colors order-2 sm:order-1"
                   >
                     Voltar
                   </button>
                   <button
                     type="button"
                     onClick={nextStep}
-                    className="px-8 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-colors shadow-lg"
+                    className="w-full sm:w-auto px-6 sm:px-8 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-colors shadow-lg order-1 sm:order-2"
                   >
                     Próximo
                   </button>
@@ -657,8 +726,8 @@ const Enrollment = () => {
 
             {/* Step 3: Dados de Pagamento */}
             {currentStep === 3 && (
-              <div className="bg-white rounded-2xl shadow-xl p-8">
-                <h2 className="text-3xl font-bold text-primary mb-8">Dados de Pagamento e Aulas</h2>
+              <div className="bg-white rounded-xl md:rounded-2xl shadow-xl p-4 sm:p-6 md:p-8">
+                <h2 className="text-2xl sm:text-3xl font-bold text-primary mb-6 md:mb-8">Dados de Pagamento</h2>
 
                 <div className="space-y-6">
                   {/* Responsável Financeiro */}
@@ -696,7 +765,7 @@ const Enrollment = () => {
                       </div>
 
                       {formData.financialResponsibleType === 'other' && (
-                        <div>
+                        <div className="animate-slide-down">
                           <label className="block text-sm font-medium text-gray-700 mb-2">
                             Nome do Responsável Financeiro *
                           </label>
@@ -771,16 +840,15 @@ const Enrollment = () => {
                       <div className="grid md:grid-cols-3 gap-6">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Número *
+                            Número
                           </label>
                           <input
                             type="text"
                             name="number"
                             value={formData.number}
                             onChange={handleInputChange}
-                            required
                             className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
-                            placeholder="123"
+                            placeholder="123 ou S/N"
                           />
                         </div>
                         <div className="md:col-span-2">
@@ -849,190 +917,45 @@ const Enrollment = () => {
                     </div>
                   </div>
 
-                  {/* Forma de Pagamento */}
-                  <div>
+                  {/* Forma de Pagamento (fixo) */}
+                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Forma de Pagamento *
+                      Forma de Pagamento
                     </label>
-                    <select
-                      name="paymentMethod"
-                      value={formData.paymentMethod}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
-                    >
-                      <option value="">Selecione...</option>
-                      <option value="pix">Pix</option>
-                      <option value="boleto">Boleto Bancário</option>
-                      <option value="cartao">Cartão de Crédito</option>
-                      <option value="debito">Débito Automático</option>
-                    </select>
+                    <p className="text-lg font-semibold text-primary">Boleto Bancário</p>
+                    <p className="text-sm text-gray-600 mt-1">Um carnê físico/online será entregue a cada família</p>
                   </div>
 
-                  {/* Formato das Aulas */}
-                  <div className="mt-8 p-6 bg-blue-50/50 rounded-xl">
-                    <h3 className="text-lg font-semibold text-primary mb-4 flex items-center">
-                      <ClockIcon className="h-6 w-6 mr-2" />
-                      Formato e Horário das Aulas
-                    </h3>
-
-                    <div className="space-y-6">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-3">
-                          Formato das Aulas *
-                        </label>
-                        <div className="space-y-3">
-                          <label className="flex items-center cursor-pointer p-3 border-2 rounded-lg hover:bg-white transition-colors">
-                            <input
-                              type="radio"
-                              name="classFormat"
-                              value="sede"
-                              checked={formData.classFormat === 'sede'}
-                              onChange={handleInputChange}
-                              className="w-5 h-5 text-primary"
-                            />
-                            <span className="ml-3 font-medium">Presencial na sede (Av. F Qd.D1 Lt.12 n.1541, Água Branca)</span>
-                          </label>
-                          <label className={`flex items-center cursor-pointer p-3 border-2 rounded-lg hover:bg-white transition-colors ${
-                            formData.cep && !canHaveHomeClasses(formData.cep) ? 'opacity-50 cursor-not-allowed' : ''
-                          }`}>
-                            <input
-                              type="radio"
-                              name="classFormat"
-                              value="domicilio"
-                              checked={formData.classFormat === 'domicilio'}
-                              onChange={handleInputChange}
-                              disabled={!!formData.cep && !canHaveHomeClasses(formData.cep)}
-                              className="w-5 h-5 text-primary"
-                            />
-                            <span className="ml-3 font-medium">Presencial no domicílio (taxa adicional de deslocamento)</span>
-                          </label>
-                        </div>
-
-                        {/* Aviso quando CEP não permite aulas em domicílio */}
-                        {formData.cep && !canHaveHomeClasses(formData.cep) && (
-                          <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
-                            <p className="text-sm text-orange-800 flex items-start">
-                              <span className="mr-2">⚠️</span>
-                              <span>
-                                <strong>Aulas em domicílio disponíveis apenas para Setor Bueno e Setor Marista.</strong>
-                                <br />
-                                Seu CEP não está nessas áreas. Por favor, escolha aulas na sede ou verifique o CEP informado.
-                              </span>
-                            </p>
-                          </div>
-                        )}
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-3">
-                          Dias da Semana *
-                        </label>
-                        <div className="space-y-3">
-                          <label className="flex items-center cursor-pointer p-3 border-2 rounded-lg hover:bg-white transition-colors">
-                            <input
-                              type="radio"
-                              name="schedule"
-                              value="seg-qua"
-                              checked={formData.schedule === 'seg-qua'}
-                              onChange={handleInputChange}
-                              className="w-5 h-5 text-primary"
-                            />
-                            <span className="ml-3 font-medium">Segunda e Quarta-feira</span>
-                          </label>
-                          <label className="flex items-center cursor-pointer p-3 border-2 rounded-lg hover:bg-white transition-colors">
-                            <input
-                              type="radio"
-                              name="schedule"
-                              value="ter-qui"
-                              checked={formData.schedule === 'ter-qui'}
-                              onChange={handleInputChange}
-                              className="w-5 h-5 text-primary"
-                            />
-                            <span className="ml-3 font-medium">Terça e Quinta-feira</span>
-                          </label>
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-3">
-                          Horários (entre 08h e 20h) *
-                        </label>
-                        <div className="grid md:grid-cols-2 gap-6">
-                          <div>
-                            <label className="block text-xs text-gray-600 mb-2">
-                              {formData.schedule === 'seg-qua' ? 'Segunda-feira' : 'Terça-feira'}
-                            </label>
-                            <div className="flex gap-2">
-                              <input
-                                type="time"
-                                name="scheduleDay1Start"
-                                value={formData.scheduleDay1Start}
-                                onChange={handleInputChange}
-                                required
-                                min="08:00"
-                                max="20:00"
-                                className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
-                              />
-                              <span className="flex items-center">às</span>
-                              <input
-                                type="time"
-                                name="scheduleDay1End"
-                                value={formData.scheduleDay1End}
-                                onChange={handleInputChange}
-                                required
-                                min="08:00"
-                                max="20:00"
-                                className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
-                              />
-                            </div>
-                          </div>
-                          <div>
-                            <label className="block text-xs text-gray-600 mb-2">
-                              {formData.schedule === 'seg-qua' ? 'Quarta-feira' : 'Quinta-feira'}
-                            </label>
-                            <div className="flex gap-2">
-                              <input
-                                type="time"
-                                name="scheduleDay2Start"
-                                value={formData.scheduleDay2Start}
-                                onChange={handleInputChange}
-                                required
-                                min="08:00"
-                                max="20:00"
-                                className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
-                              />
-                              <span className="flex items-center">às</span>
-                              <input
-                                type="time"
-                                name="scheduleDay2End"
-                                value={formData.scheduleDay2End}
-                                onChange={handleInputChange}
-                                required
-                                min="08:00"
-                                max="20:00"
-                                className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                  {/* Confirmação de Horário */}
+                  <div className="mt-6">
+                    <label className="flex items-start cursor-pointer p-4 border-2 border-primary/30 rounded-lg hover:bg-blue-50/30 transition-colors">
+                      <input
+                        type="checkbox"
+                        name="scheduleConfirmed"
+                        checked={formData.scheduleConfirmed}
+                        onChange={handleInputChange}
+                        required
+                        className="w-5 h-5 text-primary rounded focus:ring-2 focus:ring-primary mt-1 flex-shrink-0"
+                      />
+                      <span className="ml-3 text-gray-700 font-medium">
+                        Já confirmei o horário das aulas do(a) meu(minha) filho(a) *
+                      </span>
+                    </label>
                   </div>
                 </div>
 
-                <div className="flex justify-between mt-8">
+                <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0 mt-6 md:mt-8">
                   <button
                     type="button"
                     onClick={prevStep}
-                    className="px-8 py-3 bg-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-300 transition-colors"
+                    className="w-full sm:w-auto px-6 sm:px-8 py-3 bg-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-300 transition-colors order-2 sm:order-1"
                   >
                     Voltar
                   </button>
                   <button
                     type="button"
                     onClick={nextStep}
-                    className="px-8 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-colors shadow-lg"
+                    className="w-full sm:w-auto px-6 sm:px-8 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-colors shadow-lg order-1 sm:order-2"
                   >
                     Próximo
                   </button>
@@ -1042,8 +965,8 @@ const Enrollment = () => {
 
             {/* Step 4: Revisão e Autorizações */}
             {currentStep === 4 && (
-              <div className="bg-white rounded-2xl shadow-xl p-8">
-                <h2 className="text-3xl font-bold text-primary mb-8">Revisão e Confirmação</h2>
+              <div className="bg-white rounded-xl md:rounded-2xl shadow-xl p-4 sm:p-6 md:p-8">
+                <h2 className="text-2xl sm:text-3xl font-bold text-primary mb-6 md:mb-8">Revisão e Confirmação</h2>
 
                 {/* Resumo dos Dados */}
                 <div className="mb-8 space-y-6">
@@ -1101,16 +1024,6 @@ const Enrollment = () => {
                       <p><span className="text-gray-600">Forma de Pagamento:</span> <span className="font-medium">{formData.paymentMethod || '-'}</span></p>
                     </div>
                   </div>
-
-                  {/* Aulas */}
-                  <div className="p-6 bg-blue-50/50 rounded-xl">
-                    <h3 className="text-lg font-semibold text-primary mb-4">Informações das Aulas</h3>
-                    <div className="space-y-2">
-                      <p><span className="text-gray-600">Formato:</span> <span className="font-medium">{formData.classFormat === 'sede' ? 'Presencial na Sede' : 'Presencial no Domicílio'}</span></p>
-                      <p><span className="text-gray-600">Dias:</span> <span className="font-medium">{formData.schedule === 'seg-qua' ? 'Segunda e Quarta-feira' : 'Terça e Quinta-feira'}</span></p>
-                      <p><span className="text-gray-600">Horários:</span> <span className="font-medium">{formData.scheduleDay1Start && formData.scheduleDay1End ? `${formData.scheduleDay1Start} às ${formData.scheduleDay1End}` : '-'}</span></p>
-                    </div>
-                  </div>
                 </div>
 
                 {/* Autorizações */}
@@ -1128,7 +1041,7 @@ const Enrollment = () => {
                         className="w-5 h-5 text-primary rounded focus:ring-2 focus:ring-primary mt-1 flex-shrink-0"
                       />
                       <span className="ml-3 text-gray-700">
-                        Eu autorizo a escola a publicar e veicular vídeos ou fotos do aluno nas redes sociais da mesma, enquanto durar este contrato. *
+                        Autorizo o uso de imagem do(a) aluno(a) em fotos e vídeos produzidos pela escola, caso ele(a) apareça ao fundo ou em atividades gerais, para divulgação nas redes sociais da English Patio, enquanto durar este contrato. *
                       </span>
                     </label>
 
@@ -1142,7 +1055,15 @@ const Enrollment = () => {
                         className="w-5 h-5 text-primary rounded focus:ring-2 focus:ring-primary mt-1 flex-shrink-0"
                       />
                       <span className="ml-3 text-gray-700">
-                        Declaro que li e aceito os termos do contrato da English Patio, e que as informações fornecidas são verdadeiras. *
+                        Declaro que li e aceito os{' '}
+                        <button
+                          type="button"
+                          onClick={() => setIsContractModalOpen(true)}
+                          className="text-primary font-semibold underline hover:text-primary/80 transition-colors"
+                        >
+                          termos do contrato
+                        </button>
+                        {' '}da English Patio, e que as informações fornecidas são verdadeiras. *
                       </span>
                     </label>
                   </div>
@@ -1157,18 +1078,18 @@ const Enrollment = () => {
                   </p>
                 </div>
 
-                <div className="flex justify-between mt-8">
+                <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0 mt-6 md:mt-8">
                   <button
                     type="button"
                     onClick={prevStep}
-                    className="px-8 py-3 bg-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-300 transition-colors"
+                    className="w-full sm:w-auto px-6 sm:px-8 py-3 bg-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-300 transition-colors order-2 sm:order-1"
                   >
                     Voltar
                   </button>
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="px-8 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition-colors shadow-lg flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full sm:w-auto px-6 sm:px-8 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition-colors shadow-lg flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed order-1 sm:order-2"
                   >
                     {isSubmitting ? (
                       <>
@@ -1193,6 +1114,11 @@ const Enrollment = () => {
       </section>
 
       <Footer />
+
+      <ContractModal
+        isOpen={isContractModalOpen}
+        onClose={() => setIsContractModalOpen(false)}
+      />
     </div>
   );
 };

@@ -25,8 +25,6 @@ const Navbar = () => {
   const [modalData, setModalData] = useState<ModalData>({ title: '', message: '' });
   const [isMenuClosing, setIsMenuClosing] = useState(false);
   const [isSubmenuClosing, setIsSubmenuClosing] = useState(false);
-  const [isTopBarVisible, setIsTopBarVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
 
   const location = useLocation();
   const submenuButtonRef = useRef<HTMLButtonElement>(null);
@@ -185,32 +183,6 @@ const Navbar = () => {
     };
   }, []);
 
-  // Auto-hide da navbar inteira ao fazer scroll
-  const [isNavbarVisible, setIsNavbarVisible] = useState(true);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-
-      if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        // Scrolling down - esconde a navbar inteira
-        setIsNavbarVisible(false);
-        setIsTopBarVisible(false);
-      } else {
-        // Scrolling up - mostra a navbar
-        setIsNavbarVisible(true);
-        setIsTopBarVisible(true);
-      }
-
-      setLastScrollY(currentScrollY);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, [lastScrollY]);
 
   return (
     <>
@@ -224,17 +196,11 @@ const Navbar = () => {
         />
       )}
       
-      <div className={`fixed w-full top-0 z-50 bg-white shadow-sm transition-transform duration-300 ${
-        isNavbarVisible ? 'translate-y-0' : '-translate-y-full'
-      }`}>
+      <div className="fixed w-full top-0 z-50 bg-white shadow-sm">
         {/* Barra superior */}
-        <div
-          className={`bg-primary/5 border-b border-primary/10 transition-all duration-300 overflow-hidden ${
-            isTopBarVisible ? 'max-h-12 opacity-100' : 'max-h-0 opacity-0'
-          }`}
-        >
+        <div className="bg-primary/5 border-b border-primary/10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="py-2 text-sm text-center text-primary font-medium">
+            <div className="py-1 text-xs sm:text-sm text-center text-primary font-medium">
               Matrículas abertas para o primeiro semestre de 2026!
             </div>
           </div>
