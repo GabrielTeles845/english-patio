@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import InputMask from 'react-input-mask';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ContractModal from '../components/ContractModal';
 import {
   UserIcon,
-  CheckCircleIcon
+  CheckCircleIcon,
+  ChevronUpIcon
 } from '@heroicons/react/24/outline';
 import { fillContractPDF } from '../services/pdfService';
 import { sendContractEmails } from '../services/emailService';
@@ -67,6 +68,8 @@ interface FormData {
 const Enrollment = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isStepsHidden, setIsStepsHidden] = useState(false);
+  const userClosedSteps = useRef(false);
   const [formData, setFormData] = useState<FormData>({
     student1Name: '',
     student1BirthDate: '',
@@ -216,8 +219,22 @@ const Enrollment = () => {
   // Detectar scroll para compactar os steps
   useEffect(() => {
     const handleScroll = () => {
-      // Considera scrollado se passou de 200px
-      setIsScrolled(window.scrollY > 200);
+      const scrolled = window.scrollY > 200;
+      setIsScrolled(scrolled);
+
+      // Se scrollou para o topo, resetar tudo e mostrar steps expandidos
+      if (!scrolled) {
+        userClosedSteps.current = false;
+        setIsStepsHidden(false);
+      }
+      // Se scrollou para baixo e usuário fechou manualmente, manter fechado
+      else if (scrolled && userClosedSteps.current) {
+        setIsStepsHidden(true);
+      }
+      // Se scrollou para baixo e usuário NÃO fechou manualmente, mostrar compacto
+      else if (scrolled && !userClosedSteps.current) {
+        setIsStepsHidden(false);
+      }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -300,13 +317,14 @@ const Enrollment = () => {
       </section>
 
       {/* Progress Steps */}
-      <section className={`sticky top-[106px] z-40 transition-all duration-300 ${
-        isScrolled
-          ? 'pt-2 pb-1 md:pt-3 md:pb-2 shadow-md bg-white'
-          : 'pt-4 pb-2 md:pt-6 md:pb-3 bg-gradient-to-br from-slate-50 via-blue-50/30 to-white'
-      }`}>
-        <div className="max-w-5xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8">
-          <div className="relative">
+      {!isStepsHidden && (
+        <section className={`sticky top-[106px] z-40 transition-all duration-300 ${
+          isScrolled
+            ? 'pt-2 pb-1 md:pt-3 md:pb-2 shadow-md bg-white'
+            : 'pt-4 pb-2 md:pt-6 md:pb-3 bg-gradient-to-br from-slate-50 via-blue-50/30 to-white'
+        }`}>
+          <div className="max-w-5xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 relative">
+            <div className="relative">
             {/* Background Line - Desktop and Mobile */}
             <div className={`absolute left-0 right-0 h-1 bg-gray-200 transition-all duration-300 ${
               isScrolled ? 'top-4 sm:top-5 md:top-6' : 'top-5 sm:top-6 md:top-8'
@@ -389,6 +407,43 @@ const Enrollment = () => {
           </div>
         </div>
       </section>
+      )}
+
+      {/* Etiqueta para ocultar/mostrar steps */}
+      {isScrolled && (
+        <div
+          className="fixed left-1/2 transform -translate-x-1/2 z-30 pointer-events-none transition-all duration-300"
+          style={{
+            top: isStepsHidden
+              ? '106px'
+              : window.innerWidth >= 768
+                ? 'calc(106px + 5.5rem)'
+                : 'calc(106px + 4.5rem)'
+          }}
+        >
+          <button
+            onClick={() => {
+              const newHiddenState = !isStepsHidden;
+              setIsStepsHidden(newHiddenState);
+              // Marcar que o usuário fechou manualmente
+              if (newHiddenState) {
+                userClosedSteps.current = true;
+              } else {
+                userClosedSteps.current = false;
+              }
+            }}
+            className="p-1.5 bg-white rounded-b-lg shadow-md hover:shadow-lg transition-all duration-300 group pointer-events-auto"
+            title={isStepsHidden ? "Mostrar indicador de etapas" : "Ocultar indicador de etapas"}
+            aria-label={isStepsHidden ? "Mostrar indicador de etapas" : "Ocultar indicador de etapas"}
+          >
+            {isStepsHidden ? (
+              <ChevronUpIcon className="h-3.5 w-3.5 text-primary group-hover:text-secondary transition-colors rotate-180" />
+            ) : (
+              <ChevronUpIcon className="h-3.5 w-3.5 text-primary group-hover:text-secondary transition-colors" />
+            )}
+          </button>
+        </div>
+      )}
 
       {/* Form Content */}
       <section className="py-8 md:py-16 flex-1">
