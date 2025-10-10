@@ -3,13 +3,25 @@ import InputMask from 'react-input-mask';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ContractModal from '../components/ContractModal';
+import PDFViewerModal from '../components/PDFViewerModal';
 import {
   UserIcon,
   CheckCircleIcon,
-  ChevronUpIcon
+  ChevronUpIcon,
+  XCircleIcon
 } from '@heroicons/react/24/outline';
 import { fillContractPDF } from '../services/pdfService';
 import { sendContractEmails } from '../services/emailService';
+import {
+  isValidCPF,
+  isValidStudentBirthDate,
+  isValidResponsibleBirthDate,
+  isValidPhone,
+  isValidFullName,
+  isValidEmail,
+  isValidCEP,
+  ErrorMessages
+} from '../utils/validators';
 
 interface FormData {
   // Aluno 1
@@ -70,6 +82,8 @@ const Enrollment = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isStepsHidden, setIsStepsHidden] = useState(false);
   const userClosedSteps = useRef(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [cepStatus, setCepStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [formData, setFormData] = useState<FormData>({
     student1Name: '',
     student1BirthDate: '',
@@ -141,14 +155,19 @@ const Enrollment = () => {
   // Função para buscar endereço via ViaCEP
   const fetchAddressFromCep = async (cep: string) => {
     const numericCep = cep.replace(/\D/g, '');
-    if (numericCep.length !== 8) return;
+    if (numericCep.length !== 8) {
+      setCepStatus('idle');
+      return;
+    }
+
+    setCepStatus('loading');
 
     try {
       const response = await fetch(`https://viacep.com.br/ws/${numericCep}/json/`);
       const data = await response.json();
 
       if (data.erro) {
-        alert('CEP não encontrado. Por favor, verifique e tente novamente.');
+        setCepStatus('error');
         return;
       }
 
@@ -168,14 +187,25 @@ const Enrollment = () => {
           classFormat: 'sede',
         }));
       }
+
+      setCepStatus('success');
     } catch (error) {
       console.error('Erro ao buscar CEP:', error);
-      alert('Erro ao buscar CEP. Por favor, tente novamente.');
+      setCepStatus('error');
     }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
+
+    // Limpar erro do campo quando o usuário começar a digitar
+    if (errors[name]) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
 
     if (type === 'checkbox') {
       const checked = (e.target as HTMLInputElement).checked;
@@ -196,16 +226,168 @@ const Enrollment = () => {
       // Buscar endereço automaticamente quando CEP completo
       if (name === 'cep') {
         const numericCep = value.replace(/\D/g, '');
-        if (numericCep.length === 8) {
+        if (numericCep.length < 8) {
+          setCepStatus('idle');
+        } else if (numericCep.length === 8) {
           fetchAddressFromCep(value);
         }
       }
     }
   };
 
+  const validateStep1 = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    // Validar Aluno 1
+    if (!formData.student1Name.trim()) {
+      newErrors.student1Name = ErrorMessages.REQUIRED;
+    } else if (!isValidFullName(formData.student1Name)) {
+      newErrors.student1Name = ErrorMessages.INVALID_FULL_NAME;
+    }
+
+    if (!formData.student1BirthDate) {
+      newErrors.student1BirthDate = ErrorMessages.REQUIRED;
+    } else {
+      const validation = isValidStudentBirthDate(formData.student1BirthDate);
+      if (!validation.valid) {
+        newErrors.student1BirthDate = validation.message || 'Data inválida';
+      }
+    }
+
+    // Validar Aluno 2 (se existir)
+    if (formData.hasStudent2) {
+      if (!formData.student2Name.trim()) {
+        newErrors.student2Name = ErrorMessages.REQUIRED;
+      } else if (!isValidFullName(formData.student2Name)) {
+        newErrors.student2Name = ErrorMessages.INVALID_FULL_NAME;
+      }
+
+      if (!formData.student2BirthDate) {
+        newErrors.student2BirthDate = ErrorMessages.REQUIRED;
+      } else {
+        const validation = isValidStudentBirthDate(formData.student2BirthDate);
+        if (!validation.valid) {
+          newErrors.student2BirthDate = validation.message || 'Data inválida';
+        }
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateStep2 = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    // Validar Responsável Principal
+    if (!formData.responsibleName.trim()) {
+      newErrors.responsibleName = ErrorMessages.REQUIRED;
+    } else if (!isValidFullName(formData.responsibleName)) {
+      newErrors.responsibleName = ErrorMessages.INVALID_FULL_NAME;
+    }
+
+    if (!formData.responsibleBirthDate) {
+      newErrors.responsibleBirthDate = ErrorMessages.REQUIRED;
+    } else {
+      const validation = isValidResponsibleBirthDate(formData.responsibleBirthDate);
+      if (!validation.valid) {
+        newErrors.responsibleBirthDate = validation.message || 'Data inválida';
+      }
+    }
+
+    if (!formData.responsibleCPF) {
+      newErrors.responsibleCPF = ErrorMessages.REQUIRED;
+    } else if (!isValidCPF(formData.responsibleCPF)) {
+      newErrors.responsibleCPF = ErrorMessages.INVALID_CPF;
+    }
+
+    if (!formData.responsiblePhone) {
+      newErrors.responsiblePhone = ErrorMessages.REQUIRED;
+    } else if (!isValidPhone(formData.responsiblePhone)) {
+      newErrors.responsiblePhone = ErrorMessages.INVALID_PHONE;
+    }
+
+    if (!formData.responsibleRelationship) {
+      newErrors.responsibleRelationship = ErrorMessages.REQUIRED;
+    }
+
+    // Validar Segundo Responsável (se existir)
+    if (formData.hasSecondResponsible) {
+      if (!formData.secondResponsibleName.trim()) {
+        newErrors.secondResponsibleName = ErrorMessages.REQUIRED;
+      } else if (!isValidFullName(formData.secondResponsibleName)) {
+        newErrors.secondResponsibleName = ErrorMessages.INVALID_FULL_NAME;
+      }
+
+      if (!formData.secondResponsiblePhone) {
+        newErrors.secondResponsiblePhone = ErrorMessages.REQUIRED;
+      } else if (!isValidPhone(formData.secondResponsiblePhone)) {
+        newErrors.secondResponsiblePhone = ErrorMessages.INVALID_PHONE;
+      }
+
+      if (!formData.secondResponsibleRelationship) {
+        newErrors.secondResponsibleRelationship = ErrorMessages.REQUIRED;
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateStep3 = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    // Validar Email
+    if (!formData.responsibleEmail) {
+      newErrors.responsibleEmail = ErrorMessages.REQUIRED;
+    } else if (!isValidEmail(formData.responsibleEmail)) {
+      newErrors.responsibleEmail = ErrorMessages.INVALID_EMAIL;
+    }
+
+    // Validar CEP
+    if (!formData.cep) {
+      newErrors.cep = ErrorMessages.REQUIRED;
+    } else if (!isValidCEP(formData.cep)) {
+      newErrors.cep = ErrorMessages.INVALID_CEP;
+    }
+
+    // Validar Responsável Financeiro (se for outro)
+    if (formData.financialResponsibleType === 'other') {
+      if (!formData.financialResponsibleName.trim()) {
+        newErrors.financialResponsibleName = ErrorMessages.REQUIRED;
+      } else if (!isValidFullName(formData.financialResponsibleName)) {
+        newErrors.financialResponsibleName = ErrorMessages.INVALID_FULL_NAME;
+      }
+    }
+
+    // Validar confirmação de horário
+    if (!formData.scheduleConfirmed) {
+      newErrors.scheduleConfirmed = 'Você deve confirmar o horário das aulas';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const nextStep = () => {
-    setCurrentStep(prev => Math.min(prev + 1, 4));
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    let isValid = false;
+
+    if (currentStep === 1) {
+      isValid = validateStep1();
+    } else if (currentStep === 2) {
+      isValid = validateStep2();
+    } else if (currentStep === 3) {
+      isValid = validateStep3();
+    } else {
+      isValid = true;
+    }
+
+    if (isValid) {
+      setCurrentStep(prev => Math.min(prev + 1, 4));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   const prevStep = () => {
@@ -215,6 +397,8 @@ const Enrollment = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isContractModalOpen, setIsContractModalOpen] = useState(false);
+  const [isPDFModalOpen, setIsPDFModalOpen] = useState(false);
+  const [generatedPDF, setGeneratedPDF] = useState<Uint8Array | null>(null);
 
   // Detectar scroll para compactar os steps
   useEffect(() => {
@@ -246,22 +430,19 @@ const Enrollment = () => {
     setIsSubmitting(true);
 
     try {
-      // Montar endereço completo
-      const fullAddress = `${formData.street}, ${formData.number}${formData.complement ? ` - ${formData.complement}` : ''}, ${formData.neighborhood}, ${formData.city}/${formData.state}`;
+      // Montar endereço (linha 1: rua, número e complemento)
+      const addressLine1 = `${formData.street}, ${formData.number}${formData.complement ? ` - ${formData.complement}` : ''}`;
 
       // Preparar dados do contrato
       const contractData = {
         contractorName: formData.responsibleName,
-        contractorAddress: fullAddress,
+        contractorAddress: addressLine1,
+        contractorNeighborhood: formData.neighborhood,
+        contractorCity: `${formData.city}/${formData.state}`,
         contractorCEP: formData.cep,
         contractorCPF: formData.responsibleCPF,
         contractorPhone: formData.responsiblePhone,
         classFormat: formData.classFormat,
-        schedule: formData.schedule,
-        scheduleDay1Start: formData.scheduleDay1Start,
-        scheduleDay1End: formData.scheduleDay1End,
-        scheduleDay2Start: formData.scheduleDay2Start,
-        scheduleDay2End: formData.scheduleDay2End,
         imageAuthorization: formData.authorizationMedia,
         signatureDate: new Date().toLocaleDateString('pt-BR'),
       };
@@ -271,9 +452,12 @@ const Enrollment = () => {
       const pdfBytes = await fillContractPDF(contractData);
       console.log('PDF preenchido com sucesso!');
 
-      // Enviar emails
+      // Salvar PDF no estado para exibir no modal
+      setGeneratedPDF(pdfBytes);
+
+      // Enviar emails (em background, não bloquear a exibição do PDF)
       console.log('Enviando emails...');
-      await sendContractEmails(
+      sendContractEmails(
         pdfBytes,
         {
           studentName: formData.student1Name,
@@ -287,9 +471,13 @@ const Enrollment = () => {
           templateId: import.meta.env.VITE_EMAILJS_TEMPLATE_ID || '',
           publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY || '',
         }
-      );
+      ).catch(err => {
+        console.error('Erro ao enviar email:', err);
+        // Não bloqueia a exibição do PDF se o email falhar
+      });
 
-      alert('✅ Matrícula realizada com sucesso! Você receberá o contrato por email em breve.');
+      // Abrir modal com PDF
+      setIsPDFModalOpen(true);
       console.log('Formulário enviado:', formData);
     } catch (error) {
       console.error('Erro ao processar matrícula:', error);
@@ -470,10 +658,16 @@ const Enrollment = () => {
                         name="student1Name"
                         value={formData.student1Name}
                         onChange={handleInputChange}
-                        required
-                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                        className={`w-full px-4 py-3 rounded-lg border transition-colors ${
+                          errors.student1Name
+                            ? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500'
+                            : 'border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary'
+                        }`}
                         placeholder="Nome completo"
                       />
+                      {errors.student1Name && (
+                        <p className="mt-1 text-sm text-red-600">{errors.student1Name}</p>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -484,9 +678,15 @@ const Enrollment = () => {
                         name="student1BirthDate"
                         value={formData.student1BirthDate}
                         onChange={handleInputChange}
-                        required
-                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                        className={`w-full px-4 py-3 rounded-lg border transition-colors ${
+                          errors.student1BirthDate
+                            ? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500'
+                            : 'border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary'
+                        }`}
                       />
+                      {errors.student1BirthDate && (
+                        <p className="mt-1 text-sm text-red-600">{errors.student1BirthDate}</p>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -537,10 +737,16 @@ const Enrollment = () => {
                           name="student2Name"
                           value={formData.student2Name}
                           onChange={handleInputChange}
-                          required={formData.hasStudent2}
-                          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                          className={`w-full px-4 py-3 rounded-lg border transition-colors ${
+                            errors.student2Name
+                              ? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500'
+                              : 'border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary'
+                          }`}
                           placeholder="Nome completo"
                         />
+                        {errors.student2Name && (
+                          <p className="mt-1 text-sm text-red-600">{errors.student2Name}</p>
+                        )}
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -551,9 +757,15 @@ const Enrollment = () => {
                           name="student2BirthDate"
                           value={formData.student2BirthDate}
                           onChange={handleInputChange}
-                          required={formData.hasStudent2}
-                          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                          className={`w-full px-4 py-3 rounded-lg border transition-colors ${
+                            errors.student2BirthDate
+                              ? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500'
+                              : 'border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary'
+                          }`}
                         />
+                        {errors.student2BirthDate && (
+                          <p className="mt-1 text-sm text-red-600">{errors.student2BirthDate}</p>
+                        )}
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -608,10 +820,16 @@ const Enrollment = () => {
                         name="responsibleName"
                         value={formData.responsibleName}
                         onChange={handleInputChange}
-                        required
-                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                        className={`w-full px-4 py-3 rounded-lg border transition-colors ${
+                          errors.responsibleName
+                            ? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500'
+                            : 'border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary'
+                        }`}
                         placeholder="Nome completo do responsável"
                       />
+                      {errors.responsibleName && (
+                        <p className="mt-1 text-sm text-red-600">{errors.responsibleName}</p>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -622,9 +840,15 @@ const Enrollment = () => {
                         name="responsibleBirthDate"
                         value={formData.responsibleBirthDate}
                         onChange={handleInputChange}
-                        required
-                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                        className={`w-full px-4 py-3 rounded-lg border transition-colors ${
+                          errors.responsibleBirthDate
+                            ? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500'
+                            : 'border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary'
+                        }`}
                       />
+                      {errors.responsibleBirthDate && (
+                        <p className="mt-1 text-sm text-red-600">{errors.responsibleBirthDate}</p>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -636,10 +860,16 @@ const Enrollment = () => {
                         name="responsibleCPF"
                         value={formData.responsibleCPF}
                         onChange={handleInputChange}
-                        required
-                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                        className={`w-full px-4 py-3 rounded-lg border transition-colors ${
+                          errors.responsibleCPF
+                            ? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500'
+                            : 'border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary'
+                        }`}
                         placeholder="000.000.000-00"
                       />
+                      {errors.responsibleCPF && (
+                        <p className="mt-1 text-sm text-red-600">{errors.responsibleCPF}</p>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -651,10 +881,16 @@ const Enrollment = () => {
                         name="responsiblePhone"
                         value={formData.responsiblePhone}
                         onChange={handleInputChange}
-                        required
-                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                        className={`w-full px-4 py-3 rounded-lg border transition-colors ${
+                          errors.responsiblePhone
+                            ? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500'
+                            : 'border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary'
+                        }`}
                         placeholder="(62) 99999-9999"
                       />
+                      {errors.responsiblePhone && (
+                        <p className="mt-1 text-sm text-red-600">{errors.responsiblePhone}</p>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -664,8 +900,11 @@ const Enrollment = () => {
                         name="responsibleRelationship"
                         value={formData.responsibleRelationship}
                         onChange={handleInputChange}
-                        required
-                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                        className={`w-full px-4 py-3 rounded-lg border transition-colors ${
+                          errors.responsibleRelationship
+                            ? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500'
+                            : 'border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary'
+                        }`}
                       >
                         <option value="">Selecione...</option>
                         <option value="mae">Mãe</option>
@@ -677,6 +916,9 @@ const Enrollment = () => {
                         <option value="tutor">Tutor Legal</option>
                         <option value="outro">Outro</option>
                       </select>
+                      {errors.responsibleRelationship && (
+                        <p className="mt-1 text-sm text-red-600">{errors.responsibleRelationship}</p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -714,10 +956,16 @@ const Enrollment = () => {
                           name="secondResponsibleName"
                           value={formData.secondResponsibleName}
                           onChange={handleInputChange}
-                          required={formData.hasSecondResponsible}
-                          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                          className={`w-full px-4 py-3 rounded-lg border transition-colors ${
+                            errors.secondResponsibleName
+                              ? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500'
+                              : 'border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary'
+                          }`}
                           placeholder="Nome completo"
                         />
+                        {errors.secondResponsibleName && (
+                          <p className="mt-1 text-sm text-red-600">{errors.secondResponsibleName}</p>
+                        )}
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -729,10 +977,16 @@ const Enrollment = () => {
                           name="secondResponsiblePhone"
                           value={formData.secondResponsiblePhone}
                           onChange={handleInputChange}
-                          required={formData.hasSecondResponsible}
-                          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                          className={`w-full px-4 py-3 rounded-lg border transition-colors ${
+                            errors.secondResponsiblePhone
+                              ? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500'
+                              : 'border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary'
+                          }`}
                           placeholder="(62) 99999-9999"
                         />
+                        {errors.secondResponsiblePhone && (
+                          <p className="mt-1 text-sm text-red-600">{errors.secondResponsiblePhone}</p>
+                        )}
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -742,8 +996,11 @@ const Enrollment = () => {
                           name="secondResponsibleRelationship"
                           value={formData.secondResponsibleRelationship}
                           onChange={handleInputChange}
-                          required={formData.hasSecondResponsible}
-                          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                          className={`w-full px-4 py-3 rounded-lg border transition-colors ${
+                            errors.secondResponsibleRelationship
+                              ? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500'
+                              : 'border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary'
+                          }`}
                         >
                           <option value="">Selecione...</option>
                           <option value="mae">Mãe</option>
@@ -755,6 +1012,9 @@ const Enrollment = () => {
                           <option value="tutor">Tutor Legal</option>
                           <option value="outro">Outro</option>
                         </select>
+                        {errors.secondResponsibleRelationship && (
+                          <p className="mt-1 text-sm text-red-600">{errors.secondResponsibleRelationship}</p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -829,10 +1089,16 @@ const Enrollment = () => {
                             name="financialResponsibleName"
                             value={formData.financialResponsibleName}
                             onChange={handleInputChange}
-                            required={formData.financialResponsibleType === 'other'}
-                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                            className={`w-full px-4 py-3 rounded-lg border transition-colors ${
+                              errors.financialResponsibleName
+                                ? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500'
+                                : 'border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary'
+                            }`}
                             placeholder="Nome completo"
                           />
+                          {errors.financialResponsibleName && (
+                            <p className="mt-1 text-sm text-red-600">{errors.financialResponsibleName}</p>
+                          )}
                         </div>
                       )}
                     </div>
@@ -848,10 +1114,16 @@ const Enrollment = () => {
                       name="responsibleEmail"
                       value={formData.responsibleEmail}
                       onChange={handleInputChange}
-                      required
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                      className={`w-full px-4 py-3 rounded-lg border transition-colors ${
+                        errors.responsibleEmail
+                          ? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500'
+                          : 'border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary'
+                      }`}
                       placeholder="email@exemplo.com"
                     />
+                    {errors.responsibleEmail && (
+                      <p className="mt-1 text-sm text-red-600">{errors.responsibleEmail}</p>
+                    )}
                   </div>
 
                   {/* Endereço com Auto-preenchimento */}
@@ -863,16 +1135,42 @@ const Enrollment = () => {
                           <label className="block text-sm font-medium text-gray-700 mb-2">
                             CEP *
                           </label>
-                          <InputMask
-                            mask="99999-999"
-                            type="text"
-                            name="cep"
-                            value={formData.cep}
-                            onChange={handleInputChange}
-                            required
-                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
-                            placeholder="00000-000"
-                          />
+                          <div className="relative">
+                            <InputMask
+                              mask="99999-999"
+                              type="text"
+                              name="cep"
+                              value={formData.cep}
+                              onChange={handleInputChange}
+                              className={`w-full px-4 py-3 pr-12 rounded-lg border transition-colors ${
+                                errors.cep
+                                  ? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500'
+                                  : 'border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary'
+                              }`}
+                              placeholder="00000-000"
+                            />
+                            {/* Indicadores de status do CEP */}
+                            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                              {cepStatus === 'loading' && (
+                                <svg className="animate-spin h-5 w-5 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                              )}
+                              {cepStatus === 'success' && (
+                                <CheckCircleIcon className="h-5 w-5 text-green-500" />
+                              )}
+                              {cepStatus === 'error' && (
+                                <XCircleIcon className="h-5 w-5 text-red-500" />
+                              )}
+                            </div>
+                          </div>
+                          {errors.cep && (
+                            <p className="mt-1 text-sm text-red-600">{errors.cep}</p>
+                          )}
+                          {cepStatus === 'error' && !errors.cep && (
+                            <p className="mt-1 text-sm text-red-600">CEP não encontrado. Verifique e tente novamente.</p>
+                          )}
                           <p className="text-xs text-gray-500 mt-1">Os campos abaixo serão preenchidos automaticamente</p>
                         </div>
                         <div>
@@ -981,6 +1279,47 @@ const Enrollment = () => {
                     <p className="text-sm text-gray-600 mt-1">Um carnê físico/online será entregue a cada família</p>
                   </div>
 
+                  {/* Formato das Aulas */}
+                  <div className="p-6 bg-purple-50/50 rounded-xl">
+                    <h3 className="text-lg font-semibold text-primary mb-4">Formato das Aulas</h3>
+                    <div className="space-y-2">
+                      <label className="flex items-center cursor-pointer p-3 border-2 rounded-lg hover:bg-white transition-colors">
+                        <input
+                          type="radio"
+                          name="classFormat"
+                          value="sede"
+                          checked={formData.classFormat === 'sede'}
+                          onChange={handleInputChange}
+                          className="w-5 h-5 text-primary"
+                        />
+                        <span className="ml-3 font-medium">Presencial na sede da escola</span>
+                      </label>
+                      <label className={`flex items-center cursor-pointer p-3 border-2 rounded-lg transition-colors ${
+                        canHaveHomeClasses(formData.cep)
+                          ? 'hover:bg-white'
+                          : 'opacity-50 cursor-not-allowed'
+                      }`}>
+                        <input
+                          type="radio"
+                          name="classFormat"
+                          value="domicilio"
+                          checked={formData.classFormat === 'domicilio'}
+                          onChange={handleInputChange}
+                          disabled={!canHaveHomeClasses(formData.cep)}
+                          className="w-5 h-5 text-primary"
+                        />
+                        <span className="ml-3">
+                          <span className="font-medium">Presencial no domicílio do aluno</span>
+                          {!canHaveHomeClasses(formData.cep) && (
+                            <span className="block text-xs text-red-600 mt-1">
+                              (Disponível apenas para Setor Bueno e Marista)
+                            </span>
+                          )}
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+
                   {/* Confirmação de Horário */}
                   <div className="mt-6">
                     <label className="flex items-start cursor-pointer p-4 border-2 border-primary/30 rounded-lg hover:bg-blue-50/30 transition-colors">
@@ -989,13 +1328,15 @@ const Enrollment = () => {
                         name="scheduleConfirmed"
                         checked={formData.scheduleConfirmed}
                         onChange={handleInputChange}
-                        required
                         className="w-5 h-5 text-primary rounded focus:ring-2 focus:ring-primary mt-1 flex-shrink-0"
                       />
                       <span className="ml-3 text-gray-700 font-medium">
                         Já confirmei o horário das aulas do(a) meu(minha) filho(a) *
                       </span>
                     </label>
+                    {errors.scheduleConfirmed && (
+                      <p className="mt-1 text-sm text-red-600">{errors.scheduleConfirmed}</p>
+                    )}
                   </div>
                 </div>
 
@@ -1079,6 +1420,15 @@ const Enrollment = () => {
                       <p><span className="text-gray-600">Forma de Pagamento:</span> <span className="font-medium">{formData.paymentMethod || '-'}</span></p>
                     </div>
                   </div>
+
+                  {/* Formato das Aulas */}
+                  <div className="p-6 bg-purple-50/50 rounded-xl">
+                    <h3 className="text-lg font-semibold text-primary mb-4">Formato das Aulas</h3>
+                    <div className="space-y-2">
+                      <p><span className="text-gray-600">Formato:</span> <span className="font-medium">{formData.classFormat === 'sede' ? 'Presencial na sede da escola' : 'Presencial no domicílio do aluno'}</span></p>
+                    </div>
+                  </div>
+
                 </div>
 
                 {/* Autorizações */}
@@ -1173,6 +1523,13 @@ const Enrollment = () => {
       <ContractModal
         isOpen={isContractModalOpen}
         onClose={() => setIsContractModalOpen(false)}
+      />
+
+      <PDFViewerModal
+        isOpen={isPDFModalOpen}
+        onClose={() => setIsPDFModalOpen(false)}
+        pdfBytes={generatedPDF}
+        studentName={formData.student1Name}
       />
     </div>
   );

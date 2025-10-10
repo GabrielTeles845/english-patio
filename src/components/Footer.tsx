@@ -1,44 +1,7 @@
 import { PhoneIcon, EnvelopeIcon, MapPinIcon } from '@heroicons/react/24/outline';
 
-// Reutilizando os mesmos itens do menu do Navbar para manter consistência
-const homeSubmenuItems = [
-  { title: 'Aprenda Inglês', href: '#', section: 'top' },
-  { title: 'Sobre Nós', href: '#about', section: 'about' },
-  { title: 'Cursos', href: '#courses', section: 'courses' },
-  { title: 'Depoimentos', href: '#testimonials', section: 'testimonials' },
-  { title: 'Contato', href: '#contact', section: 'contact' },
-];
-
 const Footer = () => {
   const basePath = '';
-  
-  // Função para lidar com o scroll suave para as seções
-  const handleScrollToSection = (e: React.MouseEvent, sectionId: string) => {
-    e.preventDefault();
-    
-    // Se estiver na página inicial, fazer scroll suave
-    if (window.location.pathname === '/' || 
-        window.location.pathname === basePath || 
-        window.location.pathname === `${basePath}/`) {
-      if (sectionId === 'top') {
-        // Scroll para o topo da página
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } else {
-        // Scroll para a seção específica
-        const section = document.getElementById(sectionId);
-        if (section) {
-          section.scrollIntoView({ behavior: 'smooth' });
-        }
-      }
-    } else {
-      // Se não estiver na página inicial, navegar para a página inicial e depois para a seção
-      if (sectionId === 'top') {
-        window.location.href = `${basePath}/`;
-      } else {
-        window.location.href = `${basePath}/#${sectionId}`;
-      }
-    }
-  };
   
   return (
     <footer className="bg-slate-50">
@@ -67,20 +30,6 @@ const Footer = () => {
                 <a href={`${basePath}/`} className="text-gray-600 hover:text-secondary transition-colors font-medium">
                   Início
                 </a>
-                {/* Subitens de Início */}
-                <ul className="ml-5 mt-2 space-y-2">
-                  {homeSubmenuItems.map((item) => (
-                    <li key={item.section}>
-                      <a
-                        href={item.href}
-                        className="text-gray-500 hover:text-secondary transition-colors text-sm"
-                        onClick={(e) => handleScrollToSection(e, item.section)}
-                      >
-                        {item.title}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
               </li>
               
               <li>

@@ -23,7 +23,7 @@ const features = [
 
 const HeroSection = () => {
   return (
-    <div className="relative pb-12 md:pt-8 md:pb-16 overflow-hidden bg-white">
+    <div className="relative pb-12 md:pt-8 md:pb-16 overflow-hidden bg-white animate-fade-in">
       {/* Elementos decorativos */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute -top-10 -right-10 w-72 h-72 bg-yellow-200 rounded-full opacity-20 blur-3xl"></div>
@@ -56,14 +56,14 @@ const HeroSection = () => {
             <div className="mt-8 lg:mt-12 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
               <a
                 href="#contact"
-                className="btn-primary group text-center inline-flex items-center justify-center"
+                className="btn-primary btn-hover group text-center inline-flex items-center justify-center"
               >
                 Fale Conosco
                 <ArrowRightIcon className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
               </a>
               <a
                 href="#courses"
-                className="btn-secondary text-center inline-flex items-center justify-center"
+                className="btn-secondary btn-hover text-center inline-flex items-center justify-center"
               >
                 Conheça Nosso Curso
               </a>

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Bars3Icon, XMarkIcon, ChevronDownIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { Bars3Icon, XMarkIcon, ExclamationTriangleIcon, AcademicCapIcon } from '@heroicons/react/24/outline';
 import { Link, useLocation } from 'react-router-dom';
 import Logo from './Logo';
 import Modal from './Modal';
@@ -10,30 +10,15 @@ type ModalData = {
   message: string;
 };
 
-const homeSubmenuItems = [
-  { title: 'Aprenda Inglês', href: '#', section: 'top' },
-  { title: 'Infraestrutura', href: '#about', section: 'about' },
-  { title: 'Cursos', href: '#courses', section: 'courses' },
-  { title: 'Feedbacks', href: '#testimonials', section: 'testimonials' },
-  { title: 'Contato', href: '#contact', section: 'contact' },
-];
-
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isMobileSubmenuOpen, setIsMobileSubmenuOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalData, setModalData] = useState<ModalData>({ title: '', message: '' });
   const [isMenuClosing, setIsMenuClosing] = useState(false);
-  const [isSubmenuClosing, setIsSubmenuClosing] = useState(false);
 
   const location = useLocation();
-  const submenuButtonRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
-  const submenuRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
-
-  // Obter o caminho base da aplicação
-  const basePath = '';
 
   // Bloquear scroll quando menu estiver aberto
   useEffect(() => {
@@ -60,109 +45,15 @@ const Navbar = () => {
       setTimeout(() => {
         setIsMenuOpen(false);
         setIsMenuClosing(false);
-        setIsMobileSubmenuOpen(false);
-        setIsSubmenuClosing(false);
       }, 280); // Tempo um pouco menor que a duração da animação
     } else {
       setIsMenuOpen(true);
     }
   };
 
-  const toggleMobileSubmenu = (e: React.MouseEvent) => {
-    // Previne a propagação apenas quando for para abrir o menu
-    // para que o evento de clique global possa fechar o menu
-    if (!isMobileSubmenuOpen) {
-      e.stopPropagation();
-      setIsMobileSubmenuOpen(true);
-    } else {
-      // Animação de fechamento do submenu
-      setIsSubmenuClosing(true);
-      setTimeout(() => {
-        setIsMobileSubmenuOpen(false);
-        setIsSubmenuClosing(false);
-      }, 280); // Tempo um pouco menor que a duração da animação
-    }
-  };
-
   const isActive = (path: string) => {
     return location.pathname === path;
   };
-  
-  // Função para lidar com o scroll suave para as seções
-  const handleScrollToSection = (e: React.MouseEvent, sectionId: string) => {
-    e.preventDefault();
-    
-    // Animação de fechamento
-    setIsMenuClosing(true);
-    setTimeout(() => {
-      setIsMenuOpen(false);
-      setIsMenuClosing(false);
-      setIsMobileSubmenuOpen(false);
-      setIsSubmenuClosing(false);
-      
-      // Continua com o scroll após a animação
-      if (location.pathname === '/' || location.pathname === basePath || location.pathname === `${basePath}/`) {
-        if (sectionId === 'top') {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        } else {
-          const section = document.getElementById(sectionId);
-          if (section) {
-            section.scrollIntoView({ behavior: 'smooth' });
-          }
-        }
-      } else {
-        if (sectionId === 'top') {
-          window.location.href = `${basePath}/`;
-        } else {
-          window.location.href = `${basePath}/#${sectionId}`;
-        }
-      }
-    }, 280);
-  };
-  
-  // Função para exibir o modal "Em desenvolvimento"
-  // const showDevelopmentModal = (e: React.MouseEvent, feature: string) => {
-  //   e.preventDefault();
-  //   setModalData({
-  //     title: 'Em Desenvolvimento',
-  //     message: `A funcionalidade "${feature}" está em desenvolvimento e estará disponível em breve!`
-  //   });
-  //   setModalOpen(true);
-
-  //   // Fechar os menus com animação
-  //   if (isMenuOpen) {
-  //     setIsMenuClosing(true);
-  //     setTimeout(() => {
-  //       setIsMenuOpen(false);
-  //       setIsMenuClosing(false);
-  //       setIsMobileSubmenuOpen(false);
-  //       setIsSubmenuClosing(false);
-  //     }, 280);
-  //   }
-  // };
-  
-  // Efeito para fechar o submenu ao clicar em qualquer lugar
-  useEffect(() => {
-    const handleClickOutside = (_: MouseEvent) => {
-      // Fecha o submenu em qualquer clique fora ou mesmo no botão quando estiver aberto
-      if (isMobileSubmenuOpen) {
-        setIsSubmenuClosing(true);
-        setTimeout(() => {
-          setIsMobileSubmenuOpen(false);
-          setIsSubmenuClosing(false);
-        }, 280);
-      }
-    };
-
-    // Adiciona o listener apenas quando o submenu estiver aberto
-    if (isMobileSubmenuOpen) {
-      document.addEventListener('click', handleClickOutside);
-    }
-    
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, [isMobileSubmenuOpen]);
 
   // Efeito para ouvir o evento personalizado do footer
   useEffect(() => {
@@ -219,31 +110,13 @@ const Navbar = () => {
 
               {/* Links de navegação - Desktop */}
               <div className="hidden md:flex items-center space-x-8">
-                {/* Item Início com Submenu */}
-                <div className="relative group">
-                  <Link 
-                    to="/"
-                    className={`nav-item-hover flex items-center ${isActive('/') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors font-medium`}
-                  >
-                    Início
-                    <ChevronDownIcon className="ml-1 h-4 w-4 transition-transform group-hover:rotate-180 duration-300" />
-                  </Link>
-                  
-                  {/* Submenu para Início - aparece no hover */}
-                  <div className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-lg py-2 w-48 z-10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
-                    {homeSubmenuItems.map((item, index) => (
-                      <a
-                        key={item.href}
-                        href={item.href}
-                        style={{ animationDelay: `${index * 50}ms` }} 
-                        className="submenu-item-enter block px-4 py-2 text-primary hover:bg-primary/5 hover:text-secondary"
-                        onClick={(e) => handleScrollToSection(e, item.section)}
-                      >
-                        {item.title}
-                      </a>
-                    ))}
-                  </div>
-                </div>
+                {/* Item Início */}
+                <Link
+                  to="/"
+                  className={`nav-item-hover ${isActive('/') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors font-medium`}
+                >
+                  Início
+                </Link>
                 
                 <Link
                   to="/metodologia"
@@ -275,7 +148,17 @@ const Navbar = () => {
               </div>
 
               {/* Botão do menu - Mobile */}
-              <div className="md:hidden">
+              <div className="md:hidden flex items-center gap-2">
+                {/* Ícone de Matrículas */}
+                <Link
+                  to="/matriculas"
+                  className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary hover:bg-primary-light transition-colors"
+                  aria-label="Matrículas"
+                >
+                  <AcademicCapIcon className="h-5 w-5 text-white" />
+                </Link>
+
+                {/* Menu Hamburguer */}
                 <button
                   onClick={toggleMenu}
                   className="p-2 rounded-lg hover:bg-primary/5 transition-colors"
@@ -307,49 +190,13 @@ const Navbar = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
               <div className="flex flex-col space-y-4">
                 {/* Menu Início para Mobile */}
-                <div>
-                  <div className="flex justify-between items-center">
-                    <Link
-                      to="/"
-                      className={`${isActive('/') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors py-2 font-medium`}
-                      onClick={() => toggleMenu()}
-                    >
-                      Início
-                    </Link>
-                    <button
-                      ref={submenuButtonRef}
-                      onClick={toggleMobileSubmenu}
-                      className="p-2 rounded-lg hover:bg-primary/5 transition-colors"
-                      aria-label={isMobileSubmenuOpen ? "Fechar submenu" : "Abrir submenu"}
-                    >
-                      <ChevronDownIcon className={`h-5 w-5 transition-transform duration-300 ${isMobileSubmenuOpen ? 'rotate-180' : ''}`} />
-                    </button>
-                  </div>
-                  
-                  {(isMobileSubmenuOpen || isSubmenuClosing) && (
-                    <div 
-                      ref={submenuRef}
-                      className={`pl-4 mt-2 border-l-2 border-primary/10 ${isSubmenuClosing ? 'submenu-container-exit' : 'submenu-container-enter'}`}
-                      style={{ 
-                        overflow: 'hidden', 
-                        visibility: isSubmenuClosing && !isMobileSubmenuOpen ? 'hidden' : 'visible',
-                        opacity: isSubmenuClosing && !isMobileSubmenuOpen ? '0' : '1'
-                      }}
-                    >
-                      {homeSubmenuItems.map((item, index) => (
-                        <a
-                          key={item.href}
-                          href={item.href}
-                          style={{ animationDelay: `${index * 50}ms` }}
-                          className="submenu-item-enter block py-2 text-primary hover:text-secondary"
-                          onClick={(e) => handleScrollToSection(e, item.section)}
-                        >
-                          {item.title}
-                        </a>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                <Link
+                  to="/"
+                  className={`${isActive('/') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors py-2 font-medium`}
+                  onClick={() => toggleMenu()}
+                >
+                  Início
+                </Link>
                 
                 <Link
                   to="/metodologia"
