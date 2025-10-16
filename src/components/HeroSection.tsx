@@ -37,11 +37,11 @@ const HeroSection = () => {
           <div className="text-center lg:text-left order-1">
             <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold tracking-tight leading-tight">
               <span className="block text-primary">
-                Inglês com <span className="text-secondary">confiança</span>
+                Inglês para <span className="text-secondary">crianças</span>
               </span>
               <span className="block mt-1 lg:-mt-1 lg:whitespace-nowrap">
                 <span className="text-primary">e </span>
-                <span className="text-secondary">naturalidade!</span>
+                <span className="text-secondary">adolescentes</span>
               </span>
             </h1>
 

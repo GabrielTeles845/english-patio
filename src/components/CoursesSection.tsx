@@ -77,7 +77,7 @@ const levelGroups: LevelGroup[] = [
     id: 'iniciantes',
     title: 'FUN CONVERSATION',
     icon: '',
-    description: 'Primeiros contatos com o inglês, em uma abordagem totalmente lúdica, com jogos, músicas e atividades interativas.',
+    description: 'Primeiros contatos com o inglês, em uma abordagem totalmente lúdica, com jogos, músicas e atividades interativas. Para crianças de 4 e 5 anos de idade.',
     levels: [
       { name: 'Fun Conversation', color: 'bg-green-500 text-white' }
     ]
@@ -90,9 +90,7 @@ const levelGroups: LevelGroup[] = [
     levels: [
       { name: 'Conversation 1', color: 'bg-green-700 text-white' },
       { name: 'Conversation 2', color: 'bg-gray-500 text-white' },
-      { name: 'Three House 1', color: 'bg-green-500 text-white' },
-      { name: 'Three House 2', color: 'bg-orange-500 text-white' },
-      { name: 'Three House 3', color: 'bg-purple-500 text-white' }
+      { name: 'Conversation 3', color: 'bg-green-500 text-white' }
     ]
   },
   {

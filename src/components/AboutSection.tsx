@@ -6,6 +6,16 @@ import OptimizedImage from './OptimizedImage';
 
 const highlights = [
   {
+    name: 'Mais de 10 Salas Interativas',
+    description: 'Layout com mesas redondas, livros literários, decoração lúdica e climatização',
+    icon: BuildingOffice2Icon,
+  },
+  {
+    name: 'Ambiente Imersivo',
+    description: 'Murais artísticos e decoração temática que remetem à cultura de língua inglesa',
+    icon: SparklesIcon,
+  },
+  {
     name: 'Fun Space',
     description: 'Sala multiuso com karaokê, cozinha e palco para apresentações em inglês',
     icon: SparklesIcon,
@@ -13,11 +23,6 @@ const highlights = [
   {
     name: 'Pátio Amplo',
     description: 'Espaço acolhedor com bancos, música ambiente, cesta de basquete e pergolado',
-    icon: BuildingOffice2Icon,
-  },
-  {
-    name: 'Equipe Solícita',
-    description: 'Profissionais sempre presentes para orientar alunos, pais e responsáveis',
     icon: UserGroupIcon,
   },
 ];
@@ -73,23 +78,8 @@ const AboutSection = () => {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Coluna de Texto */}
           <div className="space-y-6">
-            <div className="prose prose-lg">
-              <p className="text-gray-700 leading-relaxed">
-                A escola conta com <strong>mais de 10 salas de aula</strong>, todas com layout interativo,
-                utilizando mesas redondas que favorecem a troca entre os alunos. As salas também possuem
-                estantes com livros literários, decoração lúdica, climatização, e computadores disponíveis
-                para atividades orientadas pelos professores.
-              </p>
-
-              <p className="text-gray-700 leading-relaxed">
-                Os ambientes da escola são decorados com murais artísticos e elementos visuais que remetem
-                à cultura de países de língua inglesa, criando uma atmosfera temática que contribui para
-                a imersão no idioma desde o primeiro contato.
-              </p>
-            </div>
-
-            {/* 3 Cards de Destaques */}
-            <div className="grid gap-4 mt-8">
+            {/* 4 Cards de Destaques */}
+            <div className="grid gap-4">
               {highlights.map((highlight) => (
                 <div
                   key={highlight.name}
