@@ -307,11 +307,6 @@ const Enrollment = () => {
       }
     }
 
-    // Validar confirmação de horário
-    if (!formData.scheduleConfirmed) {
-      newErrors.scheduleConfirmed = 'Você deve confirmar o horário das aulas';
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -1270,7 +1265,7 @@ const Enrollment = () => {
                         className="w-5 h-5 text-primary rounded focus:ring-2 focus:ring-primary mt-1 flex-shrink-0"
                       />
                       <span className="ml-3 text-gray-700 font-medium">
-                        Já confirmei o horário das aulas do(a) meu(minha) filho(a) *
+                        Já confirmei o horário das aulas do(a) meu(minha) filho(a)
                       </span>
                     </label>
                     {errors.scheduleConfirmed && (

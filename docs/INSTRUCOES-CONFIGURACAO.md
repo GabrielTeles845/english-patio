@@ -4,23 +4,16 @@
 
 ---
 
-## 🎯 Passo 1: Criar Conta Google Workspace (RECOMENDADO)
+## 🎯 Passo 1: Usar sua Conta Gmail (GRATUITO)
 
-**Por que Workspace?**
-- ✅ 500 emails/dia (vs 100 da conta gratuita)
-- ✅ Suporte profissional
-- ✅ Confiabilidade máxima
+**Você vai usar uma conta Gmail GRATUITA!**
+- ✅ 100 emails/dia (mais que suficiente para matrículas)
+- ✅ Zero custo
+- ✅ Configuração mais simples
 
-**Como criar:**
+**Recomendação:** Use sua conta Gmail pessoal ou crie uma nova conta para a escola.
 
-1. Acesse: https://workspace.google.com/intl/pt-BR/
-2. Clique em **"Começar agora"**
-3. Escolha o plano **Business Starter** (R$35/mês)
-4. Siga o passo a passo de cadastro
-
-**ATENÇÃO:** Use o email `englishpatio@yahoo.com` como email principal da conta.
-
-> **Alternativa gratuita:** Pode usar uma conta Gmail normal, mas terá limite de 100 emails/dia.
+> **Upgrade futuro (opcional):** Se no futuro precisar de mais emails/dia, pode migrar para Google Workspace (R$35/mês) com 500 emails/dia.
 
 ---
 
@@ -198,7 +191,7 @@ npm run dev
 
 ✅ **Planilha:** Deve aparecer uma nova linha com os dados
 ✅ **Drive:** Deve aparecer o PDF do contrato
-✅ **Email:** Você deve receber o email em englishpatio@yahoo.com
+✅ **Email:** Você deve receber o email em gabriel_teles2010@hotmail.com
 
 ---
 
@@ -232,9 +225,9 @@ Se você mudar o domínio do site, edite a variável `ALLOWED_ORIGINS` no arquiv
 - Verifique se você deu permissão de acesso público à pasta
 
 ### Email não está sendo enviado
-- Verifique se o email `englishpatio@yahoo.com` está correto
+- Verifique se o email `gabriel_teles2010@hotmail.com` está correto no arquivo Code.gs
 - Veja os logs no Google Apps Script (ícone de papel)
-- Se atingiu o limite diário, aguarde 24h ou upgrade para Workspace
+- Se atingiu o limite diário (100 emails), aguarde 24h ou upgrade para Workspace
 
 ### Erro CORS no frontend
 - Verifique se a URL do script está correta no `.env.local`
@@ -259,11 +252,13 @@ npm run deploy
 
 ## 💰 Custos
 
-- **Google Workspace Business Starter:** R$35/mês
-  - Pode cancelar após o período de matrículas
-  - Ou manter para benefícios profissionais
+- **TOTALMENTE GRATUITO!** ✅
+  - Usando conta Gmail gratuita
+  - Limite: 100 emails/dia (suficiente para matrículas)
 
-- **Alternativa gratuita:** Conta Gmail (limite de 100 emails/dia)
+- **Upgrade opcional:** Google Workspace Business Starter (R$35/mês)
+  - Apenas se precisar de mais de 100 emails/dia
+  - 500 emails/dia
 
 ---
 

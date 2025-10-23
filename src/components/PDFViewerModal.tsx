@@ -85,7 +85,7 @@ const PDFViewerModal = ({ isOpen, onClose, pdfBytes, studentName }: PDFViewerMod
                   Matrícula realizada com sucesso!
                 </p>
                 <p className="text-xs sm:text-sm text-green-700 mt-1">
-                  Você também receberá uma cópia deste contrato por e-mail em breve.
+                  A escola receberá os dados da matrícula por e-mail. Em breve entraremos em contato!
                 </p>
               </div>
             </div>
