@@ -11,7 +11,8 @@ import {
   XCircleIcon
 } from '@heroicons/react/24/outline';
 import { fillContractPDF } from '../services/pdfService';
-import { sendContractEmails } from '../services/emailService';
+import { submitEnrollment } from '../services/enrollmentService';
+import { FormData } from '../types/enrollment';
 import {
   isValidCPF,
   isValidStudentBirthDate,
@@ -22,60 +23,6 @@ import {
   isValidCEP,
   ErrorMessages
 } from '../utils/validators';
-
-interface FormData {
-  // Aluno 1
-  student1Name: string;
-  student1BirthDate: string;
-  student1Age: string;
-
-  // Aluno 2 (opcional)
-  hasStudent2: boolean;
-  student2Name: string;
-  student2BirthDate: string;
-  student2Age: string;
-
-  // Responsável Legal Principal
-  responsibleName: string;
-  responsibleBirthDate: string;
-  responsibleCPF: string;
-  responsiblePhone: string;
-  responsibleRelationship: string; // Grau de parentesco
-  responsibleEmail: string;
-
-  // Segundo Responsável (opcional - apenas contato)
-  hasSecondResponsible: boolean;
-  secondResponsibleName: string;
-  secondResponsiblePhone: string;
-  secondResponsibleRelationship: string;
-
-  // Responsável Financeiro (pode ser diferente)
-  financialResponsibleType: 'same' | 'other'; // Mesmo responsável ou outro
-  financialResponsibleName: string; // Usado se 'other'
-
-  // Endereço
-  cep: string;
-  street: string;
-  number: string;
-  complement: string;
-  neighborhood: string;
-  city: string;
-  state: string;
-  paymentMethod: string;
-
-  // Campos do Contrato
-  classFormat: 'sede' | 'domicilio';
-  schedule: 'seg-qua' | 'ter-qui';
-  scheduleDay1Start: string;
-  scheduleDay1End: string;
-  scheduleDay2Start: string;
-  scheduleDay2End: string;
-
-  // Autorizações
-  authorizationMedia: boolean;
-  authorizationContract: boolean;
-  scheduleConfirmed: boolean;
-}
 
 const Enrollment = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -455,26 +402,18 @@ const Enrollment = () => {
       // Salvar PDF no estado para exibir no modal
       setGeneratedPDF(pdfBytes);
 
-      // Enviar emails (em background, não bloquear a exibição do PDF)
-      console.log('Enviando emails...');
-      sendContractEmails(
-        pdfBytes,
-        {
-          studentName: formData.student1Name,
-          contractorName: formData.responsibleName,
-          contractorEmail: formData.responsibleEmail,
-          contractorPhone: formData.responsiblePhone,
-          pdfBase64: '', // será preenchido internamente no serviço
-        },
-        {
-          serviceId: import.meta.env.VITE_EMAILJS_SERVICE_ID || '',
-          templateId: import.meta.env.VITE_EMAILJS_TEMPLATE_ID || '',
-          publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY || '',
-        }
-      ).catch(err => {
-        console.error('Erro ao enviar email:', err);
-        // Não bloqueia a exibição do PDF se o email falhar
-      });
+      // Enviar matrícula para o backend (Google Apps Script)
+      // Isso salvará na planilha, no Drive e enviará o email
+      console.log('Enviando matrícula para o servidor...');
+      const result = await submitEnrollment(formData, pdfBytes);
+
+      if (!result.success) {
+        console.error('Erro ao enviar matrícula:', result.message);
+        // Mesmo com erro no backend, mostrar o PDF para o usuário
+        alert('⚠️ A matrícula foi processada, mas pode ter havido um problema ao enviar os dados. Por favor, entre em contato conosco para confirmar.');
+      } else {
+        console.log('✅ Matrícula enviada com sucesso!');
+      }
 
       // Abrir modal com PDF
       setIsPDFModalOpen(true);
