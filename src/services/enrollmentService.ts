@@ -49,7 +49,7 @@ export async function submitEnrollment(
     console.log('Enviando matrícula para o servidor...');
 
     // Enviar requisição POST para o Google Apps Script
-    const response = await fetch(scriptUrl, {
+    await fetch(scriptUrl, {
       method: 'POST',
       mode: 'no-cors', // Necessário para Google Apps Script
       headers: {
