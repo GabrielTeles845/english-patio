@@ -1,7 +1,7 @@
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import LearningPyramid from '../components/LearningPyramid';
-import { SparklesIcon, LightBulbIcon, AcademicCapIcon, UserGroupIcon } from '@heroicons/react/24/outline';
+import { SparklesIcon, LightBulbIcon } from '@heroicons/react/24/outline';
 import OptimizedImage from '../components/OptimizedImage';
 
 const Methodology = () => {
