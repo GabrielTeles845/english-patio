@@ -6,7 +6,7 @@ import OptimizedImage from './OptimizedImage';
 
 const highlights = [
   {
-    name: 'Mais de 10 Salas Interativas',
+    name: 'Salas Interativas',
     description: 'Layout com mesas redondas, livros literários, decoração lúdica e climatização',
     icon: BuildingOffice2Icon,
   },
@@ -30,17 +30,11 @@ const highlights = [
 // Carrossel de infraestrutura - Imagens da pasta Home - Carrossel Estrutura
 const carouselImages = [
   { src: 'DSC06844.jpg', alt: 'Infraestrutura da English Patio' },
-  { src: 'DSC06856.jpg', alt: 'Ambiente de aprendizado English Patio' },
-  { src: 'DSC06867.jpg', alt: 'Sala de aula interativa' },
   { src: 'DSC07612.jpg', alt: 'Espaço educativo da escola' },
   { src: 'DSC07678.jpg', alt: 'Ambiente acolhedor English Patio' },
   { src: 'DSC07681.jpg', alt: 'Estrutura moderna da escola' },
   { src: 'DSC07728.jpg', alt: 'Espaço de convivência' },
   { src: 'DSC07744.jpg', alt: 'Sala preparada para o aprendizado' },
-  { src: 'DSC07759.jpg', alt: 'Ambiente climatizado e confortável' },
-  { src: 'DSC07767.jpg', alt: 'Estrutura completa English Patio' },
-  { src: 'DSC07779.jpg', alt: 'Espaço integrado de aprendizado' },
-  { src: 'DSC07785.jpg', alt: 'Infraestrutura pensada para crianças' },
   { src: 'DSC07794.jpg', alt: 'Ambiente de ensino moderno' },
   { src: 'DSC07797.jpg', alt: 'Sala com recursos tecnológicos' },
   { src: 'DSC07801.jpg', alt: 'Espaço educacional completo' },
@@ -145,16 +139,6 @@ const AboutSection = () => {
               <div className="absolute -top-4 -left-4 w-24 h-24 bg-primary/10 rounded-full blur-2xl"></div>
             </div>
 
-            {/* Badge flutuante decorativo */}
-            <div className="absolute -top-6 -right-6 bg-white rounded-2xl shadow-xl p-4 hidden lg:block z-40">
-              <div className="flex items-center gap-2">
-                <BuildingOffice2Icon className="h-6 w-6 text-secondary" />
-                <div>
-                  <p className="text-xs text-gray-500">Mais de</p>
-                  <p className="text-lg font-bold text-primary">10 salas</p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

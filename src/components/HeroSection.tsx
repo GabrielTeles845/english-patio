@@ -101,12 +101,12 @@ const HeroSection = () => {
               {/* Imagem 1 - Grande no topo esquerdo */}
               <div className="col-span-2 relative rounded-2xl lg:rounded-3xl overflow-hidden shadow-xl lg:shadow-2xl transform hover:scale-[1.02] transition-transform duration-500">
                 <OptimizedImage
-                  src="DSC06890.jpg"
+                  src="DSC07398.jpg"
                   alt="Alunos da English Patio aprendendo de forma interativa"
                   className="cursor-zoom-in h-64 lg:h-80"
                   onClick={() => {
                     const event = new CustomEvent('openImageZoom', {
-                      detail: { src: img('DSC06890.jpg'), alt: 'Alunos da English Patio aprendendo de forma interativa' }
+                      detail: { src: img('DSC07398.jpg'), alt: 'Alunos da English Patio aprendendo de forma interativa' }
                     });
                     window.dispatchEvent(event);
                   }}
@@ -116,12 +116,12 @@ const HeroSection = () => {
               {/* Imagem 2 - Pequena embaixo esquerda */}
               <div className="relative rounded-xl lg:rounded-2xl overflow-hidden shadow-lg lg:shadow-xl transform hover:scale-[1.02] transition-transform duration-500">
                 <OptimizedImage
-                  src="DSC07227.jpg"
+                  src="DSC07612.jpg"
                   alt="Momento de leitura na English Patio"
                   className="cursor-zoom-in h-48 lg:h-64"
                   onClick={() => {
                     const event = new CustomEvent('openImageZoom', {
-                      detail: { src: img('DSC07227.jpg'), alt: 'Momento de leitura na English Patio' }
+                      detail: { src: img('DSC07612.jpg'), alt: 'Momento de leitura na English Patio' }
                     });
                     window.dispatchEvent(event);
                   }}
@@ -131,12 +131,12 @@ const HeroSection = () => {
               {/* Imagem 3 - Pequena embaixo direita */}
               <div className="relative rounded-xl lg:rounded-2xl overflow-hidden shadow-lg lg:shadow-xl transform hover:scale-[1.02] transition-transform duration-500">
                 <OptimizedImage
-                  src="DSC07547.jpg"
+                  src="DSC07695.jpg"
                   alt="Atividades práticas e divertidas"
                   className="cursor-zoom-in h-48 lg:h-64"
                   onClick={() => {
                     const event = new CustomEvent('openImageZoom', {
-                      detail: { src: img('DSC07547.jpg'), alt: 'Atividades práticas e divertidas' }
+                      detail: { src: img('DSC07695.jpg'), alt: 'Atividades práticas e divertidas' }
                     });
                     window.dispatchEvent(event);
                   }}
@@ -148,13 +148,13 @@ const HeroSection = () => {
             </div>
 
             {/* Badge flutuante - ajustado para mobile */}
-            <div className="hidden lg:block absolute -right-4 top-8 bg-white rounded-2xl shadow-xl p-4 max-w-[200px] z-10">
-              <p className="text-sm font-semibold text-primary">Aulas em Casa disponíveis na região dos setores Bueno e Marista</p>
+            <div className="hidden lg:block absolute -right-4 top-32 bg-white rounded-2xl shadow-xl p-4 max-w-[200px] z-10">
+              <p className="text-sm font-semibold text-primary">Matrículas Abertas!</p>
             </div>
 
             {/* Badge embaixo no mobile */}
             <div className="lg:hidden mt-4 bg-white rounded-xl shadow-lg p-4 text-center">
-              <p className="text-sm font-semibold text-primary">Aulas em Casa disponíveis na região dos setores Bueno e Marista</p>
+              <p className="text-sm font-semibold text-primary">Matrículas Abertas!</p>
             </div>
           </div>
         </div>

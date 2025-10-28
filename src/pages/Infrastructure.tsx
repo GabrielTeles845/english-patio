@@ -56,10 +56,10 @@ const Infrastructure = () => {
                 Salas de Aula
               </div>
               <h3 className="text-3xl md:text-4xl font-bold text-primary mb-4">
-                Mais de 10 Salas Interativas
+                Salas Interativas
               </h3>
               <p className="text-lg text-gray-700 leading-relaxed">
-                A escola conta com <strong>mais de 10 salas de aula</strong>, todas com layout interativo, utilizando mesas redondas que favorecem a troca entre os alunos. As salas também possuem estantes com livros literários, decoração lúdica, climatização, e computadores disponíveis para atividades orientadas pelos professores.
+                A escola conta com <strong>salas de aula</strong> com layout interativo, utilizando mesas redondas que favorecem a troca entre os alunos. As salas também possuem estantes com livros literários, decoração lúdica, climatização, e computadores disponíveis para atividades orientadas pelos professores.
               </p>
             </div>
           </div>
@@ -84,7 +84,6 @@ const Infrastructure = () => {
             <div className="md:col-span-2">
               <FadeCarousel
                 images={[
-                  { src: 'DSC06856.jpg', alt: 'Infrastructure image' },
                   { src: 'DSC07744.jpg', alt: 'Infrastructure image' },
                   { src: 'DSC07759.jpg', alt: 'Infrastructure image' }
                 ]}
@@ -239,10 +238,8 @@ const Infrastructure = () => {
         images={[
           { src: 'DSC06844.jpg', alt: 'Infrastructure image' },
           { src: 'DSC06852.jpg', alt: 'Infrastructure image' },
-          { src: 'DSC06856.jpg', alt: 'Infrastructure image' },
           { src: 'DSC06859.jpg', alt: 'Infrastructure image' },
           { src: 'DSC06862.jpg', alt: 'Infrastructure image' },
-          { src: 'DSC06867.jpg', alt: 'Infrastructure image' },
           { src: 'DSC06877.jpg', alt: 'Infrastructure image' },
           { src: 'DSC07140.jpg', alt: 'Infrastructure image' },
           { src: 'DSC07398.jpg', alt: 'Infrastructure image' },
@@ -262,7 +259,6 @@ const Infrastructure = () => {
           { src: 'DSC07741.jpg', alt: 'Infrastructure image' },
           { src: 'DSC07744.jpg', alt: 'Infrastructure image' },
           { src: 'DSC07759.jpg', alt: 'Infrastructure image' },
-          { src: 'DSC07767.jpg', alt: 'Infrastructure image' },
           { src: 'DSC07779.jpg', alt: 'Infrastructure image' },
           { src: 'DSC07785.jpg', alt: 'Infrastructure image' },
           { src: 'DSC07794.jpg', alt: 'Infrastructure image' },

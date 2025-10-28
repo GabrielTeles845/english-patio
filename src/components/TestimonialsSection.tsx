@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 
 // Importando todas as imagens de feedbacks
-import testimonial1 from '../assets/testimonials/1.png';
 import testimonial2 from '../assets/testimonials/2.png';
 import testimonial3 from '../assets/testimonials/3.png';
 import testimonial4 from '../assets/testimonials/4.png';
@@ -12,7 +11,6 @@ import testimonial8 from '../assets/testimonials/8.png';
 import testimonial9 from '../assets/testimonials/9.png';
 
 const testimonialImages = [
-  testimonial1,
   testimonial2,
   testimonial3,
   testimonial4,

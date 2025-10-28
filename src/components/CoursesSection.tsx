@@ -79,7 +79,8 @@ const levelGroups: LevelGroup[] = [
     icon: '',
     description: 'Primeiros contatos com o inglês, em uma abordagem totalmente lúdica, com jogos, músicas e atividades interativas. Para crianças de 4 e 5 anos de idade.',
     levels: [
-      { name: 'Fun Conversation', color: 'bg-green-500 text-white' }
+      { name: 'Fun Conversation 1', color: 'bg-green-500 text-white' },
+      { name: 'Fun Conversation 2', color: 'bg-green-500 text-white' }
     ]
   },
   {
@@ -89,8 +90,8 @@ const levelGroups: LevelGroup[] = [
     description: 'Desenvolvimento da escuta e da fala, com introdução gradual à leitura em inglês. Ideal para alunos que estão começando a formar frases e reconhecer palavras no idioma.',
     levels: [
       { name: 'Conversation 1', color: 'bg-green-700 text-white' },
-      { name: 'Conversation 2', color: 'bg-gray-500 text-white' },
-      { name: 'Conversation 3', color: 'bg-green-500 text-white' }
+      { name: 'Conversation 2', color: 'bg-orange-500 text-white' },
+      { name: 'Conversation 3', color: 'bg-purple-500 text-white' }
     ]
   },
   {
@@ -191,10 +192,10 @@ const CoursesSection = () => {
         <div className="text-center mt-12">
           <a
             href="#contact"
-            className="inline-flex items-center text-primary hover:text-secondary transition-colors"
+            className="inline-flex items-center px-6 py-3 bg-secondary hover:bg-secondary/90 text-primary font-bold rounded-xl transition-all shadow-md hover:shadow-lg"
           >
             Agende um teste de nível
-            <ChevronRightIcon className="h-5 w-5 ml-1" />
+            <ChevronRightIcon className="h-5 w-5 ml-2" />
           </a>
         </div>
       </div>

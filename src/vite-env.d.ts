@@ -19,4 +19,13 @@ declare module '*.jpeg' {
 declare module '*.svg' {
   const value: string;
   export default value;
+}
+
+// Declaração de tipo para o Instagram Embed
+interface Window {
+  instgrm?: {
+    Embeds: {
+      process: () => void;
+    };
+  };
 } 
