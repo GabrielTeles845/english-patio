@@ -5,8 +5,10 @@ import img from '../config/cloudinary';
 import OptimizedImage from './OptimizedImage';
 
 // Imagens para carrossel "Imersão e Aprendizado"
+// TODO: ADICIONAR MAIS FOTOS DE VACATION CLASSES AQUI
 const immersionImages = [
   { src: 'DSC07695.jpg', alt: 'Atividade de imersão e aprendizado' },
+  // AGUARDANDO NOVAS FOTOS
 ];
 
 // Imagens para carrossel final "Momentos das Nossas Atividades"
@@ -96,10 +98,10 @@ const VacationContent = () => {
             <div className="order-1 md:order-2">
               <h2 className="text-3xl md:text-4xl font-bold mb-6">
                 <span className="text-primary">Vivências</span>{' '}
-                <span className="text-secondary">em Locais Reais</span>
+                <span className="text-secondary">Práticas</span>
               </h2>
               <p className="text-lg text-gray-700 leading-relaxed">
-                Levamos as turmas para vivências reais em locais como <strong>parques, supermercados, floriculturas, shoppings,
+                Levamos as turmas para vivências práticas em locais como <strong>parques, supermercados, floriculturas, shoppings,
                 clubes</strong> e outros espaços públicos, sempre com atividades conduzidas <strong>100% em inglês</strong>.
               </p>
             </div>
@@ -136,18 +138,9 @@ const VacationContent = () => {
       <section className="py-16 md:py-20 bg-blue-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="order-2 md:order-1 relative aspect-[4/3] rounded-xl overflow-hidden shadow-lg cursor-zoom-in group">
-              <OptimizedImage
-                src="DSC07396.jpg"
-                alt="Valorização do investimento"
-                className="transition-transform duration-500 group-hover:scale-110 h-full"
-                onClick={() => {
-                  const event = new CustomEvent('openImageZoom', {
-                    detail: { src: img('DSC07396.jpg'), alt: 'Valorização do investimento' }
-                  });
-                  window.dispatchEvent(event);
-                }}
-              />
+            {/* TODO: SUBSTITUIR POR FOTO DE VACATION CLASSES - AGUARDANDO NOVA FOTO */}
+            <div className="order-2 md:order-1 relative aspect-[4/3] rounded-xl overflow-hidden shadow-lg bg-gray-200 flex items-center justify-center">
+              <p className="text-gray-500 text-center px-4">Espaço reservado para foto de Vacation Classes</p>
             </div>
             <div className="order-1 md:order-2">
               <h2 className="text-3xl md:text-4xl font-bold mb-6">

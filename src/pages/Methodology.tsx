@@ -28,10 +28,7 @@ const Methodology = () => {
               Metodologias Ativas de Aprendizagem
             </h2>
             <p className="text-lg text-gray-700 leading-relaxed">
-              No English Patio, utilizamos estratégias pedagógicas fundamentadas em <strong>metodologias ativas</strong>,
-              onde o aluno é protagonista do seu próprio processo de aprendizagem. Através de experiências práticas,
-              contextualizadas e significativas, promovemos o desenvolvimento das competências linguísticas de forma
-              natural e efetiva.
+              Na English Patio, adotamos estratégias pedagógicas fundamentadas nas metodologias ativas de ensino, que promovem a participação efetiva e o engajamento dos estudantes em seu processo de aprendizagem. Por meio de experiências práticas, contextualizadas e significativas, favorecemos o desenvolvimento das competências linguísticas de maneira natural, consistente e eficaz.
             </p>
           </div>
 
@@ -41,14 +38,8 @@ const Methodology = () => {
               <h3 className="text-2xl font-bold text-primary mb-4">
                 Aprendizagem Significativa
               </h3>
-              <p className="text-gray-700 leading-relaxed mb-4">
-                Fundamentamos nossa prática pedagógica na teoria da aprendizagem significativa, onde o conhecimento
-                prévio do aluno é ativado e conectado aos novos conteúdos. Através de atividades contextualizadas
-                e relevantes, o idioma deixa de ser abstrato e passa a fazer sentido real na vida dos estudantes.
-              </p>
               <p className="text-gray-700 leading-relaxed">
-                Ao invés de simplesmente memorizar vocabulário isolado, os alunos vivenciam situações comunicativas
-                autênticas que promovem a aquisição natural da língua inglesa.
+                Fundamentamos nossa prática pedagógica na teoria da aprendizagem significativa, onde o conhecimento prévio do aluno é ativado e conectado a novos conteúdos. Através de atividades contextualizadas e relevantes, o idioma deixa de ser abstrato e passa a fazer sentido real na vida dos alunos.
               </p>
             </div>
             <div className="order-1 md:order-2 rounded-xl aspect-[4/3] overflow-hidden shadow-lg">
@@ -67,71 +58,72 @@ const Methodology = () => {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
-              Foco e Ação: Nossa Metodologia
+              Ferramentas de Ensino
             </h2>
             <p className="text-lg text-gray-700 max-w-3xl mx-auto">
-              Selecionamos cuidadosamente materiais didáticos e recursos pedagógicos, fundamentando nosso planejamento
-              em evidências científicas sobre como o cérebro humano processa e consolida informações linguísticas.
+              Selecionamos cuidadosamente materiais didáticos e recursos pedagógicos, além de desenvolvermos ferramentas próprias de aprendizagem, fundamentando todo o nosso planejamento em evidências científicas sobre os processos cognitivos envolvidos na aquisição e consolidação da linguagem.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8 mb-12">
             <div className="bg-white rounded-2xl p-8 shadow-lg border-2 border-primary/10">
-              <div className="flex items-start gap-4 mb-4">
+              <div className="flex items-start gap-4 mb-6">
                 <div className="bg-secondary/10 rounded-full p-3 flex-shrink-0">
                   <LightBulbIcon className="h-8 w-8 text-secondary" />
                 </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-primary mb-3">Foco</h3>
-                  <p className="text-gray-700 leading-relaxed">
-                    Cada atividade possui objetivos de aprendizagem claramente definidos, alinhados ao desenvolvimento
-                    progressivo das quatro habilidades linguísticas: <em>listening</em> (compreensão oral),
-                    <em>speaking</em> (produção oral), <em>reading</em> (leitura) e <em>writing</em> (escrita).
-                  </p>
+                <p className="text-gray-700 leading-relaxed">
+                  Cada atividade possui objetivos de aprendizagem claramente definidos, alinhados ao desenvolvimento progressivo das quatro habilidades linguísticas:
+                </p>
+              </div>
+
+              {/* Grid de habilidades */}
+              <div className="grid grid-cols-2 gap-3 mt-4">
+                <div className="bg-blue-50 rounded-lg p-4 border-l-4 border-blue-400">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-2xl">👂</span>
+                    <span className="font-bold text-blue-700 text-sm">Listening</span>
+                  </div>
+                  <p className="text-xs text-gray-600">Compreensão oral</p>
+                </div>
+
+                <div className="bg-green-50 rounded-lg p-4 border-l-4 border-green-400">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-2xl">💬</span>
+                    <span className="font-bold text-green-700 text-sm">Speaking</span>
+                  </div>
+                  <p className="text-xs text-gray-600">Produção oral</p>
+                </div>
+
+                <div className="bg-purple-50 rounded-lg p-4 border-l-4 border-purple-400">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-2xl">📖</span>
+                    <span className="font-bold text-purple-700 text-sm">Reading</span>
+                  </div>
+                  <p className="text-xs text-gray-600">Leitura e interpretação</p>
+                </div>
+
+                <div className="bg-orange-50 rounded-lg p-4 border-l-4 border-orange-400">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-2xl">✍️</span>
+                    <span className="font-bold text-orange-700 text-sm">Writing</span>
+                  </div>
+                  <p className="text-xs text-gray-600">Escrita</p>
                 </div>
               </div>
             </div>
 
             <div className="bg-white rounded-2xl p-8 shadow-lg border-2 border-secondary/10">
-              <div className="flex items-start gap-4 mb-4">
+              <div className="flex items-start gap-4">
                 <div className="bg-primary/10 rounded-full p-3 flex-shrink-0">
                   <SparklesIcon className="h-8 w-8 text-primary" />
                 </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-primary mb-3">Ação</h3>
-                  <p className="text-gray-700 leading-relaxed">
-                    Promovemos análise crítica, raciocínio lógico, interpretação contextual e resolução criativa de problemas.
-                    Rejeitamos a memorização mecânica em favor de práticas pedagógicas que desenvolvem autonomia,
-                    pensamento crítico e competência comunicativa genuína.
-                  </p>
-                </div>
+                <p className="text-gray-700 leading-relaxed">
+                  Promovemos a análise crítica, o raciocínio lógico, a interpretação contextual e a resolução criativa de problemas. Embora reconheçamos a memorização como uma etapa inicial e necessária do processo de aprendizagem — atuando como ponte para a formação de frases e o desenvolvimento da conversação —, valorizamos dinâmicas interativas e repetição criativa como meios de consolidar o conhecimento. Assim, rejeitamos a memorização mecânica em favor de práticas pedagógicas que estimulam a autonomia, o pensamento crítico e a competência comunicativa genuína.
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Grid com foto placeholder */}
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="rounded-xl aspect-[4/3] overflow-hidden shadow-lg">
-              <OptimizedImage
-                src="DSC07276.jpg"
-                alt="Alunos em atividade colaborativa"
-                className="h-full"
-              />
-            </div>
-            <div>
-              <h3 className="text-2xl font-bold text-primary mb-4">
-                Linguagem Viva e Dinâmica
-              </h3>
-              <p className="text-gray-700 leading-relaxed mb-4">
-                Concebemos o idioma como ferramenta viva de comunicação, capaz de conectar pessoas, romper barreiras
-                culturais e aproximar comunidades. A memorização possui função específica e contextualizada –
-                apresentações teatrais, recitação poética, composições musicais autorais – mas nunca como fim em si mesma.
-              </p>
-              <p className="text-gray-700 leading-relaxed">
-                Priorizamos a prática comunicativa autêntica em detrimento de abordagens formulaicas e descontextualizadas.
-              </p>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -140,11 +132,10 @@ const Methodology = () => {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
-              Por Que Metodologias Ativas Funcionam?
+              Por Que as Metodologias Ativas Funcionam?
             </h2>
             <p className="text-lg text-gray-700 max-w-3xl mx-auto mb-8">
-              A Pirâmide de Aprendizagem de Glasser demonstra cientificamente que aprendemos melhor quando participamos
-              ativamente do processo educacional. Quanto mais o aluno pratica e ensina, maior é a retenção do conhecimento.
+              A Pirâmide de Glasser é um modelo que ilustra como diferentes formas de aprendizagem impactam na retenção do conhecimento. Segundo essa teoria, os alunos aprendem de maneira mais significativa quando participam ativamente do processo, especialmente ao praticar, discutir, ensinar e aplicar o que aprendem.
             </p>
           </div>
 
@@ -189,24 +180,21 @@ const Methodology = () => {
             <div className="bg-white rounded-xl p-6 shadow-md">
               <h3 className="text-xl font-bold text-primary mb-3">Aprendizagem Baseada em Projetos (PBL)</h3>
               <p className="text-gray-700 leading-relaxed">
-                Desenvolvimento de projetos temáticos onde os alunos investigam, planejam e executam atividades
-                significativas, utilizando o inglês como ferramenta de comunicação real.
+                Desenvolvimento projetos temáticos que estimulam os alunos a investigar, planejar e executar atividades significativas, utilizando o inglês como ferramenta de comunicação autêntica e aplicada a contextos reais.
               </p>
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-md">
               <h3 className="text-xl font-bold text-primary mb-3">Aprendizagem Colaborativa</h3>
               <p className="text-gray-700 leading-relaxed">
-                Trabalho em grupos heterogêneos que promovem interação constante, negociação de significados e
-                desenvolvimento de competências socioemocionais através da língua inglesa.
+                Valorização do trabalho em grupos heterogêneos, que favorece a interação constante, a negociação de significados e o desenvolvimento de competências socioemocionais, tendo o inglês como meio de expressão e colaboração.
               </p>
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-md">
               <h3 className="text-xl font-bold text-primary mb-3">Gamificação</h3>
               <p className="text-gray-700 leading-relaxed">
-                Incorporação de elementos lúdicos e desafios que aumentam o engajamento, motivação intrínseca e
-                persistência no processo de aquisição linguística.
+                Incorporação de elementos lúdicos e desafios significativos que potencializam o engajamento, a motivação intrínseca e a persistência dos alunos ao longo do processo de aquisição linguística.
               </p>
             </div>
 
@@ -228,9 +216,6 @@ const Methodology = () => {
           <h2 className="text-3xl md:text-4xl font-bold text-primary mb-6">
             Agende uma Aula Experimental
           </h2>
-          <p className="text-xl text-gray-700 mb-8">
-            Venha conhecer nossa metodologia na prática e descubra como seu filho vai se apaixonar pelo inglês!
-          </p>
           <a
             href="https://wa.me/5511999999999?text=Olá!%20Gostaria%20de%20agendar%20uma%20aula%20experimental."
             target="_blank"

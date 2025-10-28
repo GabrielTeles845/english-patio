@@ -97,7 +97,7 @@ const LearningPyramid = () => {
       {/* Título da pirâmide */}
       <div className="text-center mb-6">
         <h3 className="text-xl font-semibold text-primary">Pirâmide de Aprendizado</h3>
-        <p className="text-gray-600">Taxa média de retenção após 24 horas</p>
+        <p className="text-gray-600">Taxa média de retenção de conteúdo após 24 horas</p>
       </div>
 
       {/* Divisão entre aprendizado passivo e ativo */}
@@ -162,7 +162,7 @@ const LearningPyramid = () => {
       {/* Mensagem destacando o aprendizado ativo */}
       <div className="mt-8 text-center p-5 bg-primary-light/20 rounded-lg">
         <p className="text-primary font-medium">
-          Na English Patio, priorizamos a aprendizagem ativa, com técnicas que promovem maior retenção e aplicabilidade real do conhecimento.
+          Essa abordagem reforça a importância de metodologias participativas e experienciadas, nas quais o aprendizado é construído por meio da ação e da reflexão.
         </p>
       </div>
     </div>
