@@ -2,7 +2,7 @@ import Navbar from '../components/Navbar';
 import HeroSection from '../components/HeroSection';
 import AboutSection from '../components/AboutSection';
 import CoursesSection from '../components/CoursesSection';
-import TestimonialsSection from '../components/TestimonialsSection';
+// import TestimonialsSection from '../components/TestimonialsSection';
 import ContactSection from '../components/ContactSection';
 import InstagramFeed from '../components/InstagramFeed';
 import Footer from '../components/Footer';
@@ -18,7 +18,7 @@ const Home = () => {
           <CoursesSection />
           <ContactSection />
           <InstagramFeed />
-          <TestimonialsSection />
+          {/* <TestimonialsSection /> */}
         </main>
         <Footer />
       </div>
