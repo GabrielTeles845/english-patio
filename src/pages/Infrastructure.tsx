@@ -19,7 +19,7 @@ const Infrastructure = () => {
             <span className="text-primary">o Aprendizado</span>
           </h1>
           <p className="text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto">
-            A English Patio oferece um ambiente cuidadosamente planejado para promover o aprendizado com conforto, criatividade e acolhimento.
+            O espaço da English Patio foi concebido para ir além de uma simples sala de aula: cada detalhe foi pensado para estimular o aprendizado de forma natural e prazerosa. O ambiente convida o aluno a se sentir à vontade, favorecendo a troca, a curiosidade e a confiança necessárias para aprender um novo idioma com segurança e entusiasmo.
           </p>
         </div>
       </section>
@@ -44,7 +44,7 @@ const Infrastructure = () => {
                 Salas Interativas
               </h3>
               <p className="text-lg text-gray-700 leading-relaxed">
-                A escola conta com <strong>salas de aula</strong> com layout interativo, utilizando mesas redondas que favorecem a troca entre os alunos. As salas também possuem estantes com livros literários, decoração lúdica, climatização, e computadores disponíveis para atividades orientadas pelos professores.
+                As salas de aula da escola oferecem um ambiente acolhedor e funcional, com mesas redondas que incentivam a interação entre os alunos, espaço para leitura, estantes com livros literários e uma decoração que remete ao conforto de um lar. São climatizadas, garantindo o bem-estar de todos, e contam com computadores utilizados em atividades orientadas pelos professores.
               </p>
             </div>
           </div>
@@ -95,7 +95,7 @@ const Infrastructure = () => {
                 Fun Space
               </h3>
               <p className="text-lg text-gray-700 leading-relaxed mb-8 max-w-3xl mx-auto">
-                Sala multiuso equipada com karaokê, cozinha completa e palco. Espaço criativo onde os alunos são incentivados a atuar em apresentações, dramatizações e atividades práticas em inglês, desenvolvendo a fluência de forma natural e divertida.
+                A escola conta com uma sala multiuso equipada com karaokê, cozinha completa e palco, configurando um espaço criativo que estimula a expressão artística e a prática do idioma. Nesse ambiente, os alunos são incentivados a participar de apresentações, dramatizações e atividades práticas em inglês, além de assistirem a pequenos vídeos como parte das atividades didáticas, favorecendo o desenvolvimento da fluência de forma natural, dinâmica e envolvente.
               </p>
               <FadeCarousel
                 images={[
@@ -126,7 +126,7 @@ const Infrastructure = () => {
                 Pátio Amplo e Acolhedor
               </h3>
               <p className="text-lg text-gray-700 leading-relaxed max-w-3xl mx-auto">
-                Espaço planejado para promover o convívio e o bem-estar dos alunos, com bancos, música ambiente, cesta de basquete e um pergolado com mesas que acolhem momentos de lanche, atividades artísticas e os responsáveis durante o período de espera.
+                Espaço cuidadosamente planejado para promover o convívio e o bem-estar dos alunos, com bancos, música ambiente, cesta de basquete e um pergolado com mesas que acolhem momentos de lanche, atividades artísticas e os responsáveis durante o período de espera. O ambiente conta ainda com gramado sintético e serve como espaço para a realização de atividades didáticas mais dinâmicas, contribuindo para uma atmosfera acolhedora, agradável e inspiradora.
               </p>
             </div>
 
@@ -246,12 +246,9 @@ const Infrastructure = () => {
       {/* CTA Final */}
       <section className="py-20 md:py-24 bg-gradient-to-br from-slate-50 via-blue-50/30 to-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-primary">
-            Venha Conhecer Pessoalmente!
+          <h2 className="text-4xl md:text-5xl font-bold mb-10 text-primary">
+            Agende sua visita!
           </h2>
-          <p className="text-xl md:text-2xl text-gray-700 mb-10 max-w-2xl mx-auto">
-            Agende uma visita e veja de perto toda a nossa estrutura pensada para o seu filho
-          </p>
           <a
             href="#contact"
             className="inline-flex items-center px-10 py-5 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl transition-all shadow-lg hover:shadow-xl text-lg hover:scale-105"

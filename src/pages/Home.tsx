@@ -16,9 +16,9 @@ const Home = () => {
           <HeroSection />
           <AboutSection />
           <CoursesSection />
-          <TestimonialsSection />
           <ContactSection />
           <InstagramFeed />
+          <TestimonialsSection />
         </main>
         <Footer />
       </div>
