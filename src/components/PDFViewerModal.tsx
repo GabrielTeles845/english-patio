@@ -85,7 +85,7 @@ const PDFViewerModal = ({ isOpen, onClose, pdfBytes, studentName }: PDFViewerMod
                   Matrícula realizada com sucesso!
                 </p>
                 <p className="text-xs sm:text-sm text-green-700 mt-1">
-                  A escola receberá os dados da matrícula por e-mail. Em breve entraremos em contato!
+                  A escola receberá os dados da matrícula por e-mail. Em breve você receberá um link para assinatura digital do contrato.
                 </p>
               </div>
             </div>
@@ -137,7 +137,7 @@ const PDFViewerModal = ({ isOpen, onClose, pdfBytes, studentName }: PDFViewerMod
           <div className="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-3 sm:px-6 py-3 sm:py-4">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4">
               <p className="text-xs sm:text-sm text-gray-600 text-center sm:text-left">
-                <strong>Próximos passos:</strong> Aguarde o contato da escola com informações sobre o carnê de pagamento.
+                <strong>Próximos passos:</strong> Aguarde o contato da escola com o link para assinatura digital do contrato e informações sobre o carnê de pagamento.
               </p>
               <button
                 onClick={onClose}

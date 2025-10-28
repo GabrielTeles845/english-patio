@@ -146,7 +146,7 @@ function saveToSheet(formData, pdfUrl) {
       formatOptionalField(formData.neighborhood),
       formatOptionalField(formData.city),
       formatOptionalField(formData.state),
-      formData.classFormat === 'sede' ? 'Presencial na Sede' : 'Presencial em Domicílio',
+      'Presencial na Sede', // Formato fixo - apenas presencial na sede
       capitalizeField(formData.paymentMethod || 'Boleto'), // Boleto, PIX, etc
       formData.authorizationMedia ? 'Sim' : 'Não',
       formData.authorizationContract ? 'Sim' : 'Não',
@@ -227,7 +227,7 @@ function sendEmailToSchool(formData, pdfBase64) {
 
         <div style="background-color: #f5f5f5; padding: 20px; border-radius: 10px; margin: 20px 0;">
           <h3 style="color: #1E3765; margin-top: 0;">Dados do Curso</h3>
-          <p><strong>Formato:</strong> ${formData.classFormat === 'sede' ? 'Presencial na Sede' : 'Presencial em Domicílio'}</p>
+          <p><strong>Formato:</strong> Presencial na Sede</p>
           <p><strong>Responsável Financeiro:</strong> ${formData.financialResponsibleType === 'same' ? formData.responsibleName : formatOptionalField(formData.financialResponsibleName)}</p>
           <p><strong>Forma de Pagamento:</strong> ${capitalizeField(formData.paymentMethod || 'Boleto')}</p>
         </div>
@@ -269,9 +269,14 @@ function generatePDFFilename(formData) {
   return `Contrato_${studentName}_${timestamp}.pdf`;
 }
 
-// Função para formatar data de YYYY-MM-DD para DD/MM/YYYY
+// Função para formatar data (já vem no formato DD/MM/YYYY do frontend)
 function formatBirthDate(dateString) {
   if (!dateString) return '';
+  // Se já estiver no formato DD/MM/YYYY, retorna como está
+  if (dateString.includes('/')) {
+    return dateString;
+  }
+  // Se estiver no formato antigo YYYY-MM-DD, converte
   const parts = dateString.split('-');
   if (parts.length === 3) {
     return `${parts[2]}/${parts[1]}/${parts[0]}`;

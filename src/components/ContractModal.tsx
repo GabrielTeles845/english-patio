@@ -47,8 +47,10 @@ const ContractModal = ({ isOpen, onClose }: ContractModalProps) => {
               <div className="bg-blue-50 border-l-4 border-primary p-4 mb-6">
                 <p className="text-sm text-gray-800 leading-relaxed">
                   <strong>Fundamento Legal:</strong> O presente contrato reger-se-á pelas regras vertidas no Código de Defesa do Consumidor
-                  (Lei 8.078/1990), visto que trata-se de fornecedor de serviço e consumidor final de serviço.
-                  Aplica-se, subsidiariamente, as previsões do Código Civil.
+                  (Lei 8.078/1990), visto que trata-se de fornecedor de serviço e consumidor final de serviço, na forma do artigo 2º e 3º da Lei 8.078/1990.
+                  Aplica-se, subsidiariamente, as previsões do Código Civil (CC), especificamente art. 104 (requisitos do negócio jurídico),
+                  art. 112 (teoria objetiva da declaração da vontade), art. 113 (princípio da boa-fé objetiva), art. 247 (obrigações de fazer e responsabilidade civil),
+                  e art. 593 (prestação de serviços).
                 </p>
               </div>
 
@@ -73,48 +75,61 @@ const ContractModal = ({ isOpen, onClose }: ContractModalProps) => {
                 <div className="space-y-4">
                   <p className="text-gray-700 leading-relaxed">
                     <strong>CLÁUSULA 2ª.</strong> As aulas serão ministradas 2 (duas) vezes por semana, em blocos
-                    realizados às segundas e quartas-feiras, e às terças e quintas-feiras, entre 08h e 20h, no local
-                    previamente identificado no contrato, ressalvando os feriados e recessos previamente anunciados
-                    pela escola.
+                    realizados às segundas e quartas-feiras, e às terças e quintas-feiras, entre 08h e 19h, no local
+                    previamente identificado no contrato (presencial na sede da contratada), ressalvando os feriados
+                    e recessos previamente anunciados pela escola, informados ao contratante por qualquer meio idôneo
+                    de comunicação (telefone, e-mail ou mensagem por aplicativo WhatsApp).
                   </p>
 
                   <p className="text-gray-700 leading-relaxed">
-                    <strong>CLÁUSULA 3ª.</strong> A hora-aula tem a duração de 60 minutos, na unidade física da escola
-                    ou casa do aluno(a), devendo a escolha ser indicada quando da celebração do contrato.
+                    <strong>CLÁUSULA 3ª.</strong> A hora-aula tem a duração de 60 minutos, na unidade física da escola,
+                    e os dias e horários são definidos na recepção da escola, quando da celebração do contrato.
+                  </p>
+
+                  <p className="text-gray-700 leading-relaxed">
+                    <strong>CLÁUSULA 4ª.</strong> O CONTRATANTE não poderá remarcar aulas previamente acordadas
+                    quando da celebração do contrato, nos dias e horários estabelecidos no ato da matrícula, e o atraso
+                    gera preclusão do conteúdo ministrado, sem prejuízo do acesso aos materiais impressos da aula.
                   </p>
 
                   <div className="bg-yellow-50 border-l-4 border-yellow-500 p-3">
                     <p className="text-sm text-gray-800">
-                      <strong>Parágrafo Primeiro:</strong> A modificação do formato da prestação do serviço pode ser
-                      viabilizada a pedido do contratante, com carência de até 15 (quinze) dias, sujeitando-se a uma
-                      taxa administrativa módica e de acordo com a disponibilidade da grade de horários.
+                      <strong>Parágrafo Primeiro:</strong> Em caso de adiamento feito pela contratada, do serviço nos
+                      dias e horários designados, o contratante será informado, por qualquer meio idôneo de comunicação,
+                      em tempo hábil, sendo o serviço reagendado para data posterior, de acordo com a grade de horários
+                      da escola, sendo direito do contratante a reposição do serviço adiado.
                     </p>
                   </div>
 
                   <p className="text-gray-700 leading-relaxed">
-                    <strong>CLÁUSULA 4ª.</strong> O CONTRATANTE não poderá remarcar aulas previamente acordadas,
-                    e o atraso gera preclusão do conteúdo ministrado, sem prejuízo do acesso aos materiais impressos da aula.
+                    <strong>CLÁUSULA 5ª.</strong> As aulas de imersão, denominadas <strong>Vacation Classes</strong>,
+                    consubstanciam-se em aulas temáticas, em parques, shopping, dentre outros análogos, a fim de permitir
+                    que os alunos pratiquem a língua inglesa em situações reais, viabilizando a fixação dos conteúdos
+                    ministrados em aulas e desenvolvendo a plena capacidade de articulação do pensamento e fala da língua inglesa.
                   </p>
 
                   <div className="bg-yellow-50 border-l-4 border-yellow-500 p-3">
                     <p className="text-sm text-gray-800">
-                      <strong>Parágrafo Primeiro:</strong> Em caso de adiamento feito pela contratada, o contratante
-                      será informado em tempo hábil, sendo o serviço reagendado, sendo direito do contratante a
-                      reposição do serviço adiado.
+                      <strong>Parágrafo Primeiro:</strong> As Vacation Classes realizar-se-ão durante o ano, em dias e
+                      horários previamente agendados pelo contratado, de acordo com a disponibilidade da grade de horários,
+                      no total de 8 (oito) aulas de 02 (duas) horas cada, sendo os dias e horários informados ao contratante
+                      com antecedência, em tempo hábil, por qualquer meio idôneo de comunicação.
                     </p>
                   </div>
 
-                  <div className="bg-yellow-50 border-l-4 border-yellow-500 p-3">
-                    <p className="text-sm text-gray-800">
-                      <strong>Parágrafo Segundo:</strong> As aulas de imersão, denominadas <strong>Vacation Classes</strong>,
-                      são passeios ao ar livre (parques, shopping, etc.) para praticar a língua inglesa em situações reais.
+                  <div className="bg-orange-50 border-l-4 border-orange-500 p-3">
+                    <p className="text-sm text-gray-800 font-semibold">
+                      <strong>Parágrafo Segundo:</strong> As mensalidades correspondentes aos meses de Janeiro e Julho
+                      destinam-se ao custeio das Vacation Classes e Preparatório Cambridge, atividades que integram o
+                      planejamento pedagógico anual da contratada. Tais atividades são regularmente ministradas,
+                      garantindo-se a continuidade do processo educativo, sem qualquer prejuízo à carga horária fixa
+                      ou aos objetivos pedagógicos estabelecidos.
                     </p>
-                  </div>
-
-                  <div className="bg-yellow-50 border-l-4 border-yellow-500 p-3">
-                    <p className="text-sm text-gray-800">
-                      <strong>Parágrafo Terceiro:</strong> As Vacation Classes realizar-se-ão durante o semestre, no total
-                      de 8 (oito) passeios de 02 (duas) horas cada, em dias e horários previamente agendados.
+                    <p className="text-sm text-gray-800 mt-2">
+                      Fica expressamente estabelecido que as referidas mensalidades são parte integrante do valor total
+                      ajustado neste contrato. Assim, <strong>não haverá desconto, compensação, abatimento ou restituição</strong> dos
+                      valores correspondentes às mensalidades de Janeiro e Julho, ainda que o(a) Contratante opte por não
+                      participar, total ou parcialmente, das referidas atividades.
                     </p>
                   </div>
                 </div>
@@ -128,23 +143,17 @@ const ContractModal = ({ isOpen, onClose }: ContractModalProps) => {
 
                 <div className="space-y-3">
                   <p className="text-gray-700 leading-relaxed">
-                    <strong>CLÁUSULA 5ª.</strong> O CONTRATANTE possui direito de requerer a resilição unilateral
-                    do contrato antes do término de sua vigência, exigindo-se o adimplemento dos meses já transcorridos
-                    e do mês no qual requereu a extinção, bem como o <strong className="text-red-600">pagamento de multa
-                    rescisória no valor de 01 (uma) mensalidade</strong>.
+                    <strong>CLÁUSULA 6ª.</strong> O CONTRATANTE possui direito potestativo de requerer a resilição unilateral
+                    do contrato antes do término de sua vigência, exigindo-se, para tanto, o adimplemento dos meses já transcorridos
+                    e do mês no qual requereu a extinção dos serviços contratados, bem como o <strong className="text-red-600">pagamento
+                    de multa rescisória, no quantum correspondente a 01 (uma) mensalidade</strong>.
                   </p>
 
                   <div className="bg-red-50 border-l-4 border-red-500 p-3">
                     <p className="text-sm text-gray-800">
-                      <strong>Parágrafo Primeiro:</strong> A não comprovação dos termos da cláusula impede a resilição,
-                      devendo o contrato ser integralmente cumprido.
-                    </p>
-                  </div>
-
-                  <div className="bg-red-50 border-l-4 border-red-500 p-3">
-                    <p className="text-sm text-gray-800">
-                      <strong>Parágrafo Segundo:</strong> O contratante deverá comprovar, no prazo de 10 dias, o pagamento
-                      das mensalidades em atraso, da mensalidade do mês corrente e da multa contratual.
+                      <strong>Parágrafo Primeiro:</strong> Em caso de requerimento de resilição unilateral do contrato, pelo contratante,
+                      a não comprovação dos termos da cláusula 6ª parágrafo segundo impede a resilição do contrato, o qual deverá ser
+                      integralmente cumprido nos termos firmados.
                     </p>
                   </div>
                 </div>
@@ -153,23 +162,23 @@ const ContractModal = ({ isOpen, onClose }: ContractModalProps) => {
               {/* DO ADIMPLEMENTO E MULTA */}
               <section className="mb-6">
                 <h3 className="text-lg font-bold text-primary mb-3 border-b-2 border-primary/30 pb-2">
-                  DA FORMA DO ADIMPLEMENTO, DOS JUROS E MULTA PELA MORA
+                  DA FORMA DO ADIMPLEMENTO PELO CONTRATANTE, DOS JUROS E MULTA PELA MORA
                 </h3>
 
                 <div className="space-y-3">
                   <p className="text-gray-700 leading-relaxed">
-                    <strong>CLÁUSULA 6ª.</strong> A mensalidade tem o valor de <strong>R$ 560,00 (por aluno)</strong>.
-                    O adimplemento será realizado exclusivamente por meio de boleto bancário emitido pela contratada,
-                    os quais serão entregues quando da assinatura do contrato.
+                    <strong>CLÁUSULA 7ª.</strong> A mensalidade tem o valor de <strong>R$ 560,00 (por aluno)</strong>.
+                    O adimplemento das mensalidades, por parte do contratante, será realizado, exclusivamente, por meio
+                    de boleto bancário emitido pela contratada, os quais serão entregues quando da assinatura do contrato.
                   </p>
 
                   <div className="bg-orange-50 border-l-4 border-orange-500 p-3">
                     <p className="text-sm text-gray-800">
-                      <strong>CLÁUSULA 7ª.</strong> O pagamento após a data de vencimento gerará:
+                      <strong>CLÁUSULA 8ª.</strong> O pagamento após a data indicada como vencimento gerará:
                     </p>
                     <ul className="list-disc list-inside ml-4 mt-2 text-sm text-gray-800">
                       <li>Multa de <strong>2% (dois por cento)</strong> no valor da mensalidade</li>
-                      <li>Juros moratórios de <strong>0,33% ao mês</strong></li>
+                      <li>Juros moratórios de <strong>1,00% ao mês</strong>, com espeque nos artigos 406 do Código Civil c/c art. 161 do Código Tributário Nacional</li>
                       <li>Sem prejuízo da cobrança judicial do débito</li>
                     </ul>
                   </div>
@@ -184,13 +193,13 @@ const ContractModal = ({ isOpen, onClose }: ContractModalProps) => {
 
                 <div className="space-y-3">
                   <p className="text-gray-700 leading-relaxed">
-                    <strong>CLÁUSULA 8ª.</strong> O presente contrato terá vigência de <strong>12 (doze) meses</strong>,
+                    <strong>CLÁUSULA 9ª.</strong> O presente contrato terá vigência de <strong>12 (doze) meses</strong>,
                     iniciando em Janeiro e finalizando em Dezembro de 2026.
                   </p>
 
                   <div className="bg-green-50 border-l-4 border-green-500 p-3">
                     <p className="text-sm text-gray-800">
-                      <strong>Parágrafo Primeiro:</strong> Um carnê físico/online será entregue ao responsável com 12 parcelas.
+                      <strong>Parágrafo Primeiro:</strong> Um carnê físico será entregue ao responsável no ato da matrícula com 12 parcelas.
                     </p>
                   </div>
                 </div>
@@ -203,7 +212,7 @@ const ContractModal = ({ isOpen, onClose }: ContractModalProps) => {
                 </h3>
 
                 <p className="text-gray-700 leading-relaxed">
-                  <strong>CLÁUSULA 9ª.</strong> Não está incluso neste contrato o fornecimento de material didático e de apoio.
+                  <strong>CLÁUSULA 10ª.</strong> Não está incluso neste contrato o fornecimento de material didático e de apoio.
                 </p>
               </section>
 
@@ -215,7 +224,8 @@ const ContractModal = ({ isOpen, onClose }: ContractModalProps) => {
 
                 <div className="bg-purple-50 border-l-4 border-purple-500 p-3">
                   <p className="text-sm text-gray-800">
-                    <strong>CLÁUSULA 10ª.</strong> O CONTRATANTE poderá autorizar ou não autorizar a CONTRATADA
+                    <strong>CLÁUSULA 11ª.</strong> Pelo presente instrumento particular e na melhor forma de direito,
+                    o CONTRATANTE poderá <strong>autorizar</strong> ou <strong>não autorizar</strong> a CONTRATADA
                     a utilizar e veicular as fotografias e vídeos realizados com o registro da imagem do aluno
                     nas redes sociais da escola.
                   </p>
@@ -229,18 +239,18 @@ const ContractModal = ({ isOpen, onClose }: ContractModalProps) => {
                 </h3>
 
                 <p className="text-gray-700 leading-relaxed">
-                  <strong>CLÁUSULA 11ª.</strong> As partes elegem o foro da comarca de <strong>Goiânia-GO</strong> para
+                  <strong>CLÁUSULA 12ª.</strong> As partes elegem o foro da comarca de <strong>Goiânia-GO</strong> para
                   dirimir divergências judiciais.
                 </p>
               </section>
 
-              {/* Informação sobre contrato eletrônico */}
+              {/* Informação sobre processo de assinatura */}
               <div className="bg-blue-100 border-2 border-blue-300 rounded-lg p-4 mt-6">
                 <p className="text-sm text-blue-900">
-                  <strong>📄 Validade Jurídica do Contrato Eletrônico:</strong>
+                  <strong>📄 Processo de Assinatura:</strong>
                   <br />
-                  Este contrato tem validade jurídica conforme a Lei 13.709/2018 (LGPD) e o Marco Civil da Internet
-                  (Lei 12.965/2014). A aceitação dos termos por meio eletrônico é legalmente válida e vinculante.
+                  Após a matrícula, você receberá o contrato preenchido por e-mail. A equipe da English Patio entrará em contato
+                  e enviará um link para assinatura digital, garantindo a validade jurídica do documento conforme a legislação brasileira.
                 </p>
               </div>
             </div>

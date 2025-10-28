@@ -30,15 +30,34 @@ export function isValidCPF(cpf: string): boolean {
   return true;
 }
 
+// Função auxiliar para converter DD/MM/YYYY para Date
+function parseBrazilianDate(dateString: string): Date | null {
+  const cleanDate = dateString.replace(/\D/g, '');
+  if (cleanDate.length !== 8) return null;
+
+  const day = parseInt(cleanDate.substring(0, 2), 10);
+  const month = parseInt(cleanDate.substring(2, 4), 10) - 1; // JavaScript months are 0-indexed
+  const year = parseInt(cleanDate.substring(4, 8), 10);
+
+  const date = new Date(year, month, day);
+
+  // Verifica se a data é válida (ex: 31/02/2024 é inválida)
+  if (date.getDate() !== day || date.getMonth() !== month || date.getFullYear() !== year) {
+    return null;
+  }
+
+  return date;
+}
+
 // Validação de data de nascimento do aluno (não pode ser maior que 20 anos nem no futuro)
 export function isValidStudentBirthDate(dateString: string): { valid: boolean; message?: string } {
   if (!dateString) return { valid: false, message: 'Data obrigatória' };
 
-  const birthDate = new Date(dateString);
+  const birthDate = parseBrazilianDate(dateString);
   const today = new Date();
 
   // Verifica se a data é válida
-  if (isNaN(birthDate.getTime())) {
+  if (!birthDate || isNaN(birthDate.getTime())) {
     return { valid: false, message: 'Data inválida' };
   }
 
@@ -66,11 +85,11 @@ export function isValidStudentBirthDate(dateString: string): { valid: boolean; m
 export function isValidResponsibleBirthDate(dateString: string): { valid: boolean; message?: string } {
   if (!dateString) return { valid: false, message: 'Data obrigatória' };
 
-  const birthDate = new Date(dateString);
+  const birthDate = parseBrazilianDate(dateString);
   const today = new Date();
 
   // Verifica se a data é válida
-  if (isNaN(birthDate.getTime())) {
+  if (!birthDate || isNaN(birthDate.getTime())) {
     return { valid: false, message: 'Data inválida' };
   }
 

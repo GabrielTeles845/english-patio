@@ -72,8 +72,19 @@ const Enrollment = () => {
 
   const calculateAge = (birthDate: string): string => {
     if (!birthDate) return '';
+
+    // Parse DD/MM/YYYY
+    const cleanDate = birthDate.replace(/\D/g, '');
+    if (cleanDate.length !== 8) return '';
+
+    const day = parseInt(cleanDate.substring(0, 2), 10);
+    const month = parseInt(cleanDate.substring(2, 4), 10) - 1; // JavaScript months are 0-indexed
+    const year = parseInt(cleanDate.substring(4, 8), 10);
+
+    const birth = new Date(year, month, day);
+    if (isNaN(birth.getTime())) return '';
+
     const today = new Date();
-    const birth = new Date(birthDate);
     let age = today.getFullYear() - birth.getFullYear();
     const monthDiff = today.getMonth() - birth.getMonth();
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
@@ -82,22 +93,6 @@ const Enrollment = () => {
     return age.toString();
   };
 
-  // Função para validar se o CEP permite aulas em domicílio
-  const canHaveHomeClasses = (cep: string): boolean => {
-    // Remove formatação (hífens, espaços)
-    const numericCep = cep.replace(/\D/g, '');
-    if (numericCep.length !== 8) return false;
-
-    const cepNumber = parseInt(numericCep, 10);
-
-    // Setor Bueno: 74210-000 até 74230-999
-    const isBueno = cepNumber >= 74210000 && cepNumber <= 74230999;
-
-    // Setor Marista: 74115-000 até 74215-999
-    const isMarista = cepNumber >= 74115000 && cepNumber <= 74215999;
-
-    return isBueno || isMarista;
-  };
 
   // Função para buscar endereço via ViaCEP
   const fetchAddressFromCep = async (cep: string) => {
@@ -126,14 +121,6 @@ const Enrollment = () => {
         city: data.localidade || '',
         state: data.uf || '',
       }));
-
-      // Se o CEP não permite aulas em domicílio, reseta para 'sede'
-      if (!canHaveHomeClasses(cep) && formData.classFormat === 'domicilio') {
-        setFormData(prev => ({
-          ...prev,
-          classFormat: 'sede',
-        }));
-      }
 
       setCepStatus('success');
     } catch (error) {
@@ -429,8 +416,7 @@ const Enrollment = () => {
       <section className="relative pt-32 pb-4 md:pt-40 md:pb-8 bg-gradient-to-br from-slate-50 via-blue-50/30 to-white overflow-hidden">
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6">
-            <span className="text-primary">Matrícula</span>{' '}
-            <span className="text-secondary">Online</span>
+            <span className="text-primary">Matrícula</span>
           </h1>
           <p className="text-lg sm:text-xl md:text-2xl text-gray-700">
             Preencha o formulário e faça parte da English Patio!
@@ -607,8 +593,9 @@ const Enrollment = () => {
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Data de Nascimento *
                       </label>
-                      <input
-                        type="date"
+                      <InputMask
+                        mask="99/99/9999"
+                        type="text"
                         name="student1BirthDate"
                         value={formData.student1BirthDate}
                         onChange={handleInputChange}
@@ -617,6 +604,7 @@ const Enrollment = () => {
                             ? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500'
                             : 'border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary'
                         }`}
+                        placeholder="DD/MM/AAAA"
                       />
                       {errors.student1BirthDate && (
                         <p className="mt-1 text-sm text-red-600">{errors.student1BirthDate}</p>
@@ -686,8 +674,9 @@ const Enrollment = () => {
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Data de Nascimento *
                         </label>
-                        <input
-                          type="date"
+                        <InputMask
+                          mask="99/99/9999"
+                          type="text"
                           name="student2BirthDate"
                           value={formData.student2BirthDate}
                           onChange={handleInputChange}
@@ -696,6 +685,7 @@ const Enrollment = () => {
                               ? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500'
                               : 'border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary'
                           }`}
+                          placeholder="DD/MM/AAAA"
                         />
                         {errors.student2BirthDate && (
                           <p className="mt-1 text-sm text-red-600">{errors.student2BirthDate}</p>
@@ -769,8 +759,9 @@ const Enrollment = () => {
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Data de Nascimento *
                       </label>
-                      <input
-                        type="date"
+                      <InputMask
+                        mask="99/99/9999"
+                        type="text"
                         name="responsibleBirthDate"
                         value={formData.responsibleBirthDate}
                         onChange={handleInputChange}
@@ -779,6 +770,7 @@ const Enrollment = () => {
                             ? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500'
                             : 'border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary'
                         }`}
+                        placeholder="DD/MM/AAAA"
                       />
                       {errors.responsibleBirthDate && (
                         <p className="mt-1 text-sm text-red-600">{errors.responsibleBirthDate}</p>
@@ -1214,44 +1206,12 @@ const Enrollment = () => {
                   </div>
 
                   {/* Formato das Aulas */}
-                  <div className="p-6 bg-purple-50/50 rounded-xl">
-                    <h3 className="text-lg font-semibold text-primary mb-4">Formato das Aulas</h3>
-                    <div className="space-y-2">
-                      <label className="flex items-center cursor-pointer p-3 border-2 rounded-lg hover:bg-white transition-colors">
-                        <input
-                          type="radio"
-                          name="classFormat"
-                          value="sede"
-                          checked={formData.classFormat === 'sede'}
-                          onChange={handleInputChange}
-                          className="w-5 h-5 text-primary"
-                        />
-                        <span className="ml-3 font-medium">Presencial na sede da escola</span>
-                      </label>
-                      <label className={`flex items-center cursor-pointer p-3 border-2 rounded-lg transition-colors ${
-                        canHaveHomeClasses(formData.cep)
-                          ? 'hover:bg-white'
-                          : 'opacity-50 cursor-not-allowed'
-                      }`}>
-                        <input
-                          type="radio"
-                          name="classFormat"
-                          value="domicilio"
-                          checked={formData.classFormat === 'domicilio'}
-                          onChange={handleInputChange}
-                          disabled={!canHaveHomeClasses(formData.cep)}
-                          className="w-5 h-5 text-primary"
-                        />
-                        <span className="ml-3">
-                          <span className="font-medium">Presencial no domicílio do aluno</span>
-                          {!canHaveHomeClasses(formData.cep) && (
-                            <span className="block text-xs text-red-600 mt-1">
-                              (Disponível apenas para Setor Bueno e Marista)
-                            </span>
-                          )}
-                        </span>
-                      </label>
-                    </div>
+                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Formato das Aulas
+                    </label>
+                    <p className="text-lg font-semibold text-primary">Presencial na sede da escola</p>
+                    <p className="text-sm text-gray-600 mt-1">Aulas ministradas na unidade física da English Patio</p>
                   </div>
 
                   {/* Confirmação de Horário */}
@@ -1355,14 +1315,6 @@ const Enrollment = () => {
                     </div>
                   </div>
 
-                  {/* Formato das Aulas */}
-                  <div className="p-6 bg-purple-50/50 rounded-xl">
-                    <h3 className="text-lg font-semibold text-primary mb-4">Formato das Aulas</h3>
-                    <div className="space-y-2">
-                      <p><span className="text-gray-600">Formato:</span> <span className="font-medium">{formData.classFormat === 'sede' ? 'Presencial na sede da escola' : 'Presencial no domicílio do aluno'}</span></p>
-                    </div>
-                  </div>
-
                 </div>
 
                 {/* Autorizações */}
@@ -1376,11 +1328,10 @@ const Enrollment = () => {
                         name="authorizationMedia"
                         checked={formData.authorizationMedia}
                         onChange={handleInputChange}
-                        required
                         className="w-5 h-5 text-primary rounded focus:ring-2 focus:ring-primary mt-1 flex-shrink-0"
                       />
                       <span className="ml-3 text-gray-700">
-                        Autorizo o uso de imagem do(a) aluno(a) em fotos e vídeos produzidos pela escola, caso ele(a) apareça ao fundo ou em atividades gerais, para divulgação nas redes sociais da English Patio, enquanto durar este contrato. *
+                        Autorizo a utilização da imagem do(a) aluno(a) em fotografias e vídeos produzidos pela escola, nos quais ele(a) possa eventualmente aparecer, seja em segundo plano ou em atividades institucionais, para fins de divulgação nas redes sociais da English Patio.
                       </span>
                     </label>
 
@@ -1408,12 +1359,12 @@ const Enrollment = () => {
                   </div>
                 </div>
 
-                {/* Informação sobre Contrato Eletrônico */}
+                {/* Informação sobre Processo de Assinatura */}
                 <div className="mb-8 bg-blue-50 border border-blue-200 rounded-xl p-4">
                   <p className="text-sm text-blue-900">
-                    <strong>📄 Sobre o Contrato Eletrônico:</strong>
+                    <strong>📄 Processo de Assinatura do Contrato:</strong>
                     <br />
-                    Ao finalizar a matrícula, você receberá o contrato preenchido por e-mail. Este contrato tem validade jurídica conforme a Lei 13.709/2018 (LGPD) e o Marco Civil da Internet (Lei 12.965/2014). A aceitação dos termos por meio eletrônico é legalmente válida e vinculante.
+                    Ao finalizar a matrícula, você receberá o contrato preenchido por e-mail. Em seguida, a equipe da English Patio entrará em contato e enviará um link para assinatura digital do contrato, garantindo a validade jurídica conforme a legislação brasileira.
                   </p>
                 </div>
 

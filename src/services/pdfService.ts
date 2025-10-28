@@ -10,7 +10,7 @@ export interface ContractData {
   contractorCPF: string;
   contractorPhone: string;
 
-  // Formato das Aulas
+  // Formato das Aulas (sempre 'sede' no contrato 2026)
   classFormat: 'sede' | 'domicilio';
 
   // Autorização de Uso de Imagem
@@ -107,24 +107,15 @@ export async function fillContractPDF(formData: ContractData): Promise<Uint8Arra
     // PÁGINA 2: Formato das Aulas
     const page2Height = page2.getSize().height;
 
-    // Checkbox do formato (X no checkbox correto)
-    if (formData.classFormat === 'sede') {
-      page2.drawText('X', {
-        x: 90.5,
-        y: page2Height - 380,
-        size: 14,
-        font: fontBold,
-        color: textColor,
-      });
-    } else {
-      page2.drawText('X', {
-        x: 90.5,
-        y: page2Height - 408,
-        size: 14,
-        font: fontBold,
-        color: textColor,
-      });
-    }
+    // Checkbox do formato - Apenas "Presencial na sede" (contrato 2026)
+    // Sempre marca a opção "sede" pois não há mais opção de domicílio
+    page2.drawText('X', {
+      x: 90.5,
+      y: page2Height - 368,
+      size: 14,
+      font: fontBold,
+      color: textColor,
+    });
 
     // PÁGINA 4: Autorização de Imagem e Data
     const page4Height = page4.getSize().height;
@@ -133,7 +124,7 @@ export async function fillContractPDF(formData: ContractData): Promise<Uint8Arra
     if (formData.imageAuthorization) {
       page4.drawText('X', {
         x: 98,
-        y: page4Height - 483,
+        y: page4Height - 367,
         size: 14,
         font: fontBold,
         color: textColor,
@@ -141,7 +132,7 @@ export async function fillContractPDF(formData: ContractData): Promise<Uint8Arra
     } else {
       page4.drawText('X', {
         x: 98,
-        y: page4Height - 497,
+        y: page4Height - 381,
         size: 14,
         font: fontBold,
         color: textColor,
@@ -152,21 +143,21 @@ export async function fillContractPDF(formData: ContractData): Promise<Uint8Arra
     const [day, month, year] = formData.signatureDate.split('/');
     page4.drawText(day, {
       x: 176,
-      y: page4Height - 663,
+      y: page4Height - 594,
       size: fontSize,
       font: font,
       color: textColor,
     });
     page4.drawText(month, {
       x: 232,
-      y: page4Height - 663,
+      y: page4Height - 594,
       size: fontSize,
       font: font,
       color: textColor,
     });
     page4.drawText(year, {
       x: 288,
-      y: page4Height - 663,
+      y: page4Height - 594,
       size: fontSize,
       font: font,
       color: textColor,
@@ -174,8 +165,8 @@ export async function fillContractPDF(formData: ContractData): Promise<Uint8Arra
 
     // Nome do Contratante (linha de assinatura "CONTRATANTE")
     page4.drawText(formData.contractorName.toUpperCase(), {
-      x: 113,
-      y: page4Height - 698,
+      x: 170,
+      y: page4Height - 630,
       size: fontSize,
       font: font,
       color: textColor,
@@ -184,8 +175,8 @@ export async function fillContractPDF(formData: ContractData): Promise<Uint8Arra
     // Nome do Contratado (linha de assinatura "CONTRATADO")
     // Este campo é fixo e sempre será "English Patio Ltda"
     page4.drawText('ENGLISH PATIO LTDA', {
-      x: 113,
-      y: page4Height - 735,
+      x: 170,
+      y: page4Height - 667,
       size: fontSize,
       font: font,
       color: textColor,
