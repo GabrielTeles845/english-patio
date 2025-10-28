@@ -1,6 +1,7 @@
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import LearningPyramid from '../components/LearningPyramid';
+import LearningPyramidComparison from '../components/LearningPyramidComparison';
 import { SparklesIcon, LightBulbIcon } from '@heroicons/react/24/outline';
 import OptimizedImage from '../components/OptimizedImage';
 
@@ -16,9 +17,6 @@ const Methodology = () => {
             <span className="text-primary">Nossa</span>{' '}
             <span className="text-secondary">Metodologia</span>
           </h1>
-          <p className="text-xl md:text-2xl text-gray-700">
-            Aprender Inglês de Forma Natural e Divertida
-          </p>
         </div>
       </section>
 
@@ -150,6 +148,14 @@ const Methodology = () => {
             </p>
           </div>
 
+          <LearningPyramidComparison />
+
+          <div className="my-16 border-t-4 border-dashed border-gray-300"></div>
+
+          <div className="text-center mb-8">
+            <h3 className="text-2xl font-bold text-gray-500">Pirâmide Original (abaixo para referência)</h3>
+          </div>
+
           <LearningPyramid />
 
           <div className="mt-12 max-w-3xl mx-auto">
@@ -213,30 +219,6 @@ const Methodology = () => {
             </div>
           </div>
 
-          {/* Grid com foto placeholder */}
-          <div className="mt-16 grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <h3 className="text-2xl font-bold text-primary mb-4">
-                Ambiente de Aprendizagem Acolhedor
-              </h3>
-              <p className="text-gray-700 leading-relaxed mb-4">
-                Proporcionamos um ambiente pedagógico seguro e estimulante, onde cada estudante desenvolve confiança
-                para se expressar, cometer erros construtivos, reformular hipóteses linguísticas e, principalmente,
-                vivenciar o prazer genuíno da aprendizagem.
-              </p>
-              <p className="text-gray-700 leading-relaxed">
-                Nosso objetivo transcende o ensino do idioma: cultivamos aprendizes autônomos, críticos e apaixonados
-                pelo processo contínuo de descoberta e desenvolvimento linguístico.
-              </p>
-            </div>
-            <div className="rounded-xl aspect-[4/3] overflow-hidden shadow-lg">
-              <OptimizedImage
-                src="DSC07209.jpg"
-                alt="Ambiente de aula acolhedor e estimulante"
-                className="h-full"
-              />
-            </div>
-          </div>
         </div>
       </section>
 

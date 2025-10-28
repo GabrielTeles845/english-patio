@@ -15,71 +15,72 @@ const LearningPyramid = () => {
   const [levels, setLevels] = useState<PyramidLevel[]>([
     {
       id: 'lecture',
-      name: 'Aula Expositiva',
+      name: 'Aula',
       retention: 5,
-      color: 'bg-blue-300',
+      color: 'bg-orange-300',
       icon: '👨‍🏫',
       description: 'Apenas ouvir o professor explicando o conteúdo.',
       isActive: false
     },
     {
       id: 'reading',
-      name: 'Leitura',
+      name: 'Leitura de materiais',
       retention: 10,
-      color: 'bg-blue-400',
+      color: 'bg-orange-400',
       icon: '📚',
       description: 'Ler materiais didáticos ou textos sobre o assunto.',
       isActive: false
     },
     {
       id: 'audioVisual',
-      name: 'Audiovisual',
+      name: 'Assistir vídeos e apresentações',
       retention: 20,
-      color: 'bg-blue-500',
+      color: 'bg-orange-500',
       icon: '🎬',
       description: 'Assistir vídeos ou apresentações sobre o tema.',
       isActive: false
     },
     {
       id: 'demonstration',
-      name: 'Demonstração',
+      name: 'Observar demonstrações práticas',
       retention: 30,
-      color: 'bg-blue-600',
+      color: 'bg-blue-300',
       icon: '👀',
       description: 'Observar alguém realizando a atividade na prática.',
       isActive: false
     },
     {
       id: 'discussion',
-      name: 'Discussão em Grupo',
+      name: 'Participar de discussões em grupo',
       retention: 50,
-      color: 'bg-orange-300',
+      color: 'bg-blue-400',
       icon: '💬',
       description: 'Participar de debates e discussões sobre o tema.',
       isActive: false
     },
     {
       id: 'practice',
-      name: 'Prática',
+      name: 'Praticar e fazer exercícios sobre o conteúdo',
       retention: 75,
-      color: 'bg-orange-400',
+      color: 'bg-blue-500',
       icon: '✍️',
       description: 'Realizar exercícios práticos sobre o conteúdo.',
       isActive: false
     },
     {
       id: 'teaching',
-      name: 'Ensinar',
+      name: 'Ensinar o conteúdo para outra pessoa',
       retention: 90,
-      color: 'bg-orange-500',
+      color: 'bg-blue-600',
       icon: '👩‍🏫',
       description: 'Explicar o conteúdo para outra pessoa, fixando seu próprio conhecimento.',
-      isActive: false
+      isActive: true
     }
   ]);
 
-  // Estado para armazenar o nível selecionado
-  const [selectedLevel, setSelectedLevel] = useState<PyramidLevel | null>(null);
+  // Estado para armazenar o nível selecionado - inicializa com o nível de 90%
+  const teachingLevel = levels.find(l => l.retention === 90);
+  const [selectedLevel, setSelectedLevel] = useState<PyramidLevel | null>(teachingLevel || null);
 
   // Função para lidar com o clique em um nível
   const handleLevelClick = (level: PyramidLevel) => {
@@ -101,13 +102,13 @@ const LearningPyramid = () => {
 
       {/* Divisão entre aprendizado passivo e ativo */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        <div className="text-center p-4 bg-blue-100 rounded-lg">
-          <h4 className="font-semibold text-blue-800">Aprendizado Passivo</h4>
-          <p className="text-sm text-blue-600">5% - 30% de retenção</p>
-        </div>
         <div className="text-center p-4 bg-orange-100 rounded-lg">
-          <h4 className="font-semibold text-orange-800">Aprendizado Ativo</h4>
-          <p className="text-sm text-orange-600">50% - 90% de retenção</p>
+          <h4 className="font-semibold text-orange-800">Aprendizado Passivo</h4>
+          <p className="text-sm text-orange-600">5% - 30% de retenção</p>
+        </div>
+        <div className="text-center p-4 bg-blue-100 rounded-lg">
+          <h4 className="font-semibold text-blue-800">Aprendizado Ativo</h4>
+          <p className="text-sm text-blue-600">50% - 90% de retenção</p>
         </div>
       </div>
 
@@ -115,20 +116,20 @@ const LearningPyramid = () => {
       <div className="relative">
         <div className="flex flex-col items-center">
           {levels.map((level, index) => {
-            // Calculando a largura de cada nível (diminui conforme sobe na pirâmide)
-            const width = 100 - (index * (100 / levels.length));
+            // Calculando a largura de cada nível (aumenta conforme desce na pirâmide)
+            const width = 30 + (index * (70 / (levels.length - 1)));
             
             return (
               <div
                 key={level.id}
                 onClick={() => handleLevelClick(level)}
-                className={`${level.color} ${level.isActive ? 'ring-2 ring-yellow-400 shadow-lg' : ''} 
-                           mb-1 py-3 rounded-sm cursor-pointer transition-all duration-300 hover:brightness-110
-                           flex items-center justify-center text-white font-medium`}
+                className={`${level.color} ${level.isActive ? 'ring-2 ring-yellow-400 shadow-lg' : 'ring-1 ring-white/30'}
+                           mb-1 py-3 px-4 rounded-sm cursor-pointer transition-all duration-300 hover:brightness-110 hover:scale-105
+                           flex items-center justify-center text-white font-bold text-center relative group`}
                 style={{ width: `${width}%` }}
               >
-                <span className="mr-2">{level.icon}</span>
-                <span>{level.name}</span>
+                <span className="mr-2 text-lg">{level.icon}</span>
+                <span className="flex-1">{level.name}</span>
                 <span className="ml-3 bg-white text-gray-800 px-2 py-1 rounded-full text-sm font-bold">
                   {level.retention}%
                 </span>
