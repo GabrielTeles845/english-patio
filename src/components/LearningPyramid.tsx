@@ -69,7 +69,7 @@ const LearningPyramid = () => {
     },
     {
       id: 'teaching',
-      name: 'Ensinar aos Outros',
+      name: 'Ensinar',
       retention: 90,
       color: 'bg-orange-500',
       icon: '👩‍🏫',
