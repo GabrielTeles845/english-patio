@@ -1,7 +1,6 @@
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import LearningPyramid from '../components/LearningPyramid';
-import LearningPyramidComparison from '../components/LearningPyramidComparison';
 import { SparklesIcon, LightBulbIcon } from '@heroicons/react/24/outline';
 import OptimizedImage from '../components/OptimizedImage';
 
@@ -137,14 +136,6 @@ const Methodology = () => {
             <p className="text-lg text-gray-700 max-w-3xl mx-auto mb-8">
               A Pirâmide de Glasser é um modelo que ilustra como diferentes formas de aprendizagem impactam na retenção do conhecimento. Segundo essa teoria, os alunos aprendem de maneira mais significativa quando participam ativamente do processo, especialmente ao praticar, discutir, ensinar e aplicar o que aprendem.
             </p>
-          </div>
-
-          <LearningPyramidComparison />
-
-          <div className="my-16 border-t-4 border-dashed border-gray-300"></div>
-
-          <div className="text-center mb-8">
-            <h3 className="text-2xl font-bold text-gray-500">Pirâmide Original (abaixo para referência)</h3>
           </div>
 
           <LearningPyramid />
