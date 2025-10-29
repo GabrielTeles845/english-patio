@@ -23,7 +23,7 @@ const features = [
 
 const HeroSection = () => {
   return (
-    <div className="relative pb-12 md:pt-8 md:pb-16 overflow-hidden bg-white animate-fade-in">
+    <div className="relative pt-4 pb-12 md:pt-6 md:pb-16 overflow-hidden bg-white animate-fade-in">
       {/* Elementos decorativos */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute -top-10 -right-10 w-72 h-72 bg-yellow-200 rounded-full opacity-20 blur-3xl"></div>
@@ -32,7 +32,7 @@ const HeroSection = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative grid lg:grid-cols-2 gap-8 lg:gap-20 items-start lg:items-center py-8 lg:py-16">
+        <div className="relative grid lg:grid-cols-2 gap-8 lg:gap-20 items-start lg:items-center py-2 lg:py-4">
           {/* Conteúdo à esquerda */}
           <div className="text-center lg:text-left order-1">
             <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold tracking-tight leading-tight">
@@ -46,11 +46,13 @@ const HeroSection = () => {
             </h1>
 
             <p className="mt-6 lg:mt-8 text-base sm:text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-              Na English Patio, seu filho aprende inglês de forma natural por meio de dinâmicas e atividades interativas,
-              conduzidas por professores treinados em Metodologias Ativas.
+              Somos a English Patio, uma escola de inglês dedicada a construir a fluência com leveza e propósito.
             </p>
             <p className="mt-3 lg:mt-4 text-base sm:text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-              Nossas turmas reduzidas garantem atenção individualizada e personalização do aprendizado, respeitando o ritmo de cada aluno.
+              Adotamos uma abordagem lúdica, dinâmica e contextualizada, voltada ao ensino de crianças e adolescentes organizados em pequenas turmas de até seis alunos.
+            </p>
+            <p className="mt-3 lg:mt-4 text-base sm:text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+              Nossa unidade foi cuidadosamente planejada para proporcionar um ambiente acolhedor, inspirador e propício ao desenvolvimento linguístico, cognitivo e pessoal.
             </p>
 
             <div className="mt-8 lg:mt-12 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
@@ -58,12 +60,25 @@ const HeroSection = () => {
                 href="#contact"
                 className="btn-primary btn-hover group text-center inline-flex items-center justify-center"
               >
-                Fale Conosco
+                Faça Sua Matrícula
                 <ArrowRightIcon className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
               </a>
               <a
                 href="#courses"
                 className="btn-secondary btn-hover text-center inline-flex items-center justify-center"
+                onClick={(e) => {
+                  e.preventDefault();
+                  const element = document.getElementById('courses');
+                  if (element) {
+                    const offset = -20;
+                    const elementPosition = element.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset + offset;
+                    window.scrollTo({
+                      top: offsetPosition,
+                      behavior: 'smooth'
+                    });
+                  }
+                }}
               >
                 Conheça Nosso Curso
               </a>

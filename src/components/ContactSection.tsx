@@ -2,66 +2,83 @@ import { PhoneIcon, MapPinIcon } from '@heroicons/react/24/outline';
 
 const ContactSection = () => {
   return (
-    <section id="contact" className="py-16 md:py-24 bg-white">
+    <section id="contact" className="py-12 md:py-16 bg-gradient-to-b from-blue-50 to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center">
-          <p className="text-3xl leading-8 font-extrabold tracking-tight text-primary sm:text-4xl">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h2 className="text-4xl md:text-5xl font-bold text-primary mb-4">
             Fale Conosco
-          </p>
-          <p className="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
-            Estamos aqui para ajudar você a iniciar sua jornada no inglês
+          </h2>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Estamos prontos para ajudar você a começar sua jornada no inglês
           </p>
         </div>
 
-        <div className="mt-20">
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 max-w-4xl mx-auto">
+        <div className="max-w-5xl mx-auto">
+          {/* Cards de contato */}
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 mb-8 items-stretch">
             {/* Telefone */}
-            <div className="flex flex-col items-center p-6 bg-white rounded-lg shadow-lg">
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-primary text-white">
-                <PhoneIcon className="h-6 w-6" />
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-blue-100/30 rounded-2xl transform group-hover:scale-105 transition-transform duration-300"></div>
+              <div className="relative bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100">
+                <div className="flex flex-col items-center text-center">
+                  <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4 group-hover:bg-primary/20 transition-colors">
+                    <PhoneIcon className="h-8 w-8 text-primary" />
+                  </div>
+                  <h3 className="text-xl font-bold text-primary mb-3">Telefone</h3>
+                  <a
+                    href="tel:+556236367775"
+                    className="text-2xl font-semibold text-gray-900 hover:text-primary transition-colors mb-4 block"
+                  >
+                    (62) 3636-7775
+                  </a>
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-full mt-auto">
+                    <svg className="h-4 w-4 text-primary flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="text-sm font-medium text-gray-700">
+                      Seg a Sex: 8:00 - 18:30
+                    </span>
+                  </div>
+                </div>
               </div>
-              <h3 className="mt-4 text-lg font-medium text-gray-900">Telefone</h3>
-              <p className="mt-2 text-base text-gray-500 text-center">
-                <a href="tel:+556236367775" className="hover:text-primary">
-                  (62) 3636-7775
-                </a>
-              </p>
-              <p className="mt-2 text-sm text-gray-500 text-center">
-                Disponível de Segunda a Sexta
-                <br />
-                das 8:00 às 18:30
-              </p>
             </div>
 
             {/* Endereço */}
-            <div className="flex flex-col items-center p-6 bg-white rounded-lg shadow-lg">
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-primary text-white">
-                <MapPinIcon className="h-6 w-6" />
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-100/30 to-primary/5 rounded-2xl transform group-hover:scale-105 transition-transform duration-300"></div>
+              <div className="relative bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100">
+                <div className="flex flex-col items-center text-center">
+                  <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4 group-hover:bg-primary/20 transition-colors">
+                    <MapPinIcon className="h-8 w-8 text-primary" />
+                  </div>
+                  <h3 className="text-xl font-bold text-primary mb-3">Endereço</h3>
+                  <p className="text-base text-gray-700 font-medium mb-1">
+                    Av. F, 1541 - Quadra 01 Lote 12
+                  </p>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Água Branca, Goiânia - GO
+                  </p>
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-full mt-auto">
+                    <svg className="h-4 w-4 text-primary flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="text-sm font-medium text-gray-700">
+                      Seg a Sex: 8:00 - 18:30
+                    </span>
+                  </div>
+                </div>
               </div>
-              <h3 className="mt-4 text-lg font-medium text-gray-900">Endereço</h3>
-              <p className="mt-2 text-base text-gray-500 text-center">
-                Av. F, 1541 - Quadra 01 Lote 12
-                <br />
-                Água Branca, Goiânia - GO, 74723-100
-              </p>
-              <p className="mt-2 text-sm text-gray-500 text-center">
-                <span className="inline-flex items-center">
-                  <svg className="h-4 w-4 mr-1 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  Segunda a Sexta<br/>8:00 às 18:30
-                </span>
-              </p>
             </div>
           </div>
 
           {/* WhatsApp Button */}
-          <div className="mt-12 text-center">
+          <div className="text-center">
             <a
               href="https://wa.me/556236367775"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center px-8 py-4 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 transition duration-300"
+              className="inline-flex items-center px-8 py-4 border border-transparent text-base font-medium rounded-xl shadow-sm text-white bg-green-600 hover:bg-green-700 transition duration-300"
             >
               <svg
                 className="w-6 h-6 mr-2"

@@ -11,14 +11,14 @@ const Footer = () => {
           {/* Logo e descrição */}
           <div className="col-span-1 md:col-span-2">
             <img src="/assets/logo-index.webp" alt="English Patio" className="h-12 w-auto mb-4" />
-            <p className="text-gray-600 mb-6">
-              Somos a English Patio, uma escola de inglês que vai onde você está!
-              Nosso maior compromisso? Tornar o inglês parte do cotidiano dos nossos alunos.
+            <p className="text-gray-600 mb-4">
+              Somos a English Patio, uma escola de inglês dedicada a construir a fluência com leveza e propósito.
+            </p>
+            <p className="text-gray-600 mb-4">
+              Adotamos uma abordagem lúdica, dinâmica e contextualizada, voltada ao ensino de crianças e adolescentes organizados em pequenas turmas de até seis alunos.
             </p>
             <p className="text-gray-600">
-              Ensinamos inglês de forma lúdica, diferenciada e dinâmica, à crianças e adolescentes,
-              organizados em pequenas turmas de no máximo 6 alunos.
-              Oferecemos aulas tanto em nossa sede quanto na casa dos alunos.
+              Nossa unidade foi cuidadosamente planejada para proporcionar um ambiente acolhedor, inspirador e propício ao desenvolvimento linguístico, cognitivo e pessoal.
             </p>
           </div>
 
@@ -50,14 +50,14 @@ const Footer = () => {
                 </a>
               </li>
 
-              <li>
+              {/* <li>
                 <a
                   href={`${basePath}/infraestrutura`}
                   className="text-gray-600 hover:text-secondary transition-colors font-medium"
                 >
                   Infraestrutura
                 </a>
-              </li>
+              </li> */}
 
               <li>
                 <a

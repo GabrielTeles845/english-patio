@@ -1,49 +1,22 @@
 import { SparklesIcon } from '@heroicons/react/24/outline';
 import FadeCarousel from './FadeCarousel';
 import FlippingCards from './FlippingCards';
+import MasonryGrid from './MasonryGrid';
 import img from '../config/cloudinary';
 import OptimizedImage from './OptimizedImage';
 
 // Imagens para carrossel "Imersão e Aprendizado"
-// TODO: ADICIONAR MAIS FOTOS DE VACATION CLASSES AQUI
 const immersionImages = [
-  { src: 'DSC07695.jpg', alt: 'Atividade de imersão e aprendizado' },
-  // AGUARDANDO NOVAS FOTOS
+  { src: 'IMG_8057.jpg', alt: 'Atividade de imersão e aprendizado' },
 ];
 
-// Imagens para carrossel final "Momentos das Nossas Atividades"
+// Imagens para grid estilo Pinterest "Momentos das Nossas Atividades"
+// Primeiras 2 imagens serão destaques (maiores), as 2 seguintes serão menores
 const activityImages = [
-  { src: 'DSC06943.jpg', alt: 'Momento de atividade' },
-  { src: 'DSC06950.jpg', alt: 'Alunos em ação' },
-  { src: 'DSC06956.jpg', alt: 'Atividade criativa' },
-  { src: 'DSC06976.jpg', alt: 'Trabalho em grupo' },
-  { src: 'DSC07007.jpg', alt: 'Momento de aprendizado' },
-  { src: 'DSC07013.jpg', alt: 'Atividade lúdica' },
-  { src: 'DSC07016.jpg', alt: 'Jogos educativos' },
-  { src: 'DSC07025.jpg', alt: 'Diversão e aprendizado' },
-  { src: 'DSC07031.jpg', alt: 'Trabalho colaborativo' },
-  { src: 'DSC07045.jpg', alt: 'Grupo em ação' },
-  { src: 'DSC07076.jpg', alt: 'Atividade interativa' },
-  { src: 'DSC07077.jpg', alt: 'Momento especial' },
-  { src: 'DSC07081.jpg', alt: 'Aprendizado divertido' },
-  { src: 'DSC07088.jpg', alt: 'Atividade prática' },
-  { src: 'DSC07098.jpg', alt: 'Experiência educativa' },
-  { src: 'DSC07112.jpg', alt: 'Grupo se divertindo' },
-  { src: 'DSC07115.jpg', alt: 'Interação entre alunos' },
-  { src: 'DSC07240.jpg', alt: 'Atividade artística' },
-  { src: 'DSC07244.jpg', alt: 'Momento criativo' },
-  { src: 'DSC07247.jpg', alt: 'Arte e diversão' },
-  { src: 'DSC07250.jpg', alt: 'Trabalho artístico' },
-  { src: 'DSC07255.jpg', alt: 'Atividade de arte' },
-  { src: 'DSC07260.jpg', alt: 'Criatividade em ação' },
-  { src: 'DSC07265.jpg', alt: 'Momento artístico' },
-  { src: 'DSC07268.jpg', alt: 'Arte e aprendizado' },
-  { src: 'DSC07432.jpg', alt: 'Atividade especial' },
-  { src: 'DSC07447.jpg', alt: 'Experiência única' },
-  { src: 'DSC07657.jpg', alt: 'Ambiente de aprendizado' },
-  { src: 'DSC07662.jpg', alt: 'Momento educativo' },
-  { src: 'DSC07688.jpg', alt: 'Atividade engajadora' },
-  { src: 'DSC07695.jpg', alt: 'Aprendizado ativo' },
+  { src: 'IMG_1250.jpg', alt: 'Alunos em ação', aspectRatio: 768 / 1024 }, // Destaque 1
+  { src: 'IMG_4327.jpg', alt: 'Momento de aprendizado', aspectRatio: 3024 / 4032 }, // Destaque 2
+  { src: 'IMG_2517.jpg', alt: 'Atividade criativa', aspectRatio: 3024 / 4032 }, // Menor 1
+  { src: 'IMG_3094.jpg', alt: 'Trabalho em grupo', aspectRatio: 3024 / 4032 }, // Menor 2
 ];
 
 const VacationContent = () => {
@@ -138,9 +111,18 @@ const VacationContent = () => {
       <section className="py-16 md:py-20 bg-blue-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-12 items-center">
-            {/* TODO: SUBSTITUIR POR FOTO DE VACATION CLASSES - AGUARDANDO NOVA FOTO */}
-            <div className="order-2 md:order-1 relative aspect-[4/3] rounded-xl overflow-hidden shadow-lg bg-gray-200 flex items-center justify-center">
-              <p className="text-gray-500 text-center px-4">Espaço reservado para foto de Vacation Classes</p>
+            <div className="order-2 md:order-1 relative aspect-[4/3] rounded-xl overflow-hidden shadow-lg cursor-zoom-in group">
+              <OptimizedImage
+                src="IMG_3921.jpg"
+                alt="Valorização do investimento"
+                className="transition-transform duration-500 group-hover:scale-110 h-full"
+                onClick={() => {
+                  const event = new CustomEvent('openImageZoom', {
+                    detail: { src: img('IMG_3921.jpg'), alt: 'Valorização do investimento' }
+                  });
+                  window.dispatchEvent(event);
+                }}
+              />
             </div>
             <div className="order-1 md:order-2">
               <h2 className="text-3xl md:text-4xl font-bold mb-6">
@@ -166,7 +148,7 @@ const VacationContent = () => {
         </div>
       </section>
 
-      {/* Galeria de Atividades - Carrossel */}
+      {/* Galeria de Atividades - Grid Estilo Pinterest */}
       <section className="py-16 md:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -179,15 +161,7 @@ const VacationContent = () => {
             </p>
           </div>
 
-          <div className="max-w-5xl mx-auto">
-            <FadeCarousel
-              images={activityImages}
-              autoPlayInterval={4000}
-              showIndicators={true}
-              showControls={true}
-              aspectRatio="aspect-[16/10]"
-            />
-          </div>
+          <MasonryGrid images={activityImages} />
         </div>
       </section>
 

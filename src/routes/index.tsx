@@ -1,7 +1,7 @@
 import { createBrowserRouter, Outlet } from 'react-router-dom';
 import Home from '../pages/Home';
 import VacationClasses from '../pages/VacationClasses';
-import Infrastructure from '../pages/Infrastructure';
+// import Infrastructure from '../pages/Infrastructure';
 import Methodology from '../pages/Methodology';
 import Enrollment from '../pages/Enrollment';
 import WhatsAppButton from '../components/WhatsAppButton';
@@ -43,10 +43,10 @@ export const router = createBrowserRouter([
         path: 'vacation-classes',
         element: <VacationClasses />,
       },
-      {
-        path: 'infraestrutura',
-        element: <Infrastructure />,
-      },
+      // {
+      //   path: 'infraestrutura',
+      //   element: <Infrastructure />,
+      // },
       {
         path: 'metodologia',
         element: <Methodology />,

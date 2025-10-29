@@ -132,12 +132,12 @@ const Navbar = () => {
                   Vacation Classes
                 </Link>
 
-                <Link
+                {/* <Link
                   to="/infraestrutura"
                   className={`nav-item-hover ${isActive('/infraestrutura') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors font-medium`}
                 >
                   Infraestrutura
-                </Link>
+                </Link> */}
 
                 <Link
                   to="/matriculas"
@@ -214,13 +214,13 @@ const Navbar = () => {
                   Vacation Classes
                 </Link>
 
-                <Link
+                {/* <Link
                   to="/infraestrutura"
                   className={`${isActive('/infraestrutura') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors py-2 font-medium`}
                   onClick={() => toggleMenu()}
                 >
                   Infraestrutura
-                </Link>
+                </Link> */}
 
                 <Link
                   to="/matriculas"

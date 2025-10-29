@@ -1,5 +1,4 @@
-import { BuildingOffice2Icon, SparklesIcon, UserGroupIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
-import { Link } from 'react-router-dom';
+import { BuildingOffice2Icon, SparklesIcon, UserGroupIcon } from '@heroicons/react/24/outline';
 import { useState, useEffect } from 'react';
 import img from '../config/cloudinary';
 import OptimizedImage from './OptimizedImage';
@@ -56,7 +55,7 @@ const AboutSection = () => {
   }, []);
 
   return (
-    <section id="about" className="py-16 md:py-24 bg-blue-50">
+    <section id="about" className="py-12 md:py-16 bg-gradient-to-b from-blue-50 via-blue-50 to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
@@ -93,7 +92,7 @@ const AboutSection = () => {
             </div>
 
             {/* Botão para página completa */}
-            <div className="pt-4">
+            {/* <div className="pt-4">
               <Link
                 to="/infraestrutura"
                 className="inline-flex items-center px-6 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary-dark transition-colors shadow-md hover:shadow-lg group"
@@ -101,7 +100,7 @@ const AboutSection = () => {
                 Conheça Nossa Infraestrutura
                 <ArrowRightIcon className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Link>
-            </div>
+            </div> */}
           </div>
 
           {/* Coluna de Carrossel de Imagens */}
