@@ -2,7 +2,7 @@ import { PhoneIcon, MapPinIcon } from '@heroicons/react/24/outline';
 
 const ContactSection = () => {
   return (
-    <section id="contact" className="relative py-12 md:py-16 bg-gradient-to-b from-blue-50 to-white overflow-hidden">
+    <section id="contact" className="relative py-16 md:py-20 bg-gradient-to-b from-blue-50 to-white overflow-hidden">
       {/* Elementos decorativos */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-10 -left-20 w-96 h-96 bg-blue-200 rounded-full opacity-15 blur-3xl"></div>
@@ -12,12 +12,9 @@ const ContactSection = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         {/* Header */}
         <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold text-primary mb-4">
+          <h2 className="text-4xl md:text-5xl font-bold text-primary">
             Fale Conosco
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Estamos prontos para ajudar você a começar sua jornada no inglês
-          </p>
         </div>
 
         <div className="max-w-5xl mx-auto">

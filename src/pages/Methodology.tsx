@@ -10,7 +10,7 @@ const Methodology = () => {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative pt-48 pb-20 bg-gradient-to-br from-slate-50 via-blue-50/30 to-white overflow-hidden">
+      <section className="relative pt-48 pb-12 bg-gradient-to-br from-slate-50 via-blue-50/30 to-white overflow-hidden">
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-5xl md:text-6xl font-bold mb-6">
             <span className="text-primary">Nossa</span>{' '}
@@ -139,19 +139,6 @@ const Methodology = () => {
           </div>
 
           <LearningPyramid />
-
-          <div className="mt-12 max-w-3xl mx-auto">
-            <div className="bg-gradient-to-br from-primary/5 to-secondary/5 rounded-2xl p-8 border-2 border-primary/20">
-              <h3 className="text-xl font-bold text-primary mb-4 text-center">
-                Nossa Abordagem Pedagógica
-              </h3>
-              <p className="text-gray-700 leading-relaxed text-center">
-                Por isso, priorizamos atividades que envolvem discussão, prática e ensino entre pares. Nossos alunos
-                aprendem inglês através de projetos colaborativos, apresentações, debates, dramatizações e atividades
-                práticas que garantem maior retenção e aplicabilidade real do conhecimento linguístico adquirido.
-              </p>
-            </div>
-          </div>
         </div>
       </section>
 

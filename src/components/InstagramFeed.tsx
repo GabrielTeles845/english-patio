@@ -34,7 +34,7 @@ const InstagramFeed = () => {
   }, []);
 
   return (
-    <section className="relative py-12 md:py-16 bg-gradient-to-b from-white to-blue-50 overflow-hidden">
+    <section className="relative py-16 md:py-20 bg-gradient-to-b from-white to-blue-50 overflow-hidden">
       {/* Elementos decorativos */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute -top-20 -right-10 w-80 h-80 bg-yellow-200 rounded-full opacity-15 blur-3xl"></div>

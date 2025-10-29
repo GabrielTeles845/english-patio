@@ -135,7 +135,7 @@ const VacationContent = () => {
               </p>
               <div className="bg-white rounded-xl p-6 shadow-md border-l-4 border-secondary mb-6">
                 <p className="text-lg text-gray-700 font-semibold">
-                  As mensalidades dos meses de <strong>janeiro e julho</strong> são convertidas integralmente nessas vivências
+                  As mensalidades dos meses de <strong>Janeiro e Julho</strong> são convertidas integralmente nessas vivências
                   pedagógicas realizadas ao longo do ano.
                 </p>
               </div>

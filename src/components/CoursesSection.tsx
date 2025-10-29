@@ -132,7 +132,7 @@ const cambridgeExams: CambridgeExam[] = [
 
 const CoursesSection = () => {
   return (
-    <section id="courses" className="relative py-12 md:py-16 bg-gradient-to-b from-white to-blue-50 overflow-hidden">
+    <section id="courses" className="relative py-16 md:py-20 bg-gradient-to-b from-white to-blue-50 overflow-hidden">
       {/* Elementos decorativos */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute -top-10 -right-20 w-72 h-72 bg-yellow-200 rounded-full opacity-15 blur-3xl"></div>
@@ -141,10 +141,10 @@ const CoursesSection = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-primary">
+          <h2 className="text-4xl md:text-5xl font-bold text-primary mb-4">
             Nossos Níveis
           </h2>
-          <p className="mt-4 text-gray-500 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
             Programa estruturado em níveis progressivos para o desenvolvimento contínuo do aluno
           </p>
         </div>
