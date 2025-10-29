@@ -57,7 +57,7 @@ const HeroSection = () => {
 
             <div className="mt-8 lg:mt-12 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
               <a
-                href="#contact"
+                href="/matriculas"
                 className="btn-primary btn-hover group text-center inline-flex items-center justify-center"
               >
                 Faça Sua Matrícula
