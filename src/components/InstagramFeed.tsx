@@ -34,8 +34,14 @@ const InstagramFeed = () => {
   }, []);
 
   return (
-    <section className="py-12 md:py-16 bg-gradient-to-b from-white to-blue-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="relative py-12 md:py-16 bg-gradient-to-b from-white to-blue-50 overflow-hidden">
+      {/* Elementos decorativos */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute -top-20 -right-10 w-80 h-80 bg-yellow-200 rounded-full opacity-15 blur-3xl"></div>
+        <div className="absolute bottom-20 -left-20 w-96 h-96 bg-blue-200 rounded-full opacity-15 blur-3xl"></div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         {/* Título */}
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-extrabold text-primary mb-4">

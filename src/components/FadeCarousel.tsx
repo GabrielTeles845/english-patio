@@ -22,22 +22,22 @@ const FadeCarousel = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  useEffect(() => {
-    if (autoPlayInterval && images.length > 1) {
-      const interval = setInterval(() => {
-        nextSlide();
-      }, autoPlayInterval);
-
-      return () => clearInterval(interval);
-    }
-  }, [currentIndex, autoPlayInterval, images.length]);
-
   const nextSlide = () => {
     if (isTransitioning) return;
     setIsTransitioning(true);
     setCurrentIndex((prev) => (prev + 1) % images.length);
     setTimeout(() => setIsTransitioning(false), 600);
   };
+
+  useEffect(() => {
+    if (autoPlayInterval && images.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentIndex((prev) => (prev + 1) % images.length);
+      }, autoPlayInterval);
+
+      return () => clearInterval(interval);
+    }
+  }, [autoPlayInterval, images.length]);
 
   const prevSlide = () => {
     if (isTransitioning) return;

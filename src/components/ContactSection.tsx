@@ -2,8 +2,14 @@ import { PhoneIcon, MapPinIcon } from '@heroicons/react/24/outline';
 
 const ContactSection = () => {
   return (
-    <section id="contact" className="py-12 md:py-16 bg-gradient-to-b from-blue-50 to-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="contact" className="relative py-12 md:py-16 bg-gradient-to-b from-blue-50 to-white overflow-hidden">
+      {/* Elementos decorativos */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute top-10 -left-20 w-96 h-96 bg-blue-200 rounded-full opacity-15 blur-3xl"></div>
+        <div className="absolute -bottom-10 -right-10 w-72 h-72 bg-yellow-200 rounded-full opacity-15 blur-3xl"></div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         {/* Header */}
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-bold text-primary mb-4">

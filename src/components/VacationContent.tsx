@@ -192,7 +192,7 @@ const VacationContent = () => {
           </p>
           <a
             href="/#contact"
-            className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold rounded-lg text-white bg-primary hover:bg-primary/90 transition-all shadow-lg hover:shadow-xl"
+            className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold rounded-xl text-white bg-primary hover:bg-primary/90 transition-all shadow-lg hover:shadow-xl"
           >
             Fale Conosco
           </a>

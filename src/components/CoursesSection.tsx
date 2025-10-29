@@ -132,8 +132,14 @@ const cambridgeExams: CambridgeExam[] = [
 
 const CoursesSection = () => {
   return (
-    <section id="courses" className="py-12 md:py-16 bg-gradient-to-b from-white to-blue-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="courses" className="relative py-12 md:py-16 bg-gradient-to-b from-white to-blue-50 overflow-hidden">
+      {/* Elementos decorativos */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute -top-10 -right-20 w-72 h-72 bg-yellow-200 rounded-full opacity-15 blur-3xl"></div>
+        <div className="absolute bottom-40 -left-20 w-80 h-80 bg-blue-200 rounded-full opacity-15 blur-3xl"></div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-primary">
             Nossos Níveis
