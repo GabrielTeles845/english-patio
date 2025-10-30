@@ -70,7 +70,9 @@ const HeroSection = () => {
                   e.preventDefault();
                   const element = document.getElementById('courses');
                   if (element) {
-                    const offset = -20;
+                    // Offset maior no mobile para não cortar o título
+                    const isMobile = window.innerWidth < 768;
+                    const offset = isMobile ? -80 : -20;
                     const elementPosition = element.getBoundingClientRect().top;
                     const offsetPosition = elementPosition + window.pageYOffset + offset;
                     window.scrollTo({

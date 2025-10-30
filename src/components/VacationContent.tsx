@@ -36,7 +36,7 @@ const VacationContent = () => {
                 proporcionam aos alunos o uso real e prático do inglês em ambientes do cotidiano.
               </p>
               <p className="text-lg text-gray-700 leading-relaxed">
-                São <strong>8 encontros anuais</strong>, com duas horas de duração cada, distribuídos ao longo do semestre letivo,
+                São <strong>8 encontros anuais</strong>, com duas horas de duração cada, distribuídos ao longo do ano letivo,
                 aproximadamente um por mês.
               </p>
             </div>

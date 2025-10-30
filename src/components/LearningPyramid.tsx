@@ -14,19 +14,10 @@ const LearningPyramid = () => {
   // Definição dos níveis de aprendizado com suas informações
   const [levels, setLevels] = useState<PyramidLevel[]>([
     {
-      id: 'lecture',
-      name: 'Aula',
-      retention: 5,
-      color: 'bg-orange-300',
-      icon: '👨‍🏫',
-      description: 'Apenas ouvir o professor explicando o conteúdo.',
-      isActive: false
-    },
-    {
       id: 'reading',
       name: 'Leitura de materiais',
       retention: 10,
-      color: 'bg-orange-400',
+      color: 'bg-orange-300',
       icon: '📚',
       description: 'Ler materiais didáticos ou textos sobre o assunto.',
       isActive: false
@@ -104,7 +95,7 @@ const LearningPyramid = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
         <div className="text-center p-4 bg-orange-100 rounded-lg">
           <h4 className="font-semibold text-orange-800">Aprendizado Passivo</h4>
-          <p className="text-sm text-orange-600">5% - 30% de retenção</p>
+          <p className="text-sm text-orange-600">10% - 30% de retenção</p>
         </div>
         <div className="text-center p-4 bg-blue-100 rounded-lg">
           <h4 className="font-semibold text-blue-800">Aprendizado Ativo</h4>
