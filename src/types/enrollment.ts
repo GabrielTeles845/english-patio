@@ -25,12 +25,14 @@ export interface FormData {
   // Segundo Responsável (opcional - apenas contato)
   hasSecondResponsible: boolean;
   secondResponsibleName: string;
+  secondResponsibleCPF: string;
   secondResponsiblePhone: string;
   secondResponsibleRelationship: string;
 
   // Responsável Financeiro (pode ser diferente)
-  financialResponsibleType: 'same' | 'other'; // Mesmo responsável ou outro
+  financialResponsibleType: 'legal' | 'second' | 'other'; // Responsável Legal, Segundo Responsável ou outro
   financialResponsibleName: string; // Usado se 'other'
+  financialResponsibleCPF: string; // Usado se 'other'
 
   // Endereço
   cep: string;

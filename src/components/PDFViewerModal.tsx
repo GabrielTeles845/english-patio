@@ -87,6 +87,11 @@ const PDFViewerModal = ({ isOpen, onClose, pdfBytes, studentName }: PDFViewerMod
                 <p className="text-xs sm:text-sm text-green-700 mt-1">
                   A escola receberá os dados da matrícula por e-mail. Em breve você receberá um link para assinatura digital do contrato.
                 </p>
+                <div className="mt-3 pt-3 border-t border-green-200">
+                  <p className="text-xs sm:text-sm text-green-800 font-semibold">
+                    ⚠️ Importante: A efetivação da matrícula acontecerá mediante a quitação de parcelas em aberto e a compra dos materiais de 2026.
+                  </p>
+                </div>
               </div>
             </div>
           </div>

@@ -7,7 +7,7 @@ import OptimizedImage from './OptimizedImage';
 
 // Imagens para carrossel "Imersão e Aprendizado"
 const immersionImages = [
-  { src: 'IMG_8057.jpg', alt: 'Atividade de imersão e aprendizado' },
+  { src: 'DSC09770.jpg', alt: 'Atividade de imersão e aprendizado' },
 ];
 
 // Imagens para grid estilo Pinterest "Momentos das Nossas Atividades"

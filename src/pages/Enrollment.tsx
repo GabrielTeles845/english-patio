@@ -47,10 +47,12 @@ const Enrollment = () => {
     responsibleEmail: '',
     hasSecondResponsible: false,
     secondResponsibleName: '',
+    secondResponsibleCPF: '',
     secondResponsiblePhone: '',
     secondResponsibleRelationship: '',
-    financialResponsibleType: 'same',
+    financialResponsibleType: 'legal',
     financialResponsibleName: '',
+    financialResponsibleCPF: '',
     cep: '',
     street: '',
     number: '',
@@ -253,6 +255,12 @@ const Enrollment = () => {
         newErrors.secondResponsibleName = ErrorMessages.INVALID_FULL_NAME;
       }
 
+      if (!formData.secondResponsibleCPF) {
+        newErrors.secondResponsibleCPF = ErrorMessages.REQUIRED;
+      } else if (!isValidCPF(formData.secondResponsibleCPF)) {
+        newErrors.secondResponsibleCPF = ErrorMessages.INVALID_CPF;
+      }
+
       if (!formData.secondResponsiblePhone) {
         newErrors.secondResponsiblePhone = ErrorMessages.REQUIRED;
       } else if (!isValidPhone(formData.secondResponsiblePhone)) {
@@ -291,6 +299,12 @@ const Enrollment = () => {
         newErrors.financialResponsibleName = ErrorMessages.REQUIRED;
       } else if (!isValidFullName(formData.financialResponsibleName)) {
         newErrors.financialResponsibleName = ErrorMessages.INVALID_FULL_NAME;
+      }
+
+      if (!formData.financialResponsibleCPF) {
+        newErrors.financialResponsibleCPF = ErrorMessages.REQUIRED;
+      } else if (!isValidCPF(formData.financialResponsibleCPF)) {
+        newErrors.financialResponsibleCPF = ErrorMessages.INVALID_CPF;
       }
     }
 
@@ -362,14 +376,29 @@ const Enrollment = () => {
       // Montar endereço (linha 1: rua, número e complemento)
       const addressLine1 = `${formData.street}, ${formData.number}${formData.complement ? ` - ${formData.complement}` : ''}`;
 
-      // Preparar dados do contrato
+      // Determinar responsável financeiro (nome e CPF)
+      let financialResponsibleName = '';
+      let financialResponsibleCPF = '';
+
+      if (formData.financialResponsibleType === 'legal') {
+        financialResponsibleName = formData.responsibleName;
+        financialResponsibleCPF = formData.responsibleCPF;
+      } else if (formData.financialResponsibleType === 'second') {
+        financialResponsibleName = formData.secondResponsibleName;
+        financialResponsibleCPF = formData.secondResponsibleCPF;
+      } else {
+        financialResponsibleName = formData.financialResponsibleName;
+        financialResponsibleCPF = formData.financialResponsibleCPF;
+      }
+
+      // Preparar dados do contrato (usando responsável financeiro)
       const contractData = {
-        contractorName: formData.responsibleName,
+        contractorName: financialResponsibleName,
         contractorAddress: addressLine1,
         contractorNeighborhood: formData.neighborhood,
         contractorCity: `${formData.city}/${formData.state}`,
         contractorCEP: formData.cep,
-        contractorCPF: formData.responsibleCPF,
+        contractorCPF: financialResponsibleCPF,
         contractorPhone: formData.responsiblePhone,
         classFormat: formData.classFormat,
         imageAuthorization: formData.authorizationMedia,
@@ -895,6 +924,27 @@ const Enrollment = () => {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
+                          CPF *
+                        </label>
+                        <InputMask
+                          mask="999.999.999-99"
+                          type="text"
+                          name="secondResponsibleCPF"
+                          value={formData.secondResponsibleCPF}
+                          onChange={handleInputChange}
+                          className={`w-full px-4 py-3 rounded-lg border transition-colors ${
+                            errors.secondResponsibleCPF
+                              ? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500'
+                              : 'border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary'
+                          }`}
+                          placeholder="000.000.000-00"
+                        />
+                        {errors.secondResponsibleCPF && (
+                          <p className="mt-1 text-sm text-red-600">{errors.secondResponsibleCPF}</p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
                           Telefone/WhatsApp *
                         </label>
                         <InputMask
@@ -984,13 +1034,28 @@ const Enrollment = () => {
                             <input
                               type="radio"
                               name="financialResponsibleType"
-                              value="same"
-                              checked={formData.financialResponsibleType === 'same'}
+                              value="legal"
+                              checked={formData.financialResponsibleType === 'legal'}
                               onChange={handleInputChange}
                               className="w-5 h-5 text-primary"
                             />
-                            <span className="ml-3 font-medium">{formData.responsibleName || 'O responsável legal cadastrado'}</span>
+                            <span className="ml-3 font-medium">Responsável Legal - {formData.responsibleName || 'Cadastrado no passo anterior'}</span>
                           </label>
+
+                          {formData.hasSecondResponsible && (
+                            <label className="flex items-center cursor-pointer p-3 border-2 rounded-lg hover:bg-white transition-colors">
+                              <input
+                                type="radio"
+                                name="financialResponsibleType"
+                                value="second"
+                                checked={formData.financialResponsibleType === 'second'}
+                                onChange={handleInputChange}
+                                className="w-5 h-5 text-primary"
+                              />
+                              <span className="ml-3 font-medium">Segundo Responsável - {formData.secondResponsibleName || 'Cadastrado no passo anterior'}</span>
+                            </label>
+                          )}
+
                           <label className="flex items-center cursor-pointer p-3 border-2 rounded-lg hover:bg-white transition-colors">
                             <input
                               type="radio"
@@ -1006,25 +1071,48 @@ const Enrollment = () => {
                       </div>
 
                       {formData.financialResponsibleType === 'other' && (
-                        <div className="animate-slide-down">
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Nome do Responsável Financeiro *
-                          </label>
-                          <input
-                            type="text"
-                            name="financialResponsibleName"
-                            value={formData.financialResponsibleName}
-                            onChange={handleInputChange}
-                            className={`w-full px-4 py-3 rounded-lg border transition-colors ${
-                              errors.financialResponsibleName
-                                ? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500'
-                                : 'border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary'
-                            }`}
-                            placeholder="Nome completo"
-                          />
-                          {errors.financialResponsibleName && (
-                            <p className="mt-1 text-sm text-red-600">{errors.financialResponsibleName}</p>
-                          )}
+                        <div className="animate-slide-down space-y-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Nome do Responsável Financeiro *
+                            </label>
+                            <input
+                              type="text"
+                              name="financialResponsibleName"
+                              value={formData.financialResponsibleName}
+                              onChange={handleInputChange}
+                              className={`w-full px-4 py-3 rounded-lg border transition-colors ${
+                                errors.financialResponsibleName
+                                  ? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500'
+                                  : 'border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary'
+                              }`}
+                              placeholder="Nome completo"
+                            />
+                            {errors.financialResponsibleName && (
+                              <p className="mt-1 text-sm text-red-600">{errors.financialResponsibleName}</p>
+                            )}
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              CPF do Responsável Financeiro *
+                            </label>
+                            <InputMask
+                              mask="999.999.999-99"
+                              type="text"
+                              name="financialResponsibleCPF"
+                              value={formData.financialResponsibleCPF}
+                              onChange={handleInputChange}
+                              className={`w-full px-4 py-3 rounded-lg border transition-colors ${
+                                errors.financialResponsibleCPF
+                                  ? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500'
+                                  : 'border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary'
+                              }`}
+                              placeholder="000.000.000-00"
+                            />
+                            {errors.financialResponsibleCPF && (
+                              <p className="mt-1 text-sm text-red-600">{errors.financialResponsibleCPF}</p>
+                            )}
+                          </div>
                         </div>
                       )}
                     </div>
@@ -1283,41 +1371,78 @@ const Enrollment = () => {
                     </div>
                   </div>
 
-                  {/* Responsável Legal */}
+                  {/* Responsáveis */}
                   <div className="p-6 bg-blue-50/50 rounded-xl">
-                    <h3 className="text-lg font-semibold text-primary mb-4">Responsável Legal</h3>
-                    <div className="space-y-2">
+                    <h3 className="text-lg font-semibold text-primary mb-4">Responsáveis</h3>
+
+                    <p className="text-sm font-semibold text-gray-700 mb-2 mt-4">Responsável Legal:</p>
+                    <div className="space-y-2 ml-2">
                       <p><span className="text-gray-600">Nome:</span> <span className="font-medium">{formData.responsibleName || '-'}</span></p>
-                      <p><span className="text-gray-600">Parentesco:</span> <span className="font-medium">{formData.responsibleRelationship ? formData.responsibleRelationship.charAt(0).toUpperCase() + formData.responsibleRelationship.slice(1) : '-'}</span></p>
                       <p><span className="text-gray-600">CPF:</span> <span className="font-medium">{formData.responsibleCPF || '-'}</span></p>
+                      <p><span className="text-gray-600">Data de Nascimento:</span> <span className="font-medium">{formData.responsibleBirthDate || '-'}</span></p>
                       <p><span className="text-gray-600">Telefone:</span> <span className="font-medium">{formData.responsiblePhone || '-'}</span></p>
-                      <p><span className="text-gray-600">E-mail:</span> <span className="font-medium">{formData.responsibleEmail || '-'}</span></p>
+                      <p><span className="text-gray-600">Parentesco:</span> <span className="font-medium">{formData.responsibleRelationship ? formData.responsibleRelationship.charAt(0).toUpperCase() + formData.responsibleRelationship.slice(1) : '-'}</span></p>
                     </div>
+
                     {formData.hasSecondResponsible && (
-                      <div className="mt-4 pt-4 border-t border-primary/20">
-                        <p className="text-sm text-gray-600 mb-2">Segundo Responsável (Contato):</p>
-                        <p><span className="text-gray-600">Nome:</span> <span className="font-medium">{formData.secondResponsibleName || '-'}</span></p>
-                        <p><span className="text-gray-600">Telefone:</span> <span className="font-medium">{formData.secondResponsiblePhone || '-'}</span></p>
-                      </div>
+                      <>
+                        <hr className="my-4 border-primary/20" />
+                        <p className="text-sm font-semibold text-gray-700 mb-2">Segundo Responsável:</p>
+                        <div className="space-y-2 ml-2">
+                          <p><span className="text-gray-600">Nome:</span> <span className="font-medium">{formData.secondResponsibleName || '-'}</span></p>
+                          <p><span className="text-gray-600">CPF:</span> <span className="font-medium">{formData.secondResponsibleCPF || '-'}</span></p>
+                          <p><span className="text-gray-600">Telefone:</span> <span className="font-medium">{formData.secondResponsiblePhone || '-'}</span></p>
+                          <p><span className="text-gray-600">Parentesco:</span> <span className="font-medium">{formData.secondResponsibleRelationship || '-'}</span></p>
+                        </div>
+                      </>
                     )}
+
+                    <hr className="my-4 border-primary/20" />
+                    <p className="text-sm font-semibold text-gray-700 mb-2">Responsável Financeiro:</p>
+                    <div className="space-y-2 ml-2">
+                      <p><span className="text-gray-600">Nome:</span> <span className="font-medium">
+                        {formData.financialResponsibleType === 'legal'
+                          ? formData.responsibleName
+                          : formData.financialResponsibleType === 'second'
+                            ? formData.secondResponsibleName
+                            : formData.financialResponsibleName}
+                      </span></p>
+                      <p><span className="text-gray-600">CPF:</span> <span className="font-medium">
+                        {formData.financialResponsibleType === 'legal'
+                          ? formData.responsibleCPF
+                          : formData.financialResponsibleType === 'second'
+                            ? formData.secondResponsibleCPF
+                            : formData.financialResponsibleCPF}
+                      </span></p>
+                    </div>
                   </div>
 
-                  {/* Endereço e Pagamento */}
+                  {/* Endereço */}
                   <div className="p-6 bg-blue-50/50 rounded-xl">
-                    <h3 className="text-lg font-semibold text-primary mb-4">Endereço e Pagamento</h3>
+                    <h3 className="text-lg font-semibold text-primary mb-4">Endereço</h3>
                     <div className="space-y-2">
+                      <p><span className="text-gray-600">CEP:</span> <span className="font-medium">{formData.cep || '-'}</span></p>
                       <p><span className="text-gray-600">Endereço:</span> <span className="font-medium">{formData.street ? `${formData.street}, ${formData.number}${formData.complement ? ` - ${formData.complement}` : ''}` : '-'}</span></p>
                       <p><span className="text-gray-600">Bairro:</span> <span className="font-medium">{formData.neighborhood || '-'}</span></p>
                       <p><span className="text-gray-600">Cidade/UF:</span> <span className="font-medium">{formData.city && formData.state ? `${formData.city}/${formData.state}` : '-'}</span></p>
-                      <p><span className="text-gray-600">CEP:</span> <span className="font-medium">{formData.cep || '-'}</span></p>
-                      <p className="pt-2"><span className="text-gray-600">Responsável Financeiro:</span> <span className="font-medium">{formData.financialResponsibleType === 'same' ? formData.responsibleName : formData.financialResponsibleName}</span></p>
+                    </div>
+                  </div>
+
+                  {/* Pagamento, Curso e Contato */}
+                  <div className="p-6 bg-blue-50/50 rounded-xl">
+                    <h3 className="text-lg font-semibold text-primary mb-4">Pagamento, Curso e Contato</h3>
+                    <div className="space-y-2">
+                      <p><span className="text-gray-600">Email para Contato:</span> <span className="font-medium">{formData.responsibleEmail || '-'}</span></p>
                       <p><span className="text-gray-600">Forma de Pagamento:</span> <span className="font-medium">{formData.paymentMethod || '-'}</span></p>
+                      <p><span className="text-gray-600">Formato das Aulas:</span> <span className="font-medium">Presencial na Sede</span></p>
+                      <p><span className="text-gray-600">Autorização de Mídia:</span> <span className="font-medium">{formData.authorizationMedia ? 'Sim' : 'Não'}</span></p>
+                      <p><span className="text-gray-600">Horário Confirmado:</span> <span className="font-medium">{formData.scheduleConfirmed ? 'Sim' : 'Não'}</span></p>
                     </div>
                   </div>
 
                 </div>
 
-                {/* Autorizações */}
+                {/* Autorizações (checkboxes para aceitar) */}
                 <div className="mb-8 p-6 border-2 border-primary/20 rounded-xl bg-primary/5">
                   <h3 className="text-lg font-semibold text-primary mb-4">Autorizações Necessárias</h3>
 
@@ -1365,6 +1490,15 @@ const Enrollment = () => {
                     <strong>📄 Processo de Assinatura do Contrato:</strong>
                     <br />
                     Ao finalizar a matrícula, você receberá o contrato preenchido por e-mail. Em seguida, a equipe da English Patio entrará em contato e enviará um link para assinatura digital do contrato, garantindo a validade jurídica conforme a legislação brasileira.
+                  </p>
+                </div>
+
+                {/* Informação Importante sobre Efetivação */}
+                <div className="mb-8 bg-yellow-50 border-2 border-yellow-400 rounded-xl p-4">
+                  <p className="text-sm text-yellow-900">
+                    <strong>⚠️ Importante:</strong>
+                    <br />
+                    A efetivação da matrícula acontecerá mediante a quitação de parcelas em aberto e a compra dos materiais de 2026.
                   </p>
                 </div>
 

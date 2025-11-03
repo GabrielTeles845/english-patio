@@ -121,6 +121,22 @@ function saveToSheet(formData, pdfUrl) {
 
     // Preparar dados para a linha
     const timestamp = getBrasiliaTimestamp();
+
+    // Determinar CPF do responsável financeiro baseado na escolha
+    let financialResponsibleCPF = '';
+    let financialResponsibleName = '';
+
+    if (formData.financialResponsibleType === 'legal') {
+      financialResponsibleName = formData.responsibleName;
+      financialResponsibleCPF = formData.responsibleCPF;
+    } else if (formData.financialResponsibleType === 'second') {
+      financialResponsibleName = formData.secondResponsibleName;
+      financialResponsibleCPF = formData.secondResponsibleCPF || '-';
+    } else {
+      financialResponsibleName = formData.financialResponsibleName;
+      financialResponsibleCPF = formData.financialResponsibleCPF || '-';
+    }
+
     const rowData = [
       timestamp, // Data/Hora (Brasília)
       formatOptionalField(formData.student1Name),
@@ -138,9 +154,9 @@ function saveToSheet(formData, pdfUrl) {
       formatOptionalField(formData.secondResponsibleName),
       formatOptionalField(formData.secondResponsiblePhone),
       formatOptionalField(formData.secondResponsibleRelationship),
-      formData.financialResponsibleType === 'same'
-        ? formData.responsibleName
-        : formatOptionalField(formData.financialResponsibleName),
+      formatOptionalField(formData.secondResponsibleCPF), // NOVA COLUNA: CPF Segundo Responsável
+      financialResponsibleName, // Nome do Responsável Financeiro
+      financialResponsibleCPF, // NOVA COLUNA: CPF Responsável Financeiro
       formatOptionalField(formData.cep),
       `${formData.street || ''}, ${formData.number || ''}${formData.complement ? ' - ' + formData.complement : ''}`,
       formatOptionalField(formData.neighborhood),
@@ -201,20 +217,40 @@ function sendEmailToSchool(formData, pdfBase64) {
         </div>
 
         <div style="background-color: #f5f5f5; padding: 20px; border-radius: 10px; margin: 20px 0;">
-          <h3 style="color: #1E3765; margin-top: 0;">Responsável Legal</h3>
+          <h3 style="color: #1E3765; margin-top: 0;">Responsáveis</h3>
+
+          <p style="margin-top: 15px;"><strong>Responsável Legal:</strong></p>
           <p><strong>Nome:</strong> ${formatOptionalField(formData.responsibleName)}</p>
           <p><strong>CPF:</strong> ${formatOptionalField(formData.responsibleCPF)}</p>
-          <p><strong>Telefone:</strong> ${formatOptionalField(formData.responsiblePhone)}</p>
-          <p><strong>Email:</strong> ${formatOptionalField(formData.responsibleEmail)}</p>
-          <p><strong>Parentesco:</strong> ${capitalizeField(formData.responsibleRelationship)}</p>
           <p><strong>Data de Nascimento:</strong> ${formatBirthDate(formData.responsibleBirthDate)}</p>
+          <p><strong>Telefone:</strong> ${formatOptionalField(formData.responsiblePhone)}</p>
+          <p><strong>Parentesco:</strong> ${capitalizeField(formData.responsibleRelationship)}</p>
 
           ${formData.hasSecondResponsible ? `
             <hr style="border: 1px solid #ddd; margin: 15px 0;">
-            <p><strong>Segundo Responsável:</strong> ${formatOptionalField(formData.secondResponsibleName)}</p>
+            <p style="margin-top: 15px;"><strong>Segundo Responsável:</strong></p>
+            <p><strong>Nome:</strong> ${formatOptionalField(formData.secondResponsibleName)}</p>
+            <p><strong>CPF:</strong> ${formatOptionalField(formData.secondResponsibleCPF)}</p>
             <p><strong>Telefone:</strong> ${formatOptionalField(formData.secondResponsiblePhone)}</p>
             <p><strong>Parentesco:</strong> ${formatOptionalField(formData.secondResponsibleRelationship)}</p>
           ` : ''}
+
+          <hr style="border: 1px solid #ddd; margin: 15px 0;">
+          <p style="margin-top: 15px;"><strong>Responsável Financeiro:</strong></p>
+          <p><strong>Nome:</strong> ${
+            formData.financialResponsibleType === 'legal'
+              ? formData.responsibleName
+              : formData.financialResponsibleType === 'second'
+                ? formatOptionalField(formData.secondResponsibleName)
+                : formatOptionalField(formData.financialResponsibleName)
+          }</p>
+          <p><strong>CPF:</strong> ${
+            formData.financialResponsibleType === 'legal'
+              ? formData.responsibleCPF
+              : formData.financialResponsibleType === 'second'
+                ? formatOptionalField(formData.secondResponsibleCPF)
+                : formatOptionalField(formData.financialResponsibleCPF)
+          }</p>
         </div>
 
         <div style="background-color: #f5f5f5; padding: 20px; border-radius: 10px; margin: 20px 0;">
@@ -226,15 +262,12 @@ function sendEmailToSchool(formData, pdfBase64) {
         </div>
 
         <div style="background-color: #f5f5f5; padding: 20px; border-radius: 10px; margin: 20px 0;">
-          <h3 style="color: #1E3765; margin-top: 0;">Dados do Curso</h3>
-          <p><strong>Formato:</strong> Presencial na Sede</p>
-          <p><strong>Responsável Financeiro:</strong> ${formData.financialResponsibleType === 'same' ? formData.responsibleName : formatOptionalField(formData.financialResponsibleName)}</p>
+          <h3 style="color: #1E3765; margin-top: 0;">Pagamento, Curso e Contato</h3>
+          <p><strong>Email para Contato:</strong> ${formatOptionalField(formData.responsibleEmail)}</p>
           <p><strong>Forma de Pagamento:</strong> ${capitalizeField(formData.paymentMethod || 'Boleto')}</p>
-        </div>
-
-        <div style="background-color: #E8F5E9; padding: 20px; border-radius: 10px; margin: 20px 0;">
-          <p style="margin: 0;"><strong>✅ Autorização de Mídia:</strong> ${formData.authorizationMedia ? 'Sim' : 'Não'}</p>
-          <p style="margin: 10px 0 0 0;"><strong>✅ Horário Confirmado:</strong> ${formData.scheduleConfirmed ? 'Sim' : 'Não'}</p>
+          <p><strong>Formato das Aulas:</strong> Presencial na Sede</p>
+          <p><strong>Autorização de Mídia:</strong> ${formData.authorizationMedia ? 'Sim' : 'Não'}</p>
+          <p><strong>Horário Confirmado:</strong> ${formData.scheduleConfirmed ? 'Sim' : 'Não'}</p>
         </div>
 
         <p style="color: #666; font-size: 12px; margin-top: 30px;">

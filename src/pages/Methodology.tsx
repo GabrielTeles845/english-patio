@@ -10,9 +10,9 @@ const Methodology = () => {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative pt-48 pb-12 bg-gradient-to-br from-slate-50 via-blue-50/30 to-white overflow-hidden">
+      <section className="relative pt-48 pb-4 bg-gradient-to-br from-slate-50 via-blue-50/30 to-white overflow-hidden">
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6">
+          <h1 className="text-5xl md:text-6xl font-bold mb-0">
             <span className="text-primary">Nossa</span>{' '}
             <span className="text-secondary">Metodologia</span>
           </h1>
@@ -20,7 +20,7 @@ const Methodology = () => {
       </section>
 
       {/* Metodologias Ativas */}
-      <section className="py-16 md:py-20 bg-white">
+      <section className="pt-8 pb-16 md:pt-12 md:pb-20 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-primary mb-6">

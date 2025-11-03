@@ -21,7 +21,7 @@ const highlights = [
   {
     icon: CurrencyDollarIcon,
     title: 'Valorização do Investimento',
-    description: 'Mensalidades de janeiro e julho convertidas em vivências',
+    description: 'Mensalidades de Janeiro e Julho convertidas em vivências',
   },
 ];
 
