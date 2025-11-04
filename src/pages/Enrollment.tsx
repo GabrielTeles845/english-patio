@@ -1526,7 +1526,7 @@ const Enrollment = () => {
                     ) : (
                       <>
                         <CheckCircleIcon className="h-6 w-6 mr-2" />
-                        Finalizar Matrícula
+                        Finalizar
                       </>
                     )}
                   </button>
