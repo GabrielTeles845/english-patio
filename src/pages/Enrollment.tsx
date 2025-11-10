@@ -13,6 +13,7 @@ import {
 import { fillContractPDF } from '../services/pdfService';
 import { submitEnrollment } from '../services/enrollmentService';
 import { FormData } from '../types/enrollment';
+import { fetchAddress, CepSearchResult } from '../services/cepService';
 import {
   isValidCPF,
   isValidStudentBirthDate,
@@ -31,6 +32,8 @@ const Enrollment = () => {
   const userClosedSteps = useRef(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [cepStatus, setCepStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [cepErrorType, setCepErrorType] = useState<'notFound' | 'apisFailed' | null>(null);
+  const [allowManualAddress, setAllowManualAddress] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     student1Name: '',
     student1BirthDate: '',
@@ -96,38 +99,54 @@ const Enrollment = () => {
   };
 
 
-  // Função para buscar endereço via ViaCEP
+  // Função para buscar endereço via múltiplas APIs com fallback
   const fetchAddressFromCep = async (cep: string) => {
     const numericCep = cep.replace(/\D/g, '');
     if (numericCep.length !== 8) {
       setCepStatus('idle');
+      setCepErrorType(null);
+      setAllowManualAddress(false);
       return;
     }
 
     setCepStatus('loading');
+    setCepErrorType(null);
+    setAllowManualAddress(false);
 
     try {
-      const response = await fetch(`https://viacep.com.br/ws/${numericCep}/json/`);
-      const data = await response.json();
+      const result: CepSearchResult = await fetchAddress(numericCep);
 
-      if (data.erro) {
+      if (result.success && result.data) {
+        // CEP encontrado - atualiza os campos de endereço automaticamente
+        setFormData(prev => ({
+          ...prev,
+          street: result.data!.street || '',
+          neighborhood: result.data!.neighborhood || '',
+          city: result.data!.city || '',
+          state: result.data!.state || '',
+        }));
+
+        setCepStatus('success');
+        setCepErrorType(null);
+        setAllowManualAddress(false);
+      } else if (result.allApisFailed) {
+        // Todas as APIs estão indisponíveis - permitir preenchimento manual
         setCepStatus('error');
-        return;
+        setCepErrorType('apisFailed');
+        setAllowManualAddress(true);
+        console.warn('Todas as APIs de CEP estão indisponíveis. Permitindo preenchimento manual.');
+      } else if (result.notFound) {
+        // CEP não existe - NÃO permitir preenchimento manual (usuário deve corrigir o CEP)
+        setCepStatus('error');
+        setCepErrorType('notFound');
+        setAllowManualAddress(false);
+        console.warn('CEP não encontrado.');
       }
-
-      // Atualiza os campos de endereço automaticamente
-      setFormData(prev => ({
-        ...prev,
-        street: data.logradouro || '',
-        neighborhood: data.bairro || '',
-        city: data.localidade || '',
-        state: data.uf || '',
-      }));
-
-      setCepStatus('success');
     } catch (error) {
       console.error('Erro ao buscar CEP:', error);
       setCepStatus('error');
+      setCepErrorType('apisFailed');
+      setAllowManualAddress(true);
     }
   };
 
@@ -164,9 +183,16 @@ const Enrollment = () => {
         const numericCep = value.replace(/\D/g, '');
         if (numericCep.length < 8) {
           setCepStatus('idle');
+          setCepErrorType(null);
+          setAllowManualAddress(false);
         } else if (numericCep.length === 8) {
           fetchAddressFromCep(value);
         }
+      }
+
+      // Permitir edição de endereço se estiver em modo manual
+      if (['street', 'neighborhood', 'city', 'state'].includes(name) && allowManualAddress) {
+        setFormData(prev => ({ ...prev, [name]: value }));
       }
     }
   };
@@ -1182,10 +1208,22 @@ const Enrollment = () => {
                           {errors.cep && (
                             <p className="mt-1 text-sm text-red-600">{errors.cep}</p>
                           )}
-                          {cepStatus === 'error' && !errors.cep && (
-                            <p className="mt-1 text-sm text-red-600">CEP não encontrado. Verifique e tente novamente.</p>
+                          {cepStatus === 'error' && !errors.cep && cepErrorType === 'apisFailed' && (
+                            <p className="mt-1 text-sm text-amber-600">
+                              Não foi possível buscar o endereço automaticamente. Não se preocupe! Preencha os campos de endereço abaixo manualmente.
+                            </p>
                           )}
-                          <p className="text-xs text-gray-500 mt-1">Os campos abaixo serão preenchidos automaticamente</p>
+                          {cepStatus === 'error' && !errors.cep && cepErrorType === 'notFound' && (
+                            <p className="mt-1 text-sm text-red-600">
+                              CEP não encontrado. Verifique se o CEP está correto e tente novamente.
+                            </p>
+                          )}
+                          {cepStatus !== 'error' && !allowManualAddress && (
+                            <p className="text-xs text-gray-500 mt-1">Os campos abaixo serão preenchidos automaticamente</p>
+                          )}
+                          {allowManualAddress && (
+                            <p className="text-xs text-green-600 mt-1 font-medium">✓ Preenchimento manual habilitado</p>
+                          )}
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1197,9 +1235,11 @@ const Enrollment = () => {
                             value={formData.street}
                             onChange={handleInputChange}
                             required
-                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors bg-gray-50"
-                            placeholder="Auto-preenchido"
-                            readOnly
+                            className={`w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors ${
+                              allowManualAddress ? 'bg-white' : 'bg-gray-50'
+                            }`}
+                            placeholder={allowManualAddress ? "Digite o nome da rua" : "Auto-preenchido"}
+                            readOnly={!allowManualAddress}
                           />
                         </div>
                       </div>
@@ -1244,9 +1284,11 @@ const Enrollment = () => {
                             value={formData.neighborhood}
                             onChange={handleInputChange}
                             required
-                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors bg-gray-50"
-                            placeholder="Auto-preenchido"
-                            readOnly
+                            className={`w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors ${
+                              allowManualAddress ? 'bg-white' : 'bg-gray-50'
+                            }`}
+                            placeholder={allowManualAddress ? "Digite o bairro" : "Auto-preenchido"}
+                            readOnly={!allowManualAddress}
                           />
                         </div>
                         <div>
@@ -1259,9 +1301,11 @@ const Enrollment = () => {
                             value={formData.city}
                             onChange={handleInputChange}
                             required
-                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors bg-gray-50"
-                            placeholder="Auto-preenchido"
-                            readOnly
+                            className={`w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors ${
+                              allowManualAddress ? 'bg-white' : 'bg-gray-50'
+                            }`}
+                            placeholder={allowManualAddress ? "Digite a cidade" : "Auto-preenchido"}
+                            readOnly={!allowManualAddress}
                           />
                         </div>
                         <div>
@@ -1275,9 +1319,11 @@ const Enrollment = () => {
                             onChange={handleInputChange}
                             required
                             maxLength={2}
-                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors bg-gray-50"
-                            placeholder="UF"
-                            readOnly
+                            className={`w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors ${
+                              allowManualAddress ? 'bg-white' : 'bg-gray-50'
+                            }`}
+                            placeholder={allowManualAddress ? "UF" : "Auto-preenchido"}
+                            readOnly={!allowManualAddress}
                           />
                         </div>
                       </div>
