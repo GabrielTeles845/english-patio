@@ -25,37 +25,6 @@ import {
   ErrorMessages
 } from '../utils/validators';
 
-// Lista de estados brasileiros
-const BRAZILIAN_STATES = [
-  { value: 'AC', label: 'Acre' },
-  { value: 'AL', label: 'Alagoas' },
-  { value: 'AP', label: 'Amapá' },
-  { value: 'AM', label: 'Amazonas' },
-  { value: 'BA', label: 'Bahia' },
-  { value: 'CE', label: 'Ceará' },
-  { value: 'DF', label: 'Distrito Federal' },
-  { value: 'ES', label: 'Espírito Santo' },
-  { value: 'GO', label: 'Goiás' },
-  { value: 'MA', label: 'Maranhão' },
-  { value: 'MT', label: 'Mato Grosso' },
-  { value: 'MS', label: 'Mato Grosso do Sul' },
-  { value: 'MG', label: 'Minas Gerais' },
-  { value: 'PA', label: 'Pará' },
-  { value: 'PB', label: 'Paraíba' },
-  { value: 'PR', label: 'Paraná' },
-  { value: 'PE', label: 'Pernambuco' },
-  { value: 'PI', label: 'Piauí' },
-  { value: 'RJ', label: 'Rio de Janeiro' },
-  { value: 'RN', label: 'Rio Grande do Norte' },
-  { value: 'RS', label: 'Rio Grande do Sul' },
-  { value: 'RO', label: 'Rondônia' },
-  { value: 'RR', label: 'Roraima' },
-  { value: 'SC', label: 'Santa Catarina' },
-  { value: 'SP', label: 'São Paulo' },
-  { value: 'SE', label: 'Sergipe' },
-  { value: 'TO', label: 'Tocantins' },
-];
-
 const Enrollment = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -63,7 +32,7 @@ const Enrollment = () => {
   const userClosedSteps = useRef(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [cepStatus, setCepStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const [cepErrorType, setCepErrorType] = useState<'notFound' | 'apisFailed' | null>(null);
+  const [cepErrorType, setCepErrorType] = useState<'notFound' | 'apisFailed' | 'outsideGoiania' | null>(null);
   const [allowManualAddress, setAllowManualAddress] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     student1Name: '',
@@ -92,8 +61,8 @@ const Enrollment = () => {
     number: '',
     complement: '',
     neighborhood: '',
-    city: '',
-    state: '',
+    city: 'Goiânia',
+    state: 'GO',
     paymentMethod: 'boleto',
     classFormat: 'sede',
     schedule: 'seg-qua',
@@ -148,20 +117,32 @@ const Enrollment = () => {
       const result: CepSearchResult = await fetchAddress(numericCep);
 
       if (result.success && result.data) {
-        // CEP encontrado - atualiza os campos de endereço automaticamente
+        // CEP encontrado e é de Goiânia/GO - atualiza os campos de endereço automaticamente
         setFormData(prev => ({
           ...prev,
           street: result.data!.street || '',
           neighborhood: result.data!.neighborhood || '',
-          city: result.data!.city || '',
-          state: result.data!.state || '',
+          city: 'Goiânia',
+          state: 'GO',
         }));
 
         setCepStatus('success');
         setCepErrorType(null);
         setAllowManualAddress(false);
+      } else if (result.outsideGoiania) {
+        // CEP encontrado mas não é de Goiânia/GO - NÃO permitir preenchimento
+        setCepStatus('error');
+        setCepErrorType('outsideGoiania');
+        setAllowManualAddress(false);
+        console.warn('CEP não é de Goiânia/GO.');
       } else if (result.allApisFailed) {
         // Todas as APIs estão indisponíveis - permitir preenchimento manual
+        // mas manter cidade e estado fixos em Goiânia/GO
+        setFormData(prev => ({
+          ...prev,
+          city: 'Goiânia',
+          state: 'GO',
+        }));
         setCepStatus('error');
         setCepErrorType('apisFailed');
         setAllowManualAddress(true);
@@ -346,6 +327,27 @@ const Enrollment = () => {
       newErrors.cep = ErrorMessages.REQUIRED;
     } else if (!isValidCEP(formData.cep)) {
       newErrors.cep = ErrorMessages.INVALID_CEP;
+    } else if (cepStatus === 'error' && cepErrorType === 'outsideGoiania') {
+      // CEP de fora de Goiânia - não permitir avanço
+      newErrors.cep = 'Este CEP não é de Goiânia/GO. A escola atende apenas Goiânia.';
+    } else if (cepStatus === 'error' && cepErrorType === 'notFound') {
+      // CEP não encontrado - não permitir avanço
+      newErrors.cep = 'CEP não encontrado. Verifique se está correto.';
+    } else if (cepStatus === 'loading') {
+      // Ainda está buscando - não permitir avanço
+      newErrors.cep = 'Aguarde a busca do CEP finalizar.';
+    } else if (cepStatus !== 'success' && cepStatus !== 'idle' && cepErrorType !== 'apisFailed') {
+      // Outro erro não identificado
+      newErrors.cep = 'Por favor, verifique o CEP informado.';
+    }
+
+    // Validar campos de endereço obrigatórios
+    if (!formData.street.trim()) {
+      newErrors.street = 'Rua/Avenida é obrigatório';
+    }
+
+    if (!formData.neighborhood.trim()) {
+      newErrors.neighborhood = 'Bairro é obrigatório';
     }
 
     // Validar Responsável Financeiro (se for outro)
@@ -1237,6 +1239,11 @@ const Enrollment = () => {
                           {errors.cep && (
                             <p className="mt-1 text-sm text-red-600">{errors.cep}</p>
                           )}
+                          {cepStatus === 'error' && !errors.cep && cepErrorType === 'outsideGoiania' && (
+                            <p className="mt-1 text-sm text-red-600">
+                              ⚠️ Este CEP não é de Goiânia/GO. A English Patio atende apenas alunos de Goiânia. Por favor, verifique o CEP ou entre em contato conosco.
+                            </p>
+                          )}
                           {cepStatus === 'error' && !errors.cep && cepErrorType === 'apisFailed' && (
                             <p className="mt-1 text-sm text-amber-600">
                               Não foi possível buscar o endereço automaticamente. Não se preocupe! Preencha os campos de endereço abaixo manualmente.
@@ -1267,9 +1274,16 @@ const Enrollment = () => {
                             value={formData.street}
                             onChange={handleInputChange}
                             required
-                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors bg-white"
+                            className={`w-full px-4 py-3 rounded-lg border transition-colors bg-white ${
+                              errors.street
+                                ? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500'
+                                : 'border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary'
+                            }`}
                             placeholder="Digite o nome da rua"
                           />
+                          {errors.street && (
+                            <p className="mt-1 text-sm text-red-600">{errors.street}</p>
+                          )}
                         </div>
                       </div>
 
@@ -1313,9 +1327,16 @@ const Enrollment = () => {
                             value={formData.neighborhood}
                             onChange={handleInputChange}
                             required
-                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors bg-white"
+                            className={`w-full px-4 py-3 rounded-lg border transition-colors bg-white ${
+                              errors.neighborhood
+                                ? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500'
+                                : 'border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary'
+                            }`}
                             placeholder="Digite o bairro"
                           />
+                          {errors.neighborhood && (
+                            <p className="mt-1 text-sm text-red-600">{errors.neighborhood}</p>
+                          )}
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1324,31 +1345,23 @@ const Enrollment = () => {
                           <input
                             type="text"
                             name="city"
-                            value={formData.city}
-                            onChange={handleInputChange}
-                            required
-                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors bg-white"
-                            placeholder="Digite a cidade"
+                            value="Goiânia"
+                            readOnly
+                            className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-gray-50 text-gray-600 cursor-not-allowed"
                           />
+                          <p className="text-xs text-gray-500 mt-1">A escola atende apenas Goiânia</p>
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
                             Estado *
                           </label>
-                          <select
+                          <input
+                            type="text"
                             name="state"
-                            value={formData.state}
-                            onChange={handleInputChange}
-                            required
-                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors bg-white"
-                          >
-                            <option value="">Selecione o estado</option>
-                            {BRAZILIAN_STATES.map((state) => (
-                              <option key={state.value} value={state.value}>
-                                {state.value} - {state.label}
-                              </option>
-                            ))}
-                          </select>
+                            value="GO"
+                            readOnly
+                            className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-gray-50 text-gray-600 cursor-not-allowed"
+                          />
                         </div>
                       </div>
                     </div>
@@ -1386,9 +1399,6 @@ const Enrollment = () => {
                         Já confirmei o horário das aulas do(a) meu(minha) filho(a)
                       </span>
                     </label>
-                    {errors.scheduleConfirmed && (
-                      <p className="mt-1 text-sm text-red-600">{errors.scheduleConfirmed}</p>
-                    )}
                   </div>
                 </div>
 

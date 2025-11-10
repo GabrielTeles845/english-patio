@@ -13,6 +13,7 @@ export interface CepSearchResult {
   data?: AddressData;
   notFound?: boolean; // CEP não existe
   allApisFailed?: boolean; // Todas as APIs estão indisponíveis
+  outsideGoiania?: boolean; // CEP não é de Goiânia/GO
 }
 
 // Função para buscar CEP no ViaCEP
@@ -131,6 +132,15 @@ async function fetchFromApiCEP(cep: string): Promise<{ data: AddressData | null;
   }
 }
 
+// Função auxiliar para normalizar nomes de cidades (remove acentos e caracteres especiais)
+function normalizeCity(city: string): string {
+  return city
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim();
+}
+
 // Função principal que tenta múltiplas APIs em paralelo
 export async function fetchAddress(cep: string): Promise<CepSearchResult> {
   const cleanCEP = cep.replace(/\D/g, '');
@@ -155,10 +165,25 @@ export async function fetchAddress(cep: string): Promise<CepSearchResult> {
   // Processa os resultados
   for (const result of results) {
     if (result.status === 'fulfilled') {
-      // Se encontrou dados válidos, retorna imediatamente
+      // Se encontrou dados válidos, verifica se é de Goiânia/GO
       if (result.value.data) {
         console.log('✅ CEP encontrado!');
-        return { success: true, data: result.value.data };
+
+        const addressData = result.value.data;
+        const normalizedCity = normalizeCity(addressData.city);
+        const state = addressData.state.toUpperCase();
+
+        // Verifica se é de Goiânia/GO
+        if (normalizedCity !== 'goiania' || state !== 'GO') {
+          console.warn(`⚠️ CEP encontrado, mas não é de Goiânia/GO (${addressData.city}/${addressData.state})`);
+          return {
+            success: false,
+            outsideGoiania: true,
+            data: addressData // Retorna os dados para referência
+          };
+        }
+
+        return { success: true, data: addressData };
       }
 
       // Conta se CEP não foi encontrado ou se API falhou
