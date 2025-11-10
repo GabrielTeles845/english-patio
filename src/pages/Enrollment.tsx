@@ -25,6 +25,37 @@ import {
   ErrorMessages
 } from '../utils/validators';
 
+// Lista de estados brasileiros
+const BRAZILIAN_STATES = [
+  { value: 'AC', label: 'Acre' },
+  { value: 'AL', label: 'Alagoas' },
+  { value: 'AP', label: 'Amapá' },
+  { value: 'AM', label: 'Amazonas' },
+  { value: 'BA', label: 'Bahia' },
+  { value: 'CE', label: 'Ceará' },
+  { value: 'DF', label: 'Distrito Federal' },
+  { value: 'ES', label: 'Espírito Santo' },
+  { value: 'GO', label: 'Goiás' },
+  { value: 'MA', label: 'Maranhão' },
+  { value: 'MT', label: 'Mato Grosso' },
+  { value: 'MS', label: 'Mato Grosso do Sul' },
+  { value: 'MG', label: 'Minas Gerais' },
+  { value: 'PA', label: 'Pará' },
+  { value: 'PB', label: 'Paraíba' },
+  { value: 'PR', label: 'Paraná' },
+  { value: 'PE', label: 'Pernambuco' },
+  { value: 'PI', label: 'Piauí' },
+  { value: 'RJ', label: 'Rio de Janeiro' },
+  { value: 'RN', label: 'Rio Grande do Norte' },
+  { value: 'RS', label: 'Rio Grande do Sul' },
+  { value: 'RO', label: 'Rondônia' },
+  { value: 'RR', label: 'Roraima' },
+  { value: 'SC', label: 'Santa Catarina' },
+  { value: 'SP', label: 'São Paulo' },
+  { value: 'SE', label: 'Sergipe' },
+  { value: 'TO', label: 'Tocantins' },
+];
+
 const Enrollment = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -190,10 +221,8 @@ const Enrollment = () => {
         }
       }
 
-      // Permitir edição de endereço se estiver em modo manual
-      if (['street', 'neighborhood', 'city', 'state'].includes(name) && allowManualAddress) {
-        setFormData(prev => ({ ...prev, [name]: value }));
-      }
+      // Todos os campos de endereço são sempre editáveis
+      // (Rua, Bairro, Cidade, Estado)
     }
   };
 
@@ -1218,11 +1247,14 @@ const Enrollment = () => {
                               CEP não encontrado. Verifique se o CEP está correto e tente novamente.
                             </p>
                           )}
-                          {cepStatus !== 'error' && !allowManualAddress && (
-                            <p className="text-xs text-gray-500 mt-1">Os campos abaixo serão preenchidos automaticamente</p>
+                          {cepStatus === 'success' && (
+                            <p className="text-xs text-gray-500 mt-1">Endereço preenchido automaticamente. Você pode editar os campos se necessário.</p>
+                          )}
+                          {cepStatus !== 'error' && cepStatus !== 'success' && (
+                            <p className="text-xs text-gray-500 mt-1">Digite o CEP para preencher automaticamente (você poderá editar depois)</p>
                           )}
                           {allowManualAddress && (
-                            <p className="text-xs text-green-600 mt-1 font-medium">✓ Preenchimento manual habilitado</p>
+                            <p className="text-xs text-green-600 mt-1 font-medium">✓ Preencha todos os campos manualmente</p>
                           )}
                         </div>
                         <div>
@@ -1235,11 +1267,8 @@ const Enrollment = () => {
                             value={formData.street}
                             onChange={handleInputChange}
                             required
-                            className={`w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors ${
-                              allowManualAddress ? 'bg-white' : 'bg-gray-50'
-                            }`}
-                            placeholder={allowManualAddress ? "Digite o nome da rua" : "Auto-preenchido"}
-                            readOnly={!allowManualAddress}
+                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors bg-white"
+                            placeholder="Digite o nome da rua"
                           />
                         </div>
                       </div>
@@ -1284,11 +1313,8 @@ const Enrollment = () => {
                             value={formData.neighborhood}
                             onChange={handleInputChange}
                             required
-                            className={`w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors ${
-                              allowManualAddress ? 'bg-white' : 'bg-gray-50'
-                            }`}
-                            placeholder={allowManualAddress ? "Digite o bairro" : "Auto-preenchido"}
-                            readOnly={!allowManualAddress}
+                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors bg-white"
+                            placeholder="Digite o bairro"
                           />
                         </div>
                         <div>
@@ -1301,30 +1327,28 @@ const Enrollment = () => {
                             value={formData.city}
                             onChange={handleInputChange}
                             required
-                            className={`w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors ${
-                              allowManualAddress ? 'bg-white' : 'bg-gray-50'
-                            }`}
-                            placeholder={allowManualAddress ? "Digite a cidade" : "Auto-preenchido"}
-                            readOnly={!allowManualAddress}
+                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors bg-white"
+                            placeholder="Digite a cidade"
                           />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
                             Estado *
                           </label>
-                          <input
-                            type="text"
+                          <select
                             name="state"
                             value={formData.state}
                             onChange={handleInputChange}
                             required
-                            maxLength={2}
-                            className={`w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors ${
-                              allowManualAddress ? 'bg-white' : 'bg-gray-50'
-                            }`}
-                            placeholder={allowManualAddress ? "UF" : "Auto-preenchido"}
-                            readOnly={!allowManualAddress}
-                          />
+                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary transition-colors bg-white"
+                          >
+                            <option value="">Selecione o estado</option>
+                            {BRAZILIAN_STATES.map((state) => (
+                              <option key={state.value} value={state.value}>
+                                {state.value} - {state.label}
+                              </option>
+                            ))}
+                          </select>
                         </div>
                       </div>
                     </div>
