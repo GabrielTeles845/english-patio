@@ -128,8 +128,19 @@ export function isValidFullName(name: string): boolean {
   // Deve ter pelo menos 2 partes (nome e sobrenome)
   if (nameParts.length < 2) return false;
 
-  // Cada parte deve ter pelo menos 2 caracteres
-  return nameParts.every(part => part.length >= 2);
+  // Conectores comuns em nomes brasileiros que podem ter 1 caractere
+  const connectors = ['e', 'de', 'da', 'do', 'dos', 'das'];
+
+  // Filtra as partes significativas (não conectores)
+  const significantParts = nameParts.filter(
+    part => !connectors.includes(part.toLowerCase())
+  );
+
+  // Deve ter pelo menos 2 partes significativas
+  if (significantParts.length < 2) return false;
+
+  // Cada parte significativa deve ter pelo menos 2 caracteres
+  return significantParts.every(part => part.length >= 2);
 }
 
 // Validação de email
