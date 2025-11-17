@@ -32,7 +32,7 @@ const Enrollment = () => {
   const userClosedSteps = useRef(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [cepStatus, setCepStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const [cepErrorType, setCepErrorType] = useState<'notFound' | 'apisFailed' | 'outsideGoiania' | null>(null);
+  const [cepErrorType, setCepErrorType] = useState<'notFound' | 'apisFailed' | 'outsideGoias' | null>(null);
   const [allowManualAddress, setAllowManualAddress] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     student1Name: '',
@@ -61,7 +61,7 @@ const Enrollment = () => {
     number: '',
     complement: '',
     neighborhood: '',
-    city: 'Goiânia',
+    city: '',
     state: 'GO',
     paymentMethod: 'boleto',
     classFormat: 'sede',
@@ -117,30 +117,29 @@ const Enrollment = () => {
       const result: CepSearchResult = await fetchAddress(numericCep);
 
       if (result.success && result.data) {
-        // CEP encontrado e é de Goiânia/GO - atualiza os campos de endereço automaticamente
+        // CEP encontrado e é de Goiás/GO - atualiza os campos de endereço automaticamente
         setFormData(prev => ({
           ...prev,
           street: result.data!.street || '',
           neighborhood: result.data!.neighborhood || '',
-          city: 'Goiânia',
+          city: result.data!.city || '',
           state: 'GO',
         }));
 
         setCepStatus('success');
         setCepErrorType(null);
         setAllowManualAddress(false);
-      } else if (result.outsideGoiania) {
-        // CEP encontrado mas não é de Goiânia/GO - NÃO permitir preenchimento
+      } else if (result.outsideGoias) {
+        // CEP encontrado mas não é de Goiás/GO - NÃO permitir preenchimento
         setCepStatus('error');
-        setCepErrorType('outsideGoiania');
+        setCepErrorType('outsideGoias');
         setAllowManualAddress(false);
-        console.warn('CEP não é de Goiânia/GO.');
+        console.warn('CEP não é do estado de Goiás/GO.');
       } else if (result.allApisFailed) {
         // Todas as APIs estão indisponíveis - permitir preenchimento manual
-        // mas manter cidade e estado fixos em Goiânia/GO
+        // mas manter estado fixo em GO
         setFormData(prev => ({
           ...prev,
-          city: 'Goiânia',
           state: 'GO',
         }));
         setCepStatus('error');
@@ -327,9 +326,9 @@ const Enrollment = () => {
       newErrors.cep = ErrorMessages.REQUIRED;
     } else if (!isValidCEP(formData.cep)) {
       newErrors.cep = ErrorMessages.INVALID_CEP;
-    } else if (cepStatus === 'error' && cepErrorType === 'outsideGoiania') {
-      // CEP de fora de Goiânia - não permitir avanço
-      newErrors.cep = 'Este CEP não é de Goiânia/GO. A escola atende apenas Goiânia.';
+    } else if (cepStatus === 'error' && cepErrorType === 'outsideGoias') {
+      // CEP de fora de Goiás - não permitir avanço
+      newErrors.cep = 'CEP fora de Goiás. A escola fica em Goiânia/GO.';
     } else if (cepStatus === 'error' && cepErrorType === 'notFound') {
       // CEP não encontrado - não permitir avanço
       newErrors.cep = 'CEP não encontrado. Verifique se está correto.';
@@ -348,6 +347,10 @@ const Enrollment = () => {
 
     if (!formData.neighborhood.trim()) {
       newErrors.neighborhood = 'Bairro é obrigatório';
+    }
+
+    if (!formData.city.trim()) {
+      newErrors.city = 'Cidade é obrigatória';
     }
 
     // Validar Responsável Financeiro (se for outro)
@@ -1239,9 +1242,9 @@ const Enrollment = () => {
                           {errors.cep && (
                             <p className="mt-1 text-sm text-red-600">{errors.cep}</p>
                           )}
-                          {cepStatus === 'error' && !errors.cep && cepErrorType === 'outsideGoiania' && (
+                          {cepStatus === 'error' && !errors.cep && cepErrorType === 'outsideGoias' && (
                             <p className="mt-1 text-sm text-red-600">
-                              ⚠️ Este CEP não é de Goiânia/GO. A English Patio atende apenas alunos de Goiânia. Por favor, verifique o CEP ou entre em contato conosco.
+                              ⚠️ CEP fora de Goiás. A escola fica em Goiânia/GO. Verifique o CEP ou entre em contato conosco.
                             </p>
                           )}
                           {cepStatus === 'error' && !errors.cep && cepErrorType === 'apisFailed' && (
@@ -1345,11 +1348,20 @@ const Enrollment = () => {
                           <input
                             type="text"
                             name="city"
-                            value="Goiânia"
-                            readOnly
-                            className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-gray-50 text-gray-600 cursor-not-allowed"
+                            value={formData.city}
+                            onChange={handleInputChange}
+                            required
+                            className={`w-full px-4 py-3 rounded-lg border transition-colors bg-white ${
+                              errors.city
+                                ? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500'
+                                : 'border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary'
+                            }`}
+                            placeholder="Digite a cidade"
                           />
-                          <p className="text-xs text-gray-500 mt-1">A escola atende apenas Goiânia</p>
+                          {errors.city && (
+                            <p className="mt-1 text-sm text-red-600">{errors.city}</p>
+                          )}
+                          <p className="text-xs text-gray-500 mt-1">A escola fica em Goiânia/GO</p>
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
