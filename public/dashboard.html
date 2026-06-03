@@ -150,25 +150,26 @@
 
 <!-- ============================= LOGIN ============================= -->
 <div id="login" class="relative min-h-screen flex items-center justify-center p-6 overflow-hidden">
-  <!-- fundo da marca: blobs suaves -->
-  <div class="absolute -top-36 -left-36 w-[520px] h-[520px] rounded-full opacity-35 blur-3xl pointer-events-none" style="background:#FFE17A"></div>
-  <div class="absolute -bottom-44 -right-36 w-[560px] h-[560px] rounded-full opacity-20 blur-3xl pointer-events-none" style="background:#2F539A"></div>
-  <!-- detalhes lúdicos discretos -->
-  <div class="absolute top-[18%] right-[14%] w-4 h-4 rounded-full pointer-events-none" style="background:#F5B700;opacity:.45"></div>
-  <div class="absolute bottom-[20%] left-[12%] w-10 h-10 rounded-full border-4 pointer-events-none" style="border-color:#2F539A;opacity:.18"></div>
-  <div class="absolute top-[30%] left-[20%] w-2.5 h-2.5 rounded-full pointer-events-none" style="background:#2F539A;opacity:.25"></div>
+  <!-- pattern de bolinhas do site + luz da marca -->
+  <div class="absolute inset-0 pointer-events-none" style="background-image:radial-gradient(rgba(245,183,0,.16) 1.5px,transparent 1.5px);background-size:24px 24px"></div>
+  <div class="absolute inset-x-0 bottom-0 h-1/2 pointer-events-none" style="background:linear-gradient(to top,rgba(47,83,154,.10),transparent)"></div>
+  <div class="absolute -top-36 -left-36 w-[520px] h-[520px] rounded-full opacity-30 blur-3xl pointer-events-none" style="background:#FFE17A"></div>
+  <div class="absolute -bottom-44 -right-36 w-[560px] h-[560px] rounded-full opacity-15 blur-3xl pointer-events-none" style="background:#2F539A"></div>
 
-  <div class="relative w-full max-w-[440px] mt-8">
-    <!-- medalhão da logo, saltando da borda (à esquerda) -->
-    <div class="absolute -top-9 left-8 z-10 bg-white rounded-2xl shadow-xl border px-4 py-2.5" style="border-color:var(--border)">
-      <img src="assets/logo-index.webp" alt="English Patio" class="h-11 w-auto">
-    </div>
+  <div class="relative w-full max-w-[440px]">
     <div class="surface rounded-3xl shadow-2xl overflow-hidden">
-      <!-- fio gradiente da marca -->
-      <div class="h-1.5" style="background:linear-gradient(90deg,#F5B700,#FFE17A 45%,#2F539A)"></div>
-      <div class="p-8 sm:p-9 pt-14">
-        <h2 class="font-heading text-2xl font-semibold">Que bom te ver! 👋</h2>
-        <p class="text-sm text-[var(--muted)] mt-1">Entre para cuidar da escola.</p>
+      <!-- faixa navy de identidade (elementos do site, remixados) -->
+      <div class="relative px-8 pt-7 pb-8 overflow-hidden" style="background:linear-gradient(135deg,#1E3765,#2F539A)">
+        <div class="absolute -top-12 -right-8 w-44 h-44 rounded-full pointer-events-none" style="background:rgba(245,183,0,.16)"></div>
+        <div class="absolute bottom-3 right-6 w-8 h-8 rounded-full border-[3px] pointer-events-none" style="border-color:rgba(255,255,255,.12)"></div>
+        <img src="assets/logo-sidebar-azul.svg" alt="English Patio" class="relative h-12 w-auto">
+        <p class="relative font-heading text-[22px] font-semibold text-white mt-4">Dashboard da escola</p>
+        <p class="relative text-sm text-white/60 mt-0.5">Matrículas, alunos, contratos e o site — num lugar só.</p>
+        <span class="relative inline-block mt-3.5 text-[10px] font-bold tracking-wide px-2.5 py-1 rounded-full" style="background:#FFE17A;color:#15294d">MATRÍCULAS ABERTAS · 2º SEMESTRE 2026</span>
+      </div>
+      <div class="p-8 sm:p-9 pt-7">
+        <h2 class="font-heading text-xl font-semibold">Que bom te ver! 👋</h2>
+        <p class="text-sm text-[var(--muted)] mt-1">Entre com o seu acesso.</p>
 
         <div class="mt-7 space-y-4">
           <label class="block">
@@ -299,11 +300,13 @@
     <!-- topbar -->
     <header class="sticky top-0 z-30 h-16 flex items-center gap-3 px-4 sm:px-6 border-b" style="background:var(--card);border-color:var(--border)">
       <button onclick="toggleSidebar(true)" class="lg:hidden p-2 -ml-2 rounded-lg hover:bg-[var(--hover)]"><i data-lucide="menu" class="w-5 h-5"></i></button>
-      <span class="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full" style="background:rgba(245,183,0,.15);color:#B5860B" title="Este é um preview para aprovação — nenhum dado aqui é real">
-        <i data-lucide="flask-conical" class="w-3 h-3"></i><span class="hidden sm:inline">Preview ·</span> dados fictícios</span>
-      <div class="ml-auto flex items-center gap-1">
-        <button onclick="toggleTheme(event)" class="p-2.5 rounded-xl hover:bg-[var(--hover)]" title="Tema claro/escuro" data-tour="theme">
-          <i id="themeIcon" data-lucide="moon" class="w-[18px] h-[18px]"></i></button>
+      <div class="min-w-0">
+        <p class="font-heading font-semibold leading-tight truncate" id="headerTitle">Visão geral</p>
+        <p class="text-[11px] text-[var(--muted)] leading-tight hidden sm:block">Quarta-feira, 3 de junho de 2026</p>
+      </div>
+      <div class="ml-auto flex items-center gap-2">
+        <span class="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full" style="background:rgba(245,183,0,.15);color:#B5860B" title="Este é um preview para aprovação — nenhum dado aqui é real">
+          <i data-lucide="flask-conical" class="w-3 h-3"></i><span class="hidden sm:inline">Preview ·</span> dados fictícios</span>
         <!-- sino de notificações -->
         <div class="relative" data-tour="bell">
           <button onclick="toggleNotif(event)" class="relative p-2.5 rounded-xl hover:bg-[var(--hover)]" title="Notificações">
@@ -317,7 +320,7 @@
             </div>
             <div id="notifList" class="max-h-[360px] overflow-y-auto"></div>
             <div class="px-4 py-2.5 border-t text-center" style="border-color:var(--border)">
-              <button onclick="toggleNotif(); go('alunos')" class="text-xs font-medium text-brand-light hover:underline">Ver todas as matrículas</button>
+              <button onclick="toggleNotif(); go('notifs')" class="text-xs font-medium text-brand-light hover:underline">Ver todas as notificações</button>
             </div>
           </div>
         </div>
@@ -390,30 +393,10 @@
               <span class="flex items-center gap-1.5"><span class="w-4 h-0.5 rounded-full" style="background:#F5B700"></span> Rematrículas</span>
             </div>
           </div>
-          <div class="surface rounded-2xl p-5">
-            <h3 class="font-heading font-semibold text-lg mb-1">Distribuição por horário</h3>
-            <p class="text-xs text-[var(--muted)] mb-4">Dias das aulas</p>
-            <div class="h-44"><canvas id="chartSchedule"></canvas></div>
-            <div class="mt-4 space-y-2 text-sm">
-              <div class="flex items-center justify-between"><span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full" style="background:#2F539A"></span>Seg/Qua</span><span class="font-semibold">71</span></div>
-              <div class="flex items-center justify-between"><span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full" style="background:#F5B700"></span>Ter/Qui</span><span class="font-semibold">57</span></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="grid lg:grid-cols-3 gap-4 mt-4">
-          <div class="surface rounded-2xl p-5">
-            <h3 class="font-heading font-semibold text-lg mb-1">Faixa etária</h3>
-            <p class="text-xs text-[var(--muted)] mb-4">Idade dos alunos</p>
-            <div class="h-56"><canvas id="chartAge"></canvas></div>
-          </div>
-          <!-- últimas matrículas -->
-          <div class="surface rounded-2xl p-5 lg:col-span-2">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="font-heading font-semibold text-lg">Últimas matrículas</h3>
-              <button onclick="go('alunos')" class="text-sm font-medium text-brand-light hover:underline flex items-center gap-1">Ver todos <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
-            </div>
-            <div id="recentList" class="space-y-1.5"></div>
+          <div class="surface rounded-2xl p-5" data-tour="health">
+            <h3 class="font-heading font-semibold text-lg mb-1">Saúde dos contratos</h3>
+            <p class="text-xs text-[var(--muted)] mb-5">Status das 128 matrículas</p>
+            <div class="space-y-4" id="contractHealth"></div>
           </div>
         </div>
 
@@ -465,6 +448,22 @@
           </div>
         </div>
 
+        <div class="grid lg:grid-cols-3 gap-4 mt-4">
+          <div class="surface rounded-2xl p-5">
+            <h3 class="font-heading font-semibold text-lg mb-1">Faixa etária</h3>
+            <p class="text-xs text-[var(--muted)] mb-4">Idade dos alunos</p>
+            <div class="h-56"><canvas id="chartAge"></canvas></div>
+          </div>
+          <!-- últimas matrículas -->
+          <div class="surface rounded-2xl p-5 lg:col-span-2">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-heading font-semibold text-lg">Últimas matrículas</h3>
+              <button onclick="go('alunos')" class="text-sm font-medium text-brand-light hover:underline flex items-center gap-1">Ver todos <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
+            </div>
+            <div id="recentList" class="space-y-1.5"></div>
+          </div>
+        </div>
+
         <!-- horário das matrículas + aniversariantes -->
         <div class="grid lg:grid-cols-3 gap-4 mt-4">
           <div class="surface rounded-2xl p-5 lg:col-span-2">
@@ -477,8 +476,8 @@
             <p class="text-xs text-[var(--muted)] mt-3 flex items-center gap-1.5"><i data-lucide="lightbulb" class="w-3.5 h-3.5" style="color:#F5B700"></i> A maioria das famílias matricula à noite — bom horário para impulsionar posts e responder rápido no WhatsApp.</p>
           </div>
           <div class="surface rounded-2xl p-5">
-            <h3 class="font-heading font-semibold text-lg mb-1">Aniversariantes 🎂</h3>
-            <p class="text-xs text-[var(--muted)] mb-4">Alunos que fazem aniversário em junho</p>
+            <h3 class="font-heading font-semibold text-lg mb-1">Próximos aniversariantes 🎂</h3>
+            <p class="text-xs text-[var(--muted)] mb-4">Os 5 próximos da fila</p>
             <div id="birthdayList" class="space-y-2"></div>
           </div>
         </div>
@@ -491,15 +490,19 @@
             <div id="hoodList" class="space-y-4"></div>
           </div>
           <div class="surface rounded-2xl p-5">
-            <h3 class="font-heading font-semibold text-lg mb-1">Formas de pagamento</h3>
-            <p class="text-xs text-[var(--muted)] mb-4">Como as famílias preferem pagar</p>
+            <h3 class="font-heading font-semibold text-lg mb-1">Autorização de imagem</h3>
+            <p class="text-xs text-[var(--muted)] mb-4">Quem permite fotos nas redes da escola</p>
             <div class="h-40"><canvas id="chartPay"></canvas></div>
-            <div id="payLegend" class="mt-4 grid grid-cols-2 gap-2"></div>
+            <div id="payLegend" class="mt-4 space-y-2"></div>
           </div>
-          <div class="surface rounded-2xl p-5 sm:col-span-2 lg:col-span-1" data-tour="health">
-            <h3 class="font-heading font-semibold text-lg mb-1">Saúde dos contratos</h3>
-            <p class="text-xs text-[var(--muted)] mb-5">Status das 128 matrículas</p>
-            <div class="space-y-4" id="contractHealth"></div>
+          <div class="surface rounded-2xl p-5 sm:col-span-2 lg:col-span-1">
+            <h3 class="font-heading font-semibold text-lg mb-1">Distribuição por horário</h3>
+            <p class="text-xs text-[var(--muted)] mb-4">Dias das aulas</p>
+            <div class="h-44"><canvas id="chartSchedule"></canvas></div>
+            <div class="mt-4 space-y-2 text-sm">
+              <div class="flex items-center justify-between"><span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full" style="background:#2F539A"></span>Seg/Qua</span><span class="font-semibold">71</span></div>
+              <div class="flex items-center justify-between"><span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full" style="background:#F5B700"></span>Ter/Qui</span><span class="font-semibold">57</span></div>
+            </div>
           </div>
         </div>
       </section>
@@ -516,21 +519,19 @@
         </div>
 
         <!-- filtros -->
-        <div class="surface rounded-2xl p-3 mb-4 flex flex-wrap items-center gap-2">
+        <div class="surface rounded-2xl p-3 mb-4 flex flex-wrap items-center gap-2" data-tour="filtros">
           <div class="flex items-center gap-2 rounded-xl px-3 h-10 flex-1 min-w-[200px]" style="background:var(--hover)">
             <i data-lucide="search" class="w-4 h-4 text-[var(--muted)]"></i>
             <input id="alunoSearch" oninput="renderTable()" placeholder="Buscar por nome, responsável ou bairro…" class="flex-1 bg-transparent outline-none text-sm">
           </div>
           <span id="fScheduleWrap"></span>
           <span id="fStatusWrap"></span>
-          <span id="fPayWrap"></span>
+          <span id="fActiveWrap"></span>
         </div>
 
-        <!-- tabela com design próprio -->
+        <!-- tabela com design próprio (cabeçalho ordenável renderizado via JS) -->
         <div class="surface rounded-2xl overflow-hidden">
-          <div class="hidden md:grid grid-cols-[1.6fr_1.3fr_.7fr_.75fr_.85fr_.7fr_116px] gap-3 px-5 py-3 text-[11px] uppercase tracking-wider text-[var(--muted)] font-semibold border-b" style="border-color:var(--border)">
-            <span>Aluno</span><span>Responsável</span><span>Horário</span><span>Pagamento</span><span>Contrato</span><span>Matrícula</span><span class="text-right">Ações</span>
-          </div>
+          <div id="tableHead" class="hidden md:grid grid-cols-[1.6fr_1.3fr_.75fr_.85fr_.7fr_.85fr_52px] gap-3 px-5 py-3 text-[11px] uppercase tracking-wider text-[var(--muted)] font-semibold border-b" style="border-color:var(--border)"></div>
           <div id="tableBody"></div>
           <div class="flex items-center justify-between px-5 py-3 border-t text-sm text-[var(--muted)]" style="border-color:var(--border)">
             <span id="tableCount">—</span>
@@ -604,7 +605,7 @@
             <p class="text-[var(--muted)] text-sm mt-0.5">Esta é a <span class="font-medium text-[var(--text)]">página real do site</span>. Passe o mouse sobre um texto e clique para editar.</p></div>
           <div class="flex items-center gap-2">
             <span id="pendingChip" class="hidden text-xs font-semibold px-2.5 py-1.5 rounded-full" style="background:rgba(245,183,0,.16);color:#B5860B"></span>
-            <button onclick="publishSite()" class="h-10 px-4 rounded-xl text-white text-sm font-semibold flex items-center gap-2" style="background:#1E3765"><i data-lucide="rocket" class="w-4 h-4"></i> Publicar</button>
+            <button onclick="publishSite()" data-tour="publish" class="h-10 px-4 rounded-xl text-white text-sm font-semibold flex items-center gap-2" style="background:#1E3765"><i data-lucide="rocket" class="w-4 h-4"></i> Publicar</button>
           </div>
         </div>
 
@@ -657,6 +658,16 @@
         <p class="text-xs text-[var(--muted)] mt-3 flex items-center gap-1.5"><i data-lucide="mouse-pointer-click" class="w-3.5 h-3.5"></i> Dica: a borda pontilhada amarela mostra o que dá para editar. As mudanças aparecem na hora na pré-visualização.</p>
       </section>
 
+      <!-- ====================== NOTIFICAÇÕES (tela cheia) ====================== -->
+      <section data-view="notifs" class="fade-in">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+          <div><h1 class="font-heading text-2xl sm:text-3xl font-semibold">Notificações</h1>
+            <p class="text-[var(--muted)] text-sm mt-0.5">Tudo que aconteceu na escola, em ordem</p></div>
+          <button onclick="markAllRead()" class="h-10 px-4 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)] flex items-center gap-2"><i data-lucide="check-check" class="w-4 h-4"></i> Marcar todas como lidas</button>
+        </div>
+        <div class="surface rounded-2xl overflow-hidden" id="notifFullList"></div>
+      </section>
+
       <!-- ====================== USUÁRIOS ====================== -->
       <section data-view="usuarios" class="fade-in">
         <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
@@ -675,28 +686,73 @@
 
       <!-- ====================== CONFIGURAÇÕES ====================== -->
       <section data-view="config" class="fade-in">
-        <h1 class="font-heading text-2xl sm:text-3xl font-semibold mb-5">Configurações</h1>
-        <div class="grid lg:grid-cols-2 gap-4">
-          <div class="surface rounded-2xl p-5">
-            <h3 class="font-heading font-semibold text-lg mb-4">Aparência</h3>
-            <div class="flex items-center justify-between py-2"><div><p class="font-medium text-sm">Modo escuro</p><p class="text-xs text-[var(--muted)]">Claro por padrão</p></div>
-              <button onclick="toggleTheme(event)" class="w-12 h-7 rounded-full relative transition" style="background:var(--hover)"><span id="switchKnob" class="absolute top-1 left-1 w-5 h-5 rounded-full bg-brand transition-all"></span></button></div>
-            <div class="py-3 border-t" style="border-color:var(--border)">
-              <p class="font-medium text-sm">Tema da sidebar</p>
-              <p class="text-xs text-[var(--muted)] mb-3">Combinado com claro/escuro, são 6 visuais — também dá pra trocar nas bolinhas no rodapé da sidebar</p>
-              <div class="flex gap-4" id="sbThemePicker"></div>
+        <h1 class="font-heading text-2xl sm:text-3xl font-semibold mb-1">Configurações</h1>
+        <p class="text-[var(--muted)] text-sm mb-6">Aparência, conta e segurança do painel</p>
+        <div class="grid lg:grid-cols-2 gap-4 items-start">
+
+          <!-- aparência -->
+          <div class="surface rounded-2xl overflow-hidden">
+            <div class="flex items-center gap-3 px-5 py-4 border-b" style="border-color:var(--border)">
+              <div class="w-10 h-10 rounded-xl grid place-content-center" style="background:rgba(245,183,0,.14)"><i data-lucide="palette" class="w-5 h-5" style="color:#B5860B"></i></div>
+              <div><h3 class="font-heading font-semibold">Aparência</h3><p class="text-xs text-[var(--muted)]">Deixe o painel com a sua cara</p></div>
             </div>
-            <div onclick="startTour()" class="flex items-center justify-between py-2 border-t cursor-pointer hover:bg-[var(--hover)] -mx-2 px-2 rounded-lg transition" style="border-color:var(--border)">
-              <div><p class="font-medium text-sm">Rever o tour de boas-vindas</p><p class="text-xs text-[var(--muted)]">Apresentação guiada das telas</p></div>
-              <i data-lucide="play-circle" class="w-5 h-5 text-brand-light"></i>
+            <div class="p-5">
+              <div class="flex items-center justify-between"><div><p class="font-medium text-sm">Modo escuro</p><p class="text-xs text-[var(--muted)]">Claro por padrão · animação a partir do clique</p></div>
+                <button onclick="toggleTheme(event)" class="w-12 h-7 rounded-full relative transition" style="background:var(--hover)"><span id="switchKnob" class="absolute top-1 left-1 w-5 h-5 rounded-full bg-brand transition-all"></span></button></div>
+              <div class="pt-4 mt-4 border-t" style="border-color:var(--border)">
+                <p class="font-medium text-sm">Tema da sidebar</p>
+                <p class="text-xs text-[var(--muted)] mb-3">Com claro/escuro, são 6 combinações — as bolinhas no rodapé da sidebar também trocam</p>
+                <div class="flex gap-4" id="sbThemePicker"></div>
+              </div>
             </div>
           </div>
-          <div class="surface rounded-2xl p-5">
-            <h3 class="font-heading font-semibold text-lg mb-4 flex items-center gap-2"><i data-lucide="lock" class="w-5 h-5 text-brand-light"></i> Segurança</h3>
-            <div class="flex items-center justify-between py-2"><div><p class="font-medium text-sm">Autenticação em 2 fatores</p><p class="text-xs text-[var(--muted)]">Camada extra de proteção</p></div><span class="text-xs px-2 py-1 rounded-full bg-[var(--hover)] text-[var(--muted)]">Em breve</span></div>
-            <div class="flex items-center justify-between py-2 border-t" style="border-color:var(--border)"><div><p class="font-medium text-sm">Registro de acessos</p><p class="text-xs text-[var(--muted)]">Histórico de quem viu os dados dos alunos</p></div><i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-500"></i></div>
-            <div onclick="openAccountModal()" class="flex items-center justify-between py-2 border-t cursor-pointer hover:bg-[var(--hover)] -mx-2 px-2 rounded-lg transition" style="border-color:var(--border)"><div><p class="font-medium text-sm">Trocar e-mail ou senha</p><p class="text-xs text-[var(--muted)]">Dados da sua conta</p></div><i data-lucide="chevron-right" class="w-4 h-4 text-[var(--muted)]"></i></div>
+
+          <!-- conta -->
+          <div class="surface rounded-2xl overflow-hidden">
+            <div class="flex items-center gap-3 px-5 py-4 border-b" style="border-color:var(--border)">
+              <div class="w-10 h-10 rounded-xl grid place-content-center" style="background:rgba(47,83,154,.10)"><i data-lucide="user-round" class="w-5 h-5 text-brand-light"></i></div>
+              <div><h3 class="font-heading font-semibold">Minha conta</h3><p class="text-xs text-[var(--muted)]">Quem está usando o painel</p></div>
+            </div>
+            <div class="p-5">
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full grid place-content-center font-semibold text-[#15294d]" style="background:#FFE17A">PM</div>
+                <div class="min-w-0"><p class="font-medium truncate">Priscylla Martins</p><p class="text-xs text-[var(--muted)] truncate">priscylla@englishpatio.com.br · Administrador</p></div>
+              </div>
+              <button onclick="openAccountModal()" class="mt-4 w-full h-10 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)] transition flex items-center justify-center gap-2"><i data-lucide="pencil" class="w-4 h-4"></i> Editar e-mail e senha</button>
+            </div>
           </div>
+
+          <!-- segurança -->
+          <div class="surface rounded-2xl overflow-hidden">
+            <div class="flex items-center gap-3 px-5 py-4 border-b" style="border-color:var(--border)">
+              <div class="w-10 h-10 rounded-xl grid place-content-center" style="background:rgba(22,163,74,.10)"><i data-lucide="shield-check" class="w-5 h-5 text-emerald-500"></i></div>
+              <div><h3 class="font-heading font-semibold">Segurança</h3><p class="text-xs text-[var(--muted)]">Proteção dos dados dos alunos</p></div>
+            </div>
+            <div class="p-5 space-y-3">
+              <div class="flex items-center justify-between"><div><p class="font-medium text-sm">Registro de acessos</p><p class="text-xs text-[var(--muted)]">Histórico de quem viu os dados</p></div><span class="text-xs font-semibold px-2.5 py-1 rounded-full" style="background:rgba(22,163,74,.10);color:#16a34a">Ativo</span></div>
+              <div class="flex items-center justify-between pt-3 border-t" style="border-color:var(--border)"><div><p class="font-medium text-sm">Autenticação em 2 fatores</p><p class="text-xs text-[var(--muted)]">Código extra no celular ao entrar</p></div><span class="text-xs px-2.5 py-1 rounded-full bg-[var(--hover)] text-[var(--muted)]">Em breve</span></div>
+              <div class="flex items-center justify-between pt-3 border-t" style="border-color:var(--border)"><div><p class="font-medium text-sm">Sessões ativas</p><p class="text-xs text-[var(--muted)]">1 dispositivo conectado agora</p></div><i data-lucide="monitor-smartphone" class="w-5 h-5 text-[var(--muted)]"></i></div>
+            </div>
+          </div>
+
+          <!-- ajuda -->
+          <div class="surface rounded-2xl overflow-hidden">
+            <div class="flex items-center gap-3 px-5 py-4 border-b" style="border-color:var(--border)">
+              <div class="w-10 h-10 rounded-xl grid place-content-center" style="background:rgba(124,58,237,.10)"><i data-lucide="life-buoy" class="w-5 h-5" style="color:#7C3AED"></i></div>
+              <div><h3 class="font-heading font-semibold">Ajuda e dicas</h3><p class="text-xs text-[var(--muted)]">Tours guiados por tela</p></div>
+            </div>
+            <div class="p-5 space-y-3">
+              <div onclick="startTour()" class="flex items-center justify-between cursor-pointer hover:bg-[var(--hover)] -mx-2 px-2 py-1.5 rounded-lg transition">
+                <div><p class="font-medium text-sm">Rever as dicas desta tela</p><p class="text-xs text-[var(--muted)]">O botão "?" no canto faz o mesmo em qualquer tela</p></div>
+                <i data-lucide="play-circle" class="w-5 h-5 text-brand-light"></i>
+              </div>
+              <div onclick="localStorage.removeItem('ep-tours-off');['overview','alunos','editor','contratos','emails'].forEach(v=>localStorage.removeItem('ep-tour-seen-'+v));toast('Dicas reativadas em todas as telas!')" class="flex items-center justify-between pt-3 border-t cursor-pointer hover:bg-[var(--hover)] -mx-2 px-2 py-1.5 rounded-lg transition" style="border-color:var(--border)">
+                <div><p class="font-medium text-sm">Reativar dicas em todas as telas</p><p class="text-xs text-[var(--muted)]">Volta a mostrar os tours uma vez por tela</p></div>
+                <i data-lucide="rotate-ccw" class="w-5 h-5 text-[var(--muted)]"></i>
+              </div>
+            </div>
+          </div>
+
         </div>
       </section>
 
@@ -802,19 +858,19 @@ const CLOUD = f => `https://res.cloudinary.com/dfvihcel2/image/upload/w_700,q_au
 
 /* ====================== DADOS FICTÍCIOS (Goiânia) ====================== */
 const STUDENTS = [
-  { id:1, kids:[{n:'Helena Duarte Lima', age:8, b:'14/02/2018'}], resp:{n:'Mariana Duarte Lima', cpf:'047.812.336-50', phone:'(62) 99214-8870', email:'mariana.duarte@gmail.com', rel:'Mãe', b:'09/05/1989'}, second:{n:'Rafael Lima', phone:'(62) 98112-4471', rel:'Pai'}, fin:'Mariana Duarte Lima', addr:{cep:'74230-110', street:'Rua T-55', num:'180', comp:'Apto 902', bairro:'Setor Bueno', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'15h00–16h30', pay:'PIX', status:'signed', media:true, date:'02/06/2026' },
-  { id:2, kids:[{n:'Théo Andrade Rocha', age:10, b:'22/08/2015'},{n:'Lara Andrade Rocha', age:7, b:'30/11/2018'}], resp:{n:'Patrícia Andrade', cpf:'118.553.701-22', phone:'(62) 99980-1245', email:'patricia.andrade@hotmail.com', rel:'Mãe', b:'17/03/1986'}, second:{n:'Bruno Rocha', phone:'(62) 99771-3380', rel:'Pai'}, fin:'Bruno Rocha', addr:{cep:'74115-030', street:'Av. T-9', num:'1240', comp:'', bairro:'Jardim Goiás', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'17h00–18h30', pay:'Boleto', status:'pending', media:true, date:'31/05/2026' },
-  { id:3, kids:[{n:'Miguel Ferreira Souza', age:12, b:'05/01/2014'}], resp:{n:'Camila Ferreira', cpf:'203.447.882-09', phone:'(62) 98341-6622', email:'camila.fsouza@gmail.com', rel:'Mãe', b:'25/07/1984'}, second:null, fin:'Camila Ferreira', addr:{cep:'74080-010', street:'Rua 90', num:'455', comp:'Casa 2', bairro:'Setor Sul', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'16h30–18h00', pay:'Cartão', status:'signed', media:false, date:'30/05/2026' },
-  { id:4, kids:[{n:'Sofia Mendes Castro', age:9, b:'19/09/2016'}], resp:{n:'Juliana Castro', cpf:'355.221.940-71', phone:'(62) 99657-2218', email:'ju.castro@outlook.com', rel:'Mãe', b:'12/12/1990'}, second:{n:'André Mendes', phone:'(62) 98220-9981', rel:'Pai'}, fin:'André Mendes', addr:{cep:'74810-100', street:'Rua C-140', num:'78', comp:'', bairro:'Jardim América', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'14h00–15h30', pay:'PIX', status:'sent', media:true, date:'29/05/2026' },
-  { id:5, kids:[{n:'Bernardo Pires Alves', age:6, b:'09/06/2020'}], resp:{n:'Fernanda Pires', cpf:'412.889.503-44', phone:'(62) 99102-7755', email:'fernanda.pires@gmail.com', rel:'Mãe', b:'28/02/1992'}, second:null, fin:'Fernanda Pires', addr:{cep:'74663-520', street:'Rua VP-7D', num:'320', comp:'Qd 12 Lt 4', bairro:'Vila São João', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'14h00–15h30', pay:'Dinheiro', status:'signed', media:true, date:'28/05/2026' },
-  { id:6, kids:[{n:'Alice Barbosa Nunes', age:11, b:'27/06/2015'}], resp:{n:'Renata Nunes', cpf:'509.334.118-60', phone:'(62) 98876-4400', email:'renata.nunes@yahoo.com', rel:'Mãe', b:'05/09/1983'}, second:{n:'Carlos Barbosa', phone:'(62) 99443-1102', rel:'Pai'}, fin:'Renata Nunes', addr:{cep:'74125-160', street:'Av. Mutirão', num:'2540', comp:'Apto 1503', bairro:'Setor Marista', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'16h30–18h00', pay:'PIX', status:'signed', media:true, date:'27/05/2026' },
-  { id:7, kids:[{n:'Davi Cardoso Melo', age:13, b:'11/06/2013'}], resp:{n:'Aline Melo', cpf:'620.778.245-31', phone:'(62) 99320-8845', email:'aline.melo@gmail.com', rel:'Mãe', b:'19/11/1981'}, second:null, fin:'Aline Melo', addr:{cep:'74305-040', street:'Rua 1136', num:'95', comp:'', bairro:'Setor Pedro Ludovico', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'18h00–19h30', pay:'Boleto', status:'pending', media:false, date:'26/05/2026' },
-  { id:8, kids:[{n:'Manuela Teixeira Gomes', age:7, b:'08/07/2018'},{n:'Pedro Teixeira Gomes', age:9, b:'16/05/2016'}], resp:{n:'Vanessa Teixeira', cpf:'731.005.667-88', phone:'(62) 98990-3321', email:'va.teixeira@hotmail.com', rel:'Mãe', b:'03/06/1988'}, second:{n:'Marcos Gomes', phone:'(62) 99558-7700', rel:'Pai'}, fin:'Marcos Gomes', addr:{cep:'74884-120', street:'Av. Rio Verde', num:'1180', comp:'Cond. Jardins', bairro:'Jardim Atlântico', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'15h00–16h30', pay:'Cartão', status:'sent', media:true, date:'25/05/2026' },
-  { id:9, kids:[{n:'Isabela Ribeiro Dias', age:14, b:'02/02/2012'}], resp:{n:'Cristina Dias', cpf:'845.119.302-15', phone:'(62) 99701-2266', email:'cristina.dias@gmail.com', rel:'Mãe', b:'21/08/1979'}, second:null, fin:'Cristina Dias', addr:{cep:'74215-908', street:'Av. 136', num:'960', comp:'Sala 408', bairro:'Setor Sul', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'18h00–19h30', pay:'PIX', status:'signed', media:false, date:'24/05/2026' },
-  { id:10, kids:[{n:'Arthur Moraes Pinto', age:8, b:'29/10/2017'}], resp:{n:'Letícia Moraes', cpf:'956.443.870-02', phone:'(62) 98112-9943', email:'leticia.moraes@outlook.com', rel:'Mãe', b:'14/04/1991'}, second:{n:'Felipe Pinto', phone:'(62) 99887-6610', rel:'Pai'}, fin:'Felipe Pinto', addr:{cep:'74070-060', street:'Rua 22', num:'310', comp:'', bairro:'Setor Aeroporto', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'17h00–18h30', pay:'Boleto', status:'pending', media:true, date:'23/05/2026' },
-  { id:11, kids:[{n:'Laura Cavalcante Reis', age:10, b:'12/12/2015'}], resp:{n:'Daniela Reis', cpf:'063.778.221-49', phone:'(62) 99334-1180', email:'dani.reis@gmail.com', rel:'Mãe', b:'30/01/1987'}, second:null, fin:'Daniela Reis', addr:{cep:'74343-230', street:'Rua RF-12', num:'140', comp:'Qd 8', bairro:'Residencial Forte', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'15h00–16h30', pay:'PIX', status:'signed', media:true, date:'22/05/2026' },
-  { id:12, kids:[{n:'Gabriel Fonseca Lopes', age:11, b:'07/08/2014'}], resp:{n:'Simone Fonseca', cpf:'174.882.605-77', phone:'(62) 98445-2290', email:'simone.fonseca@yahoo.com', rel:'Mãe', b:'08/10/1982'}, second:{n:'Thiago Lopes', phone:'(62) 99221-5544', rel:'Pai'}, fin:'Thiago Lopes', addr:{cep:'74150-020', street:'Av. T-63', num:'880', comp:'Apto 701', bairro:'Setor Bueno', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'16h30–18h00', pay:'Cartão', status:'sent', media:true, date:'21/05/2026' },
-  { id:13, kids:[{n:'Valentina Almeida Prado', age:9, b:'15/04/2017'},{n:'Henrique Almeida Prado', age:11, b:'20/09/2014'},{n:'Cecília Almeida Prado', age:6, b:'02/01/2020'}], resp:{n:'Roberta Almeida Prado', cpf:'288.443.190-66', phone:'(62) 99845-7733', email:'roberta.prado@gmail.com', rel:'Mãe', b:'11/07/1985'}, second:{n:'Eduardo Prado', phone:'(62) 99102-8844', rel:'Pai'}, fin:'Eduardo Prado', addr:{cep:'74110-100', street:'Rua 9', num:'520', comp:'Casa 1', bairro:'Setor Oeste', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'16h30–18h00', pay:'PIX', status:'signed', media:true, date:'20/05/2026' },
+  { id:1, kids:[{n:'Helena Duarte Lima', age:8, b:'14/02/2018'}], resp:{n:'Mariana Duarte Lima', cpf:'047.812.336-50', phone:'(62) 99214-8870', email:'mariana.duarte@gmail.com', rel:'Mãe', b:'09/05/1989'}, second:{n:'Rafael Lima', phone:'(62) 98112-4471', rel:'Pai'}, fin:'Mariana Duarte Lima', addr:{cep:'74230-110', street:'Rua T-55', num:'180', comp:'Apto 902', bairro:'Setor Bueno', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'15h00–16h30', pay:'PIX', status:'signed', media:true, date:'02/06/2026', hora:'20h14' },
+  { id:2, kids:[{n:'Théo Andrade Rocha', age:10, b:'22/08/2015'},{n:'Lara Andrade Rocha', age:7, b:'30/11/2018'}], resp:{n:'Patrícia Andrade', cpf:'118.553.701-22', phone:'(62) 99980-1245', email:'patricia.andrade@hotmail.com', rel:'Mãe', b:'17/03/1986'}, second:{n:'Bruno Rocha', phone:'(62) 99771-3380', rel:'Pai'}, fin:'Bruno Rocha', addr:{cep:'74115-030', street:'Av. T-9', num:'1240', comp:'', bairro:'Jardim Goiás', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'17h00–18h30', pay:'Boleto', status:'pending', media:true, date:'31/05/2026', hora:'19h32' },
+  { id:3, kids:[{n:'Miguel Ferreira Souza', age:12, b:'05/01/2014'}], resp:{n:'Camila Ferreira', cpf:'203.447.882-09', phone:'(62) 98341-6622', email:'camila.fsouza@gmail.com', rel:'Mãe', b:'25/07/1984'}, second:null, fin:'Camila Ferreira', addr:{cep:'74080-010', street:'Rua 90', num:'455', comp:'Casa 2', bairro:'Setor Sul', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'16h30–18h00', pay:'Cartão', status:'signed', media:false, date:'30/05/2026', hora:'10h05' },
+  { id:4, kids:[{n:'Sofia Mendes Castro', age:9, b:'19/09/2016'}], resp:{n:'Juliana Castro', cpf:'355.221.940-71', phone:'(62) 99657-2218', email:'ju.castro@outlook.com', rel:'Mãe', b:'12/12/1990'}, second:{n:'André Mendes', phone:'(62) 98220-9981', rel:'Pai'}, fin:'André Mendes', addr:{cep:'74810-100', street:'Rua C-140', num:'78', comp:'', bairro:'Jardim América', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'14h00–15h30', pay:'PIX', status:'sent', media:true, date:'29/05/2026', hora:'21h47' },
+  { id:5, kids:[{n:'Bernardo Pires Alves', age:6, b:'09/06/2020'}], resp:{n:'Fernanda Pires', cpf:'412.889.503-44', phone:'(62) 99102-7755', email:'fernanda.pires@gmail.com', rel:'Mãe', b:'28/02/1992'}, second:null, fin:'Fernanda Pires', addr:{cep:'74663-520', street:'Rua VP-7D', num:'320', comp:'Qd 12 Lt 4', bairro:'Vila São João', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'14h00–15h30', pay:'Dinheiro', status:'signed', media:true, date:'28/05/2026', hora:'14h22' },
+  { id:6, kids:[{n:'Alice Barbosa Nunes', age:11, b:'27/06/2015'}], resp:{n:'Renata Nunes', cpf:'509.334.118-60', phone:'(62) 98876-4400', email:'renata.nunes@yahoo.com', rel:'Mãe', b:'05/09/1983'}, second:{n:'Carlos Barbosa', phone:'(62) 99443-1102', rel:'Pai'}, fin:'Renata Nunes', addr:{cep:'74125-160', street:'Av. Mutirão', num:'2540', comp:'Apto 1503', bairro:'Setor Marista', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'16h30–18h00', pay:'PIX', status:'signed', media:true, date:'27/05/2026', hora:'18h39' },
+  { id:7, kids:[{n:'Davi Cardoso Melo', age:13, b:'11/06/2013'}], resp:{n:'Aline Melo', cpf:'620.778.245-31', phone:'(62) 99320-8845', email:'aline.melo@gmail.com', rel:'Mãe', b:'19/11/1981'}, second:null, fin:'Aline Melo', addr:{cep:'74305-040', street:'Rua 1136', num:'95', comp:'', bairro:'Setor Pedro Ludovico', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'18h00–19h30', pay:'Boleto', status:'pending', media:false, date:'26/05/2026', hora:'20h51' },
+  { id:8, kids:[{n:'Manuela Teixeira Gomes', age:7, b:'08/07/2018'},{n:'Pedro Teixeira Gomes', age:9, b:'16/05/2016'}], resp:{n:'Vanessa Teixeira', cpf:'731.005.667-88', phone:'(62) 98990-3321', email:'va.teixeira@hotmail.com', rel:'Mãe', b:'03/06/1988'}, second:{n:'Marcos Gomes', phone:'(62) 99558-7700', rel:'Pai'}, fin:'Marcos Gomes', addr:{cep:'74884-120', street:'Av. Rio Verde', num:'1180', comp:'Cond. Jardins', bairro:'Jardim Atlântico', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'15h00–16h30', pay:'Cartão', status:'sent', media:true, date:'25/05/2026', hora:'16h08' },
+  { id:9, kids:[{n:'Isabela Ribeiro Dias', age:14, b:'02/02/2012'}], resp:{n:'Cristina Dias', cpf:'845.119.302-15', phone:'(62) 99701-2266', email:'cristina.dias@gmail.com', rel:'Mãe', b:'21/08/1979'}, second:null, fin:'Cristina Dias', addr:{cep:'74215-908', street:'Av. 136', num:'960', comp:'Sala 408', bairro:'Setor Sul', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'18h00–19h30', pay:'PIX', status:'signed', media:false, active:false, date:'24/05/2026', hora:'19h15' },
+  { id:10, kids:[{n:'Arthur Moraes Pinto', age:8, b:'29/10/2017'}], resp:{n:'Letícia Moraes', cpf:'956.443.870-02', phone:'(62) 98112-9943', email:'leticia.moraes@outlook.com', rel:'Mãe', b:'14/04/1991'}, second:{n:'Felipe Pinto', phone:'(62) 99887-6610', rel:'Pai'}, fin:'Felipe Pinto', addr:{cep:'74070-060', street:'Rua 22', num:'310', comp:'', bairro:'Setor Aeroporto', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'17h00–18h30', pay:'Boleto', status:'pending', media:true, active:false, date:'23/05/2026', hora:'11h26' },
+  { id:11, kids:[{n:'Laura Cavalcante Reis', age:10, b:'12/12/2015'}], resp:{n:'Daniela Reis', cpf:'063.778.221-49', phone:'(62) 99334-1180', email:'dani.reis@gmail.com', rel:'Mãe', b:'30/01/1987'}, second:null, fin:'Daniela Reis', addr:{cep:'74343-230', street:'Rua RF-12', num:'140', comp:'Qd 8', bairro:'Residencial Forte', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'15h00–16h30', pay:'PIX', status:'signed', media:true, date:'22/05/2026', hora:'20h33' },
+  { id:12, kids:[{n:'Gabriel Fonseca Lopes', age:11, b:'07/08/2014'}], resp:{n:'Simone Fonseca', cpf:'174.882.605-77', phone:'(62) 98445-2290', email:'simone.fonseca@yahoo.com', rel:'Mãe', b:'08/10/1982'}, second:{n:'Thiago Lopes', phone:'(62) 99221-5544', rel:'Pai'}, fin:'Thiago Lopes', addr:{cep:'74150-020', street:'Av. T-63', num:'880', comp:'Apto 701', bairro:'Setor Bueno', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'16h30–18h00', pay:'Cartão', status:'sent', media:true, date:'21/05/2026', hora:'17h44' },
+  { id:13, kids:[{n:'Valentina Almeida Prado', age:9, b:'15/04/2017'},{n:'Henrique Almeida Prado', age:11, b:'20/09/2014'},{n:'Cecília Almeida Prado', age:6, b:'02/01/2020'}], resp:{n:'Roberta Almeida Prado', cpf:'288.443.190-66', phone:'(62) 99845-7733', email:'roberta.prado@gmail.com', rel:'Mãe', b:'11/07/1985'}, second:{n:'Eduardo Prado', phone:'(62) 99102-8844', rel:'Pai'}, fin:'Eduardo Prado', addr:{cep:'74110-100', street:'Rua 9', num:'520', comp:'Casa 1', bairro:'Setor Oeste', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'16h30–18h00', pay:'PIX', status:'signed', media:true, date:'20/05/2026', hora:'19h58' },
 ];
 
 const palette = ['#1E3765','#2F539A','#F5B700','#7C9AD6','#B5860B','#16a34a','#9333ea','#0891b2','#dc2626','#ea580c','#0d9488','#65a30d'];
@@ -842,6 +898,7 @@ function cselect(id, items, opts={}){
 function csToggle(id,e){ e&&e.stopPropagation(); const wrap=document.getElementById('cs-'+id), menu=document.getElementById('csm-'+id);
   const willOpen=menu.classList.contains('hidden'); csCloseAll(); if(willOpen){ menu.classList.remove('hidden'); wrap.classList.add('open'); } }
 function csCloseAll(){ document.querySelectorAll('.cs-menu').forEach(m=>m.classList.add('hidden')); document.querySelectorAll('.cs').forEach(c=>c.classList.remove('open')); }
+function csSet(id,value){ const s=SEL[id]; if(!s) return; const i=s.items.findIndex(x=>x.v===value); if(i>=0) csPick(id,i); }
 function csPick(id,i){ const s=SEL[id]; s.value=s.items[i].v;
   document.getElementById('csl-'+id).textContent=s.items[i].l;
   const menu=document.getElementById('csm-'+id);
@@ -856,8 +913,10 @@ function go(view, el){
   else { const map={overview:0,alunos:1,contratos:2,emails:3,editor:4,usuarios:5,config:6};
     const idx=map[view]; if(idx!=null) document.querySelectorAll('.nav-item')[idx]?.classList.add('active'); }
   toggleSidebar(false); closeEdit();
+  const ht=document.getElementById('headerTitle'); if(ht) ht.textContent=VIEW_LABEL[view]||'Visão geral';
   window.scrollTo(0,0);
   lucide.createIcons();
+  if(typeof maybeTourFor==='function' && inited) maybeTourFor(view);
 }
 function toggleSidebar(open){
   const sb=document.getElementById('sidebar'), ov=document.getElementById('overlay');
@@ -869,7 +928,6 @@ function toggleSidebar(open){
 /* ====================== TEMA (com animação circular) ====================== */
 function applyDarkToggle(){
   const dark = document.documentElement.classList.toggle('dark');
-  document.getElementById('themeIcon')?.setAttribute('data-lucide', dark?'sun':'moon');
   document.getElementById('sbThemeIcon')?.setAttribute('data-lucide', dark?'sun':'moon');
   const knob=document.getElementById('switchKnob'); if(knob) knob.style.left = dark?'1.5rem':'0.25rem';
   applySidebarTheme();
@@ -925,6 +983,17 @@ function renderNotifs(){
       ${n.unread?'<span class="w-2 h-2 rounded-full bg-accent shrink-0 mt-2"></span>':''}
     </div>`;
   }).join('');
+  const full=document.getElementById('notifFullList');
+  if(full){
+    full.innerHTML=NOTIFS.map((n,i)=>{
+      const [ic,c,bg]=icon(n.type);
+      return `<div onclick="notifClick(${i})" class="flex items-start gap-4 px-5 py-4 cursor-pointer hover:bg-[var(--hover)] transition border-b last:border-0" style="border-color:var(--border)">
+        <div class="w-11 h-11 rounded-xl grid place-content-center shrink-0" style="background:${bg};color:${c}"><i data-lucide="${ic}" class="w-5 h-5"></i></div>
+        <div class="min-w-0 flex-1"><p class="font-medium">${n.title}</p><p class="text-sm text-[var(--muted)]">${n.desc}</p><p class="text-xs text-[var(--muted)] mt-0.5">${n.time}</p></div>
+        ${n.unread?'<span class="w-2.5 h-2.5 rounded-full bg-accent shrink-0 mt-2"></span>':''}
+      </div>`;
+    }).join('');
+  }
   const unread=NOTIFS.filter(n=>n.unread).length;
   const bb=document.getElementById('bellBadge'); bb.textContent=unread; bb.style.display=unread?'grid':'none';
   const nb=document.getElementById('navNewBadge');
@@ -933,25 +1002,56 @@ function renderNotifs(){
   lucide.createIcons();
 }
 function toggleNotif(e){ e&&e.stopPropagation(); document.getElementById('notifPanel').classList.toggle('hidden'); lucide.createIcons(); }
-function notifClick(i){ const n=NOTIFS[i]; n.unread=false; renderNotifs(); toggleNotif(); if(n.sid) openDetail(n.sid); }
+function notifClick(i){ const n=NOTIFS[i]; n.unread=false; renderNotifs(); document.getElementById('notifPanel')?.classList.add('hidden'); if(n.sid) openDetail(n.sid); }
 function markAllRead(){ NOTIFS.forEach(n=>n.unread=false); renderNotifs(); }
 
 /* ====================== TOUR DE BOAS-VINDAS (spotlight nos elementos reais) ====================== */
-const TOUR_STEPS=[
-  { target:null, title:'Boas-vindas ao preview da dashboard!', body:'Explore à vontade — os dados são fictícios e nada aqui quebra. Veja o que não dá pra descobrir só explorando:', placement:'center', logo:true, pre:()=>go('overview') },
-  { target:'[data-tour="nav-editor"]', title:'Editor do site', body:'Aqui você muda os textos do site real: passe o mouse sobre um texto (aparece uma borda pontilhada amarela), clique e escreva.', placement:'right', pre:()=>toggleSidebar(true) },
-  { target:'[data-tour="row-menu"]', title:'Ações rápidas em cada aluno', body:'Nos três pontinhos de cada linha tem atalhos: ver e baixar o contrato, enviar no WhatsApp, copiar o telefone e até marcar como assinado.', placement:'left', pre:()=>{ toggleSidebar(false); go('alunos'); } },
-  { target:'[data-tour="health"]', title:'Cobrança sem dor de cabeça', body:'A "Saúde dos contratos" mostra quem ainda não assinou — e o botão verde prepara o lembrete de WhatsApp para todos os pendentes de uma vez.', placement:'left', pre:()=>go('overview') },
-  { target:'#cmFab', title:'O botão mais importante', body:'Viu algo que quer mudar? Clique em "Comentar", depois em qualquer parte da tela, e escreva sua sugestão. Tudo chega para a equipe — e quando for ajustado, o alfinete fica verde com a resposta.', placement:'top', last:true },
-];
-let tourI=0, tourActive=false, tourBuilt=false;
-function maybeStartTour(){ if(!localStorage.getItem('ep-tour-done')) startTour(); }
-function startTour(){
+/* tours POR TELA — cada tela mostra o seu, 1x (opt-out global em 'ep-tours-off') */
+const TOURS={
+  overview:[
+    { target:null, title:'Boas-vindas ao preview da dashboard!', body:'Explore à vontade — os dados são fictícios e nada aqui quebra. Cada tela tem o seu próprio mini-tour com o que não é óbvio.', placement:'center', logo:true },
+    { target:'[data-tour="health"]', title:'Cobrança sem dor de cabeça', body:'A "Saúde dos contratos" mostra quem ainda não assinou — e o botão verde leva direto para a lista já filtrada nos pendentes.', placement:'left' },
+    { target:'#cmFab', title:'O botão mais importante', body:'Viu algo que quer mudar? Clique em "Comentar", depois em qualquer parte da tela, e escreva sua sugestão. Quando for ajustado, o alfinete fica verde com a resposta.', placement:'top', last:true },
+  ],
+  alunos:[
+    { target:'[data-tour="row-menu"]', title:'Tudo mora nos três pontinhos', body:'Cada linha tem um menu completo: ficha do aluno, ver e baixar contrato, enviar no WhatsApp, copiar telefone e marcar como assinado.', placement:'left' },
+    { target:'#tableHead', title:'Ordene por qualquer coluna', body:'Clique no título de uma coluna para ordenar (vem por nome). Clique de novo para inverter a ordem.', placement:'bottom' },
+    { target:'[data-tour="filtros"]', title:'Busca e filtros', body:'Filtre por horário, status do contrato e situação (ativas/inativas) — e exporte a lista filtrada como planilha.', placement:'bottom', last:true },
+  ],
+  editor:[
+    { target:'#editorTabs', title:'Todas as páginas do site', body:'Escolha qual página editar — até as telas de matrícula entram aqui no produto final.', placement:'bottom' },
+    { target:'#devMob', title:'Veja como fica no celular', body:'Este botão mostra a página dentro de um iPhone, do jeito que as famílias veem.', placement:'bottom' },
+    { target:'[data-tour="publish"]', title:'Nada vai ao ar sem querer', body:'As mudanças ficam só na pré-visualização até você clicar em Publicar.', placement:'bottom', last:true },
+  ],
+  contratos:[
+    { target:'#cvList', title:'Cartões ou lista', body:'Alterne entre ver os contratos em cartões ou um por linha.', placement:'bottom' },
+    { target:'#contractGrid', title:'Envio em um clique', body:'Cada contrato tem o botão verde que prepara o envio pelo WhatsApp da família.', placement:'top', last:true },
+  ],
+  emails:[
+    { target:'#emailToWrap', title:'Escolha o público', body:'Dispare para todos os responsáveis ou só para um grupo (uma turma, contratos pendentes…).', placement:'bottom' },
+    { target:'#emailBody', title:'Mensagens personalizadas', body:'Use {{nome_responsavel}} e {{nome_aluno}} — cada família recebe o e-mail com os próprios nomes.', placement:'top', last:true },
+  ],
+};
+let tourSteps=TOURS.overview, tourI=0, tourActive=false, tourBuilt=false;
+function toursOff(){ return !!localStorage.getItem('ep-tours-off'); }
+function disableTours(){
+  localStorage.setItem('ep-tours-off','1');
+  endTour(false);
+  toast('Dicas desativadas — o botão "?" reativa o tour da tela quando quiser.');
+}
+function maybeStartTour(){ maybeTourFor('overview'); }
+function maybeTourFor(view){
+  if(tourActive||toursOff()||!TOURS[view]) return;
+  if(localStorage.getItem('ep-tour-seen-'+view)) return;
+  localStorage.setItem('ep-tour-seen-'+view,'1');
+  setTimeout(()=>{ if(!tourActive) startTour(view); },400);
+}
+function startTour(view){
+  tourSteps=TOURS[view||currentView()]||TOURS.overview;
   tourI=0; tourActive=true;
-  go('overview');
   if(!tourBuilt) buildTourDom();
   document.getElementById('tourOverlay').style.display='block';
-  // primeiro card nasce já centralizado (sem deslizar do canto)
+  // primeiro card nasce já posicionado (sem deslizar do canto)
   const card=document.getElementById('tourCard');
   card.style.transition='none';
   setTimeout(()=>{ tourRender(); requestAnimationFrame(()=>{ card.style.transition='left .22s ease-out, top .22s ease-out'; }); },80);
@@ -975,7 +1075,7 @@ function buildTourDom(){
   tourBuilt=true;
 }
 function tourRender(){
-  const s=TOUR_STEPS[tourI]; if(!s) return;
+  const s=tourSteps[tourI]; if(!s) return;
   if(s.pre) s.pre();
   const dim=document.getElementById('tourDim'), spot=document.getElementById('tourSpot'),
         halo=document.getElementById('tourHalo'), card=document.getElementById('tourCard');
@@ -1005,17 +1105,18 @@ function tourRender(){
   card.innerHTML=`
     <button onclick="endTour(false)" class="absolute top-3 right-3 p-1.5 rounded-lg hover:bg-[var(--hover)] text-[var(--muted)] transition" title="Fechar tour"><i data-lucide="x" class="w-4 h-4"></i></button>
     ${s.logo?`<img src="${document.documentElement.classList.contains('dark')?LOGOS.blue:LOGOS.colored}" alt="English Patio" class="h-12 w-auto mb-3">`:''}
-    <p class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider">${s.target?`Passo ${tourI+1} de ${TOUR_STEPS.length}`:(s.last?'Fim do tour':'Tour rápido')}</p>
+    <p class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider">${s.target?`Dica ${tourI+1} de ${tourSteps.length} · ${VIEW_LABEL[currentView()]||''}`:(s.last?'Fim do tour':'Tour rápido')}</p>
     <h3 class="font-heading text-lg font-semibold mt-1">${s.title}</h3>
     <p class="text-sm text-[var(--muted)] mt-1.5 leading-relaxed">${s.body}</p>
-    <div class="flex items-center gap-1.5 mt-3.5">${TOUR_STEPS.map((_,i)=>`<span class="h-1 rounded-full transition-all ${i===tourI?'w-5':'w-1.5'}" style="background:${i===tourI?'#F5B700':'var(--border)'}"></span>`).join('')}</div>
+    <div class="flex items-center gap-1.5 mt-3.5">${tourSteps.map((_,i)=>`<span class="h-1 rounded-full transition-all ${i===tourI?'w-5':'w-1.5'}" style="background:${i===tourI?'#F5B700':'var(--border)'}"></span>`).join('')}</div>
     <div class="flex items-center justify-between gap-2 mt-4">
       ${s.last?'<span></span>':`<button onclick="endTour(false)" class="h-9 px-3 rounded-lg border border-[var(--border)] bg-[var(--card)] text-sm font-medium text-[var(--muted)] hover:bg-[var(--hover)] transition">Pular tour</button>`}
       <div class="flex gap-2">
         ${tourI>0&&!s.last?`<button onclick="tourPrev()" class="h-9 px-3 rounded-lg border border-[var(--border)] bg-[var(--card)] text-sm font-medium hover:bg-[var(--hover)] transition">Voltar</button>`:''}
-        <button onclick="${s.last?'endTour(true)':'tourNext()'}" class="h-9 px-4 rounded-lg text-white text-sm font-semibold" style="background:linear-gradient(135deg,#1E3765,#2F539A)">${s.last?'Começar a usar':(tourI===0?'Fazer o tour':'Próximo')}</button>
+        <button onclick="${s.last?'endTour(true)':'tourNext()'}" class="h-9 px-4 rounded-lg text-white text-sm font-semibold" style="background:linear-gradient(135deg,#1E3765,#2F539A)">${s.last?'Entendi':(s.target?'Próximo':'Ver as dicas')}</button>
       </div>
-    </div>`;
+    </div>
+    <button onclick="disableTours()" class="w-full text-center text-[11px] text-[var(--muted)] hover:underline mt-3">Não mostrar dicas em nenhuma tela</button>`;
   positionTourCard(card,s,r);
   lucide.createIcons();
 }
@@ -1038,14 +1139,12 @@ function positionTourCard(card,s,r){
   card.style.left=Math.max(M,Math.min(left,innerWidth-W-M))+'px';
   card.style.top=Math.max(M,Math.min(top,innerHeight-H-M))+'px';
 }
-function tourNext(){ if(tourI<TOUR_STEPS.length-1){ tourI++; tourRender(); } else endTour(true); }
+function tourNext(){ if(tourI<tourSteps.length-1){ tourI++; tourRender(); } else endTour(true); }
 function tourPrev(){ if(tourI>0){ tourI--; tourRender(); } }
 function endTour(done){
   tourActive=false;
-  localStorage.setItem('ep-tour-done', done?'completed':'skipped');
   const o=document.getElementById('tourOverlay'); if(o) o.style.display='none';
   toggleSidebar(false);
-  if(done) toast('Tour concluído! Explore à vontade.');
 }
 
 /* ====================== TABELA DE ALUNOS ====================== */
@@ -1055,34 +1154,62 @@ function rowHTML(s){
   const st=STATUS[s.status];
   const schColor = s.sch==='seg-qua' ? '#2F539A' : '#B5860B';
   const schBg = s.sch==='seg-qua' ? 'rgba(47,83,154,.10)' : 'rgba(245,183,0,.14)';
-  return `<div onclick="openDetail(${s.id})" class="grid grid-cols-1 md:grid-cols-[1.6fr_1.3fr_.7fr_.75fr_.85fr_.7fr_116px] gap-3 px-5 py-3.5 items-center cursor-pointer hover:bg-[var(--hover)] transition border-b last:border-0" style="border-color:var(--border)">
+  const inactive=s.active===false;
+  return `<div onclick="openDetail(${s.id})" class="grid grid-cols-1 md:grid-cols-[1.6fr_1.3fr_.75fr_.85fr_.7fr_.85fr_52px] gap-3 px-5 py-3.5 items-center cursor-pointer hover:bg-[var(--hover)] transition border-b last:border-0 ${inactive?'opacity-60':''}" style="border-color:var(--border)">
     <div class="flex items-center gap-3 min-w-0">
-      <div class="w-10 h-10 rounded-xl grid place-content-center text-white font-semibold text-sm shrink-0" style="background:linear-gradient(135deg,${palette[s.id%palette.length]},#2F539A)">${initials(s.kids[0].n)}</div>
-      <div class="min-w-0"><p class="font-medium truncate flex items-center gap-2">${s.kids[0].n} ${more}</p>
+      <div class="w-10 h-10 rounded-xl grid place-content-center text-white font-semibold text-sm shrink-0" style="background:linear-gradient(135deg,${palette[s.id%palette.length]},#2F539A);${inactive?'filter:grayscale(.7)':''}">${initials(s.kids[0].n)}</div>
+      <div class="min-w-0"><p class="font-medium truncate flex items-center gap-2">${s.kids[0].n} ${more}${s.media===false?'<span class="inline-grid place-content-center w-5 h-5 rounded-md shrink-0" style="background:rgba(220,38,38,.10);color:#dc2626" title="NÃO autorizou uso de imagem"><i data-lucide="camera-off" class="w-3 h-3"></i></span>':''}</p>
         <p class="text-xs text-[var(--muted)]">${s.kids[0].age} anos · ${s.addr.bairro}</p></div>
     </div>
     <div class="min-w-0"><p class="text-sm truncate">${s.resp.n}</p><p class="text-xs text-[var(--muted)]">${s.resp.rel} · ${s.resp.phone}</p></div>
     <div><span class="text-xs font-medium px-2.5 py-1 rounded-lg whitespace-nowrap" style="color:${schColor};background:${schBg}">${schLabel(s.sch)}</span></div>
-    <div><span class="text-sm">${s.pay}</span></div>
     <div><span class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap" style="color:${st.c};background:${st.bg}"><span class="w-1.5 h-1.5 rounded-full" style="background:${st.c}"></span>${st.t}</span></div>
-    <div class="hidden md:block"><span class="text-xs text-[var(--muted)] whitespace-nowrap">${s.date.slice(0,5)}</span></div>
-    <div class="hidden md:flex items-center justify-end gap-1">
-      <button onclick="event.stopPropagation();openContractModal(${s.id})" class="w-8 h-8 rounded-lg border border-[var(--border)] grid place-content-center hover:bg-[var(--card)] transition" title="Ver contrato"><i data-lucide="file-text" class="w-4 h-4 text-[var(--muted)]"></i></button>
-      ${waBtn(s.resp.n.split(' ')[0])}
-      <button onclick="openRowMenu(event,${s.id})" data-tour="row-menu" class="w-8 h-8 rounded-lg grid place-content-center hover:bg-[var(--card)] transition" title="Mais ações"><i data-lucide="more-vertical" class="w-4 h-4 text-[var(--muted)]"></i></button>
+    <div><span class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap" style="${inactive?'color:#64748B;background:rgba(100,116,139,.14)':'color:#16a34a;background:rgba(22,163,74,.10)'}"><span class="w-1.5 h-1.5 rounded-full" style="background:${inactive?'#94a3b8':'#16a34a'}"></span>${inactive?'Inativa':'Ativa'}</span></div>
+    <div class="hidden md:block"><p class="text-xs whitespace-nowrap">${s.date}</p><p class="text-[10px] text-[var(--muted)]">às ${s.hora||'—'}</p></div>
+    <div class="hidden md:flex items-center justify-end">
+      <button onclick="openRowMenu(event,${s.id})" data-tour="row-menu" class="w-9 h-9 rounded-lg border border-[var(--border)] grid place-content-center hover:bg-[var(--card)] transition" title="Todas as ações"><i data-lucide="more-vertical" class="w-4 h-4 text-[var(--muted)]"></i></button>
     </div>
   </div>`;
 }
 function filteredStudents(){
   const q=(document.getElementById('alunoSearch')?.value||'').toLowerCase();
-  const fs=SEL.fSchedule?.value||'', fst=SEL.fStatus?.value||'', fp=SEL.fPay?.value||'';
+  const fs=SEL.fSchedule?.value||'', fst=SEL.fStatus?.value||'', fa=SEL.fActive?.value||'';
   return STUDENTS.filter(s=>{
     const hay=(s.kids.map(k=>k.n).join(' ')+' '+s.resp.n+' '+s.addr.bairro).toLowerCase();
-    return hay.includes(q) && (!fs||s.sch===fs) && (!fst||s.status===fst) && (!fp||s.pay===fp);
+    const act = fa==='' ? true : fa==='on' ? s.active!==false : s.active===false;
+    return hay.includes(q) && (!fs||s.sch===fs) && (!fst||s.status===fst) && act;
   });
 }
+/* ordenação por coluna (nome como padrão) */
+const TABLE_COLS=[
+  {k:'name', l:'Aluno'},{k:'resp', l:'Responsável'},{k:'sch', l:'Horário'},
+  {k:'status', l:'Contrato'},{k:'active', l:'Situação'},{k:'date', l:'Matrícula'},
+];
+const SORT_VAL={
+  name:s=>s.kids[0].n.toLowerCase(),
+  resp:s=>s.resp.n.toLowerCase(),
+  sch:s=>s.sch+s.t,
+  status:s=>STATUS[s.status].t,
+  active:s=>s.active===false?1:0,
+  date:s=>s.date.split('/').reverse().join('')+(s.hora||''),
+};
+let sortKey='name', sortDir=1;
+function setSort(k){
+  if(sortKey===k) sortDir*=-1; else { sortKey=k; sortDir=1; }
+  renderTableHead(); renderTable();
+}
+function renderTableHead(){
+  const head=document.getElementById('tableHead'); if(!head) return;
+  head.innerHTML=TABLE_COLS.map(c=>{
+    const on=c.k===sortKey;
+    return `<button onclick="setSort('${c.k}')" class="flex items-center gap-1 text-left uppercase tracking-wider font-semibold transition hover:text-[var(--text)] ${on?'text-[var(--text)]':''}" title="Ordenar por ${c.l}">${c.l}<span class="text-[9px] leading-none">${on?(sortDir===1?'▲':'▼'):'↕'}</span></button>`;
+  }).join('')+'<span class="text-right">Ações</span>';
+}
 function renderTable(){
-  const rows=filteredStudents();
+  const rows=filteredStudents().slice().sort((a,b)=>{
+    const va=SORT_VAL[sortKey](a), vb=SORT_VAL[sortKey](b);
+    return (va<vb?-1:va>vb?1:0)*sortDir;
+  });
   document.getElementById('tableBody').innerHTML = rows.length ? rows.map(rowHTML).join('') : `<div class="px-5 py-12 text-center text-[var(--muted)] text-sm">Nenhum aluno encontrado com esses filtros.</div>`;
   document.getElementById('tableCount').textContent = `Mostrando ${rows.length} de ${STUDENTS.length} · dados fictícios`;
   lucide.createIcons();
@@ -1101,7 +1228,7 @@ function openDetail(id){
         <div class="flex items-center gap-4">
           <div class="w-16 h-16 rounded-2xl grid place-content-center text-white font-heading text-2xl font-semibold" style="background:linear-gradient(135deg,${palette[s.id%palette.length]},#2F539A)">${initials(s.kids[0].n)}</div>
           <div><h1 class="font-heading text-2xl font-semibold">${s.kids[0].n}</h1>
-            <p class="text-[var(--muted)] text-sm">${s.kids.length>1?s.kids.length+' alunos (irmãos)':'1 aluno'} · matrícula em ${s.date}</p>
+            <p class="text-[var(--muted)] text-sm">${s.kids.length>1?s.kids.length+' alunos (irmãos)':'1 aluno'} · matrícula em ${s.date}${s.hora?' às '+s.hora:''}</p>
             <div class="flex items-center gap-2 mt-2"><span class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full" style="color:${st.c};background:${st.bg}"><span class="w-1.5 h-1.5 rounded-full" style="background:${st.c}"></span>Contrato ${st.t.toLowerCase()}</span>
               <span class="text-xs font-medium px-2.5 py-1 rounded-lg" style="color:#2F539A;background:rgba(47,83,154,.10)">${schLabel(s.sch)} · ${s.t}</span></div></div>
         </div>
@@ -1119,7 +1246,7 @@ function openDetail(id){
         ${card('Endereço','map-pin', infoRow('CEP',s.addr.cep)+infoRow('Logradouro',`${s.addr.street}, ${s.addr.num}${s.addr.comp?' - '+s.addr.comp:''}`)+infoRow('Bairro',s.addr.bairro)+infoRow('Cidade/UF',`${s.addr.city}/${s.addr.uf}`))}
       </div>
       <div class="space-y-4">
-        ${card('Financeiro','wallet', infoRow('Responsável financeiro',s.fin)+infoRow('Forma de pagamento',s.pay))}
+        ${card('Financeiro','wallet', infoRow('Responsável financeiro',s.fin)+infoRow('Forma de pagamento','Boleto · carnê em 6 parcelas')+infoRow('Mensalidade','R$ 460,00'))}
         ${card('Autorizações','shield-check', infoRow('Uso de imagem', s.media?"<span class='text-emerald-500'>Autorizado</span>":"<span class='text-[var(--muted)]'>Não autorizado</span>")+infoRow('Aceite do contrato',"<span class='text-emerald-500'>Sim</span>")+infoRow('Horário confirmado',"<span class='text-emerald-500'>Sim</span>"))}
         ${card('Contrato','file-text', `<div class="rounded-xl p-4 text-center" style="background:var(--hover)"><i data-lucide="file-text" class="w-8 h-8 mx-auto text-brand-light mb-2"></i><p class="text-sm font-medium">Contrato_${s.kids[0].n.split(' ')[0]}.pdf</p><p class="text-xs text-[var(--muted)] mb-3">gerado em ${s.date}</p><div class="flex gap-2"><button onclick="toast('Download iniciado (demo)')" class="flex-1 h-9 rounded-lg border border-[var(--border)] text-sm font-medium flex items-center justify-center gap-2"><i data-lucide="download" class="w-4 h-4"></i> Baixar</button><button onclick="toast('Contrato pronto para envio no WhatsApp!')" class="w-9 h-9 rounded-lg grid place-content-center text-white" style="background:#25D366">${WA('w-4 h-4')}</button></div></div>`)}
       </div>
@@ -1191,7 +1318,7 @@ function renderEmails(){
   document.getElementById('emailHistory').innerHTML=data.map(e=>`<div class="flex items-center gap-3 p-3 rounded-xl" style="background:var(--hover)"><div class="w-9 h-9 rounded-lg grid place-content-center bg-[var(--card)]"><i data-lucide="${e.ic}" class="w-4 h-4 text-brand-light"></i></div><div class="flex-1 min-w-0"><p class="text-sm font-medium truncate">${e.s}</p><p class="text-xs text-[var(--muted)]">${e.n} destinatários · ${e.d}</p></div><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500"></i></div>`).join('');
   lucide.createIcons();
 }
-const USERS=[{n:'Priscylla Martins',e:'priscylla@englishpatio.com.br',r:'Administrador',c:'#1E3765'},{n:'Gabriel Teles',e:'gabriel@englishpatio.com.br',r:'Administrador',c:'#2F539A'},{n:'Beatriz Souza',e:'beatriz@englishpatio.com.br',r:'Secretaria',c:'#B5860B'}];
+const USERS=[{n:'Priscylla Martins',e:'priscylla@englishpatio.com.br',r:'Administrador',c:'#1E3765'},{n:'Gabriel Teles',e:'gabriel@englishpatio.com.br',r:'Administrador',c:'#2F539A'},{n:'Stefany Oliveira',e:'stefany@englishpatio.com.br',r:'Secretaria',c:'#B5860B'},{n:'Beatriz Souza',e:'beatriz@englishpatio.com.br',r:'Secretaria',c:'#0d9488'}];
 function renderUsers(){
   document.getElementById('userList').innerHTML=USERS.map(x=>`<div class="flex items-center gap-3 p-4"><div class="w-10 h-10 rounded-full grid place-content-center text-white font-semibold" style="background:${x.c}">${initials(x.n)}</div><div class="flex-1 min-w-0"><p class="font-medium truncate">${x.n} ${x.pending?'<span class="text-[10px] font-semibold px-1.5 py-0.5 rounded-md align-middle" style="background:rgba(245,183,0,.16);color:#B5860B">convite pendente</span>':''}</p><p class="text-xs text-[var(--muted)] truncate">${x.e}</p></div><span class="text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap" style="background:var(--hover)">${x.r}</span><button class="p-2 rounded-lg hover:bg-[var(--hover)]"><i data-lucide="more-vertical" class="w-4 h-4 text-[var(--muted)]"></i></button></div>`).join('');
   lucide.createIcons();
@@ -1199,11 +1326,17 @@ function renderUsers(){
 
 /* ====================== WIDGETS DA VISÃO GERAL ====================== */
 function renderBirthdays(){
+  // próximos aniversários a partir de 03/06 (data do preview)
+  const REF=6*100+3;
   const list=[];
-  STUDENTS.forEach(s=>s.kids.forEach(k=>{ const [d,m]=k.b.split('/'); if(m==='06') list.push({n:k.n,d:+d,age:k.age+1,sid:s.id}); }));
-  list.sort((a,b)=>a.d-b.d);
-  document.getElementById('birthdayList').innerHTML=list.map(x=>`<div onclick="openDetail(${x.sid})" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-[var(--hover)] cursor-pointer transition">
-    <div class="w-10 h-10 rounded-xl grid place-content-center font-heading font-semibold text-[13px] shrink-0" style="background:rgba(245,183,0,.16);color:#B5860B">${String(x.d).padStart(2,'0')}/06</div>
+  STUDENTS.forEach(s=>s.kids.forEach(k=>{
+    const [d,m]=k.b.split('/').map(Number); if(!d||!m) return;
+    const key=m*100+d;
+    list.push({n:k.n, d, m, age:k.age+1, sid:s.id, order:(key>=REF?key:key+1200)});
+  }));
+  list.sort((a,b)=>a.order-b.order);
+  document.getElementById('birthdayList').innerHTML=list.slice(0,5).map(x=>`<div onclick="openDetail(${x.sid})" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-[var(--hover)] cursor-pointer transition">
+    <div class="w-10 h-10 rounded-xl grid place-content-center font-heading font-semibold text-[13px] shrink-0" style="background:rgba(245,183,0,.16);color:#B5860B">${String(x.d).padStart(2,'0')}/${String(x.m).padStart(2,'0')}</div>
     <div class="min-w-0 flex-1"><p class="text-sm font-medium truncate">${x.n}</p><p class="text-xs text-[var(--muted)]">faz ${x.age} anos</p></div>
     <i data-lucide="gift" class="w-4 h-4 shrink-0" style="color:#F5B700"></i></div>`).join('')
   + `<button onclick="toast('Mensagens de parabéns preparadas!')" class="mt-2 w-full h-10 rounded-xl border border-[var(--border)] text-sm font-medium flex items-center justify-center gap-2 hover:bg-[var(--hover)] transition"><span style="color:#1faa53">${WA('w-4 h-4')}</span> Enviar parabéns</button>`;
@@ -1216,7 +1349,8 @@ function renderHoods(){
     <div class="flex justify-between text-sm mb-1.5"><span class="font-medium">${n}</span><span class="text-[var(--muted)]">${v} alunos</span></div>
     <div class="h-2 rounded-full overflow-hidden" style="background:var(--hover)"><div class="h-full rounded-full" style="width:${Math.round(v/max*100)}%;background:${i===0?'#F5B700':'#2F539A'}"></div></div></div>`).join('');
 }
-const PAY=[['PIX',48,'#2F539A'],['Cartão',36,'#F5B700'],['Boleto',32,'#1E3765'],['Dinheiro',12,'#7C9AD6']];
+/* autorização de uso de imagem (pagamento é sempre boleto/carnê, conforme o contrato) */
+const PAY=[['Autorizam fotos',104,'#2F539A'],['Não autorizam',24,'#F5B700']];
 function renderPayLegend(){
   document.getElementById('payLegend').innerHTML=PAY.map(p=>`<div class="flex items-center justify-between"><span class="flex items-center gap-2 text-[13px]"><span class="w-2.5 h-2.5 rounded-full" style="background:${p[2]}"></span>${p[0]}</span><span class="font-semibold text-[13px]">${p[1]}</span></div>`).join('');
 }
@@ -1225,7 +1359,12 @@ function renderHealth(){
   document.getElementById('contractHealth').innerHTML=data.map(x=>`<div>
     <div class="flex justify-between text-sm mb-1.5"><span class="font-medium">${x.t}</span><span class="font-semibold" style="color:${x.c}">${x.v}</span></div>
     <div class="h-2 rounded-full overflow-hidden" style="background:var(--hover)"><div class="h-full rounded-full" style="width:${Math.round(x.v/128*100)}%;background:${x.c}"></div></div></div>`).join('')
-  + `<button onclick="toast('Lembretes preparados para 7 responsáveis!')" class="mt-1 w-full h-10 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 text-white transition hover:brightness-105" style="background:#25D366">${WA('w-4 h-4')} Cobrar pendentes no WhatsApp</button>`;
+  + `<button onclick="goPendentes()" class="mt-1 w-full h-10 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 text-white transition hover:brightness-105" style="background:#25D366">${WA('w-4 h-4')} Cobrar pendentes no WhatsApp</button>`;
+}
+function goPendentes(){
+  go('alunos');
+  csSet('fStatus','pending'); csSet('fActive','on');
+  toast('Mostrando os contratos pendentes — use o menu ⋮ de cada linha para cobrar.');
 }
 
 /* ====================== EDITOR DO SITE (página real) ====================== */
@@ -1435,6 +1574,12 @@ function chartColors(){ const dark=document.documentElement.classList.contains('
 function buildCharts(){
   const c=chartColors();
   Chart.defaults.font.family='Inter'; Chart.defaults.color=c.text;
+  /* tooltip com a cara da marca (em vez do quadradinho padrão) */
+  Object.assign(Chart.defaults.plugins.tooltip,{
+    backgroundColor:'#15294d', titleColor:'#FFE17A', bodyColor:'#fff',
+    titleFont:{family:'Fredoka',size:13,weight:'600'}, bodyFont:{family:'Inter',size:12},
+    padding:{x:14,y:10}, cornerRadius:12, displayColors:false, caretSize:6,
+  });
   const ctxE=document.getElementById('chartEnroll');
   const grad=ctxE.getContext('2d').createLinearGradient(0,0,0,260); grad.addColorStop(0,'rgba(47,83,154,.35)'); grad.addColorStop(1,'rgba(47,83,154,0)');
   const p0=PERIOD_DATA['6m'];
@@ -1447,7 +1592,7 @@ function buildCharts(){
   // horário em que as matrículas chegam
   const hoursData=[1,3,6,4,2,3,7,5,4,6,8,11,13,9,4];
   const top3=[...hoursData].sort((a,b)=>b-a).slice(0,3);
-  charts.hours=new Chart(document.getElementById('chartHours'),{type:'bar',data:{labels:['8h','9h','10h','11h','12h','13h','14h','15h','16h','17h','18h','19h','20h','21h','22h'],datasets:[{data:hoursData,backgroundColor:hoursData.map(v=>top3.includes(v)?'#F5B700':'#2F539A'),borderRadius:6,borderSkipped:false,maxBarThickness:26}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:c.grid},border:{display:false},ticks:{stepSize:4}},x:{grid:{display:false},border:{display:false}}}}});
+  charts.hours=new Chart(document.getElementById('chartHours'),{type:'bar',data:{labels:['8h','9h','10h','11h','12h','13h','14h','15h','16h','17h','18h','19h','20h','21h','22h'],datasets:[{data:hoursData,backgroundColor:hoursData.map(v=>top3.includes(v)?'#F5B700':'#2F539A'),borderRadius:6,borderSkipped:false,maxBarThickness:26}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{title:items=>'Por volta das '+items[0].label,label:item=>item.parsed.y+' matrícula'+(item.parsed.y===1?'':'s')+' chegaram nesse horário'}}},scales:{y:{beginAtZero:true,grid:{color:c.grid},border:{display:false},ticks:{stepSize:4}},x:{grid:{display:false},border:{display:false}}}}});
   charts.pay=new Chart(document.getElementById('chartPay'),{type:'doughnut',data:{labels:PAY.map(p=>p[0]),datasets:[{data:PAY.map(p=>p[1]),backgroundColor:PAY.map(p=>p[2]),borderWidth:0,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,cutout:'66%',plugins:{legend:{display:false}}}});
 }
 function refreshCharts(){ if(!charts.enroll) return; const c=chartColors(); Chart.defaults.color=c.text; Object.values(charts).forEach(ch=>{ if(ch.options.scales){['x','y'].forEach(a=>{ if(ch.options.scales[a]?.grid) ch.options.scales[a].grid.color=c.grid; });} ch.update(); }); }
@@ -1468,7 +1613,8 @@ function init(){
   document.getElementById('periodSelWrap').innerHTML=cselect('period',[{v:'6m',l:'Últimos 6 meses'},{v:'ano',l:'Últimos 12 meses'},{v:'mes',l:'Este mês'}],{icon:'calendar',onChange:applyPeriod});
   document.getElementById('fScheduleWrap').innerHTML=cselect('fSchedule',[{v:'',l:'Todos os horários'},{v:'seg-qua',l:'Seg/Qua'},{v:'ter-qui',l:'Ter/Qui'}],{onChange:renderTable});
   document.getElementById('fStatusWrap').innerHTML=cselect('fStatus',[{v:'',l:'Contrato: todos'},{v:'signed',l:'Assinado'},{v:'sent',l:'Enviado'},{v:'pending',l:'Pendente'}],{onChange:renderTable});
-  document.getElementById('fPayWrap').innerHTML=cselect('fPay',[{v:'',l:'Pagamento: todos'},{v:'PIX',l:'PIX'},{v:'Boleto',l:'Boleto'},{v:'Cartão',l:'Cartão'},{v:'Dinheiro',l:'Dinheiro'}],{onChange:renderTable});
+  document.getElementById('fActiveWrap').innerHTML=cselect('fActive',[{v:'',l:'Situação: todas'},{v:'on',l:'Ativas'},{v:'off',l:'Inativas'}],{onChange:renderTable});
+  renderTableHead();
   document.getElementById('emailToWrap').innerHTML=cselect('emailTo',[{v:'all',l:'Todos os responsáveis (96)'},{v:'sq',l:'Apenas turma Seg/Qua (71)'},{v:'tq',l:'Apenas turma Ter/Qui (57)'},{v:'pend',l:'Contratos pendentes (7)'}],{block:true});
   // conteúdo
   renderRecent(); renderTable(); renderContracts(); renderEmails(); renderUsers();
@@ -1510,10 +1656,13 @@ function openNewEnrollment(){
     <div class="grid grid-cols-2 gap-3">
       <label class="block"><span class="text-sm font-medium">Telefone</span>
         <input id="nmPhone" placeholder="(62) 9xxxx-xxxx" oninput="maskPhone(this)" inputmode="numeric" class="${inputCls}"></label>
-      <div><span class="text-sm font-medium">Pagamento</span><div class="mt-1.5" id="nmPayWrap"></div></div>
+      <label class="block"><span class="text-sm font-medium">Bairro</span>
+        <input id="nmHood" placeholder="Ex.: Setor Bueno" class="${inputCls}"></label>
     </div>
-    <label class="block"><span class="text-sm font-medium">Bairro</span>
-      <input id="nmHood" placeholder="Ex.: Setor Bueno" class="${inputCls}"></label>
+    <div class="rounded-xl p-3 text-sm flex items-center justify-between" style="background:rgba(47,83,154,.07)">
+      <div><p class="font-semibold" style="color:#2F539A">Boleto Bancário</p><p class="text-xs text-[var(--muted)]">Carnê em 6 parcelas — forma única, conforme o contrato</p></div>
+      <i data-lucide="receipt" class="w-5 h-5" style="color:#2F539A"></i>
+    </div>
     <p class="text-xs text-[var(--muted)] flex items-center gap-1.5"><i data-lucide="info" class="w-3.5 h-3.5 shrink-0"></i> No produto final este formulário é completo (2º aluno, CPF, endereço via CEP, contrato etc.).</p>
   </div>
   <div class="p-5 pt-0 flex gap-2">
@@ -1521,7 +1670,6 @@ function openNewEnrollment(){
     <button onclick="submitNewEnrollment()" class="flex-1 h-11 rounded-xl text-white font-semibold text-sm" style="background:linear-gradient(135deg,#1E3765,#2F539A)">Adicionar matrícula</button>
   </div>`);
   document.getElementById('nmSchWrap').innerHTML=cselect('nmSch',[{v:'seg-qua',l:'Seg/Qua'},{v:'ter-qui',l:'Ter/Qui'}],{block:true});
-  document.getElementById('nmPayWrap').innerHTML=cselect('nmPay',[{v:'PIX',l:'PIX'},{v:'Boleto',l:'Boleto'},{v:'Cartão',l:'Cartão'},{v:'Dinheiro',l:'Dinheiro'}],{block:true});
   lucide.createIcons();
   document.getElementById('nmStudent').focus();
 }
@@ -1539,8 +1687,8 @@ function submitNewEnrollment(){
     resp:{n:resp,cpf:'000.000.000-00',phone:document.getElementById('nmPhone').value.trim()||'(62) 9----',email:'—',rel:'Responsável',b:'—'},
     second:null, fin:resp,
     addr:{cep:'74000-000',street:'—',num:'',comp:'',bairro:hood,city:'Goiânia',uf:'GO'},
-    sch:SEL.nmSch?.value||'seg-qua', t:'15h00–16h30', pay:SEL.nmPay?.value||'PIX',
-    status:'pending', media:true, date:'03/06/2026' });
+    sch:SEL.nmSch?.value||'seg-qua', t:'15h00–16h30', pay:'Boleto',
+    status:'pending', media:true, active:true, date:'03/06/2026', hora:'16h05' });
   NOTIFS.unshift({type:'enroll',sid:id,title:'Nova matrícula',desc:`${name} · ${hood}`,time:'agora',unread:true});
   renderTable(); renderRecent(); renderContracts(); renderNotifs();
   closeModal(); go('alunos'); toast(`Matrícula de ${name.split(' ')[0]} adicionada!`);
@@ -1608,15 +1756,18 @@ function openContractModal(id){
     <div class="bg-white text-slate-800 rounded-lg shadow-md p-6 sm:p-8 text-[13px] leading-relaxed">
       <p class="text-center font-bold text-sm mb-4">CONTRATO DE PRESTAÇÃO DE SERVIÇOS EDUCACIONAIS</p>
       <p><strong>CONTRATADA:</strong> ENGLISH PATIO LTDA, escola de idiomas com sede em Goiânia/GO.</p>
-      <p class="mt-2"><strong>CONTRATANTE:</strong> ${esc(s.resp.n.toUpperCase())} — CPF ${maskCPF(s.resp.cpf)}</p>
+      <p class="mt-2"><strong>CONTRATANTE:</strong> ${esc(s.resp.n.toUpperCase())} — CPF ${maskCPF(s.resp.cpf)}, residente em ${esc(s.addr.street)}, ${esc(s.addr.num)}${s.addr.comp?' - '+esc(s.addr.comp):''}, ${esc(s.addr.bairro)}, ${esc(s.addr.city)}/${esc(s.addr.uf)}, CEP ${s.addr.cep}, tel. ${s.resp.phone}.</p>
       <p class="mt-2"><strong>ALUNO(S):</strong> ${esc(kids)}</p>
-      <p class="mt-3 text-slate-500"><strong>CLÁUSULA 1ª.</strong> O presente contrato tem por objeto a prestação de serviços educacionais de ensino de língua inglesa, na modalidade presencial na sede…</p>
-      <p class="mt-2 text-slate-500"><strong>CLÁUSULA 9ª.</strong> O presente contrato terá vigência de 6 (seis) meses, iniciando em Julho e finalizando em Dezembro de 2026…</p>
+      <p class="mt-3 text-slate-500"><strong>DAS MENSALIDADES.</strong> O pagamento dar-se-á por meio de <strong>boleto bancário</strong> emitido pela contratada; um <strong>carnê físico</strong> será entregue ao responsável no ato da matrícula, com <strong>6 parcelas</strong>.</p>
+      <p class="mt-2 text-slate-500"><strong>PARÁGRAFO SEGUNDO.</strong> As mensalidades correspondentes aos meses de Janeiro e Julho são convertidas integralmente nas <em>Vacation Classes</em>.</p>
+      <p class="mt-2 text-slate-500"><strong>DA VIGÊNCIA — CLÁUSULA 9ª.</strong> O presente contrato terá vigência de <strong>6 (seis) meses</strong>, iniciando em Julho e finalizando em Dezembro de 2026.</p>
+      <p class="mt-3"><strong>FORMATO DAS AULAS:</strong> <span class="inline-block w-3.5 h-3.5 border border-slate-400 rounded-sm text-center leading-[0.85] align-middle">✓</span> Presencial na Sede</p>
+      <p class="mt-1"><strong>AUTORIZAÇÃO DE USO DE IMAGEM:</strong> <span class="inline-block w-3.5 h-3.5 border border-slate-400 rounded-sm text-center leading-[0.85] align-middle">${s.media?'✓':'&nbsp;'}</span> ${s.media?'Autorizado':'Não autorizado'}</p>
       <div class="grid grid-cols-2 gap-6 mt-8 text-center text-[11px]">
         <div><div class="border-t border-slate-300 pt-1">${esc(s.resp.n)}</div><p class="text-slate-400">Contratante</p></div>
         <div><div class="border-t border-slate-300 pt-1">ENGLISH PATIO LTDA</div><p class="text-slate-400">Contratada</p></div>
       </div>
-      <p class="text-center text-slate-400 text-[11px] mt-4">Goiânia, ${s.date} · página 1 de 4 (visualização demo)</p>
+      <p class="text-center text-slate-400 text-[11px] mt-4">Goiânia, ${s.date} · página 1 de 4 (visualização resumida do contrato real)</p>
     </div>
   </div>
   <div class="p-5 flex flex-wrap gap-2">
@@ -1644,9 +1795,9 @@ function openChangePass(){
 /* --- exportar CSV (de verdade) --- */
 function exportCSV(useFilters){
   const rows=useFilters?filteredStudents():STUDENTS;
-  const head=['Aluno','Idade','Nascimento','Responsável','Telefone','Horário','Pagamento','Status contrato','Bairro','Cidade','Matrícula em'];
+  const head=['Aluno','Idade','Nascimento','Responsável','Telefone','Horário','Status contrato','Situação','Bairro','Cidade','Matrícula em','Hora'];
   const csv=[head.join(';')].concat(rows.flatMap(s=>s.kids.map(k=>
-    [k.n,k.age,k.b,s.resp.n,s.resp.phone,schLabel(s.sch)+' '+s.t,s.pay,STATUS[s.status].t,s.addr.bairro,s.addr.city,s.date].join(';')
+    [k.n,k.age,k.b,s.resp.n,s.resp.phone,schLabel(s.sch)+' '+s.t,STATUS[s.status].t,s.active===false?'Inativa':'Ativa',s.addr.bairro,s.addr.city,s.date,s.hora||''].join(';')
   ))).join('\n');
   const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'});
   const a=document.createElement('a');
@@ -1663,7 +1814,6 @@ function applySidebarTheme(){
   const dark=document.documentElement.classList.contains('dark');
   const logo=document.getElementById('sbLogo');
   if(logo) logo.src = dark ? LOGOS.blue : (sbTheme==='blue' ? LOGOS.blue : LOGOS.colored);
-  const ll=document.getElementById('loginLogo'); if(ll) ll.src=dark?LOGOS.blue:LOGOS.colored;
   const dots=document.getElementById('sbThemeDots');
   if(dots){
     const opts=[['blue','linear-gradient(135deg,#1E3765,#2F539A)','Sidebar azul'],['white','linear-gradient(135deg,#fff,#e8edf5)','Sidebar branca'],['yellow','linear-gradient(135deg,#FFF6DB,#F5B700)','Sidebar amarela']];
@@ -1831,7 +1981,7 @@ function elLabel(el){
     || '<'+el.tagName.toLowerCase()+'>';
 }
 function currentView(){ return document.querySelector('[data-view].view-active')?.dataset.view||'overview'; }
-const VIEW_LABEL={overview:'Visão geral',alunos:'Alunos',detalhe:'Detalhe do aluno',contratos:'Contratos',emails:'E-mails',editor:'Editor do site',usuarios:'Usuários',config:'Configurações'};
+const VIEW_LABEL={overview:'Visão geral',alunos:'Alunos',detalhe:'Detalhe do aluno',contratos:'Contratos',emails:'E-mails',editor:'Editor do site',usuarios:'Usuários',config:'Configurações',notifs:'Notificações'};
 
 function toggleCommentMode(){
   commentMode=!commentMode;
