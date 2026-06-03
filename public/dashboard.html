@@ -380,35 +380,35 @@
           <div class="surface rounded-2xl p-5">
             <div class="flex items-center justify-between"><span class="text-sm text-[var(--muted)]">Alunos ativos</span>
               <div class="w-9 h-9 rounded-xl grid place-content-center" style="background:var(--hover)"><i data-lucide="graduation-cap" class="w-[18px] h-[18px] text-brand-light"></i></div></div>
-            <p class="font-heading text-3xl font-semibold mt-3">128</p>
-            <p class="text-xs mt-1 text-emerald-500 font-medium flex items-center gap-1"><i data-lucide="trending-up" class="w-3.5 h-3.5"></i> +12 este mês</p>
+            <p class="font-heading text-3xl font-semibold mt-3" id="kpiActive">—</p>
+            <p class="text-xs mt-1 text-emerald-500 font-medium flex items-center gap-1"><i data-lucide="trending-up" class="w-3.5 h-3.5"></i> <span id="kpiActiveSub">—</span></p>
           </div>
           <div class="surface rounded-2xl p-5">
             <div class="flex items-center justify-between"><span class="text-sm text-[var(--muted)]">Novos esta semana</span>
               <div class="w-9 h-9 rounded-xl grid place-content-center" style="background:var(--hover)"><i data-lucide="user-plus" class="w-[18px] h-[18px] text-brand-light"></i></div></div>
-            <p class="font-heading text-3xl font-semibold mt-3">9</p>
-            <p class="text-xs mt-1 text-emerald-500 font-medium flex items-center gap-1"><i data-lucide="trending-up" class="w-3.5 h-3.5"></i> +3 vs. semana passada</p>
+            <p class="font-heading text-3xl font-semibold mt-3" id="kpiWeek">—</p>
+            <p class="text-xs mt-1 text-[var(--muted)] font-medium">matrículas de 28/05 a 03/06</p>
           </div>
           <div class="surface rounded-2xl p-5">
             <div class="flex items-center justify-between"><span class="text-sm text-[var(--muted)]">Contratos pendentes</span>
               <div class="w-9 h-9 rounded-xl grid place-content-center" style="background:#FFF6DC"><i data-lucide="file-clock" class="w-[18px] h-[18px]" style="color:#B5860B"></i></div></div>
-            <p class="font-heading text-3xl font-semibold mt-3">7</p>
-            <p class="text-xs mt-1 text-[var(--muted)] font-medium">aguardando assinatura</p>
+            <p class="font-heading text-3xl font-semibold mt-3" id="kpiPending">—</p>
+            <p class="text-xs mt-1 text-[var(--muted)] font-medium">aguardando envio ou assinatura</p>
           </div>
           <div class="surface rounded-2xl p-5">
             <div class="flex items-center justify-between"><span class="text-sm text-[var(--muted)]">Matrículas no mês</span>
               <div class="w-9 h-9 rounded-xl grid place-content-center" style="background:var(--hover)"><i data-lucide="trending-up" class="w-[18px] h-[18px] text-brand-light"></i></div></div>
-            <p class="font-heading text-3xl font-semibold mt-3">21</p>
-            <p class="text-xs mt-1 text-emerald-500 font-medium flex items-center gap-1"><i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i> melhor mês do ano</p>
+            <p class="font-heading text-3xl font-semibold mt-3" id="kpiMonth">—</p>
+            <p class="text-xs mt-1 text-emerald-500 font-medium flex items-center gap-1"><i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i> junho em andamento</p>
           </div>
         </div>
 
-        <!-- mini-indicadores -->
+        <!-- mini-indicadores (calculados da base) -->
         <div class="surface rounded-2xl mt-4 px-5 py-3 flex flex-wrap items-center gap-x-8 gap-y-2 text-sm lg:col-span-3" data-tour="strip">
-          <span class="flex items-center gap-2"><i data-lucide="cake" class="w-4 h-4 text-brand-light"></i>Média de idade <strong>9,6 anos</strong></span>
-          <span class="flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-brand-light"></i><strong>32 famílias</strong> com irmãos matriculados</span>
-          <span class="flex items-center gap-2"><i data-lucide="armchair" class="w-4 h-4 text-brand-light"></i>Ocupação das turmas <strong>85%</strong></span>
-          <span class="flex items-center gap-2"><i data-lucide="file-check-2" class="w-4 h-4 text-brand-light"></i>Contratos assinados <strong>89%</strong></span>
+          <span class="flex items-center gap-2"><i data-lucide="cake" class="w-4 h-4 text-brand-light"></i>Média de idade <strong id="stAge">—</strong></span>
+          <span class="flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-brand-light"></i><strong id="stFam">—</strong> com irmãos matriculados</span>
+          <span class="flex items-center gap-2"><i data-lucide="armchair" class="w-4 h-4 text-brand-light"></i>Ocupação das turmas <strong id="stOcc">—</strong></span>
+          <span class="flex items-center gap-2"><i data-lucide="file-check-2" class="w-4 h-4 text-brand-light"></i>Contratos assinados <strong id="stSigned">—</strong></span>
           <span class="flex items-center gap-2"><i data-lucide="refresh-ccw" class="w-4 h-4 text-brand-light"></i>Rematrículas do semestre <strong>91%</strong></span>
         </div>
 
@@ -427,7 +427,7 @@
           </div>
           <div class="surface rounded-2xl p-5 flex flex-col" data-tour="health">
             <h3 class="font-heading font-semibold text-lg mb-1">Andamento dos contratos</h3>
-            <p class="text-xs text-[var(--muted)] mb-4">Status das 128 matrículas</p>
+            <p class="text-xs text-[var(--muted)] mb-4" id="healthSub">—</p>
             <div class="flex-1 flex flex-col justify-evenly gap-4" id="contractHealth"></div>
           </div>
         </div>
@@ -438,32 +438,9 @@
             <div class="flex items-center justify-between mb-4">
               <div><h3 class="font-heading font-semibold text-lg">Vagas por horário</h3>
                 <p class="text-xs text-[var(--muted)]">Turmas de até 6 alunos · capacidade total de 150 vagas</p></div>
-              <span class="text-xs px-2.5 py-1 rounded-full font-semibold" style="background:rgba(22,163,74,.10);color:#16a34a">22 vagas livres</span>
+              <span class="text-xs px-2.5 py-1 rounded-full font-semibold" style="background:rgba(22,163,74,.10);color:#16a34a" id="vagasChip">—</span>
             </div>
-            <div class="flex-1 content-center grid sm:grid-cols-2 gap-x-8 gap-y-3">
-              <div class="space-y-3">
-                <p class="text-[10px] font-bold uppercase tracking-wider text-[var(--muted)]">Segunda / Quarta</p>
-                <div><div class="flex justify-between text-[13px] mb-1"><span class="font-medium">14h00–15h30</span><span class="text-[var(--muted)]">16/18</span></div>
-                  <div class="h-2 rounded-full overflow-hidden" style="background:var(--hover)"><div class="h-full rounded-full" style="width:89%;background:#2F539A"></div></div></div>
-                <div><div class="flex justify-between text-[13px] mb-1"><span class="font-medium">15h00–16h30 <span class="text-[9px] font-bold px-1.5 py-0.5 rounded align-middle" style="background:rgba(245,183,0,.22);color:#B5860B">CHEIA</span></span><span class="text-[var(--muted)]">18/18</span></div>
-                  <div class="h-2 rounded-full overflow-hidden" style="background:var(--hover)"><div class="h-full rounded-full" style="width:100%;background:#F5B700"></div></div></div>
-                <div><div class="flex justify-between text-[13px] mb-1"><span class="font-medium">16h30–18h00</span><span class="text-[var(--muted)]">19/24</span></div>
-                  <div class="h-2 rounded-full overflow-hidden" style="background:var(--hover)"><div class="h-full rounded-full" style="width:79%;background:#2F539A"></div></div></div>
-                <div><div class="flex justify-between text-[13px] mb-1"><span class="font-medium">18h00–19h30 <span class="text-[9px] font-bold px-1.5 py-0.5 rounded align-middle" style="background:rgba(245,183,0,.22);color:#B5860B">CHEIA</span></span><span class="text-[var(--muted)]">18/18</span></div>
-                  <div class="h-2 rounded-full overflow-hidden" style="background:var(--hover)"><div class="h-full rounded-full" style="width:100%;background:#F5B700"></div></div></div>
-              </div>
-              <div class="space-y-3">
-                <p class="text-[10px] font-bold uppercase tracking-wider text-[var(--muted)]">Terça / Quinta</p>
-                <div><div class="flex justify-between text-[13px] mb-1"><span class="font-medium">14h00–15h30</span><span class="text-[var(--muted)]">12/18</span></div>
-                  <div class="h-2 rounded-full overflow-hidden" style="background:var(--hover)"><div class="h-full rounded-full" style="width:67%;background:#2F539A"></div></div></div>
-                <div><div class="flex justify-between text-[13px] mb-1"><span class="font-medium">15h00–16h30</span><span class="text-[var(--muted)]">15/18</span></div>
-                  <div class="h-2 rounded-full overflow-hidden" style="background:var(--hover)"><div class="h-full rounded-full" style="width:83%;background:#2F539A"></div></div></div>
-                <div><div class="flex justify-between text-[13px] mb-1"><span class="font-medium">16h30–18h00 <span class="text-[9px] font-bold px-1.5 py-0.5 rounded align-middle" style="background:rgba(245,183,0,.22);color:#B5860B">CHEIA</span></span><span class="text-[var(--muted)]">18/18</span></div>
-                  <div class="h-2 rounded-full overflow-hidden" style="background:var(--hover)"><div class="h-full rounded-full" style="width:100%;background:#F5B700"></div></div></div>
-                <div><div class="flex justify-between text-[13px] mb-1"><span class="font-medium">17h00–18h30</span><span class="text-[var(--muted)]">12/18</span></div>
-                  <div class="h-2 rounded-full overflow-hidden" style="background:var(--hover)"><div class="h-full rounded-full" style="width:67%;background:#2F539A"></div></div></div>
-              </div>
-            </div>
+            <div class="flex-1 content-center grid sm:grid-cols-2 gap-x-8 gap-y-3" id="vagasGrid"></div>
             <p class="text-xs text-[var(--muted)] mt-auto pt-4 flex items-center gap-1.5"><i data-lucide="lightbulb" class="w-3.5 h-3.5" style="color:#F5B700"></i> Ter/Qui 14h é o horário mais vazio — boa opção para sugerir a quem pedir matrícula.</p>
           </div>
           <div class="surface rounded-2xl p-5 flex flex-col">
@@ -543,7 +520,7 @@
           <div class="flex items-center gap-2">
             <div class="flex items-center gap-2 rounded-xl px-3 h-10 flex-1 min-w-0" style="background:var(--hover)">
               <i data-lucide="search" class="w-4 h-4 text-[var(--muted)]"></i>
-              <input id="alunoSearch" oninput="renderTable()" placeholder="Buscar por nome, responsável ou bairro…" class="flex-1 bg-transparent outline-none text-sm">
+              <input id="alunoSearch" oninput="tableChanged()" placeholder="Buscar por nome, responsável ou bairro…" class="flex-1 bg-transparent outline-none text-sm">
             </div>
             <button id="fClear" onclick="clearFilters()" class="hidden h-10 px-3 rounded-xl text-sm font-semibold transition items-center gap-1.5 shrink-0" style="background:rgba(245,183,0,.14);color:#B5860B"><i data-lucide="filter-x" class="w-4 h-4"></i>Limpar <span id="fClearN"></span></button>
             <button onclick="toggleFilters('fRow','fChev')" class="md:hidden h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium flex items-center gap-1.5 shrink-0"><i data-lucide="sliders-horizontal" class="w-4 h-4"></i>Filtros<i id="fChev" data-lucide="chevron-down" class="w-4 h-4 transition-transform"></i></button>
@@ -564,14 +541,9 @@
         <div class="surface rounded-2xl overflow-hidden table-shell">
           <div id="tableHead" class="hidden md:grid grid-cols-[1.6fr_1.3fr_.75fr_.85fr_.7fr_.85fr_52px] gap-3 px-5 py-3 text-[11px] uppercase tracking-wider text-[var(--muted)] font-semibold border-b" style="border-color:var(--border)"></div>
           <div id="tableBody"></div>
-          <div class="table-foot flex items-center justify-between px-5 py-3 md:border-t text-sm text-[var(--muted)]" style="border-color:var(--border)">
+          <div class="table-foot flex flex-wrap items-center justify-between gap-2 px-5 py-3 md:border-t text-sm text-[var(--muted)]" style="border-color:var(--border)">
             <span id="tableCount">—</span>
-            <div class="flex items-center gap-1">
-              <button class="w-8 h-8 rounded-lg border border-[var(--border)] grid place-content-center"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
-              <button class="w-8 h-8 rounded-lg text-white grid place-content-center" style="background:#1E3765">1</button>
-              <button class="w-8 h-8 rounded-lg border border-[var(--border)] grid place-content-center">2</button>
-              <button class="w-8 h-8 rounded-lg border border-[var(--border)] grid place-content-center"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
-            </div>
+            <div id="tablePager" class="flex items-center gap-1"></div>
           </div>
         </div>
       </section>
@@ -600,7 +572,7 @@
           <div class="flex items-center gap-2">
             <div class="flex items-center gap-2 rounded-xl px-3 h-10 flex-1 min-w-0" style="background:var(--hover)">
               <i data-lucide="search" class="w-4 h-4 text-[var(--muted)]"></i>
-              <input id="contractSearch" oninput="renderContracts()" placeholder="Buscar por aluno ou responsável…" class="flex-1 bg-transparent outline-none text-sm">
+              <input id="contractSearch" oninput="contractsChanged()" placeholder="Buscar por aluno ou responsável…" class="flex-1 bg-transparent outline-none text-sm">
             </div>
             <button id="cClear" onclick="clearContractFilters()" class="hidden h-10 px-3 rounded-xl text-sm font-semibold transition items-center gap-1.5 shrink-0" style="background:rgba(245,183,0,.14);color:#B5860B"><i data-lucide="filter-x" class="w-4 h-4"></i>Limpar <span id="cClearN"></span></button>
             <button onclick="toggleFilters('cfRow','cfChev')" class="md:hidden h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium flex items-center gap-1.5 shrink-0"><i data-lucide="sliders-horizontal" class="w-4 h-4"></i>Filtros<i id="cfChev" data-lucide="chevron-down" class="w-4 h-4 transition-transform"></i></button>
@@ -613,6 +585,10 @@
         </div>
 
         <div id="contractGrid"></div>
+        <div class="surface rounded-2xl flex flex-wrap items-center justify-between gap-2 px-5 py-3 mt-3 text-sm text-[var(--muted)]">
+          <span id="contractCount">—</span>
+          <div id="contractPager" class="flex items-center gap-1"></div>
+        </div>
       </section>
 
       <!-- ====================== E-MAILS ====================== -->
@@ -953,6 +929,16 @@ const WA = (cls='w-4 h-4') => `<svg class="${cls}" viewBox="0 0 448 512" fill="c
 const CLOUD = f => `https://res.cloudinary.com/dfvihcel2/image/upload/w_700,q_auto:good,f_auto,fl_progressive/${f}`;
 
 /* ====================== DADOS FICTÍCIOS (Goiânia) ====================== */
+/* motivos de desligamento (usados pelo modal de desligar aluno e pelo gerador de dados) */
+const EXIT_REASONS=[
+  { k:'adapt',      ic:'puzzle',          l:'Não se adaptou à escola',        d:'Metodologia, turma ou ambiente não funcionaram para a criança' },
+  { k:'financial',  ic:'wallet',          l:'Questões financeiras',           d:'A família não consegue manter a mensalidade no momento' },
+  { k:'competitor', ic:'school',          l:'Optou por outra escola',         d:'A família encontrou outra opção de curso de inglês' },
+  { k:'moved',      ic:'truck',           l:'Mudança de cidade ou bairro',    d:'A distância tornou inviável continuar frequentando' },
+  { k:'schedule',   ic:'clock',           l:'Horários incompatíveis',         d:'A rotina da família não encaixa mais nos horários das turmas' },
+  { k:'completed',  ic:'graduation-cap',  l:'Concluiu o curso',               d:'O aluno alcançou o objetivo e encerrou o ciclo na escola' },
+  { k:'other',      ic:'pencil-line',     l:'Outro motivo',                   d:'Descreva abaixo o que aconteceu' },
+];
 const STUDENTS = [
   { id:1, kids:[{n:'Helena Duarte Lima', age:8, b:'14/02/2018'}], resp:{n:'Mariana Duarte Lima', cpf:'047.812.336-50', phone:'(62) 99214-8870', email:'mariana.duarte@gmail.com', rel:'Mãe', b:'09/05/1989'}, second:{n:'Rafael Lima', phone:'(62) 98112-4471', rel:'Pai'}, fin:'Mariana Duarte Lima', addr:{cep:'74230-110', street:'Rua T-55', num:'180', comp:'Apto 902', bairro:'Setor Bueno', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'15h00–16h30', pay:'PIX', status:'signed', media:true, date:'02/06/2026', hora:'20h14' },
   { id:2, kids:[{n:'Théo Andrade Rocha', age:10, b:'22/08/2015'},{n:'Lara Andrade Rocha', age:7, b:'30/11/2018'}], resp:{n:'Patrícia Andrade', cpf:'118.553.701-22', phone:'(62) 99980-1245', email:'patricia.andrade@hotmail.com', rel:'Mãe', b:'17/03/1986'}, second:{n:'Bruno Rocha', phone:'(62) 99771-3380', rel:'Pai'}, fin:'Bruno Rocha', addr:{cep:'74115-030', street:'Av. T-9', num:'1240', comp:'', bairro:'Jardim Goiás', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'17h00–18h30', pay:'Boleto', status:'pending', media:true, date:'31/05/2026', hora:'19h32' },
@@ -970,6 +956,117 @@ const STUDENTS = [
   // mesma mãe da Helena (id 1), em matrícula separada — agrupa ao ordenar por responsável
   { id:14, kids:[{n:'Lorenzo Duarte Lima', age:5, b:'09/10/2021'}], resp:{n:'Mariana Duarte Lima', cpf:'047.812.336-50', phone:'(62) 99214-8870', email:'mariana.duarte@gmail.com', rel:'Mãe', b:'09/05/1989'}, second:{n:'Rafael Lima', phone:'(62) 98112-4471', rel:'Pai'}, fin:'Mariana Duarte Lima', addr:{cep:'74230-110', street:'Rua T-55', num:'180', comp:'Apto 902', bairro:'Setor Bueno', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'14h00–15h30', pay:'Boleto', status:'sent', media:true, date:'19/05/2026', hora:'20h41' },
 ];
+
+/* +~116 matrículas geradas com seed fixa (mesmos dados em todo reload), calibradas para a
+   história da Visão geral: ~128 alunos ativos, 150 vagas, 3 turmas cheias, Ter/Qui 14h vazia */
+(function genStudents(){
+  let seed=20260603;
+  const rnd=()=>{ seed=(seed*1664525+1013904223)>>>0; return seed/4294967296; };
+  const int=(a,b)=>a+Math.floor(rnd()*(b-a+1));
+  const pick=a=>a[Math.floor(rnd()*a.length)];
+  const pad=n=>String(n).padStart(2,'0');
+  const shuffle=a=>{ for(let i=a.length-1;i>0;i--){ const j=Math.floor(rnd()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+
+  const GIRLS=['Alice','Maria','Laura','Valentina','Heloísa','Júlia','Lívia','Cecília','Maitê','Antonella','Esther','Lorena','Sophia','Isadora','Luna','Maya','Elisa','Aurora','Clarice','Olívia','Beatriz','Catarina','Melissa','Yasmin','Stella','Rebeca','Agatha','Marina','Vitória','Ana Clara','Maria Eduarda','Ana Luísa','Manuela','Larissa','Bianca','Gabriela','Rafaela','Isabella','Emanuelly','Pietra','Milena','Eduarda','Sarah','Joana','Nicole','Mariah','Liz','Helena'];
+  const BOYS=['Miguel','Arthur','Heitor','Bernardo','Davi','Théo','Gael','Ravi','Noah','Samuel','Benício','Benjamin','Matheus','Lucas','Pedro','Gustavo','Felipe','Nicolas','Caio','Vicente','Bryan','Enzo','Murilo','Lorenzo','Otávio','Augusto','Emanuel','João Pedro','João Miguel','Antônio','Francisco','Tomás','Rodrigo','Vinícius','Yuri','Ian','Levi','Anthony','Erick','Luan','Daniel','Rafael','Henrique','Eduardo','Isaac','Bento','Caleb','Davi Lucca'];
+  const MOMS=['Adriana','Aline','Amanda','Ana Paula','Bruna','Carla','Carolina','Cristiane','Daniela','Débora','Elaine','Fabiana','Fernanda','Flávia','Gisele','Ingrid','Janaína','Jéssica','Joyce','Juliana','Karina','Kelly','Luana','Luciana','Marcela','Márcia','Michele','Natália','Patrícia','Paula','Priscila','Raquel','Regina','Renata','Roberta','Rosana','Sabrina','Sílvia','Simone','Tatiana','Vanessa','Viviane'];
+  const DADS=['Alexandre','André','Antônio','Bruno','Carlos','César','Cristiano','Daniel','Diego','Eduardo','Fábio','Felipe','Fernando','Gustavo','Henrique','Hugo','Igor','João','Leandro','Leonardo','Marcelo','Márcio','Marcos','Murilo','Paulo','Rafael','Renato','Ricardo','Roberto','Rodrigo','Sérgio','Thiago','Vinícius','Wagner'];
+  const GRANS=['Maria José','Terezinha','Aparecida','Neusa','Marlene'];
+  const SUR=['Silva','Santos','Oliveira','Souza','Costa','Pereira','Rodrigues','Almeida','Nascimento','Lima','Araújo','Fernandes','Carvalho','Gomes','Martins','Rocha','Ribeiro','Alves','Monteiro','Mendes','Barros','Freitas','Barbosa','Pinto','Moura','Cavalcante','Dias','Castro','Campos','Cardoso','Teixeira','Correia','Vieira','Moreira','Cunha','Queiroz','Farias','Sales','Brito','Tavares','Aguiar','Siqueira','Xavier','Prado','Andrade','Nogueira','Rezende','Borges','Macedo','Pacheco'];
+  const HOODS=[['Setor Bueno',14],['Jardim Goiás',10],['Setor Marista',8],['Setor Sul',7],['Jardim América',6],['Setor Oeste',5],['Jardim Atlântico',4],['Setor Pedro Ludovico',4],['Setor Aeroporto',3],['Setor Campinas',3],['Parque Amazônia',3],['Setor Coimbra',2],['Vila Nova',2],['Setor Leste Universitário',2],['Jardim Europa',2],['Setor Faiçalville',2],['Setor Nova Suíça',2],['Residencial Granville',1],['Vila Jaraguá',1],['Setor dos Funcionários',1]];
+  const hoodPool=[]; HOODS.forEach(([n,w])=>{ for(let i=0;i<w;i++) hoodPool.push(n); });
+  const APARECIDA=['Setor Garavelo','Jardim Luz','Cidade Vera Cruz'];
+  const MAILS=['@gmail.com','@gmail.com','@gmail.com','@hotmail.com','@outlook.com','@yahoo.com','@icloud.com'];
+
+  const genCPF=()=>{ const n=[...Array(9)].map(()=>int(0,9));
+    let d1=n.reduce((a,v,i)=>a+v*(10-i),0)%11; d1=d1<2?0:11-d1;
+    let d2=[...n,d1].reduce((a,v,i)=>a+v*(11-i),0)%11; d2=d2<2?0:11-d2;
+    const s=n.join('')+d1+d2; return s.slice(0,3)+'.'+s.slice(3,6)+'.'+s.slice(6,9)+'-'+s.slice(9); };
+  const genPhone=()=>`(62) 9${int(7,9)}${int(0,9)}${int(0,9)}${int(0,9)}-${int(0,9)}${int(0,9)}${int(0,9)}${int(0,9)}`;
+  const slug=s=>s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,'.');
+  const genStreet=()=>pick([`Rua T-${int(25,68)}`,`Av. T-${int(1,15)}`,`Rua C-${int(100,260)}`,`Rua ${int(1,150)}`,`Av. ${pick([85,87,90,136])}`,`Rua ${int(1000,1240)}`,'Alameda das Rosas','Av. Rio Verde','Av. Mutirão','Rua das Orquídeas','Av. Perimetral Norte','Rua Serra Dourada','Av. Castelo Branco','Rua Buriti Alegre']);
+  const genComp=()=>{ const r=rnd(); return r<.32?`Apto ${int(1,18)}0${int(1,4)}`:r<.55?`Qd ${int(1,40)} Lt ${int(1,30)}`:r<.65?`Casa ${int(1,3)}`:''; };
+  const genBirth=age=>{ const m=int(1,12), d=int(1,28); const y=2026-age-((m*100+d)<=603?0:1); return `${pad(d)}/${pad(m)}/${y}`; };
+  /* horário de chegada da matrícula segue o gráfico (pico 19h–20h) */
+  const HORAS=[[8,1],[9,3],[10,6],[11,4],[12,2],[13,3],[14,7],[15,5],[16,4],[17,6],[18,8],[19,11],[20,13],[21,9],[22,4]];
+  const horaPool=[]; HORAS.forEach(([h,w])=>{ for(let i=0;i<w;i++) horaPool.push(h); });
+  const genHora=()=>`${pick(horaPool)}h${pad(int(0,59))}`;
+
+  const mkFamily=()=>{ const surA=pick(SUR); let surB=pick(SUR); if(surB===surA) surB=pick(SUR);
+    const rel=rnd(), isMom=rel<.78, isDad=!isMom&&rel<.94;
+    const respFirst=isMom?pick(MOMS):isDad?pick(DADS):pick(GRANS);
+    const respRel=isMom?'Mãe':isDad?'Pai':pick(['Avó','Tia']);
+    const resp={ n:`${respFirst} ${surB}${rnd()<.4?' '+surA:''}`, cpf:genCPF(), phone:genPhone(),
+      email:`${slug(respFirst)}.${slug(surB)}${rnd()<.25?int(2,99):''}${pick(MAILS)}`, rel:respRel, b:genBirth(int(28,46)) };
+    const second=rnd()<.55?{ n:`${isMom?pick(DADS):pick(MOMS)} ${surA}`, phone:genPhone(), rel:isMom?'Pai':'Mãe' }:null;
+    const inAparecida=rnd()<.05;
+    const addr={ cep:`74${inAparecida?9:int(0,6)}${int(0,9)}${int(0,9)}-${int(1,9)}${int(0,9)}0`, street:genStreet(), num:String(int(15,2400)), comp:genComp(), bairro:inAparecida?pick(APARECIDA):pick(hoodPool), city:inAparecida?'Aparecida de Goiânia':'Goiânia', uf:'GO' };
+    return { resp, second, fin: second&&rnd()<.3?second.n:resp.n, addr, surA, surB };
+  };
+  const mkKid=(fam,age)=>{ const first=rnd()<.5?pick(GIRLS):pick(BOYS);
+    return { n:`${first} ${fam.surB} ${fam.surA}`, age, b:genBirth(age) }; };
+
+  /* vagas restantes por turma p/ alunos ATIVOS (já descontando os 14 hand-written) —
+     fecha em: SQ 16/18!/19/18! · TQ 11/15/18!/13 = 128 ativos, 22 vagas livres */
+  const TURMAS=[
+    {sch:'seg-qua',t:'14h00–15h30',q:14},{sch:'seg-qua',t:'15h00–16h30',q:16},
+    {sch:'seg-qua',t:'16h30–18h00',q:15},{sch:'seg-qua',t:'18h00–19h30',q:17},
+    {sch:'ter-qui',t:'14h00–15h30',q:10},{sch:'ter-qui',t:'15h00–16h30',q:13},
+    {sch:'ter-qui',t:'16h30–18h00',q:16},{sch:'ter-qui',t:'17h00–18h30',q:11},
+  ];
+  const takeTurma=n=>{ const opts=TURMAS.filter(x=>x.q>=n);
+    if(!opts.length){ const f=TURMAS.slice().sort((a,b)=>b.q-a.q)[0]; f.q-=n; return f; }
+    const tot=opts.reduce((a,x)=>a+x.q,0); let r=rnd()*tot;
+    for(const o of opts){ r-=o.q; if(r<=0){ o.q-=n; return o; } }
+    opts[0].q-=n; return opts[0]; };
+
+  /* idades dos 112 ativos gerados → faixa etária fecha em 18/42/39/22/7 com os hand-written */
+  const agePool=[];
+  [[4,5],[5,5],[6,5],[7,12],[8,12],[9,12],[10,11],[11,11],[12,11],[13,7],[14,7],[15,7],[16,4],[17,3]]
+    .forEach(([a,q])=>{ for(let i=0;i<q;i++) agePool.push(a); });
+  shuffle(agePool);
+
+  /* datas seguem o gráfico de matrículas por mês (Jul/25 → Jun/26) */
+  const MONTHS=[['07',2025,13],['08',2025,10],['09',2025,8],['10',2025,11],['11',2025,9],['12',2025,6],['01',2026,10],['02',2026,12],['03',2026,10],['04',2026,15],['05',2026,7],['06',2026,5]];
+  const datePool=[]; MONTHS.forEach(([m,y,q])=>{ for(let i=0;i<q;i++) datePool.push({m,y}); });
+  const inactiveDates=[]; for(let i=19;i>=0;i--) inactiveDates.push(datePool.splice(Math.min(i*3,datePool.length-1),1)[0]);
+  shuffle(datePool);
+  const mkDate=({m,y})=>`${pad(m==='06'&&y===2026?int(1,3):m==='05'&&y===2026?int(2,26):int(1,28))}/${m}/${y}`;
+  const statusFor=({m,y})=> (y===2026&&m==='06') ? pick(['pending','pending','sent','sent','signed'])
+    : (y===2026&&m==='05') ? pick(['sent','pending','signed','signed','signed','signed'])
+    : rnd()<.97 ? 'signed' : pick(['sent','pending']);
+
+  let nextId=100;
+  /* 96 matrículas ativas: 81 de 1 aluno + 14 duplas de irmãos + 1 trio = 112 alunos */
+  const plans=[3, ...Array(14).fill(2), ...Array(81).fill(1)];
+  const actives=plans.map(nKids=>{ const fam=mkFamily(); const tu=takeTurma(nKids); const dt=datePool.pop();
+    return { id:nextId++, kids:Array.from({length:nKids},()=>mkKid(fam,agePool.pop())),
+      resp:fam.resp, second:fam.second, fin:fam.fin, addr:fam.addr,
+      sch:tu.sch, t:tu.t, pay:'Boleto', status:statusFor(dt), media:rnd()>=.2, date:mkDate(dt), hora:genHora() }; });
+  /* 5 famílias com matrículas separadas (mesmo responsável → agrupa e ganha badge de família) */
+  for(let i=0;i<5;i++){ const a=actives[20+i*13], b=actives[26+i*13];
+    b.resp=a.resp; b.second=a.second; b.fin=a.fin; b.addr=a.addr;
+    /* sobrenome é sempre o par final do nome (primeiro nome pode ser composto, ex. João Pedro) */
+    b.kids=b.kids.map(k=>{ const first=k.n.split(' ').slice(0,-2).join(' '); const sur=a.kids[0].n.split(' ').slice(-2).join(' '); return {...k, n:`${first} ${sur}`}; }); }
+
+  /* 20 matrículas desligadas (22 alunos), com motivo registrado */
+  const TNAMES=TURMAS.map(x=>({sch:x.sch,t:x.t}));
+  const EX_NOTES={ adapt:['Sentiu dificuldade com a dinâmica da turma.',''], financial:['Pediram para retornar no próximo semestre.',''],
+    competitor:['Foram para uma escola bilíngue de período integral.',''], moved:['Família se mudou de bairro.','Mudança para Senador Canedo.'],
+    schedule:['Treinos de futebol passaram para o mesmo horário.',''], completed:['Encerrou o ciclo com avaliação excelente.',''],
+    other:['Pausa por questões de saúde na família.','Foi morar com o pai em outro estado.','Vai estudar fora do país por um ano.'] };
+  const inactives=Array.from({length:20},(_, i)=>{ const fam=mkFamily(); const tu=pick(TNAMES); const dt=inactiveDates[i];
+    const reason=EXIT_REASONS[i%EXIT_REASONS.length]; const nKids=i<2?2:1;
+    return { id:nextId++, kids:Array.from({length:nKids},()=>mkKid(fam,int(5,15))),
+      resp:fam.resp, second:fam.second, fin:fam.fin, addr:fam.addr,
+      sch:tu.sch, t:tu.t, pay:'Boleto', status:'signed', media:rnd()>=.2, active:false,
+      exit:{ k:reason.k, label:reason.l, note:pick(EX_NOTES[reason.k]), date:`${pad(int(1,28))}/${pad(int(2,5))}/2026` },
+      date:mkDate(dt), hora:genHora() }; });
+
+  STUDENTS.push(...actives, ...inactives);
+  const dv=s=>s.date.split('/').reverse().join('')+(s.hora||'');
+  STUDENTS.sort((a,b)=> dv(a)<dv(b)?1:dv(a)>dv(b)?-1:0); // mais recentes primeiro
+})();
 
 const palette = ['#1E3765','#2F539A','#F5B700','#7C9AD6','#B5860B','#16a34a','#9333ea','#0891b2','#dc2626','#ea580c','#0d9488','#65a30d'];
 const initials = n => n.split(' ').filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase();
@@ -1348,7 +1445,7 @@ function toggleFilters(rowId,chevId){
 function clearFilters(){
   const inp=document.getElementById('alunoSearch'); if(inp) inp.value='';
   ['fSchedule','fStatus','fActive','fHood','fAge','fMedia','fSib'].forEach(id=>csSet(id,''));
-  renderTable();
+  tableChanged();
   toast('Filtros limpos.');
 }
 /* ordenação por coluna (nome como padrão) */
@@ -1367,6 +1464,7 @@ const SORT_VAL={
 let sortKey='name', sortDir=1;
 function setSort(k){
   if(sortKey===k) sortDir*=-1; else { sortKey=k; sortDir=1; }
+  tablePage=1;
   renderTableHead(); renderTable();
 }
 function renderTableHead(){
@@ -1384,14 +1482,38 @@ function updateClearBtn(){
   btn.classList.toggle('flex', n>0);
   const cnt=document.getElementById('fClearN'); if(cnt) cnt.textContent=n>0?`(${n})`:'';
 }
+/* paginação (a base agora tem ~150 alunos) */
+const PAGE_SIZE=20;
+let tablePage=1, contractPage=1;
+function tableChanged(){ tablePage=1; renderTable(); }
+function contractsChanged(){ contractPage=1; renderContracts(); }
+function setTablePage(p){ tablePage=p; renderTable(); document.querySelector('.table-shell')?.scrollIntoView({behavior:'smooth',block:'start'}); }
+function setContractPage(p){ contractPage=p; renderContracts(); document.getElementById('contractGrid')?.scrollIntoView({behavior:'smooth',block:'start'}); }
+function pagerHTML(page,pages,fn){
+  if(pages<=1) return '';
+  const btn=(label,p,on,dis)=>`<button ${dis?'disabled':''} onclick="${fn}(${p})" class="min-w-8 h-8 px-1.5 rounded-lg grid place-content-center text-sm font-medium transition ${on?'text-white':'border border-[var(--border)] hover:bg-[var(--hover)]'} disabled:opacity-35" ${on?'style="background:#1E3765"':''}>${label}</button>`;
+  /* janela de até 5 páginas em torno da atual */
+  let start=Math.max(1,Math.min(page-2,pages-4)), end=Math.min(pages,start+4);
+  let nums=''; for(let p=start;p<=end;p++) nums+=btn(p,p,p===page,false);
+  return btn('<i data-lucide="chevron-left" class="w-4 h-4"></i>',page-1,false,page===1)
+    + (start>1?btn(1,1,false,false)+(start>2?'<span class="px-0.5">…</span>':''):'')
+    + nums
+    + (end<pages?(end<pages-1?'<span class="px-0.5">…</span>':'')+btn(pages,pages,false,false):'')
+    + btn('<i data-lucide="chevron-right" class="w-4 h-4"></i>',page+1,false,page===pages);
+}
 function renderTable(){
   updateClearBtn();
   const rows=filteredStudents().slice().sort((a,b)=>{
     const va=SORT_VAL[sortKey](a), vb=SORT_VAL[sortKey](b);
     return (va<vb?-1:va>vb?1:0)*sortDir;
   });
-  document.getElementById('tableBody').innerHTML = rows.length ? rows.map(rowHTML).join('') : `<div class="px-5 py-12 text-center text-[var(--muted)] text-sm">Nenhum aluno encontrado com esses filtros.</div>`;
-  document.getElementById('tableCount').textContent = `Mostrando ${rows.length} de ${STUDENTS.length} · dados fictícios`;
+  const pages=Math.max(1,Math.ceil(rows.length/PAGE_SIZE));
+  tablePage=Math.min(tablePage,pages);
+  const pageRows=rows.slice((tablePage-1)*PAGE_SIZE, tablePage*PAGE_SIZE);
+  document.getElementById('tableBody').innerHTML = pageRows.length ? pageRows.map(rowHTML).join('') : `<div class="px-5 py-12 text-center text-[var(--muted)] text-sm">Nenhum aluno encontrado com esses filtros.</div>`;
+  const from=rows.length?(tablePage-1)*PAGE_SIZE+1:0, to=Math.min(tablePage*PAGE_SIZE,rows.length);
+  document.getElementById('tableCount').textContent = `Mostrando ${from}–${to} de ${rows.length} matrículas · dados fictícios`;
+  document.getElementById('tablePager').innerHTML = pagerHTML(tablePage,pages,'setTablePage');
   lucide.createIcons();
 }
 
@@ -1472,7 +1594,7 @@ function filteredContracts(){
 function clearContractFilters(){
   const inp=document.getElementById('contractSearch'); if(inp) inp.value='';
   csSet('cStatus',''); csSet('cActive','');
-  renderContracts();
+  contractsChanged();
 }
 function renderContracts(){
   const cBtn=document.getElementById('cClear');
@@ -1483,7 +1605,13 @@ function renderContracts(){
     cBtn.classList.toggle('flex', n>0);
     const cnt=document.getElementById('cClearN'); if(cnt) cnt.textContent=n>0?`(${n})`:'';
   }
-  const rows=filteredContracts();
+  const all=filteredContracts();
+  const pages=Math.max(1,Math.ceil(all.length/PAGE_SIZE));
+  contractPage=Math.min(contractPage,pages);
+  const rows=all.slice((contractPage-1)*PAGE_SIZE, contractPage*PAGE_SIZE);
+  const from=all.length?(contractPage-1)*PAGE_SIZE+1:0, to=Math.min(contractPage*PAGE_SIZE,all.length);
+  document.getElementById('contractCount').textContent=`Mostrando ${from}–${to} de ${all.length} contratos · dados fictícios`;
+  document.getElementById('contractPager').innerHTML=pagerHTML(contractPage,pages,'setContractPage');
   const el=document.getElementById('contractGrid');
   if(!rows.length){
     el.className='surface rounded-2xl';
@@ -1550,7 +1678,7 @@ function renderBirthdays(){
   // próximos aniversários a partir de 03/06 (data do preview)
   const REF=6*100+3;
   const list=[];
-  STUDENTS.forEach(s=>s.kids.forEach(k=>{
+  STUDENTS.filter(s=>s.active!==false).forEach(s=>s.kids.forEach(k=>{
     const [d,m]=k.b.split('/').map(Number); if(!d||!m) return;
     const key=m*100+d;
     list.push({n:k.n, d, m, age:k.age+1, sid:s.id, order:(key>=REF?key:key+1200)});
@@ -1564,23 +1692,67 @@ function renderBirthdays(){
   lucide.createIcons();
 }
 function renderHoods(){
-  const data=[['Setor Bueno',26],['Jardim Goiás',19],['Setor Marista',15],['Setor Sul',12],['Jardim América',9],['Setor Oeste',8],['Jardim Atlântico',7],['Setor Pedro Ludovico',6]];
-  const max=data[0][1];
+  const cnt={};
+  STUDENTS.forEach(s=>{ if(s.active===false) return; cnt[s.addr.bairro]=(cnt[s.addr.bairro]||0)+s.kids.length; });
+  const data=Object.entries(cnt).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const max=data[0]?.[1]||1;
   document.getElementById('hoodList').innerHTML=data.map(([n,v],i)=>`<div>
-    <div class="flex justify-between gap-3 text-sm mb-1.5"><span class="font-medium truncate">${n}</span><span class="text-[var(--muted)] whitespace-nowrap shrink-0">${v} alunos</span></div>
+    <div class="flex justify-between gap-3 text-sm mb-1.5"><span class="font-medium truncate">${n}</span><span class="text-[var(--muted)] whitespace-nowrap shrink-0">${v} aluno${v===1?'':'s'}</span></div>
     <div class="h-2 rounded-full overflow-hidden" style="background:var(--hover)"><div class="h-full rounded-full" style="width:${Math.round(v/max*100)}%;background:${i===0?'#F5B700':'#2F539A'}"></div></div></div>`).join('');
 }
-/* autorização de uso de imagem (pagamento é sempre boleto/carnê, conforme o contrato) */
-const PAY=[['Autorizam fotos',104,'#2F539A'],['Não autorizam',24,'#F5B700']];
+/* autorização de uso de imagem — calculada da base (pagamento é sempre boleto/carnê) */
+function payData(){
+  let yes=0,no=0;
+  STUDENTS.forEach(s=>{ if(s.active===false) return; if(s.media!==false) yes+=s.kids.length; else no+=s.kids.length; });
+  return [['Autorizam fotos',yes,'#2F539A'],['Não autorizam',no,'#F5B700']];
+}
 function renderPayLegend(){
-  document.getElementById('payLegend').innerHTML=PAY.map(p=>`<div class="flex items-center justify-between"><span class="flex items-center gap-2 text-[13px]"><span class="w-2.5 h-2.5 rounded-full" style="background:${p[2]}"></span>${p[0]}</span><span class="font-semibold text-[13px]">${p[1]}</span></div>`).join('');
+  document.getElementById('payLegend').innerHTML=payData().map(p=>`<div class="flex items-center justify-between"><span class="flex items-center gap-2 text-[13px]"><span class="w-2.5 h-2.5 rounded-full" style="background:${p[2]}"></span>${p[0]}</span><span class="font-semibold text-[13px]">${p[1]}</span></div>`).join('');
 }
 function renderHealth(){
-  const data=[{t:'Assinados',v:114,c:'#16a34a'},{t:'Enviados, aguardando',v:7,c:'#2F539A'},{t:'Pendentes de envio',v:7,c:'#B5860B'}];
+  const act=STUDENTS.filter(s=>s.active!==false);
+  const by=k=>act.filter(s=>s.status===k).length;
+  const data=[{t:'Assinados',v:by('signed'),c:'#16a34a'},{t:'Enviados, aguardando',v:by('sent'),c:'#2F539A'},{t:'Pendentes de envio',v:by('pending'),c:'#B5860B'}];
+  const sub=document.getElementById('healthSub'); if(sub) sub.textContent=`Status das ${act.length} matrículas ativas`;
   document.getElementById('contractHealth').innerHTML=data.map(x=>`<div>
     <div class="flex justify-between text-sm mb-1.5"><span class="font-medium">${x.t}</span><span class="font-semibold" style="color:${x.c}">${x.v}</span></div>
-    <div class="h-2 rounded-full overflow-hidden" style="background:var(--hover)"><div class="h-full rounded-full" style="width:${Math.round(x.v/128*100)}%;background:${x.c}"></div></div></div>`).join('')
+    <div class="h-2 rounded-full overflow-hidden" style="background:var(--hover)"><div class="h-full rounded-full" style="width:${Math.round(x.v/(act.length||1)*100)}%;background:${x.c}"></div></div></div>`).join('')
   + `<button onclick="goPendentes()" class="mt-1 w-full h-10 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 text-white transition hover:brightness-105" style="background:#25D366">${WA('w-4 h-4')} Cobrar pendentes no WhatsApp</button>`;
+}
+/* vagas por horário — ocupação real das turmas (capacidade fixa de 150 lugares) */
+const TURMA_CAP={ 'seg-qua':{'14h00–15h30':18,'15h00–16h30':18,'16h30–18h00':24,'18h00–19h30':18},
+                  'ter-qui':{'14h00–15h30':18,'15h00–16h30':18,'16h30–18h00':18,'17h00–18h30':18} };
+function renderVagas(){
+  const cnt={}; let tot=0;
+  STUDENTS.forEach(s=>{ if(s.active===false) return; cnt[s.sch+'|'+s.t]=(cnt[s.sch+'|'+s.t]||0)+s.kids.length; tot+=s.kids.length; });
+  const col=(sch,label)=>`<div class="space-y-3"><p class="text-[10px] font-bold uppercase tracking-wider text-[var(--muted)]">${label}</p>`+
+    Object.entries(TURMA_CAP[sch]).map(([t,cap])=>{ const v=cnt[sch+'|'+t]||0; const full=v>=cap; const pct=Math.min(100,Math.round(v/cap*100));
+      return `<div><div class="flex justify-between text-[13px] mb-1"><span class="font-medium">${t}${full?' <span class="text-[9px] font-bold px-1.5 py-0.5 rounded align-middle" style="background:rgba(245,183,0,.22);color:#B5860B">CHEIA</span>':''}</span><span class="text-[var(--muted)]">${v}/${cap}</span></div>
+      <div class="h-2 rounded-full overflow-hidden" style="background:var(--hover)"><div class="h-full rounded-full" style="width:${pct}%;background:${full?'#F5B700':'#2F539A'}"></div></div></div>`; }).join('')+`</div>`;
+  const grid=document.getElementById('vagasGrid'); if(grid) grid.innerHTML=col('seg-qua','Segunda / Quarta')+col('ter-qui','Terça / Quinta');
+  const chip=document.getElementById('vagasChip'); if(chip) chip.textContent=`${Math.max(0,150-tot)} vagas livres`;
+}
+/* recalcula tudo que deriva da base (chamado no init e após desligar/reativar/nova matrícula) */
+function refreshOverviewData(){
+  const act=STUDENTS.filter(s=>s.active!==false);
+  const actKids=act.flatMap(s=>s.kids);
+  const dv=s=>parseInt(s.date.split('/').reverse().join(''),10);
+  const set=(id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v; };
+  const juneKids=act.filter(s=>dv(s)>=20260601).reduce((a,s)=>a+s.kids.length,0);
+  set('kpiActive',actKids.length); set('kpiActiveSub',`+${juneKids} em junho`);
+  set('kpiWeek',act.filter(s=>{ const d=dv(s); return d>=20260528&&d<=20260603; }).length);
+  set('kpiPending',act.filter(s=>s.status!=='signed').length);
+  set('kpiMonth',act.filter(s=>dv(s)>=20260601).length);
+  set('stAge',(actKids.reduce((a,k)=>a+k.age,0)/(actKids.length||1)).toFixed(1).replace('.',',')+' anos');
+  const fams={}; act.forEach(s=>{ fams[s.resp.cpf]=(fams[s.resp.cpf]||0)+s.kids.length; });
+  set('stFam',Object.values(fams).filter(n=>n>1).length+' famílias');
+  set('stOcc',Math.round(actKids.length/150*100)+'%');
+  set('stSigned',Math.round(act.filter(s=>s.status==='signed').length/(act.length||1)*100)+'%');
+  renderHealth(); renderPayLegend(); renderVagas(); renderHoods(); renderBirthdays(); renderRecent();
+  /* gráficos que derivam da base */
+  if(charts.sch){ charts.sch.data.datasets[0].data=['seg-qua','ter-qui'].map(sc=>act.filter(s=>s.sch===sc).reduce((a,s)=>a+s.kids.length,0)); charts.sch.update(); }
+  if(charts.age){ const b=[0,0,0,0,0]; actKids.forEach(k=>{ b[k.age<=6?0:k.age<=9?1:k.age<=12?2:k.age<=15?3:4]++; }); charts.age.data.datasets[0].data=b; charts.age.update(); }
+  if(charts.pay){ charts.pay.data.datasets[0].data=payData().map(p=>p[1]); charts.pay.update(); }
 }
 function goPendentes(){
   go('alunos');
@@ -1919,7 +2091,8 @@ function buildCharts(){
   const hoursData=[1,3,6,4,2,3,7,5,4,6,8,11,13,9,4];
   const top3=[...hoursData].sort((a,b)=>b-a).slice(0,3);
   charts.hours=new Chart(document.getElementById('chartHours'),{type:'bar',data:{labels:['8h','9h','10h','11h','12h','13h','14h','15h','16h','17h','18h','19h','20h','21h','22h'],datasets:[{data:hoursData,backgroundColor:hoursData.map(v=>top3.includes(v)?'#F5B700':'#2F539A'),borderRadius:6,borderSkipped:false,maxBarThickness:26}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{title:items=>'Por volta das '+items[0].label,label:item=>item.parsed.y+' matrícula'+(item.parsed.y===1?'':'s')+' chegaram nesse horário'}}},scales:{y:{beginAtZero:true,grid:{color:c.grid},border:{display:false},ticks:{stepSize:4}},x:{grid:{display:false},border:{display:false}}}}});
-  charts.pay=new Chart(document.getElementById('chartPay'),{type:'doughnut',data:{labels:PAY.map(p=>p[0]),datasets:[{data:PAY.map(p=>p[1]),backgroundColor:PAY.map(p=>p[2]),borderWidth:0,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,cutout:'66%',plugins:{legend:{display:false}}}});
+  const pd=payData();
+  charts.pay=new Chart(document.getElementById('chartPay'),{type:'doughnut',data:{labels:pd.map(p=>p[0]),datasets:[{data:pd.map(p=>p[1]),backgroundColor:pd.map(p=>p[2]),borderWidth:0,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,cutout:'66%',plugins:{legend:{display:false}}}});
 }
 function refreshCharts(){ if(!charts.enroll) return; const c=chartColors(); Chart.defaults.color=c.text; Object.values(charts).forEach(ch=>{ if(ch.options.scales){['x','y'].forEach(a=>{ if(ch.options.scales[a]?.grid) ch.options.scales[a].grid.color=c.grid; });} ch.update(); }); }
 
@@ -1937,25 +2110,27 @@ function toast(msg){
 function init(){
   // selects customizados
   document.getElementById('periodSelWrap').innerHTML=cselect('period',[{v:'6m',l:'Últimos 6 meses'},{v:'ano',l:'Últimos 12 meses'},{v:'mes',l:'Este mês'}],{icon:'calendar',onChange:applyPeriod});
-  document.getElementById('fScheduleWrap').innerHTML=cselect('fSchedule',[{v:'',l:'Todos os horários'},{v:'seg-qua',l:'Seg/Qua'},{v:'ter-qui',l:'Ter/Qui'}],{onChange:renderTable});
-  document.getElementById('fStatusWrap').innerHTML=cselect('fStatus',[{v:'',l:'Contrato: todos'},{v:'signed',l:'Assinado'},{v:'sent',l:'Enviado'},{v:'pending',l:'Pendente'}],{onChange:renderTable});
-  document.getElementById('fActiveWrap').innerHTML=cselect('fActive',[{v:'',l:'Situação: todas'},{v:'on',l:'Ativas'},{v:'off',l:'Inativas'}],{onChange:renderTable});
+  document.getElementById('fScheduleWrap').innerHTML=cselect('fSchedule',[{v:'',l:'Todos os horários'},{v:'seg-qua',l:'Seg/Qua'},{v:'ter-qui',l:'Ter/Qui'}],{onChange:tableChanged});
+  document.getElementById('fStatusWrap').innerHTML=cselect('fStatus',[{v:'',l:'Contrato: todos'},{v:'signed',l:'Assinado'},{v:'sent',l:'Enviado'},{v:'pending',l:'Pendente'}],{onChange:tableChanged});
+  document.getElementById('fActiveWrap').innerHTML=cselect('fActive',[{v:'',l:'Situação: todas'},{v:'on',l:'Ativas'},{v:'off',l:'Inativas'}],{onChange:tableChanged});
   const hoods=[...new Set(STUDENTS.map(s=>s.addr.bairro))].sort();
-  document.getElementById('fHoodWrap').innerHTML=cselect('fHood',[{v:'',l:'Bairro: todos'},...hoods.map(h=>({v:h,l:h}))],{onChange:renderTable});
-  document.getElementById('fAgeWrap').innerHTML=cselect('fAge',[{v:'',l:'Idade: todas'},{v:'4-6',l:'4 a 6 anos'},{v:'7-9',l:'7 a 9 anos'},{v:'10-12',l:'10 a 12 anos'},{v:'13+',l:'13 anos ou mais'}],{onChange:renderTable});
-  document.getElementById('fMediaWrap').innerHTML=cselect('fMedia',[{v:'',l:'Imagem: todos'},{v:'yes',l:'Autorizou imagem'},{v:'no',l:'Não autorizou'}],{onChange:renderTable});
-  document.getElementById('fSibWrap').innerHTML=cselect('fSib',[{v:'',l:'Irmãos: todos'},{v:'multi',l:'Com irmãos'},{v:'single',l:'Aluno único'}],{onChange:renderTable});
-  document.getElementById('cStatusWrap').innerHTML=cselect('cStatus',[{v:'',l:'Status: todos'},{v:'pending',l:'Pendentes'},{v:'sent',l:'Aguardando assinatura'},{v:'signed',l:'Assinados'}],{onChange:renderContracts});
-  document.getElementById('cActiveWrap').innerHTML=cselect('cActive',[{v:'',l:'Situação: todas'},{v:'on',l:'Ativas'},{v:'off',l:'Inativas'}],{onChange:renderContracts});
+  document.getElementById('fHoodWrap').innerHTML=cselect('fHood',[{v:'',l:'Bairro: todos'},...hoods.map(h=>({v:h,l:h}))],{onChange:tableChanged});
+  document.getElementById('fAgeWrap').innerHTML=cselect('fAge',[{v:'',l:'Idade: todas'},{v:'4-6',l:'4 a 6 anos'},{v:'7-9',l:'7 a 9 anos'},{v:'10-12',l:'10 a 12 anos'},{v:'13+',l:'13 anos ou mais'}],{onChange:tableChanged});
+  document.getElementById('fMediaWrap').innerHTML=cselect('fMedia',[{v:'',l:'Imagem: todos'},{v:'yes',l:'Autorizou imagem'},{v:'no',l:'Não autorizou'}],{onChange:tableChanged});
+  document.getElementById('fSibWrap').innerHTML=cselect('fSib',[{v:'',l:'Irmãos: todos'},{v:'multi',l:'Com irmãos'},{v:'single',l:'Aluno único'}],{onChange:tableChanged});
+  document.getElementById('cStatusWrap').innerHTML=cselect('cStatus',[{v:'',l:'Status: todos'},{v:'pending',l:'Pendentes'},{v:'sent',l:'Aguardando assinatura'},{v:'signed',l:'Assinados'}],{onChange:contractsChanged});
+  document.getElementById('cActiveWrap').innerHTML=cselect('cActive',[{v:'',l:'Situação: todas'},{v:'on',l:'Ativas'},{v:'off',l:'Inativas'}],{onChange:contractsChanged});
   renderTableHead();
-  document.getElementById('emailToWrap').innerHTML=cselect('emailTo',[{v:'all',l:'Todos os responsáveis (96)'},{v:'sq',l:'Apenas turma Seg/Qua (71)'},{v:'tq',l:'Apenas turma Ter/Qui (57)'},{v:'pend',l:'Contratos pendentes (7)'}],{block:true});
+  const actE=STUDENTS.filter(s=>s.active!==false);
+  const kidsOf=sc=>actE.filter(s=>s.sch===sc).reduce((a,s)=>a+s.kids.length,0);
+  document.getElementById('emailToWrap').innerHTML=cselect('emailTo',[{v:'all',l:`Todos os responsáveis (${actE.length})`},{v:'sq',l:`Apenas turma Seg/Qua (${kidsOf('seg-qua')})`},{v:'tq',l:`Apenas turma Ter/Qui (${kidsOf('ter-qui')})`},{v:'pend',l:`Contratos pendentes (${actE.filter(s=>s.status!=='signed').length})`}],{block:true});
   // conteúdo
   document.querySelectorAll('.wa-slot').forEach(s=>s.innerHTML=WA('w-4 h-4'));
-  renderRecent(); renderTable(); renderContracts(); renderEmails(); renderUsers();
-  renderBirthdays(); renderHoods(); renderPayLegend(); renderHealth(); renderNotifs();
+  renderTable(); renderContracts(); renderEmails(); renderUsers(); renderNotifs();
   renderEditorTabs(); setEditorPage('home');
   cmRender(); applySidebarTheme();
   buildCharts();
+  refreshOverviewData(); // KPIs, vagas, bairros, aniversários, gráficos — tudo derivado da base
   lucide.createIcons();
 }
 
@@ -2035,7 +2210,7 @@ function submitNewEnrollment(){
     sch:SEL.nmSch?.value||'seg-qua', t:'15h00–16h30', pay:'Boleto',
     status:'pending', media:true, active:true, date:'03/06/2026', hora:'16h05' });
   NOTIFS.unshift({type:'enroll',sid:id,title:'Nova matrícula',desc:`${name} · ${hood}`,time:'agora',unread:true});
-  renderTable(); renderRecent(); renderContracts(); renderNotifs();
+  renderTable(); renderContracts(); renderNotifs(); refreshOverviewData();
   closeModal(); go('alunos'); toast(`Matrícula de ${name.split(' ')[0]} adicionada!`);
 }
 
@@ -2404,16 +2579,7 @@ function markSent(id){
   toast('Contrato marcado como enviado!');
 }
 
-/* --- desligamento de aluno (com motivo) --- */
-const EXIT_REASONS=[
-  { k:'adapt',      ic:'puzzle',          l:'Não se adaptou à escola',        d:'Metodologia, turma ou ambiente não funcionaram para a criança' },
-  { k:'financial',  ic:'wallet',          l:'Questões financeiras',           d:'A família não consegue manter a mensalidade no momento' },
-  { k:'competitor', ic:'school',          l:'Optou por outra escola',         d:'A família encontrou outra opção de curso de inglês' },
-  { k:'moved',      ic:'truck',           l:'Mudança de cidade ou bairro',    d:'A distância tornou inviável continuar frequentando' },
-  { k:'schedule',   ic:'clock',           l:'Horários incompatíveis',         d:'A rotina da família não encaixa mais nos horários das turmas' },
-  { k:'completed',  ic:'graduation-cap',  l:'Concluiu o curso',               d:'O aluno alcançou o objetivo e encerrou o ciclo na escola' },
-  { k:'other',      ic:'pencil-line',     l:'Outro motivo',                   d:'Descreva abaixo o que aconteceu' },
-];
+/* --- desligamento de aluno (com motivo) — EXIT_REASONS declarado junto dos dados --- */
 let exitReasonKey=null;
 function openExitModal(id){
   const s=STUDENTS.find(x=>x.id===id); if(!s) return;
@@ -2468,13 +2634,13 @@ function confirmExit(id){
   s.active=false;
   s.exit={ k:r.k, label:r.l, note:document.getElementById('exitNote')?.value.trim()||'', date:'03/06/2026' };
   closeModal();
-  renderTable(); renderRecent(); renderContracts();
+  renderTable(); renderContracts(); refreshOverviewData();
   toast(`${s.kids[0].n.split(' ')[0]} foi desligado da escola — motivo registrado.`);
 }
 function reactivateStudent(id){
   const s=STUDENTS.find(x=>x.id===id); if(!s) return;
   s.active=true; delete s.exit;
-  renderTable(); renderRecent(); renderContracts();
+  renderTable(); renderContracts(); refreshOverviewData();
   toast(`${s.kids[0].n.split(' ')[0]} voltou a ser aluno ativo!`);
 }
 
