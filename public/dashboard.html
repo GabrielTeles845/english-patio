@@ -46,30 +46,40 @@
   /* ===== temas da sidebar (azul / branca / amarela) × claro / escuro ===== */
   :root, html[data-sidebar="blue"]{
     --sb-1:#1E3765; --sb-2:#15294d; --sb-text:#cdd7e8; --sb-strong:#ffffff;
-    --sb-muted:rgba(255,255,255,.40); --sb-hover:rgba(255,255,255,.10); --sb-border:rgba(255,255,255,.10);
+    --sb-muted:rgba(255,255,255,.40); --sb-hover:rgba(255,255,255,.08); --sb-border:rgba(255,255,255,.10);
     --sb-badge-bg:rgba(255,255,255,.12); --sb-badge-text:#cdd7e8; --sb-accent:#F5B700; --sb-accent-text:#15294d;
+    --sb-active-bg:rgba(255,255,255,.14); --sb-active-text:#ffffff; --sb-bar:#F5B700;
+    --sb-edge:rgba(255,255,255,.08); --sb-shadow:6px 0 24px rgba(7,15,34,.22);
   }
-  html.dark[data-sidebar="blue"]{ --sb-1:#0c1731; --sb-2:#070f22; --sb-text:#aab8d4; }
+  html.dark[data-sidebar="blue"]{ --sb-1:#0c1731; --sb-2:#070f22; --sb-text:#aab8d4; --sb-shadow:6px 0 24px rgba(0,0,0,.45); }
   html[data-sidebar="white"]{
-    --sb-1:#ffffff; --sb-2:#f3f6fb; --sb-text:#48556b; --sb-strong:#1E3765;
-    --sb-muted:#94a3b8; --sb-hover:rgba(30,55,101,.07); --sb-border:#e7ecf3;
-    --sb-badge-bg:#eef2f9; --sb-badge-text:#48556b; --sb-accent:#F5B700; --sb-accent-text:#15294d;
+    --sb-1:#ffffff; --sb-2:#fbfcfe; --sb-text:#4a586e; --sb-strong:#1E3765;
+    --sb-muted:#93a1b5; --sb-hover:#f1f5fa; --sb-border:#e8edf4;
+    --sb-badge-bg:#eef2f9; --sb-badge-text:#4a586e; --sb-accent:#F5B700; --sb-accent-text:#15294d;
+    --sb-active-bg:#e9f0fa; --sb-active-text:#1E3765; --sb-bar:#F5B700;
+    --sb-edge:#e3e9f2; --sb-shadow:6px 0 28px rgba(15,23,42,.07);
   }
   html.dark[data-sidebar="white"]{
     --sb-1:#111d36; --sb-2:#0b1424; --sb-text:#aab8d4; --sb-strong:#ffffff;
-    --sb-muted:rgba(255,255,255,.40); --sb-hover:rgba(255,255,255,.08); --sb-border:rgba(255,255,255,.08);
+    --sb-muted:rgba(255,255,255,.40); --sb-hover:rgba(255,255,255,.07); --sb-border:rgba(255,255,255,.08);
     --sb-badge-bg:rgba(255,255,255,.10); --sb-badge-text:#aab8d4;
+    --sb-active-bg:rgba(255,255,255,.12); --sb-active-text:#ffffff;
+    --sb-edge:rgba(255,255,255,.07); --sb-shadow:6px 0 24px rgba(0,0,0,.45);
   }
   html[data-sidebar="yellow"]{
-    --sb-1:#F5B700; --sb-2:#E3A600; --sb-text:rgba(21,41,77,.80); --sb-strong:#15294d;
-    --sb-muted:rgba(21,41,77,.52); --sb-hover:rgba(21,41,77,.09); --sb-border:rgba(21,41,77,.14);
-    --sb-badge-bg:rgba(21,41,77,.12); --sb-badge-text:#15294d; --sb-accent:#1E3765; --sb-accent-text:#ffffff;
+    --sb-1:#FFC42E; --sb-2:#F0A800; --sb-text:#4a3a07; --sb-strong:#15294d;
+    --sb-muted:rgba(58,44,5,.55); --sb-hover:rgba(21,41,77,.10); --sb-border:rgba(120,84,0,.18);
+    --sb-badge-bg:rgba(21,41,77,.14); --sb-badge-text:#15294d; --sb-accent:#1E3765; --sb-accent-text:#ffffff;
+    --sb-active-bg:#1E3765; --sb-active-text:#ffffff; --sb-bar:#FFE17A;
+    --sb-edge:#d99e00; --sb-shadow:6px 0 26px rgba(120,84,0,.22);
   }
-  html.dark[data-sidebar="yellow"]{ --sb-1:#D9A300; --sb-2:#B78900; }
+  html.dark[data-sidebar="yellow"]{ --sb-1:#DBA400; --sb-2:#A87B00; --sb-edge:#8a6500; --sb-shadow:6px 0 26px rgba(0,0,0,.4); }
+  #sidebar{ border-right:1px solid var(--sb-edge); box-shadow:var(--sb-shadow); }
   .sb-item{ color:var(--sb-text); }
   .sb-item:hover{ background:var(--sb-hover); }
-  .nav-item.active{ background:var(--sb-hover); color:var(--sb-strong); }
-  .nav-item.active .bar{ opacity:1; }
+  .nav-item.active{ background:var(--sb-active-bg); color:var(--sb-active-text); }
+  .nav-item.active:hover{ background:var(--sb-active-bg); }
+  .nav-item.active .bar{ opacity:1; background:var(--sb-bar) !important; }
   body{ background:var(--bg); color:var(--text); font-family:'Inter',system-ui,sans-serif; }
   h1,h2,h3,.font-heading{ font-family:'Fredoka',system-ui,sans-serif; }
   ::-webkit-scrollbar{ width:10px; height:10px; }
@@ -642,6 +652,9 @@
 
 <!-- ===== MODO COMENTÁRIO (estilo Adobe XD) ===== -->
 <div class="fixed bottom-6 right-6 z-[78] flex flex-col items-end gap-2">
+  <button onclick="startTour()" class="w-11 h-11 rounded-full surface shadow-xl grid place-content-center hover:scale-105 transition" title="Tour da tela — conheça os recursos">
+    <span class="font-heading font-semibold text-lg text-brand-light leading-none">?</span>
+  </button>
   <button id="cmListBtn" onclick="openCommentPanel()" class="relative w-11 h-11 rounded-full surface shadow-xl grid place-content-center hover:scale-105 transition" title="Ver comentários">
     <i data-lucide="message-square" class="w-5 h-5" style="color:#7C3AED"></i>
     <span id="cmCount" class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full text-white text-[10px] font-bold grid place-content-center" style="background:#7C3AED">0</span>
@@ -686,6 +699,9 @@
 
 <!-- menu de ações da linha (3 pontinhos) -->
 <div id="rowMenu" class="hidden fixed z-[86] w-64 surface rounded-xl shadow-2xl p-1.5"></div>
+
+<!-- calendário componentizado (datepicker) -->
+<div id="datePicker" class="hidden fixed z-[89] w-[280px] surface rounded-2xl shadow-2xl p-3"></div>
 </div>
 
 <!-- pin de rascunho do comentário (mostra onde a pessoa clicou) -->
@@ -867,15 +883,10 @@ function markAllRead(){ NOTIFS.forEach(n=>n.unread=false); renderNotifs(); }
 
 /* ====================== TOUR DE BOAS-VINDAS (spotlight nos elementos reais) ====================== */
 const TOUR_STEPS=[
-  { target:null, title:'Bem-vinda à sua dashboard! 🎉', body:'Esta é a central da English Patio: matrículas, alunos, contratos, e-mails e o site — tudo num lugar só. Vamos fazer um tour rapidinho pelas coisas mais importantes?', placement:'center', logo:true },
-  { target:'[data-tour="sidebar"]', title:'Tudo começa aqui', body:'Use o menu lateral para navegar entre as telas. Os aviso amarelos mostram quando algo precisa da sua atenção.', placement:'right', pre:()=>toggleSidebar(true) },
-  { target:'[data-tour="nav-alunos"]', title:'Alunos', body:'A lista completa: busca, filtros, e ações rápidas em cada aluno — inclusive enviar o contrato pelo WhatsApp com um clique.', placement:'right', pre:()=>toggleSidebar(true) },
-  { target:'[data-tour="nav-editor"]', title:'Editor do site', body:'Aqui você muda os textos do site de verdade: passa o mouse, clica no que quer mudar e escreve. Sem precisar de programador.', placement:'right', pre:()=>toggleSidebar(true) },
-  { target:'[data-tour="kpis"]', title:'O resumo da escola', body:'Alunos ativos, novos da semana, contratos pendentes… os números mais importantes, sempre à vista.', placement:'bottom', pre:()=>toggleSidebar(false) },
-  { target:'[data-tour="bell"]', title:'Novas matrículas avisam aqui', body:'Cada matrícula feita no site aparece neste sininho na hora. É só clicar para abrir a ficha do aluno.', placement:'bottom' },
-  { target:'[data-tour="theme"]', title:'Do seu jeito', body:'Modo claro ou escuro. E lá embaixo na barra lateral você escolhe a cor dela: azul, branca ou amarela.', placement:'bottom' },
-  { target:'#cmFab', title:'O botão mais importante deste preview 💜', body:'Viu algo que quer mudar? Clique em "Comentar", depois clique em qualquer parte da tela e escreva sua sugestão. Tudo chega direto para a equipe!', placement:'top' },
-  { target:null, title:'Pronto, é só explorar! ✨', body:'Clique à vontade — os dados são fictícios, nada aqui quebra. E qualquer ideia que tiver, use o botão roxo de comentários.', placement:'center', last:true },
+  { target:null, title:'Bem-vinda ao preview da dashboard! 🎉', body:'Explore à vontade — os dados são fictícios e nada aqui quebra. Deixa eu te mostrar só o que não dá pra descobrir sozinha:', placement:'center', logo:true },
+  { target:'[data-tour="nav-editor"]', title:'Editor do site', body:'Aqui você muda os textos do site real: passe o mouse sobre um texto (aparece uma borda pontilhada amarela), clique e escreva.', placement:'right', pre:()=>toggleSidebar(true) },
+  { target:'#sbThemeDots', title:'Deixe com a sua cara', body:'Essas bolinhas trocam a cor da barra lateral — azul, branca ou amarela. E a luinha ao lado liga o modo escuro.', placement:'right', pre:()=>toggleSidebar(true) },
+  { target:'#cmFab', title:'O botão mais importante 💜', body:'Viu algo que quer mudar? Clique em "Comentar", depois em qualquer parte da tela, e escreva sua sugestão. Tudo chega para a equipe — e quando for ajustado, o alfinete fica verde com a resposta.', placement:'top', pre:()=>toggleSidebar(false), last:true },
 ];
 let tourI=0, tourActive=false, tourBuilt=false;
 function maybeStartTour(){ if(!localStorage.getItem('ep-tour-done')) startTour(); }
@@ -1406,15 +1417,16 @@ function openNewEnrollment(){
     <label class="block"><span class="text-sm font-medium">Nome do aluno</span>
       <input id="nmStudent" placeholder="Nome completo" class="${inputCls}"></label>
     <div class="grid grid-cols-2 gap-3">
-      <label class="block"><span class="text-sm font-medium">Nascimento</span>
-        <input id="nmBirth" placeholder="dd/mm/aaaa" class="${inputCls}"></label>
+      <label class="block relative"><span class="text-sm font-medium">Nascimento</span>
+        <input id="nmBirth" placeholder="dd/mm/aaaa" oninput="maskDate(this)" inputmode="numeric" class="${inputCls} pr-10">
+        <button type="button" onclick="openDatePicker(event,'nmBirth',2018)" class="dp-btn absolute right-2 bottom-[9px] p-1 rounded-md text-[var(--muted)] hover:text-brand-light hover:bg-[var(--hover)] transition" title="Abrir calendário"><i data-lucide="calendar" class="w-4 h-4"></i></button></label>
       <div><span class="text-sm font-medium">Horário</span><div class="mt-1.5" id="nmSchWrap"></div></div>
     </div>
     <label class="block"><span class="text-sm font-medium">Responsável legal</span>
       <input id="nmResp" placeholder="Nome do responsável" class="${inputCls}"></label>
     <div class="grid grid-cols-2 gap-3">
       <label class="block"><span class="text-sm font-medium">Telefone</span>
-        <input id="nmPhone" placeholder="(62) 9xxxx-xxxx" class="${inputCls}"></label>
+        <input id="nmPhone" placeholder="(62) 9xxxx-xxxx" oninput="maskPhone(this)" inputmode="numeric" class="${inputCls}"></label>
       <div><span class="text-sm font-medium">Pagamento</span><div class="mt-1.5" id="nmPayWrap"></div></div>
     </div>
     <label class="block"><span class="text-sm font-medium">Bairro</span>
@@ -1608,6 +1620,76 @@ function openAccountModal(){
   </div>`);
 }
 
+/* ====================== MÁSCARAS DE INPUT ====================== */
+function maskDate(el){
+  let v=el.value.replace(/\D/g,'').slice(0,8);
+  if(v.length>=5) v=v.slice(0,2)+'/'+v.slice(2,4)+'/'+v.slice(4);
+  else if(v.length>=3) v=v.slice(0,2)+'/'+v.slice(2);
+  el.value=v;
+}
+function maskPhone(el){
+  const v=el.value.replace(/\D/g,'').slice(0,11);
+  let out=v;
+  if(v.length>7) out='('+v.slice(0,2)+') '+v.slice(2,7)+'-'+v.slice(7);
+  else if(v.length>2) out='('+v.slice(0,2)+') '+v.slice(2);
+  else if(v.length>0) out='('+v;
+  el.value=out;
+}
+
+/* ====================== DATEPICKER (calendário componentizado) ====================== */
+const DP_MONTHS=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+let dpTarget=null, dpM=0, dpY=2018, dpMode='days', dpYearBase=2012;
+function openDatePicker(e,inputId,startYear){
+  e.stopPropagation();
+  dpTarget=document.getElementById(inputId); if(!dpTarget) return;
+  const m=dpTarget.value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if(m){ dpY=+m[3]; dpM=+m[2]-1; } else { dpY=startYear||2018; dpM=0; }
+  dpMode='days'; dpYearBase=dpY-5;
+  const dp=document.getElementById('datePicker');
+  dp.classList.remove('hidden');
+  renderDP();
+  const r=e.currentTarget.getBoundingClientRect();
+  const h=dp.offsetHeight||320;
+  dp.style.left=Math.max(10,Math.min(r.left-120,innerWidth-292))+'px';
+  dp.style.top=(r.bottom+h+12>innerHeight ? r.top-h-8 : r.bottom+8)+'px';
+}
+function closeDP(){ document.getElementById('datePicker')?.classList.add('hidden'); dpTarget=null; }
+function dpNav(d){ if(dpMode==='years'){ dpYearBase+=d*12; } else { dpM+=d; if(dpM<0){dpM=11;dpY--;} if(dpM>11){dpM=0;dpY++;} } renderDP(); }
+function dpToggleMode(){ dpMode=dpMode==='days'?'years':'days'; if(dpMode==='years') dpYearBase=dpY-5; renderDP(); }
+function dpPickYear(y){ dpY=y; dpMode='days'; renderDP(); }
+function dpPick(d){
+  if(!dpTarget) return;
+  dpTarget.value=String(d).padStart(2,'0')+'/'+String(dpM+1).padStart(2,'0')+'/'+dpY;
+  closeDP();
+}
+function renderDP(){
+  const dp=document.getElementById('datePicker');
+  const sel=dpTarget?.value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  const navBtn=(d,ic)=>`<button onclick="event.stopPropagation();dpNav(${d})" class="w-8 h-8 rounded-lg grid place-content-center hover:bg-[var(--hover)] transition"><i data-lucide="${ic}" class="w-4 h-4 text-[var(--muted)]"></i></button>`;
+  let body='';
+  if(dpMode==='years'){
+    body=`<div class="grid grid-cols-3 gap-1.5 mt-2">${Array.from({length:12},(_,i)=>{const y=dpYearBase+i;
+      return `<button onclick="event.stopPropagation();dpPickYear(${y})" class="h-9 rounded-lg text-sm font-medium transition ${y===dpY?'text-white':'hover:bg-[var(--hover)]'}" ${y===dpY?'style="background:#1E3765"':''}>${y}</button>`;}).join('')}</div>`;
+  } else {
+    const firstDow=new Date(dpY,dpM,1).getDay();
+    const nDays=new Date(dpY,dpM+1,0).getDate();
+    const cells=[];
+    for(let i=0;i<firstDow;i++) cells.push('<span></span>');
+    for(let d=1;d<=nDays;d++){
+      const isSel=sel && +sel[1]===d && +sel[2]===dpM+1 && +sel[3]===dpY;
+      cells.push(`<button onclick="event.stopPropagation();dpPick(${d})" class="h-8 w-8 rounded-lg text-[13px] font-medium transition ${isSel?'text-white':'hover:bg-[var(--hover)]'}" ${isSel?'style="background:#1E3765"':''}>${d}</button>`);
+    }
+    body=`<div class="grid grid-cols-7 gap-0.5 mt-1 text-center text-[10px] font-bold text-[var(--muted)] uppercase"><span>D</span><span>S</span><span>T</span><span>Q</span><span>Q</span><span>S</span><span>S</span></div>
+    <div class="grid grid-cols-7 gap-0.5 mt-1 place-items-center">${cells.join('')}</div>`;
+  }
+  dp.innerHTML=`<div class="flex items-center justify-between">
+    ${navBtn(-1,'chevron-left')}
+    <button onclick="event.stopPropagation();dpToggleMode()" class="font-heading font-semibold text-sm px-3 py-1.5 rounded-lg hover:bg-[var(--hover)] transition">${dpMode==='years'?`${dpYearBase} – ${dpYearBase+11}`:`${DP_MONTHS[dpM]} ${dpY}`}</button>
+    ${navBtn(1,'chevron-right')}
+  </div>${body}`;
+  lucide.createIcons();
+}
+
 /* ====================== MENU DE AÇÕES DA LINHA ====================== */
 function openRowMenu(e,id){
   e.stopPropagation();
@@ -1786,13 +1868,16 @@ function closeCommentPanel(){ document.getElementById('commentPanel').style.tran
 /* keyboard + cliques globais */
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){
-    closeEdit();closeForgot();closeModal();closeCommentPanel();csCloseAll();cmCancel();closeRowMenu();
+    closeEdit();closeForgot();closeModal();closeCommentPanel();csCloseAll();cmCancel();closeRowMenu();closeDP();
     document.getElementById('notifPanel')?.classList.add('hidden');
     if(commentMode) toggleCommentMode();
     if(tourActive) endTour(false);
   }
 });
-document.addEventListener('click',e=>{ if(!e.target.closest('#rowMenu')) closeRowMenu(); });
+document.addEventListener('click',e=>{
+  if(!e.target.closest('#rowMenu')) closeRowMenu();
+  if(!e.target.closest('#datePicker') && !e.target.closest('.dp-btn')) closeDP();
+});
 applySidebarTheme();
 lucide.createIcons();
 </script>
