@@ -174,9 +174,11 @@ export async function fillContractPDF(formData: ContractData): Promise<Uint8Arra
 
     // Nome do Contratado (linha de assinatura "CONTRATADO")
     // Este campo é fixo e sempre será "English Patio Ltda"
+    // Obs.: no contrato semestral (Jul-Dez/2026) esta linha desceu ~19pt em
+    // relação ao contrato anual (era page4Height - 667). Demais campos iguais.
     page4.drawText('ENGLISH PATIO LTDA', {
       x: 170,
-      y: page4Height - 667,
+      y: page4Height - 686,
       size: fontSize,
       font: font,
       color: textColor,

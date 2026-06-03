@@ -110,9 +110,9 @@ const ContractModal = ({ isOpen, onClose }: ContractModalProps) => {
 
                   <div className="bg-yellow-50 border-l-4 border-yellow-500 p-3">
                     <p className="text-sm text-gray-800">
-                      <strong>Parágrafo Primeiro:</strong> As Vacation Classes realizar-se-ão durante o ano, em dias e
+                      <strong>Parágrafo Primeiro:</strong> As Vacation Classes realizar-se-ão durante o semestre, em dias e
                       horários previamente agendados pelo contratado, de acordo com a disponibilidade da grade de horários,
-                      no total de 8 (oito) aulas de 02 (duas) horas cada, sendo os dias e horários informados ao contratante
+                      no total de 4 (quatro) aulas de 02 (duas) horas cada, sendo os dias e horários informados ao contratante
                       com antecedência, em tempo hábil, por qualquer meio idôneo de comunicação.
                     </p>
                   </div>
@@ -127,8 +127,8 @@ const ContractModal = ({ isOpen, onClose }: ContractModalProps) => {
                     </p>
                     <p className="text-sm text-gray-800 mt-2">
                       Fica expressamente estabelecido que as referidas mensalidades são parte integrante do valor total
-                      ajustado neste contrato. Assim, <strong>não haverá desconto, compensação, abatimento ou restituição</strong> dos
-                      valores correspondentes às mensalidades de Janeiro e Julho, ainda que o(a) Contratante opte por não
+                      ajustado neste contrato. Assim, <strong>não haverá desconto, compensação, abatimento ou restituição</strong> do
+                      valor correspondente à mensalidade de Julho, ainda que o(a) Contratante opte por não
                       participar, total ou parcialmente, das referidas atividades.
                     </p>
                   </div>
@@ -167,7 +167,7 @@ const ContractModal = ({ isOpen, onClose }: ContractModalProps) => {
 
                 <div className="space-y-3">
                   <p className="text-gray-700 leading-relaxed">
-                    <strong>CLÁUSULA 7ª.</strong> A mensalidade tem o valor de <strong>R$ 560,00 (por aluno)</strong>.
+                    <strong>CLÁUSULA 7ª.</strong> A mensalidade tem o valor de <strong>R$ 560,00</strong>.
                     O adimplemento das mensalidades, por parte do contratante, será realizado, exclusivamente, por meio
                     de boleto bancário emitido pela contratada, os quais serão entregues quando da assinatura do contrato.
                   </p>
@@ -193,13 +193,13 @@ const ContractModal = ({ isOpen, onClose }: ContractModalProps) => {
 
                 <div className="space-y-3">
                   <p className="text-gray-700 leading-relaxed">
-                    <strong>CLÁUSULA 9ª.</strong> O presente contrato terá vigência de <strong>12 (doze) meses</strong>,
-                    iniciando em Janeiro e finalizando em Dezembro de 2026.
+                    <strong>CLÁUSULA 9ª.</strong> O presente contrato terá vigência de <strong>6 (seis) meses</strong>,
+                    iniciando em Julho e finalizando em Dezembro de 2026.
                   </p>
 
                   <div className="bg-green-50 border-l-4 border-green-500 p-3">
                     <p className="text-sm text-gray-800">
-                      <strong>Parágrafo Primeiro:</strong> Um carnê físico será entregue ao responsável no ato da matrícula com 12 parcelas.
+                      <strong>Parágrafo Primeiro:</strong> Um carnê físico será entregue ao responsável no ato da matrícula com 6 parcelas.
                     </p>
                   </div>
                 </div>
