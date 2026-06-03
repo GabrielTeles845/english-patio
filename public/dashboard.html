@@ -128,6 +128,21 @@
   #dashGrid.customizing .dash-card > *{ pointer-events:none; }
   #dashGrid .dash-card.dragging{ opacity:.35; outline-style:solid; }
   @keyframes wiggle{ from{ transform:rotate(-.15deg);} to{ transform:rotate(.15deg);} }
+  /* tooltip customizado da marca (toda title= vira isso automaticamente) */
+  .tip{ position:relative; }
+  .tip:hover::after{ content:attr(data-tip); position:absolute; bottom:calc(100% + 8px); left:50%;
+    transform:translateX(-50%); background:#15294d; color:#fff; font-size:11px; font-weight:600;
+    font-family:'Inter'; padding:6px 10px; border-radius:10px; width:max-content; max-width:230px;
+    white-space:normal; text-align:center; line-height:1.35;
+    box-shadow:0 8px 20px rgba(0,0,0,.28); z-index:96; pointer-events:none; }
+  .tip:hover::before{ content:''; position:absolute; bottom:calc(100% + 3px); left:50%;
+    transform:translateX(-50%); border:5px solid transparent; border-top-color:#15294d; z-index:96; pointer-events:none; }
+  .tip-bottom:hover::after{ bottom:auto; top:calc(100% + 8px); }
+  .tip-bottom:hover::before{ bottom:auto; top:calc(100% + 3px); border-top-color:transparent; border-bottom-color:#15294d; }
+  .tip-end:hover::after{ left:auto; right:0; transform:none; }
+  .tip-end:hover::before{ left:auto; right:14px; transform:none; }
+  .tip-start:hover::after{ left:0; right:auto; transform:none; }
+  .tip-start:hover::before{ left:14px; right:auto; transform:none; }
   /* transição circular do modo claro/escuro (View Transitions) */
   ::view-transition-old(root), ::view-transition-new(root){ animation:none; mix-blend-mode:normal; }
   /* select customizado */
@@ -190,7 +205,8 @@
             <span class="text-sm font-medium">Senha</span>
             <div class="mt-1.5 flex items-center gap-2 rounded-xl px-3 h-11 border border-[var(--border)] focus-within:ring-2 ring-brand-light transition" style="background:var(--bg)">
               <i data-lucide="lock" class="w-4 h-4 text-[var(--muted)]"></i>
-              <input type="password" value="••••••••••" class="flex-1 bg-transparent outline-none text-sm">
+              <input type="password" value="senha-demo-123" class="flex-1 bg-transparent outline-none text-sm">
+              <button type="button" onclick="togglePass(this)" class="p-1 -mr-1 rounded-md text-[var(--muted)] hover:text-brand-light transition" title="Mostrar/ocultar senha"><i data-lucide="eye" class="w-4 h-4"></i></button>
             </div>
           </label>
           <div class="flex items-center justify-between text-sm">
@@ -538,6 +554,11 @@
           <span id="fScheduleWrap"></span>
           <span id="fStatusWrap"></span>
           <span id="fActiveWrap"></span>
+          <span id="fHoodWrap"></span>
+          <span id="fAgeWrap"></span>
+          <span id="fMediaWrap"></span>
+          <span id="fSibWrap"></span>
+          <button onclick="clearFilters()" class="h-10 px-3 rounded-xl text-sm font-medium text-[var(--muted)] hover:bg-[var(--hover)] transition flex items-center gap-1.5"><i data-lucide="filter-x" class="w-4 h-4"></i>Limpar</button>
         </div>
 
         <!-- tabela com design próprio (cabeçalho ordenável renderizado via JS) -->
@@ -882,6 +903,8 @@ const STUDENTS = [
   { id:11, kids:[{n:'Laura Cavalcante Reis', age:10, b:'12/12/2015'}], resp:{n:'Daniela Reis', cpf:'063.778.221-49', phone:'(62) 99334-1180', email:'dani.reis@gmail.com', rel:'Mãe', b:'30/01/1987'}, second:null, fin:'Daniela Reis', addr:{cep:'74343-230', street:'Rua RF-12', num:'140', comp:'Qd 8', bairro:'Residencial Forte', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'15h00–16h30', pay:'PIX', status:'signed', media:true, date:'22/05/2026', hora:'20h33' },
   { id:12, kids:[{n:'Gabriel Fonseca Lopes', age:11, b:'07/08/2014'}], resp:{n:'Simone Fonseca', cpf:'174.882.605-77', phone:'(62) 98445-2290', email:'simone.fonseca@yahoo.com', rel:'Mãe', b:'08/10/1982'}, second:{n:'Thiago Lopes', phone:'(62) 99221-5544', rel:'Pai'}, fin:'Thiago Lopes', addr:{cep:'74150-020', street:'Av. T-63', num:'880', comp:'Apto 701', bairro:'Setor Bueno', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'16h30–18h00', pay:'Cartão', status:'sent', media:true, date:'21/05/2026', hora:'17h44' },
   { id:13, kids:[{n:'Valentina Almeida Prado', age:9, b:'15/04/2017'},{n:'Henrique Almeida Prado', age:11, b:'20/09/2014'},{n:'Cecília Almeida Prado', age:6, b:'02/01/2020'}], resp:{n:'Roberta Almeida Prado', cpf:'288.443.190-66', phone:'(62) 99845-7733', email:'roberta.prado@gmail.com', rel:'Mãe', b:'11/07/1985'}, second:{n:'Eduardo Prado', phone:'(62) 99102-8844', rel:'Pai'}, fin:'Eduardo Prado', addr:{cep:'74110-100', street:'Rua 9', num:'520', comp:'Casa 1', bairro:'Setor Oeste', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'16h30–18h00', pay:'PIX', status:'signed', media:true, date:'20/05/2026', hora:'19h58' },
+  // mesma mãe da Helena (id 1), em matrícula separada — agrupa ao ordenar por responsável
+  { id:14, kids:[{n:'Lorenzo Duarte Lima', age:5, b:'09/10/2021'}], resp:{n:'Mariana Duarte Lima', cpf:'047.812.336-50', phone:'(62) 99214-8870', email:'mariana.duarte@gmail.com', rel:'Mãe', b:'09/05/1989'}, second:{n:'Rafael Lima', phone:'(62) 98112-4471', rel:'Pai'}, fin:'Mariana Duarte Lima', addr:{cep:'74230-110', street:'Rua T-55', num:'180', comp:'Apto 902', bairro:'Setor Bueno', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'14h00–15h30', pay:'Boleto', status:'sent', media:true, date:'19/05/2026', hora:'20h41' },
 ];
 
 const palette = ['#1E3765','#2F539A','#F5B700','#7C9AD6','#B5860B','#16a34a','#9333ea','#0891b2','#dc2626','#ea580c','#0d9488','#65a30d'];
@@ -1170,7 +1193,9 @@ function rowHTML(s){
   return `<div onclick="openDetail(${s.id})" class="grid grid-cols-1 md:grid-cols-[1.6fr_1.3fr_.75fr_.85fr_.7fr_.85fr_52px] gap-3 px-5 py-3.5 items-center cursor-pointer hover:bg-[var(--hover)] transition border-b last:border-0 ${inactive?'opacity-60':''}" style="border-color:var(--border)">
     <div class="flex items-center gap-3 min-w-0">
       <div class="w-10 h-10 rounded-xl grid place-content-center text-white font-semibold text-sm shrink-0" style="background:linear-gradient(135deg,${palette[s.id%palette.length]},#2F539A);${inactive?'filter:grayscale(.7)':''}">${initials(s.kids[0].n)}</div>
-      <div class="min-w-0"><p class="font-medium truncate flex items-center gap-2">${s.kids[0].n} ${more}${s.media===false?'<span class="inline-grid place-content-center w-5 h-5 rounded-md shrink-0" style="background:rgba(220,38,38,.10);color:#dc2626" title="NÃO autorizou uso de imagem"><i data-lucide="camera-off" class="w-3 h-3"></i></span>':''}</p>
+      <div class="min-w-0"><p class="font-medium truncate flex items-center gap-2">${s.kids[0].n} ${more}${s.media===false
+        ? '<span class="tip inline-grid place-content-center w-5 h-5 rounded-md shrink-0" data-tip="Não autorizou uso de imagem" style="background:rgba(220,38,38,.10);color:#dc2626"><i data-lucide="camera-off" class="w-3 h-3"></i></span>'
+        : '<span class="tip inline-grid place-content-center w-5 h-5 rounded-md shrink-0" data-tip="Autorizou uso de imagem" style="background:rgba(22,163,74,.10);color:#16a34a"><i data-lucide="camera" class="w-3 h-3"></i></span>'}</p>
         <p class="text-xs text-[var(--muted)]">${s.kids[0].age} anos · ${s.addr.bairro}</p></div>
     </div>
     <div class="min-w-0"><p class="text-sm truncate">${s.resp.n}</p><p class="text-xs text-[var(--muted)]">${s.resp.rel} · ${s.resp.phone}</p></div>
@@ -1186,11 +1211,22 @@ function rowHTML(s){
 function filteredStudents(){
   const q=(document.getElementById('alunoSearch')?.value||'').toLowerCase();
   const fs=SEL.fSchedule?.value||'', fst=SEL.fStatus?.value||'', fa=SEL.fActive?.value||'';
+  const fh=SEL.fHood?.value||'', fage=SEL.fAge?.value||'', fm=SEL.fMedia?.value||'', fsib=SEL.fSib?.value||'';
   return STUDENTS.filter(s=>{
     const hay=(s.kids.map(k=>k.n).join(' ')+' '+s.resp.n+' '+s.addr.bairro).toLowerCase();
     const act = fa==='' ? true : fa==='on' ? s.active!==false : s.active===false;
-    return hay.includes(q) && (!fs||s.sch===fs) && (!fst||s.status===fst) && act;
+    const ageOk = !fage || s.kids.some(k=>fage==='4-6'?k.age>=4&&k.age<=6 : fage==='7-9'?k.age>=7&&k.age<=9 : fage==='10-12'?k.age>=10&&k.age<=12 : k.age>=13);
+    const mediaOk = !fm || (fm==='yes' ? s.media!==false : s.media===false);
+    const sibOk = !fsib || (fsib==='multi' ? s.kids.length>1 : s.kids.length===1);
+    return hay.includes(q) && (!fs||s.sch===fs) && (!fst||s.status===fst) && act
+      && (!fh||s.addr.bairro===fh) && ageOk && mediaOk && sibOk;
   });
+}
+function clearFilters(){
+  const inp=document.getElementById('alunoSearch'); if(inp) inp.value='';
+  ['fSchedule','fStatus','fActive','fHood','fAge','fMedia','fSib'].forEach(id=>csSet(id,''));
+  renderTable();
+  toast('Filtros limpos.');
 }
 /* ordenação por coluna (nome como padrão) */
 const TABLE_COLS=[
@@ -1627,6 +1663,11 @@ function init(){
   document.getElementById('fScheduleWrap').innerHTML=cselect('fSchedule',[{v:'',l:'Todos os horários'},{v:'seg-qua',l:'Seg/Qua'},{v:'ter-qui',l:'Ter/Qui'}],{onChange:renderTable});
   document.getElementById('fStatusWrap').innerHTML=cselect('fStatus',[{v:'',l:'Contrato: todos'},{v:'signed',l:'Assinado'},{v:'sent',l:'Enviado'},{v:'pending',l:'Pendente'}],{onChange:renderTable});
   document.getElementById('fActiveWrap').innerHTML=cselect('fActive',[{v:'',l:'Situação: todas'},{v:'on',l:'Ativas'},{v:'off',l:'Inativas'}],{onChange:renderTable});
+  const hoods=[...new Set(STUDENTS.map(s=>s.addr.bairro))].sort();
+  document.getElementById('fHoodWrap').innerHTML=cselect('fHood',[{v:'',l:'Bairro: todos'},...hoods.map(h=>({v:h,l:h}))],{onChange:renderTable});
+  document.getElementById('fAgeWrap').innerHTML=cselect('fAge',[{v:'',l:'Idade: todas'},{v:'4-6',l:'4 a 6 anos'},{v:'7-9',l:'7 a 9 anos'},{v:'10-12',l:'10 a 12 anos'},{v:'13+',l:'13 anos ou mais'}],{onChange:renderTable});
+  document.getElementById('fMediaWrap').innerHTML=cselect('fMedia',[{v:'',l:'Imagem: todos'},{v:'yes',l:'Autorizou imagem'},{v:'no',l:'Não autorizou'}],{onChange:renderTable});
+  document.getElementById('fSibWrap').innerHTML=cselect('fSib',[{v:'',l:'Irmãos: todos'},{v:'multi',l:'Com irmãos'},{v:'single',l:'Aluno único'}],{onChange:renderTable});
   renderTableHead();
   document.getElementById('emailToWrap').innerHTML=cselect('emailTo',[{v:'all',l:'Todos os responsáveis (96)'},{v:'sq',l:'Apenas turma Seg/Qua (71)'},{v:'tq',l:'Apenas turma Ter/Qui (57)'},{v:'pend',l:'Contratos pendentes (7)'}],{block:true});
   // conteúdo
@@ -1651,6 +1692,17 @@ const modalHeader = t => `<div class="flex items-center justify-between px-5 h-1
   <h3 class="font-heading font-semibold text-lg">${t}</h3>
   <button onclick="closeModal()" class="p-2 rounded-lg hover:bg-[var(--hover)]"><i data-lucide="x" class="w-5 h-5"></i></button></div>`;
 const inputCls='mt-1.5 w-full h-11 rounded-xl border border-[var(--border)] bg-[var(--card)] px-3 text-sm outline-none focus:ring-2 ring-brand-light';
+/* input de senha componentizado, com olhinho */
+const passInput=(label,extra='')=>`<label class="block relative ${extra}"><span class="text-sm font-medium">${label}</span>
+  <input type="password" class="${inputCls} pr-10">
+  <button type="button" onclick="togglePass(this)" class="absolute right-2 bottom-[9px] p-1 rounded-md text-[var(--muted)] hover:text-brand-light hover:bg-[var(--hover)] transition" title="Mostrar/ocultar senha"><i data-lucide="eye" class="w-4 h-4"></i></button></label>`;
+function togglePass(btn){
+  const inp=btn.parentElement.querySelector('input'); if(!inp) return;
+  const show=inp.type==='password';
+  inp.type=show?'text':'password';
+  btn.querySelector('svg,i')?.setAttribute('data-lucide', show?'eye-off':'eye');
+  lucide.createIcons();
+}
 
 /* --- nova matrícula --- */
 function openNewEnrollment(){
@@ -1794,9 +1846,9 @@ function openContractModal(id){
 function openChangePass(){
   openModal(`${modalHeader('Trocar senha')}
   <div class="p-5 space-y-3">
-    <label class="block"><span class="text-sm font-medium">Senha atual</span><input type="password" class="${inputCls}"></label>
-    <label class="block"><span class="text-sm font-medium">Nova senha</span><input type="password" class="${inputCls}"></label>
-    <label class="block"><span class="text-sm font-medium">Confirmar nova senha</span><input type="password" class="${inputCls}"></label>
+    ${passInput('Senha atual')}
+    ${passInput('Nova senha')}
+    ${passInput('Confirmar nova senha')}
     <p class="text-xs text-[var(--muted)] flex items-center gap-1.5"><i data-lucide="shield-check" class="w-3.5 h-3.5 shrink-0"></i> Mínimo de 10 caracteres, com letras e números.</p>
   </div>
   <div class="p-5 pt-0 flex gap-2">
@@ -1855,9 +1907,9 @@ function openAccountModal(){
       <input id="accEmail" type="email" value="priscylla@englishpatio.com.br" class="${inputCls}"></label>
     <div class="pt-3 border-t" style="border-color:var(--border)">
       <p class="text-sm font-semibold mb-2">Trocar senha <span class="font-normal text-xs text-[var(--muted)]">(deixe em branco para manter)</span></p>
-      <label class="block mb-2"><span class="text-sm font-medium">Senha atual</span><input type="password" class="${inputCls}"></label>
-      <label class="block mb-2"><span class="text-sm font-medium">Nova senha</span><input type="password" class="${inputCls}"></label>
-      <label class="block"><span class="text-sm font-medium">Confirmar nova senha</span><input type="password" class="${inputCls}"></label>
+      ${passInput('Senha atual','mb-2')}
+      ${passInput('Nova senha','mb-2')}
+      ${passInput('Confirmar nova senha')}
     </div>
     <p class="text-xs text-[var(--muted)] flex items-center gap-1.5"><i data-lucide="shield-check" class="w-3.5 h-3.5 shrink-0"></i> Ao trocar e-mail ou senha, você recebe uma confirmação no e-mail antigo.</p>
   </div>
@@ -2206,6 +2258,23 @@ document.addEventListener('click',e=>{
   if(!e.target.closest('#rowMenu')) closeRowMenu();
   if(!e.target.closest('#datePicker') && !e.target.closest('.dp-btn')) closeDP();
 });
+
+/* toda title= vira tooltip da marca, inclusive em conteúdo renderizado depois */
+function upgradeTooltips(){
+  document.querySelectorAll('[title]').forEach(el=>{
+    const t=el.getAttribute('title'); if(!t) return;
+    el.removeAttribute('title');
+    el.setAttribute('data-tip',t);
+    el.classList.add('tip');
+    const r=el.getBoundingClientRect();
+    if(r.top<80) el.classList.add('tip-bottom');
+    if(r.right>innerWidth-130) el.classList.add('tip-end');
+    else if(r.left<130) el.classList.add('tip-start');
+  });
+}
+const __createIcons=lucide.createIcons.bind(lucide);
+lucide.createIcons=opts=>{ __createIcons(opts); upgradeTooltips(); };
+
 applySidebarTheme();
 lucide.createIcons();
 </script>

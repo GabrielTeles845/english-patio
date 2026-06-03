@@ -99,3 +99,30 @@ Setup guides: `docs/INSTRUCOES-CONFIGURACAO.md`, `docs/IMPLEMENTACAO_EMAIL_SHEET
 ## TypeScript / Lint Notes
 
 Strict mode plus `noUnusedLocals`, `noUnusedParameters`, `noFallthroughCasesInSwitch`. Because `lint` runs with `--max-warnings 0` and `build` runs `tsc`, unused imports/vars will fail CI — clean them up as you go.
+
+## Dashboard Administrativa (preview em `/dashboard`)
+
+`public/dashboard.html` é o preview navegável da futura dashboard (plano completo em
+`docs/DASHBOARD_PLAN.md`, feedback via `docs/google-apps-script/FeedbackPreview.gs`).
+Regras de design definidas pelo Gabriel — valem para o preview **e** para a versão final:
+
+- **Nunca usar controles HTML crus**: nada de `<select>`, checkbox nativa, tooltip nativa
+  (`title=`), date input nativo ou `alert/confirm`. Tudo componentizado no estilo shadcn —
+  o preview já tem select (`cselect`), checkbox (`.ck`), tooltip (`.tip`, com conversão
+  automática de `title=`), datepicker e modais próprios.
+- Inputs sempre com máscara quando aplicável (data `dd/mm/aaaa`, telefone) e campos de
+  senha com botão de mostrar/ocultar (olhinho).
+- **Toasts amarelos** (`#F5B700` com texto navy `#15294d`) — nunca verdes.
+- Linguagem **neutra** (sem "bem-vinda"/flexão feminina) e uso mínimo de emojis.
+- Papéis: **Administrador** (sem flexão de gênero; acesso total) e **Secretaria**
+  (só vê alunos e envia contratos).
+- Forma de pagamento é **sempre boleto/carnê em 6 parcelas** (conforme o contrato real) —
+  não inventar PIX/cartão/dinheiro.
+- Tema claro por padrão; 3 temas de sidebar (azul / branca / **amarela em tom pastel**,
+  nunca amarelo saturado chapado) × claro/escuro, com borda+sombra separando do conteúdo.
+- Modo escuro com animação circular (View Transitions) a partir do clique.
+- Tours guiados **por tela** (spotlight + halo amarelo) com opt-out global e botão "?".
+- Ações por linha concentradas no menu ⋮ (sem fileira de ícones soltos); transições de
+  status do contrato só mostram opções válidas para o status atual.
+- Comentários estilo Figma (pin roxo, sem login) são o canal de feedback da dona; ao
+  resolver um feedback, registrar o id no mapa `RESOLVED` do `dashboard.html`.
