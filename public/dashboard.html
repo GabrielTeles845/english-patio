@@ -278,9 +278,6 @@
             <span class="bar absolute left-0 top-2 bottom-2 w-1 rounded-full opacity-0 transition" style="background:var(--sb-accent)"></span>
             <i data-lucide="file-text" class="w-[18px] h-[18px]"></i><span class="text-sm font-medium">Contratos</span>
             <span class="ml-auto text-[11px] px-2 py-0.5 rounded-full" style="background:var(--sb-badge-bg);color:var(--sb-badge-text)">7 pend.</span></a>
-          <a class="nav-item sb-item group relative flex items-center gap-3 px-3 h-10 rounded-xl transition cursor-pointer" onclick="go('remat', this)">
-            <span class="bar absolute left-0 top-2 bottom-2 w-1 rounded-full opacity-0 transition" style="background:var(--sb-accent)"></span>
-            <i data-lucide="repeat" class="w-[18px] h-[18px]"></i><span class="text-sm font-medium">Rematrículas</span></a>
           <a class="nav-item sb-item group relative flex items-center gap-3 px-3 h-10 rounded-xl transition cursor-pointer" onclick="go('emails', this)">
             <span class="bar absolute left-0 top-2 bottom-2 w-1 rounded-full opacity-0 transition" style="background:var(--sb-accent)"></span>
             <i data-lucide="megaphone" class="w-[18px] h-[18px]"></i><span class="text-sm font-medium">Comunicados</span></a>
@@ -604,11 +601,6 @@
         <div id="modelosContent"></div>
       </section>
 
-      <!-- ====================== REMATRÍCULAS (campanha com link mágico) ====================== -->
-      <section data-view="remat" class="fade-in">
-        <div id="rematContent"></div>
-      </section>
-
       <!-- ====================== E-MAILS ====================== -->
       <section data-view="emails" class="fade-in">
         <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
@@ -833,7 +825,7 @@
                 <div><p class="font-medium text-sm">Rever as dicas desta tela</p><p class="text-xs text-[var(--muted)]">O botão "?" no canto faz o mesmo em qualquer tela</p></div>
                 <i data-lucide="play-circle" class="w-5 h-5 text-brand-light"></i>
               </div>
-              <div onclick="localStorage.removeItem('ep-tours-off');['overview','alunos','editor','contratos','modelos','remat','emails','usuarios','config'].forEach(v=>localStorage.removeItem('ep-tour-seen-'+v));toast('Dicas reativadas em todas as telas!')" class="flex items-center justify-between pt-3 border-t cursor-pointer hover:bg-[var(--hover)] -mx-2 px-2 py-1.5 rounded-lg transition" style="border-color:var(--border)">
+              <div onclick="localStorage.removeItem('ep-tours-off');['overview','alunos','editor','contratos','modelos','emails','usuarios','config'].forEach(v=>localStorage.removeItem('ep-tour-seen-'+v));toast('Dicas reativadas em todas as telas!')" class="flex items-center justify-between pt-3 border-t cursor-pointer hover:bg-[var(--hover)] -mx-2 px-2 py-1.5 rounded-lg transition" style="border-color:var(--border)">
                 <div><p class="font-medium text-sm">Reativar dicas em todas as telas</p><p class="text-xs text-[var(--muted)]">Volta a mostrar os tours uma vez por tela</p></div>
                 <i data-lucide="rotate-ccw" class="w-5 h-5 text-[var(--muted)]"></i>
               </div>
@@ -1123,7 +1115,7 @@ function go(view, el){
   document.querySelectorAll('[data-view]').forEach(s=>s.classList.toggle('view-active', s.dataset.view===view));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   if(el){ el.classList.add('active'); }
-  else { const map={overview:0,alunos:1,contratos:2,remat:3,emails:4,editor:5,usuarios:6,config:7};
+  else { const map={overview:0,alunos:1,contratos:2,emails:3,editor:4,usuarios:5,config:6};
     const idx=map[view]; if(idx!=null) document.querySelectorAll('.nav-item')[idx]?.classList.add('active'); }
   toggleSidebar(false); closeEdit();
   const ht=document.getElementById('headerTitle'); if(ht) ht.textContent=VIEW_LABEL[view]||'Visão geral';
@@ -1253,12 +1245,6 @@ const TOURS={
     { target:'[data-tour="cfiltros"]', title:'Ache qualquer contrato', body:'Busque por aluno ou responsável e filtre por status (pendente, aguardando, assinado) e situação.', placement:'bottom' },
     { target:'[data-tour="cmodelos"]', title:'O PDF que as matrículas usam', body:'Aqui ficam os modelos de contrato: importe um PDF novo (editado no Google Docs), veja onde cada campo é carimbado e escolha qual modelo vale para as próximas matrículas.', placement:'bottom' },
     { target:'#contractGrid', title:'Envio em um clique', body:'Cada contrato tem o botão verde que prepara o envio pelo WhatsApp da família — e dá para abrir e baixar o PDF.', placement:'top', last:true },
-  ],
-  remat:[
-    { target:'[data-tour="rm-campanha"]', title:'Uma campanha por semestre', body:'Defina o contrato novo (PDF da campanha), a mensalidade com reajuste e a validade dos links. A barra mostra quantas famílias já estão garantidas.', placement:'bottom' },
-    { target:'[data-tour="rm-como"]', title:'A família não preenche nada', body:'O link mágico abre o formulário do site já preenchido — ela só revisa os dados, escolhe o horário e assina. Link único, que expira e morre depois do uso.', placement:'top' },
-    { target:'[data-tour="rm-status"]', title:'Acompanhe cada família', body:'Assinaram, confirmaram, link enviado, sem envio e não renovam — clique num cartão para filtrar a lista. Quem não renova já registra o motivo (vira o desligamento no fim do semestre).', placement:'bottom' },
-    { target:'[data-tour="rm-lista"]', title:'Ações por família', body:'No menu ⋮: ver exatamente o que a família recebe, copiar ou reenviar o link e marcar quem não vai renovar.', placement:'top', last:true },
   ],
   modelos:[
     { target:'[data-tour="tpl-import"]', title:'Trocar o contrato é simples', body:'Edite o contrato no Google Docs, baixe como PDF e importe aqui. Não precisa mexer em código.', placement:'bottom' },
@@ -2158,7 +2144,7 @@ function init(){
   document.getElementById('emailToWrap').innerHTML=cselect('emailTo',[{v:'all',l:`Todos os responsáveis (${actE.length})`},{v:'sq',l:`Apenas turma Seg/Qua (${kidsOf('seg-qua')})`},{v:'tq',l:`Apenas turma Ter/Qui (${kidsOf('ter-qui')})`},{v:'pend',l:`Contratos pendentes (${actE.filter(s=>s.status!=='signed').length})`}],{block:true});
   // conteúdo
   document.querySelectorAll('.wa-slot').forEach(s=>s.innerHTML=WA('w-4 h-4'));
-  renderTable(); renderContracts(); renderRemat(); renderEmails(); renderUsers(); renderNotifs();
+  renderTable(); renderContracts(); renderEmails(); renderUsers(); renderNotifs();
   renderEditorTabs(); setEditorPage('home');
   cmRender(); applySidebarTheme();
   buildCharts();
@@ -2911,240 +2897,6 @@ function tplPlaceField(k){
   renderModelos();
   toast(`"${f.label}" posicionado no centro da página ${f.page} — arraste para o lugar certo.`);
 }
-/* ====================== REMATRÍCULAS (link mágico, formulário pré-preenchido) ====================== */
-/* A família recebe um link único e SEGURO (expira e morre após o uso) que abre o formulário
-   de matrícula do site JÁ PREENCHIDO — ela só revisa, escolhe o horário e assina. */
-const RM_CAMPAIGN={ name:'Campanha 2026.2', period:'Julho a Dezembro de 2026', tplId:1, fee:'R$ 480,00', adj:'+4,3% sobre 2026.1', linkH:48 };
-const RM={}; // estado por matrícula: signed | ok (confirmou) | sent | none | no (não renova)
-function rmEnsure(){
-  const act=STUDENTS.filter(s=>s.active!==false);
-  const TN=[['seg-qua','14h00–15h30'],['seg-qua','16h30–18h00'],['ter-qui','15h00–16h30'],['ter-qui','17h00–18h30']];
-  act.forEach((s,i)=>{
-    if(RM[s.id]) return;
-    const r=i%20;
-    const st = r<9?'signed' : r<12?'ok' : r<16?'sent' : r<18?'none' : 'no';
-    const e={st};
-    if(st==='ok'||st==='signed'){ e.sch=s.sch; e.t=s.t;
-      if(r===10||r===3){ const[a,b]=TN[i%TN.length]; e.sch=a; e.t=b; } } // alguns trocaram de horário
-    if(st==='sent') e.left=(12+(i*7)%36)+'h';
-    if(st==='no') e.reason=EXIT_REASONS[i%(EXIT_REASONS.length-1)].l;
-    RM[s.id]=e;
-  });
-}
-const rmLink=id=>`englishpatio.com.br/rematricula/${(id*2654435761%1e10).toString(36)}${(id*97%899+100)}`;
-let rmPage=1, rmFilter='';
-function setRmPage(p){ rmPage=p; renderRemat(); document.getElementById('rmList')?.scrollIntoView({behavior:'smooth',block:'start'}); }
-function rmSetFilter(f){ rmFilter=rmFilter===f?'':f; rmPage=1; renderRemat(); }
-const RM_META={
-  signed:{l:'Assinaram',     c:'#16a34a', bg:'rgba(22,163,74,.12)',  ic:'check-circle-2' },
-  ok:    {l:'Confirmaram',   c:'#2F539A', bg:'rgba(47,83,154,.12)',  ic:'calendar-check' },
-  sent:  {l:'Link enviado',  c:'#B5860B', bg:'rgba(245,183,0,.16)',  ic:'send' },
-  none:  {l:'Sem envio',     c:'#64748B', bg:'rgba(100,116,139,.14)',ic:'circle-dashed' },
-  no:    {l:'Não renovam',   c:'#DC2626', bg:'rgba(220,38,38,.10)',  ic:'x-circle' },
-};
-function renderRemat(){
-  const el=document.getElementById('rematContent'); if(!el) return;
-  rmEnsure();
-  const act=STUDENTS.filter(s=>s.active!==false);
-  const cnt={signed:0,ok:0,sent:0,none:0,no:0};
-  act.forEach(s=>cnt[RM[s.id].st]++);
-  const tpl=tplById(RM_CAMPAIGN.tplId);
-  const rows=act.filter(s=>!rmFilter||RM[s.id].st===rmFilter);
-  const pages=Math.max(1,Math.ceil(rows.length/PAGE_SIZE)); rmPage=Math.min(rmPage,pages);
-  const pageRows=rows.slice((rmPage-1)*PAGE_SIZE,rmPage*PAGE_SIZE);
-  const chip=k=>{ const m=RM_META[k];
-    return `<button onclick="rmSetFilter('${k}')" class="rounded-xl p-3 text-center transition ${rmFilter===k?'ring-2 ring-brand-light':''}" style="background:${m.bg}">
-      <p class="font-heading text-2xl font-semibold" style="color:${m.c}">${cnt[k]}</p>
-      <p class="text-[11px] font-medium leading-tight" style="color:${m.c}">${m.l}</p></button>`; };
-  const pct=Math.round((cnt.signed+cnt.ok)/(act.length||1)*100);
-  const step=(n,ic,t,d)=>`<div class="flex items-start gap-3"><div class="w-9 h-9 rounded-xl grid place-content-center shrink-0 font-heading font-semibold text-sm" style="background:rgba(245,183,0,.16);color:#B5860B">${n}</div>
-    <div class="min-w-0"><p class="text-sm font-medium flex items-center gap-1.5"><i data-lucide="${ic}" class="w-4 h-4 text-brand-light"></i>${t}</p><p class="text-xs text-[var(--muted)] mt-0.5 leading-relaxed">${d}</p></div></div>`;
-  const rowHTMLr=s=>{ const e=RM[s.id]; const m=RM_META[e.st];
-    const turma=e.st==='ok'||e.st==='signed'
-      ? (e.sch!==s.sch||e.t!==s.t
-        ? `<span class="text-xs text-[var(--muted)]">${schLabel(s.sch)} ${s.t}</span> <i data-lucide="arrow-right" class="w-3 h-3 inline text-[var(--muted)]"></i> <span class="text-xs font-semibold" style="color:#2F539A">${schLabel(e.sch)} ${e.t}</span>`
-        : `<span class="text-xs text-[var(--muted)]">mantém ${schLabel(s.sch)} ${s.t}</span>`)
-      : e.st==='sent' ? `<span class="text-xs" style="color:#B5860B">link expira em ${e.left}</span>`
-      : e.st==='no' ? `<span class="text-xs" style="color:#DC2626">${e.reason}</span>`
-      : `<span class="text-xs text-[var(--muted)]">${schLabel(s.sch)} ${s.t}</span>`;
-    return `<div class="flex items-center gap-3 px-4 sm:px-5 py-3 border-b last:border-0 hover:bg-[var(--hover)] transition" style="border-color:var(--border)">
-      <div class="w-10 h-10 rounded-xl grid place-content-center text-white font-semibold text-sm shrink-0" style="background:linear-gradient(135deg,${palette[s.id%palette.length]},#2F539A)">${initials(s.kids[0].n)}</div>
-      <div class="flex-1 min-w-0">
-        <p class="font-medium text-sm truncate">${s.kids.map(k=>k.n.split(' ')[0]).join(' e ')} <span class="text-[var(--muted)] font-normal hidden sm:inline">· ${s.resp.n}</span></p>
-        <div class="truncate">${turma}</div>
-      </div>
-      <span class="hidden sm:inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap" style="color:${m.c};background:${m.bg}"><i data-lucide="${m.ic}" class="w-3.5 h-3.5"></i>${m.l==='Não renovam'?'Não renova':m.l}</span>
-      <button onclick="openRmMenu(event,${s.id})" class="w-9 h-9 rounded-lg border border-[var(--border)] grid place-content-center hover:bg-[var(--card)] transition shrink-0" title="Ações da rematrícula"><i data-lucide="more-vertical" class="w-4 h-4 text-[var(--muted)]"></i></button>
-    </div>`; };
-  const from=rows.length?(rmPage-1)*PAGE_SIZE+1:0, to=Math.min(rmPage*PAGE_SIZE,rows.length);
-  el.innerHTML=`
-    <div class="flex flex-wrap items-end justify-between gap-3 mb-5">
-      <div><h1 class="font-heading text-2xl sm:text-3xl font-semibold mb-1">Rematrículas</h1>
-        <p class="text-[var(--muted)] text-sm">A família recebe um link seguro com o formulário <b>já preenchido</b> — só revisa, escolhe o horário e assina.</p></div>
-      <button onclick="rmSendAll()" class="flex items-center gap-2 h-10 px-4 rounded-xl text-white text-sm font-semibold" style="background:linear-gradient(135deg,#1E3765,#2F539A)"><i data-lucide="send" class="w-4 h-4"></i>Enviar links pendentes (${cnt.none})</button>
-    </div>
-
-    <div class="surface rounded-2xl p-5 mb-4" data-tour="rm-campanha">
-      <div class="flex flex-wrap items-center justify-between gap-3">
-        <div class="flex items-center gap-3">
-          <div class="w-11 h-11 rounded-xl grid place-content-center" style="background:rgba(245,183,0,.16)"><i data-lucide="repeat" class="w-5 h-5" style="color:#B5860B"></i></div>
-          <div><h3 class="font-heading font-semibold">${RM_CAMPAIGN.name} <span class="text-xs font-sans font-semibold px-2 py-0.5 rounded-full align-middle" style="background:rgba(22,163,74,.12);color:#16a34a">Em andamento</span></h3>
-            <p class="text-xs text-[var(--muted)]">${RM_CAMPAIGN.period}</p></div>
-        </div>
-        <button onclick="openRmConfig()" class="h-9 px-3.5 rounded-lg border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)] transition flex items-center gap-1.5"><i data-lucide="settings-2" class="w-4 h-4"></i> Configurar</button>
-      </div>
-      <div class="flex flex-wrap gap-x-6 gap-y-2 mt-4 text-sm">
-        <span class="flex items-center gap-1.5"><i data-lucide="file-text" class="w-4 h-4 text-brand-light"></i>Contrato: <button onclick="openTplMap(${RM_CAMPAIGN.tplId})" class="font-medium text-brand-light hover:underline">${tpl?tpl.name:'—'}</button></span>
-        <span class="flex items-center gap-1.5"><i data-lucide="receipt" class="w-4 h-4 text-brand-light"></i>Mensalidade: <b>${RM_CAMPAIGN.fee}</b> <span class="text-xs text-[var(--muted)]">(${RM_CAMPAIGN.adj})</span></span>
-        <span class="flex items-center gap-1.5"><i data-lucide="timer" class="w-4 h-4 text-brand-light"></i>Link expira em <b>${RM_CAMPAIGN.linkH}h</b> e morre após o uso</span>
-      </div>
-      <div class="mt-4">
-        <div class="flex justify-between text-xs text-[var(--muted)] mb-1.5"><span>${cnt.signed+cnt.ok} de ${act.length} famílias garantidas</span><span class="font-semibold" style="color:#16a34a">${pct}%</span></div>
-        <div class="h-2.5 rounded-full overflow-hidden flex" style="background:var(--hover)">
-          <div style="width:${cnt.signed/(act.length||1)*100}%;background:#16a34a"></div>
-          <div style="width:${cnt.ok/(act.length||1)*100}%;background:#2F539A"></div>
-          <div style="width:${cnt.sent/(act.length||1)*100}%;background:#F5B700"></div>
-          <div style="width:${cnt.no/(act.length||1)*100}%;background:#DC2626"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 mb-4" data-tour="rm-status">${['signed','ok','sent','none','no'].map(chip).join('')}</div>
-
-    <div class="surface rounded-2xl p-5 mb-4" data-tour="rm-como">
-      <h3 class="font-heading font-semibold mb-3">Como funciona o link mágico</h3>
-      <div class="grid sm:grid-cols-3 gap-4">
-        ${step(1,'send','A escola dispara os links','Um link único por família, pelo WhatsApp. Nada muda no site — é o mesmo formulário de matrícula de sempre.')}
-        ${step(2,'clipboard-check','A família só revisa','O formulário abre já preenchido com os dados atuais. Ela confere, ajusta o que mudou e escolhe o horário do próximo semestre.')}
-        ${step(3,'pen-line','Contrato novo, assinatura digital','O contrato da campanha é gerado na hora e segue para assinatura no Autentique. Assinou, o status atualiza aqui sozinho.')}
-      </div>
-    </div>
-
-    <div id="rmList" class="surface rounded-2xl overflow-hidden table-shell" data-tour="rm-lista">${pageRows.map(rowHTMLr).join('')||'<div class="px-5 py-12 text-center text-[var(--muted)] text-sm">Nenhuma família neste filtro.</div>'}</div>
-    <div class="surface rounded-2xl flex flex-wrap items-center justify-between gap-2 px-5 py-3 mt-3 text-sm text-[var(--muted)]">
-      <span>Mostrando ${from}–${to} de ${rows.length} famílias${rmFilter?` · filtro: ${RM_META[rmFilter].l}`:''} · dados fictícios</span>
-      <div class="flex items-center gap-1">${pagerHTML(rmPage,pages,'setRmPage')}</div>
-    </div>`;
-  lucide.createIcons();
-}
-function rmSendAll(){
-  rmEnsure();
-  let n=0;
-  STUDENTS.filter(s=>s.active!==false).forEach((s,i)=>{ if(RM[s.id].st==='none'){ RM[s.id]={st:'sent',left:'48h'}; n++; } });
-  renderRemat();
-  toast(n?`${n} link${n>1?'s':''} de rematrícula enviado${n>1?'s':''} no WhatsApp!`:'Nenhum link pendente de envio.');
-}
-function openRmMenu(e,id){
-  e.stopPropagation();
-  const s=STUDENTS.find(x=>x.id===id); if(!s) return;
-  rmEnsure();
-  const st=RM[id].st;
-  const m=document.getElementById('rowMenu');
-  const item=(ic,label,fn,color)=>`<button onclick="closeRowMenu();${fn}" class="w-full flex items-center gap-2.5 text-left text-sm px-3 py-2 rounded-lg hover:bg-[var(--hover)] transition" ${color?`style="color:${color}"`:''}><i data-lucide="${ic}" class="w-4 h-4 ${color?'':'text-[var(--muted)]'}"></i>${label}</button>`;
-  m.innerHTML=
-    item('eye','Ver como a família vê',`openRmPreview(${id})`)+
-    item('link-2','Copiar link mágico',`rmCopy(${id})`)+
-    (st==='none'?item('send','Enviar link no WhatsApp',`rmSend(${id})`):'')+
-    (st==='sent'?item('send','Reenviar link (gera um novo)',`rmSend(${id})`):'')+
-    item('user-round','Ver ficha do aluno',`openDetail(${id})`)+
-    (st!=='no'&&st!=='signed'?`<div class="h-px my-1" style="background:var(--border)"></div>`+item('x-circle','Marcar que não vai renovar',`openRmDecline(${id})`,'#DC2626'):'')+
-    (st==='no'?`<div class="h-px my-1" style="background:var(--border)"></div>`+item('rotate-ccw','Voltar para a campanha',`rmUndecline(${id})`,'#16a34a'):'');
-  m.classList.remove('hidden');
-  const r=e.currentTarget.getBoundingClientRect();
-  const mh=m.offsetHeight||260;
-  m.style.left=Math.max(10, Math.min(r.left-220, innerWidth-270))+'px';
-  m.style.top=(r.bottom+mh+12>innerHeight ? r.top-mh-6 : r.bottom+6)+'px';
-  lucide.createIcons();
-}
-function rmCopy(id){
-  if(navigator.clipboard) navigator.clipboard.writeText('https://'+rmLink(id)).catch(()=>{});
-  toast('Link copiado — único desta família, expira em '+RM_CAMPAIGN.linkH+'h.');
-}
-function rmSend(id){ RM[id]={st:'sent',left:RM_CAMPAIGN.linkH+'h'}; renderRemat(); toast('Link de rematrícula enviado no WhatsApp!'); }
-function rmUndecline(id){ RM[id]={st:'none'}; renderRemat(); toast('Família de volta à campanha — envie o link quando quiser.'); }
-function openRmDecline(id){
-  const s=STUDENTS.find(x=>x.id===id); if(!s) return;
-  openModal(`${modalHeader('Não vai renovar')}
-  <div class="p-5 space-y-4">
-    <p class="text-sm"><b>${s.kids.map(k=>k.n.split(' ')[0]).join(' e ')}</b> fica fora da campanha. No fim do semestre, quem não renovou vira <b>desligamento</b> com este motivo já registrado.</p>
-    <div><span class="text-sm font-medium">Motivo</span><div class="mt-1.5" id="rmReasonWrap"></div></div>
-    <div class="flex gap-2">
-      <button onclick="closeModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] text-sm font-semibold">Cancelar</button>
-      <button onclick="confirmRmDecline(${id})" class="flex-1 h-11 rounded-xl text-white text-sm font-semibold" style="background:#DC2626">Confirmar</button>
-    </div>
-  </div>`);
-  document.getElementById('rmReasonWrap').innerHTML=cselect('rmReason',EXIT_REASONS.map(r=>({v:r.k,l:r.l})),{block:true});
-  lucide.createIcons();
-}
-function confirmRmDecline(id){
-  const k=SEL.rmReason?.value||'other';
-  RM[id]={st:'no',reason:EXIT_REASONS.find(r=>r.k===k)?.l||'Outro motivo'};
-  closeModal(); renderRemat();
-  toast('Anotado — a família não entra na rematrícula.');
-}
-function openRmConfig(){
-  openModal(`${modalHeader('Configurar campanha')}
-  <div class="p-5 space-y-3">
-    <label class="block"><span class="text-sm font-medium">Nome da campanha</span>
-      <input id="rmcName" value="${RM_CAMPAIGN.name}" class="${inputCls}"></label>
-    <label class="block"><span class="text-sm font-medium">Período do contrato</span>
-      <input id="rmcPeriod" value="${RM_CAMPAIGN.period}" class="${inputCls}"></label>
-    <div><span class="text-sm font-medium">Modelo de contrato</span><div class="mt-1.5" id="rmcTplWrap"></div>
-      <p class="text-xs text-[var(--muted)] mt-1">A rematrícula sempre usa um PDF novo (período e cláusulas mudam) — importe antes na tela de modelos.</p></div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-      <label class="block"><span class="text-sm font-medium">Mensalidade</span>
-        <input id="rmcFee" value="${RM_CAMPAIGN.fee}" class="${inputCls}"></label>
-      <div><span class="text-sm font-medium">Validade do link</span><div class="mt-1.5" id="rmcLinkWrap"></div></div>
-    </div>
-  </div>
-  <div class="p-5 pt-0 flex gap-2">
-    <button onclick="closeModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] font-medium text-sm">Cancelar</button>
-    <button onclick="saveRmConfig()" class="flex-1 h-11 rounded-xl text-white font-semibold text-sm" style="background:linear-gradient(135deg,#1E3765,#2F539A)">Salvar campanha</button>
-  </div>`,'max-w-lg');
-  const mapped=TEMPLATES.filter(t=>!unmappedCount(t));
-  document.getElementById('rmcTplWrap').innerHTML=cselect('rmcTpl',mapped.map(t=>({v:String(t.id),l:t.name})),{block:true,value:String(RM_CAMPAIGN.tplId)});
-  document.getElementById('rmcLinkWrap').innerHTML=cselect('rmcLink',[{v:'24',l:'24 horas'},{v:'48',l:'48 horas'},{v:'72',l:'72 horas'}],{block:true,value:String(RM_CAMPAIGN.linkH)});
-  lucide.createIcons();
-}
-function saveRmConfig(){
-  RM_CAMPAIGN.name=document.getElementById('rmcName').value.trim()||RM_CAMPAIGN.name;
-  RM_CAMPAIGN.period=document.getElementById('rmcPeriod').value.trim()||RM_CAMPAIGN.period;
-  RM_CAMPAIGN.fee=document.getElementById('rmcFee').value.trim()||RM_CAMPAIGN.fee;
-  RM_CAMPAIGN.tplId=parseInt(SEL.rmcTpl?.value||RM_CAMPAIGN.tplId,10);
-  RM_CAMPAIGN.linkH=parseInt(SEL.rmcLink?.value||RM_CAMPAIGN.linkH,10);
-  closeModal(); renderRemat();
-  toast('Campanha atualizada!');
-}
-/* prévia: o formulário do SITE pré-preenchido que a família abre pelo link */
-function openRmPreview(id){
-  const s=STUDENTS.find(x=>x.id===id); if(!s) return;
-  const ro=(label,val)=>`<label class="block"><span class="text-[11px] font-semibold text-slate-500">${label}</span>
-    <div class="mt-1 h-10 rounded-lg border border-slate-200 bg-slate-50 px-3 text-[13px] flex items-center justify-between text-slate-700">${esc(val)}<i data-lucide="lock" class="w-3.5 h-3.5 text-slate-300"></i></div></label>`;
-  openModal(`${modalHeader('O que a família vê pelo link')}
-  <div class="p-4" style="background:var(--hover)">
-    <div class="flex items-center gap-2 bg-white rounded-t-xl px-3 py-2 border-b border-slate-200">
-      <span class="w-2.5 h-2.5 rounded-full bg-red-400"></span><span class="w-2.5 h-2.5 rounded-full bg-yellow-400"></span><span class="w-2.5 h-2.5 rounded-full bg-green-400"></span>
-      <span class="ml-2 text-[11px] text-slate-400 truncate flex items-center gap-1"><i data-lucide="lock" class="w-3 h-3"></i>${rmLink(id)}</span>
-    </div>
-    <div class="bg-white rounded-b-xl p-5 text-slate-800">
-      <p class="font-heading font-semibold text-lg" style="color:#1E3765">Rematrícula ${RM_CAMPAIGN.period.replace('Julho a Dezembro de ','')}.2 — ${esc(s.kids.map(k=>k.n.split(' ')[0]).join(' e '))} 🎒</p>
-      <p class="text-xs text-slate-500 mt-1 mb-4">Olá, ${esc(s.resp.n.split(' ')[0])}! Confira os dados — está tudo preenchido. Se algo mudou, é só corrigir.</p>
-      <div class="space-y-2.5">
-        ${s.kids.map(k=>ro('Aluno',k.n+' · '+k.b)).join('')}
-        ${ro('Responsável legal',s.resp.n+' · CPF '+maskCPF(s.resp.cpf))}
-        ${ro('Endereço',s.addr.street+', '+s.addr.num+' — '+s.addr.bairro)}
-        <label class="block"><span class="text-[11px] font-semibold" style="color:#B5860B">Horário para o próximo semestre (escolha aqui)</span>
-          <div class="mt-1 h-10 rounded-lg border-2 px-3 text-[13px] flex items-center justify-between font-medium" style="border-color:#F5B700;color:#15294d;background:#FFFBEB">${schLabel(s.sch)} · ${s.t}<i data-lucide="chevron-down" class="w-4 h-4" style="color:#B5860B"></i></div></label>
-        <div class="rounded-lg p-3 text-[12px] flex items-center justify-between" style="background:rgba(30,55,101,.05)">
-          <span class="text-slate-600">Mensalidade ${RM_CAMPAIGN.period.split(' de ').pop()}</span><b style="color:#1E3765">${RM_CAMPAIGN.fee} <span class="font-normal text-[10px] text-slate-400">· carnê em 6 parcelas</span></b>
-        </div>
-        <button class="w-full h-11 rounded-xl text-white text-sm font-bold mt-1" style="background:linear-gradient(135deg,#1E3765,#2F539A)">Confirmar rematrícula e assinar contrato →</button>
-        <p class="text-[10px] text-center text-slate-400 flex items-center justify-center gap-1"><i data-lucide="shield-check" class="w-3 h-3"></i>Link único desta família · expira em ${RM_CAMPAIGN.linkH}h · após confirmar, deixa de funcionar</p>
-      </div>
-    </div>
-  </div>`,'max-w-lg');
-}
-
 let tplDrag=null;
 function chipDown(e,fk){
   const t=tplById(tplOpen); if(!t) return;
@@ -3440,7 +3192,7 @@ function elLabel(el){
     || '<'+el.tagName.toLowerCase()+'>';
 }
 function currentView(){ return document.querySelector('[data-view].view-active')?.dataset.view||'overview'; }
-const VIEW_LABEL={overview:'Visão geral',alunos:'Alunos',detalhe:'Detalhe do aluno',contratos:'Contratos',modelos:'Modelos de contrato',remat:'Rematrículas',emails:'Comunicados',editor:'Editor do site',usuarios:'Usuários',config:'Configurações',notifs:'Notificações'};
+const VIEW_LABEL={overview:'Visão geral',alunos:'Alunos',detalhe:'Detalhe do aluno',contratos:'Contratos',modelos:'Modelos de contrato',emails:'Comunicados',editor:'Editor do site',usuarios:'Usuários',config:'Configurações',notifs:'Notificações'};
 
 function toggleCommentMode(){
   commentMode=!commentMode;
