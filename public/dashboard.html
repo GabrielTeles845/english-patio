@@ -229,7 +229,7 @@
     <div class="h-16 flex items-center px-5 border-b" style="border-color:var(--sb-border)">
       <img id="sbLogo" src="assets/logo-sidebar-azul.svg" alt="English Patio" class="h-10 w-auto">
       <div class="h-6 w-px mx-3" style="background:var(--sb-border)"></div>
-      <span class="font-heading text-[15px] font-medium tracking-wide" style="color:var(--sb-strong)">Dashboard</span>
+      <span class="font-heading text-[17px] font-medium tracking-wide" style="color:var(--sb-strong)">Dashboard</span>
     </div>
 
     <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-6" data-tour="sidebar">
@@ -368,14 +368,27 @@
           </div>
         </div>
 
+        <!-- mini-indicadores -->
+        <div class="surface rounded-2xl mt-4 px-5 py-3 flex flex-wrap items-center gap-x-8 gap-y-2 text-sm">
+          <span class="flex items-center gap-2"><i data-lucide="cake" class="w-4 h-4 text-brand-light"></i>Média de idade <strong>9,6 anos</strong></span>
+          <span class="flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-brand-light"></i><strong>32 famílias</strong> com irmãos matriculados</span>
+          <span class="flex items-center gap-2"><i data-lucide="armchair" class="w-4 h-4 text-brand-light"></i>Ocupação das turmas <strong>85%</strong></span>
+          <span class="flex items-center gap-2"><i data-lucide="file-check-2" class="w-4 h-4 text-brand-light"></i>Contratos assinados <strong>89%</strong></span>
+          <span class="flex items-center gap-2"><i data-lucide="refresh-ccw" class="w-4 h-4 text-brand-light"></i>Rematrículas do semestre <strong>91%</strong></span>
+        </div>
+
         <!-- charts -->
         <div class="grid lg:grid-cols-3 gap-4 mt-4">
           <div class="surface rounded-2xl p-5 lg:col-span-2">
             <div class="flex items-center justify-between mb-4">
-              <div><h3 class="font-heading font-semibold text-lg">Matrículas por mês</h3><p class="text-xs text-[var(--muted)]">Evolução no semestre</p></div>
-              <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 font-medium">↑ 38%</span>
+              <div><h3 class="font-heading font-semibold text-lg">Matrículas</h3><p class="text-xs text-[var(--muted)]" id="enrollSub">Evolução no semestre</p></div>
+              <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 font-medium" id="enrollChip">↑ 38%</span>
             </div>
-            <div class="h-64"><canvas id="chartEnroll"></canvas></div>
+            <div class="h-60"><canvas id="chartEnroll"></canvas></div>
+            <div class="flex items-center gap-5 mt-3 text-xs text-[var(--muted)]">
+              <span class="flex items-center gap-1.5"><span class="w-4 h-0.5 rounded-full" style="background:#2F539A"></span> Novas matrículas</span>
+              <span class="flex items-center gap-1.5"><span class="w-4 h-0.5 rounded-full" style="background:#F5B700"></span> Rematrículas</span>
+            </div>
           </div>
           <div class="surface rounded-2xl p-5">
             <h3 class="font-heading font-semibold text-lg mb-1">Distribuição por horário</h3>
@@ -401,6 +414,54 @@
               <button onclick="go('alunos')" class="text-sm font-medium text-brand-light hover:underline flex items-center gap-1">Ver todos <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
             </div>
             <div id="recentList" class="space-y-1.5"></div>
+          </div>
+        </div>
+
+        <!-- vagas por horário + financeiro -->
+        <div class="grid lg:grid-cols-3 gap-4 mt-4">
+          <div class="surface rounded-2xl p-5 lg:col-span-2">
+            <div class="flex items-center justify-between mb-4">
+              <div><h3 class="font-heading font-semibold text-lg">Vagas por horário</h3>
+                <p class="text-xs text-[var(--muted)]">Turmas de até 6 alunos · capacidade total de 150 vagas</p></div>
+              <span class="text-xs px-2.5 py-1 rounded-full font-semibold" style="background:rgba(22,163,74,.10);color:#16a34a">22 vagas livres</span>
+            </div>
+            <div class="grid sm:grid-cols-2 gap-x-8 gap-y-3">
+              <div class="space-y-3">
+                <p class="text-[10px] font-bold uppercase tracking-wider text-[var(--muted)]">Segunda / Quarta</p>
+                <div><div class="flex justify-between text-[13px] mb-1"><span class="font-medium">14h00–15h30</span><span class="text-[var(--muted)]">16/18</span></div>
+                  <div class="h-2 rounded-full overflow-hidden" style="background:var(--hover)"><div class="h-full rounded-full" style="width:89%;background:#2F539A"></div></div></div>
+                <div><div class="flex justify-between text-[13px] mb-1"><span class="font-medium">15h00–16h30 <span class="text-[9px] font-bold px-1.5 py-0.5 rounded align-middle" style="background:rgba(245,183,0,.22);color:#B5860B">CHEIA</span></span><span class="text-[var(--muted)]">18/18</span></div>
+                  <div class="h-2 rounded-full overflow-hidden" style="background:var(--hover)"><div class="h-full rounded-full" style="width:100%;background:#F5B700"></div></div></div>
+                <div><div class="flex justify-between text-[13px] mb-1"><span class="font-medium">16h30–18h00</span><span class="text-[var(--muted)]">19/24</span></div>
+                  <div class="h-2 rounded-full overflow-hidden" style="background:var(--hover)"><div class="h-full rounded-full" style="width:79%;background:#2F539A"></div></div></div>
+                <div><div class="flex justify-between text-[13px] mb-1"><span class="font-medium">18h00–19h30 <span class="text-[9px] font-bold px-1.5 py-0.5 rounded align-middle" style="background:rgba(245,183,0,.22);color:#B5860B">CHEIA</span></span><span class="text-[var(--muted)]">18/18</span></div>
+                  <div class="h-2 rounded-full overflow-hidden" style="background:var(--hover)"><div class="h-full rounded-full" style="width:100%;background:#F5B700"></div></div></div>
+              </div>
+              <div class="space-y-3">
+                <p class="text-[10px] font-bold uppercase tracking-wider text-[var(--muted)]">Terça / Quinta</p>
+                <div><div class="flex justify-between text-[13px] mb-1"><span class="font-medium">14h00–15h30</span><span class="text-[var(--muted)]">12/18</span></div>
+                  <div class="h-2 rounded-full overflow-hidden" style="background:var(--hover)"><div class="h-full rounded-full" style="width:67%;background:#2F539A"></div></div></div>
+                <div><div class="flex justify-between text-[13px] mb-1"><span class="font-medium">15h00–16h30</span><span class="text-[var(--muted)]">15/18</span></div>
+                  <div class="h-2 rounded-full overflow-hidden" style="background:var(--hover)"><div class="h-full rounded-full" style="width:83%;background:#2F539A"></div></div></div>
+                <div><div class="flex justify-between text-[13px] mb-1"><span class="font-medium">16h30–18h00 <span class="text-[9px] font-bold px-1.5 py-0.5 rounded align-middle" style="background:rgba(245,183,0,.22);color:#B5860B">CHEIA</span></span><span class="text-[var(--muted)]">18/18</span></div>
+                  <div class="h-2 rounded-full overflow-hidden" style="background:var(--hover)"><div class="h-full rounded-full" style="width:100%;background:#F5B700"></div></div></div>
+                <div><div class="flex justify-between text-[13px] mb-1"><span class="font-medium">17h00–18h30</span><span class="text-[var(--muted)]">12/18</span></div>
+                  <div class="h-2 rounded-full overflow-hidden" style="background:var(--hover)"><div class="h-full rounded-full" style="width:67%;background:#2F539A"></div></div></div>
+              </div>
+            </div>
+            <p class="text-xs text-[var(--muted)] mt-4 flex items-center gap-1.5"><i data-lucide="lightbulb" class="w-3.5 h-3.5" style="color:#F5B700"></i> Ter/Qui 14h é o horário mais vazio — boa opção para sugerir a quem pedir matrícula.</p>
+          </div>
+          <div class="surface rounded-2xl p-5">
+            <h3 class="font-heading font-semibold text-lg mb-1">Financeiro do mês</h3>
+            <p class="text-xs text-[var(--muted)]">Estimativa · mensalidade R$ 460</p>
+            <p class="font-heading text-3xl font-semibold mt-4">R$ 58.880</p>
+            <p class="text-xs text-emerald-500 font-medium flex items-center gap-1 mt-1"><i data-lucide="trending-up" class="w-3.5 h-3.5"></i> + R$ 5.520 vs. maio</p>
+            <div class="mt-4 space-y-1">
+              <div class="flex justify-between gap-4 py-2 border-b" style="border-color:var(--border)"><span class="text-sm text-[var(--muted)]">Ticket médio</span><span class="text-sm font-medium">R$ 460</span></div>
+              <div class="flex justify-between gap-4 py-2 border-b" style="border-color:var(--border)"><span class="text-sm text-[var(--muted)]">Garantido (assinados)</span><span class="text-sm font-medium">R$ 52.440</span></div>
+              <div class="flex justify-between gap-4 py-2"><span class="text-sm text-[var(--muted)]">Previsão do semestre</span><span class="text-sm font-medium">R$ 353.280</span></div>
+            </div>
+            <p class="text-xs text-[var(--muted)] mt-3 flex items-center gap-1.5"><i data-lucide="info" class="w-3.5 h-3.5 shrink-0"></i> Com o banco de dados, estes números virão dos valores reais de cada contrato.</p>
           </div>
         </div>
 
@@ -435,7 +496,7 @@
             <div class="h-40"><canvas id="chartPay"></canvas></div>
             <div id="payLegend" class="mt-4 grid grid-cols-2 gap-2"></div>
           </div>
-          <div class="surface rounded-2xl p-5 sm:col-span-2 lg:col-span-1">
+          <div class="surface rounded-2xl p-5 sm:col-span-2 lg:col-span-1" data-tour="health">
             <h3 class="font-heading font-semibold text-lg mb-1">Saúde dos contratos</h3>
             <p class="text-xs text-[var(--muted)] mb-5">Status das 128 matrículas</p>
             <div class="space-y-4" id="contractHealth"></div>
@@ -753,6 +814,7 @@ const STUDENTS = [
   { id:10, kids:[{n:'Arthur Moraes Pinto', age:8, b:'29/10/2017'}], resp:{n:'Letícia Moraes', cpf:'956.443.870-02', phone:'(62) 98112-9943', email:'leticia.moraes@outlook.com', rel:'Mãe', b:'14/04/1991'}, second:{n:'Felipe Pinto', phone:'(62) 99887-6610', rel:'Pai'}, fin:'Felipe Pinto', addr:{cep:'74070-060', street:'Rua 22', num:'310', comp:'', bairro:'Setor Aeroporto', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'17h00–18h30', pay:'Boleto', status:'pending', media:true, date:'23/05/2026' },
   { id:11, kids:[{n:'Laura Cavalcante Reis', age:10, b:'12/12/2015'}], resp:{n:'Daniela Reis', cpf:'063.778.221-49', phone:'(62) 99334-1180', email:'dani.reis@gmail.com', rel:'Mãe', b:'30/01/1987'}, second:null, fin:'Daniela Reis', addr:{cep:'74343-230', street:'Rua RF-12', num:'140', comp:'Qd 8', bairro:'Residencial Forte', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'15h00–16h30', pay:'PIX', status:'signed', media:true, date:'22/05/2026' },
   { id:12, kids:[{n:'Gabriel Fonseca Lopes', age:11, b:'07/08/2014'}], resp:{n:'Simone Fonseca', cpf:'174.882.605-77', phone:'(62) 98445-2290', email:'simone.fonseca@yahoo.com', rel:'Mãe', b:'08/10/1982'}, second:{n:'Thiago Lopes', phone:'(62) 99221-5544', rel:'Pai'}, fin:'Thiago Lopes', addr:{cep:'74150-020', street:'Av. T-63', num:'880', comp:'Apto 701', bairro:'Setor Bueno', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'16h30–18h00', pay:'Cartão', status:'sent', media:true, date:'21/05/2026' },
+  { id:13, kids:[{n:'Valentina Almeida Prado', age:9, b:'15/04/2017'},{n:'Henrique Almeida Prado', age:11, b:'20/09/2014'},{n:'Cecília Almeida Prado', age:6, b:'02/01/2020'}], resp:{n:'Roberta Almeida Prado', cpf:'288.443.190-66', phone:'(62) 99845-7733', email:'roberta.prado@gmail.com', rel:'Mãe', b:'11/07/1985'}, second:{n:'Eduardo Prado', phone:'(62) 99102-8844', rel:'Pai'}, fin:'Eduardo Prado', addr:{cep:'74110-100', street:'Rua 9', num:'520', comp:'Casa 1', bairro:'Setor Oeste', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'16h30–18h00', pay:'PIX', status:'signed', media:true, date:'20/05/2026' },
 ];
 
 const palette = ['#1E3765','#2F539A','#F5B700','#7C9AD6','#B5860B','#16a34a','#9333ea','#0891b2','#dc2626','#ea580c','#0d9488','#65a30d'];
@@ -876,10 +938,11 @@ function markAllRead(){ NOTIFS.forEach(n=>n.unread=false); renderNotifs(); }
 
 /* ====================== TOUR DE BOAS-VINDAS (spotlight nos elementos reais) ====================== */
 const TOUR_STEPS=[
-  { target:null, title:'Bem-vinda ao preview da dashboard!', body:'Explore à vontade — os dados são fictícios e nada aqui quebra. Deixa eu te mostrar só o que não dá pra descobrir sozinha:', placement:'center', logo:true },
+  { target:null, title:'Boas-vindas ao preview da dashboard!', body:'Explore à vontade — os dados são fictícios e nada aqui quebra. Veja o que não dá pra descobrir só explorando:', placement:'center', logo:true, pre:()=>go('overview') },
   { target:'[data-tour="nav-editor"]', title:'Editor do site', body:'Aqui você muda os textos do site real: passe o mouse sobre um texto (aparece uma borda pontilhada amarela), clique e escreva.', placement:'right', pre:()=>toggleSidebar(true) },
-  { target:'#sbThemeDots', title:'Deixe com a sua cara', body:'Essas bolinhas trocam a cor da barra lateral — azul, branca ou amarela. E a luinha ao lado liga o modo escuro.', placement:'right', pre:()=>toggleSidebar(true) },
-  { target:'#cmFab', title:'O botão mais importante', body:'Viu algo que quer mudar? Clique em "Comentar", depois em qualquer parte da tela, e escreva sua sugestão. Tudo chega para a equipe — e quando for ajustado, o alfinete fica verde com a resposta.', placement:'top', pre:()=>toggleSidebar(false), last:true },
+  { target:'[data-tour="row-menu"]', title:'Ações rápidas em cada aluno', body:'Nos três pontinhos de cada linha tem atalhos: ver e baixar o contrato, enviar no WhatsApp, copiar o telefone e até marcar como assinado.', placement:'left', pre:()=>{ toggleSidebar(false); go('alunos'); } },
+  { target:'[data-tour="health"]', title:'Cobrança sem dor de cabeça', body:'A "Saúde dos contratos" mostra quem ainda não assinou — e o botão verde prepara o lembrete de WhatsApp para todos os pendentes de uma vez.', placement:'left', pre:()=>go('overview') },
+  { target:'#cmFab', title:'O botão mais importante', body:'Viu algo que quer mudar? Clique em "Comentar", depois em qualquer parte da tela, e escreva sua sugestão. Tudo chega para a equipe — e quando for ajustado, o alfinete fica verde com a resposta.', placement:'top', last:true },
 ];
 let tourI=0, tourActive=false, tourBuilt=false;
 function maybeStartTour(){ if(!localStorage.getItem('ep-tour-done')) startTour(); }
@@ -987,7 +1050,8 @@ function endTour(done){
 
 /* ====================== TABELA DE ALUNOS ====================== */
 function rowHTML(s){
-  const more = s.kids.length>1 ? `<span class="text-[11px] px-1.5 py-0.5 rounded-md font-medium" style="background:var(--hover);color:var(--muted)">+1 irmão</span>` : '';
+  const nSib=s.kids.length-1;
+  const more = nSib>0 ? `<span class="text-[11px] px-1.5 py-0.5 rounded-md font-medium whitespace-nowrap" style="background:var(--hover);color:var(--muted)">+${nSib} irmã${nSib>1?'os':'o'}</span>` : '';
   const st=STATUS[s.status];
   const schColor = s.sch==='seg-qua' ? '#2F539A' : '#B5860B';
   const schBg = s.sch==='seg-qua' ? 'rgba(47,83,154,.10)' : 'rgba(245,183,0,.14)';
@@ -1005,7 +1069,7 @@ function rowHTML(s){
     <div class="hidden md:flex items-center justify-end gap-1">
       <button onclick="event.stopPropagation();openContractModal(${s.id})" class="w-8 h-8 rounded-lg border border-[var(--border)] grid place-content-center hover:bg-[var(--card)] transition" title="Ver contrato"><i data-lucide="file-text" class="w-4 h-4 text-[var(--muted)]"></i></button>
       ${waBtn(s.resp.n.split(' ')[0])}
-      <button onclick="openRowMenu(event,${s.id})" class="w-8 h-8 rounded-lg grid place-content-center hover:bg-[var(--card)] transition" title="Mais ações"><i data-lucide="more-vertical" class="w-4 h-4 text-[var(--muted)]"></i></button>
+      <button onclick="openRowMenu(event,${s.id})" data-tour="row-menu" class="w-8 h-8 rounded-lg grid place-content-center hover:bg-[var(--card)] transition" title="Mais ações"><i data-lucide="more-vertical" class="w-4 h-4 text-[var(--muted)]"></i></button>
     </div>
   </div>`;
 }
@@ -1037,7 +1101,7 @@ function openDetail(id){
         <div class="flex items-center gap-4">
           <div class="w-16 h-16 rounded-2xl grid place-content-center text-white font-heading text-2xl font-semibold" style="background:linear-gradient(135deg,${palette[s.id%palette.length]},#2F539A)">${initials(s.kids[0].n)}</div>
           <div><h1 class="font-heading text-2xl font-semibold">${s.kids[0].n}</h1>
-            <p class="text-[var(--muted)] text-sm">${s.kids.length>1?'2 alunos (irmãos)':'1 aluno'} · matriculado em ${s.date}</p>
+            <p class="text-[var(--muted)] text-sm">${s.kids.length>1?s.kids.length+' alunos (irmãos)':'1 aluno'} · matrícula em ${s.date}</p>
             <div class="flex items-center gap-2 mt-2"><span class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full" style="color:${st.c};background:${st.bg}"><span class="w-1.5 h-1.5 rounded-full" style="background:${st.c}"></span>Contrato ${st.t.toLowerCase()}</span>
               <span class="text-xs font-medium px-2.5 py-1 rounded-lg" style="color:#2F539A;background:rgba(47,83,154,.10)">${schLabel(s.sch)} · ${s.t}</span></div></div>
         </div>
@@ -1350,13 +1414,34 @@ function publishSite(){
 
 /* ====================== CHARTS ====================== */
 let charts={};
+/* dados por período do filtro da visão geral */
+const PERIOD_DATA={
+  '6m': { labels:['Jan','Fev','Mar','Abr','Mai','Jun'], data:[8,11,9,14,17,21], rema:[3,2,4,5,9,14], sub:'Evolução no semestre', chip:'↑ 38%' },
+  'ano':{ labels:['Jul','Ago','Set','Out','Nov','Dez','Jan','Fev','Mar','Abr','Mai','Jun'], data:[12,9,7,10,8,5,8,11,9,14,17,21], rema:[10,6,4,5,3,2,3,2,4,5,9,14], sub:'Últimos 12 meses (Jul/25 – Jun/26)', chip:'↑ 24%' },
+  'mes':{ labels:['Semana 1','Semana 2','Semana 3','Semana 4'], data:[4,6,7,4], rema:[3,4,5,2], sub:'Junho, semana a semana', chip:'↑ 18%' },
+};
+function applyPeriod(v){
+  const p=PERIOD_DATA[v]||PERIOD_DATA['6m'];
+  if(charts.enroll){
+    charts.enroll.data.labels=p.labels;
+    charts.enroll.data.datasets[0].data=p.data;
+    charts.enroll.data.datasets[1].data=p.rema;
+    charts.enroll.update();
+  }
+  const sub=document.getElementById('enrollSub'); if(sub) sub.textContent=p.sub;
+  const chip=document.getElementById('enrollChip'); if(chip) chip.textContent=p.chip;
+}
 function chartColors(){ const dark=document.documentElement.classList.contains('dark'); return { grid:dark?'rgba(255,255,255,.06)':'rgba(0,0,0,.05)', text:dark?'#93a2bd':'#64748B' }; }
 function buildCharts(){
   const c=chartColors();
   Chart.defaults.font.family='Inter'; Chart.defaults.color=c.text;
   const ctxE=document.getElementById('chartEnroll');
   const grad=ctxE.getContext('2d').createLinearGradient(0,0,0,260); grad.addColorStop(0,'rgba(47,83,154,.35)'); grad.addColorStop(1,'rgba(47,83,154,0)');
-  charts.enroll=new Chart(ctxE,{type:'line',data:{labels:['Jan','Fev','Mar','Abr','Mai','Jun'],datasets:[{data:[8,11,9,14,17,21],fill:true,backgroundColor:grad,borderColor:'#2F539A',borderWidth:3,tension:.4,pointBackgroundColor:'#F5B700',pointBorderColor:'#fff',pointBorderWidth:2,pointRadius:5,pointHoverRadius:7}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:c.grid},border:{display:false}},x:{grid:{display:false},border:{display:false}}}}});
+  const p0=PERIOD_DATA['6m'];
+  charts.enroll=new Chart(ctxE,{type:'line',data:{labels:p0.labels,datasets:[
+    {data:p0.data,fill:true,backgroundColor:grad,borderColor:'#2F539A',borderWidth:3,tension:.4,pointBackgroundColor:'#F5B700',pointBorderColor:'#fff',pointBorderWidth:2,pointRadius:5,pointHoverRadius:7},
+    {data:p0.rema,fill:false,borderColor:'#F5B700',borderWidth:2.5,borderDash:[6,5],tension:.4,pointBackgroundColor:'#fff',pointBorderColor:'#F5B700',pointBorderWidth:2,pointRadius:3.5,pointHoverRadius:6}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:c.grid},border:{display:false}},x:{grid:{display:false},border:{display:false}}}}});
   charts.sch=new Chart(document.getElementById('chartSchedule'),{type:'doughnut',data:{labels:['Seg/Qua','Ter/Qui'],datasets:[{data:[71,57],backgroundColor:['#2F539A','#F5B700'],borderWidth:0,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:false}}}});
   charts.age=new Chart(document.getElementById('chartAge'),{type:'bar',data:{labels:['4–6','7–9','10–12','13–15','16+'],datasets:[{data:[18,42,39,22,7],backgroundColor:['#FFE17A','#F5B700','#2F539A','#1E3765','#7C9AD6'],borderRadius:8,borderSkipped:false,barThickness:34}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:c.grid},border:{display:false}},x:{grid:{display:false},border:{display:false}}}}});
   // horário em que as matrículas chegam
@@ -1380,7 +1465,7 @@ function toast(msg){
 /* ====================== INIT ====================== */
 function init(){
   // selects customizados
-  document.getElementById('periodSelWrap').innerHTML=cselect('period',[{v:'6m',l:'Últimos 6 meses'},{v:'ano',l:'Este ano'},{v:'mes',l:'Este mês'}],{icon:'calendar'});
+  document.getElementById('periodSelWrap').innerHTML=cselect('period',[{v:'6m',l:'Últimos 6 meses'},{v:'ano',l:'Últimos 12 meses'},{v:'mes',l:'Este mês'}],{icon:'calendar',onChange:applyPeriod});
   document.getElementById('fScheduleWrap').innerHTML=cselect('fSchedule',[{v:'',l:'Todos os horários'},{v:'seg-qua',l:'Seg/Qua'},{v:'ter-qui',l:'Ter/Qui'}],{onChange:renderTable});
   document.getElementById('fStatusWrap').innerHTML=cselect('fStatus',[{v:'',l:'Contrato: todos'},{v:'signed',l:'Assinado'},{v:'sent',l:'Enviado'},{v:'pending',l:'Pendente'}],{onChange:renderTable});
   document.getElementById('fPayWrap').innerHTML=cselect('fPay',[{v:'',l:'Pagamento: todos'},{v:'PIX',l:'PIX'},{v:'Boleto',l:'Boleto'},{v:'Cartão',l:'Cartão'},{v:'Dinheiro',l:'Dinheiro'}],{onChange:renderTable});
@@ -1516,7 +1601,8 @@ function openEmailPreview(){
 /* --- visualizar contrato --- */
 function openContractModal(id){
   const s=STUDENTS.find(x=>x.id===id); if(!s) return;
-  const kids=s.kids.map(k=>k.n).join(' e ');
+  const names=s.kids.map(k=>k.n);
+  const kids=names.length>1 ? names.slice(0,-1).join(', ')+' e '+names[names.length-1] : names[0];
   openModal(`${modalHeader('Contrato_'+s.kids[0].n.split(' ')[0]+'.pdf')}
   <div class="p-5" style="background:var(--hover)">
     <div class="bg-white text-slate-800 rounded-lg shadow-md p-6 sm:p-8 text-[13px] leading-relaxed">
