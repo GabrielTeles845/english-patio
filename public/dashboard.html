@@ -272,7 +272,7 @@
             <span class="ml-auto text-[11px] px-2 py-0.5 rounded-full" style="background:var(--sb-badge-bg);color:var(--sb-badge-text)">7 pend.</span></a>
           <a class="nav-item sb-item group relative flex items-center gap-3 px-3 h-10 rounded-xl transition cursor-pointer" onclick="go('emails', this)">
             <span class="bar absolute left-0 top-2 bottom-2 w-1 rounded-full opacity-0 transition" style="background:var(--sb-accent)"></span>
-            <i data-lucide="mail" class="w-[18px] h-[18px]"></i><span class="text-sm font-medium">E-mails</span></a>
+            <i data-lucide="megaphone" class="w-[18px] h-[18px]"></i><span class="text-sm font-medium">Comunicados</span></a>
         </div>
       </div>
       <div>
@@ -608,8 +608,8 @@
       <!-- ====================== E-MAILS ====================== -->
       <section data-view="emails" class="fade-in">
         <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
-          <div><h1 class="font-heading text-2xl sm:text-3xl font-semibold">E-mails</h1>
-            <p class="text-[var(--muted)] text-sm mt-0.5">Mande um aviso para todas as famílias de uma vez — sem copiar e colar um por um</p></div>
+          <div><h1 class="font-heading text-2xl sm:text-3xl font-semibold">Comunicados</h1>
+            <p class="text-[var(--muted)] text-sm mt-0.5">Escreva o aviso uma vez — cada família recebe por e-mail, WhatsApp ou os dois</p></div>
         </div>
         <div class="grid lg:grid-cols-5 gap-4 items-start">
 
@@ -617,7 +617,7 @@
           <div class="surface rounded-2xl overflow-hidden lg:col-span-3">
             <div class="flex items-center gap-3 px-5 py-4 border-b" style="border-color:var(--border)">
               <div class="w-10 h-10 rounded-xl grid place-content-center" style="background:rgba(47,83,154,.10)"><i data-lucide="send" class="w-5 h-5 text-brand-light"></i></div>
-              <div><h3 class="font-heading font-semibold">Escrever aviso</h3><p class="text-xs text-[var(--muted)]">Cada responsável recebe no próprio e-mail, com o próprio nome</p></div>
+              <div><h3 class="font-heading font-semibold">Escrever comunicado</h3><p class="text-xs text-[var(--muted)]">Cada responsável recebe com o próprio nome, no canal que você escolher</p></div>
             </div>
             <div class="p-5">
               <div class="mb-4">
@@ -629,8 +629,17 @@
                 </div>
               </div>
               <div class="h-px mb-4" style="background:var(--border)"></div>
-              <div class="mb-3"><span class="text-sm font-medium">Para quem vai</span>
-                <div class="mt-1.5" id="emailToWrap"></div></div>
+              <div class="grid sm:grid-cols-2 gap-3 mb-3">
+                <div><span class="text-sm font-medium">Para quem vai</span>
+                  <div class="mt-1.5" id="emailToWrap"></div></div>
+                <div><span class="text-sm font-medium">Por onde vai</span>
+                  <div class="mt-1.5 flex items-center bg-[var(--hover)] rounded-xl p-1 w-fit" id="chSeg">
+                    <button onclick="setCommChannel('email')" data-ch="email" class="flex items-center gap-1.5 px-3 h-9 rounded-lg text-[13px] font-medium bg-[var(--card)] shadow-sm"><i data-lucide="mail" class="w-4 h-4"></i>E-mail</button>
+                    <button onclick="setCommChannel('wa')" data-ch="wa" class="flex items-center gap-1.5 px-3 h-9 rounded-lg text-[13px] font-medium text-[var(--muted)]"><span class="wa-slot" style="color:#1faa53"></span>WhatsApp</button>
+                    <button onclick="setCommChannel('both')" data-ch="both" class="flex items-center gap-1.5 px-3 h-9 rounded-lg text-[13px] font-medium text-[var(--muted)]">Ambos</button>
+                  </div>
+                </div>
+              </div>
               <label class="block mb-3"><span class="text-sm font-medium">Assunto</span>
                 <input id="emailSubject" value="Recesso de julho — calendário atualizado 📅" class="mt-1.5 w-full h-11 rounded-xl border border-[var(--border)] bg-[var(--card)] px-3 text-sm outline-none focus:ring-2 ring-brand-light"></label>
               <div class="flex items-center justify-between mb-1.5">
@@ -642,8 +651,8 @@
               </div>
               <textarea id="emailBody" rows="7" class="w-full rounded-xl border border-[var(--border)] bg-[var(--card)] p-3 text-sm outline-none focus:ring-2 ring-brand-light resize-none">Olá, {{nome_responsavel}}! Passando para avisar sobre o calendário de julho...</textarea>
               <div class="flex items-center justify-end gap-2 mt-4">
-                <button onclick="openEmailPreview()" class="h-10 px-4 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)] flex items-center gap-2"><i data-lucide="eye" class="w-4 h-4"></i> Ver como chega</button>
-                <button onclick="toast('Aviso enviado para 96 responsáveis!')" class="h-10 px-4 rounded-xl text-white text-sm font-semibold flex items-center gap-2" style="background:linear-gradient(135deg,#1E3765,#2F539A)"><i data-lucide="send" class="w-4 h-4"></i> Enviar</button>
+                <button onclick="openCommPreview()" class="h-10 px-4 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)] flex items-center gap-2"><i data-lucide="eye" class="w-4 h-4"></i> Ver como chega</button>
+                <button id="sendBtn" onclick="sendComm()" class="h-10 px-4 rounded-xl text-white text-sm font-semibold flex items-center gap-2" style="background:linear-gradient(135deg,#1E3765,#2F539A)"><i data-lucide="send" class="w-4 h-4"></i> Enviar e-mail</button>
               </div>
             </div>
           </div>
@@ -1107,8 +1116,8 @@ const TOURS={
     { target:'#contractGrid', title:'Envio em um clique', body:'Cada contrato tem o botão verde que prepara o envio pelo WhatsApp da família.', placement:'top', last:true },
   ],
   emails:[
-    { target:'#emailToWrap', title:'Escolha o público', body:'Dispare para todos os responsáveis ou só para um grupo (uma turma, contratos pendentes…).', placement:'bottom' },
-    { target:'#emailBody', title:'Mensagens personalizadas', body:'Use {{nome_responsavel}} e {{nome_aluno}} — cada família recebe o e-mail com os próprios nomes.', placement:'top', last:true },
+    { target:'#chSeg', title:'E-mail, WhatsApp ou os dois', body:'Escreva o comunicado uma vez e escolha por onde cada família recebe — dá até para ver a prévia nos dois formatos.', placement:'bottom' },
+    { target:'#emailBody', title:'Mensagens personalizadas', body:'Use os botões de variável — cada família recebe a mensagem com o próprio nome.', placement:'top', last:true },
   ],
 };
 let tourSteps=TOURS.overview, tourI=0, tourActive=false, tourBuilt=false;
@@ -1443,8 +1452,15 @@ function renderContracts(){
 }
 
 function renderEmails(){
-  const data=[{s:'Boas-vindas — turma de junho',n:21,d:'há 2 dias',ic:'mail-check'},{s:'Lembrete: contrato pendente',n:7,d:'há 5 dias',ic:'clock'},{s:'Festa junina da escola 🎉',n:96,d:'há 12 dias',ic:'party-popper'}];
-  document.getElementById('emailHistory').innerHTML=data.map(e=>`<div class="flex items-center gap-3 p-3 rounded-xl" style="background:var(--hover)"><div class="w-9 h-9 rounded-lg grid place-content-center bg-[var(--card)]"><i data-lucide="${e.ic}" class="w-4 h-4 text-brand-light"></i></div><div class="flex-1 min-w-0"><p class="text-sm font-medium truncate">${e.s}</p><p class="text-xs text-[var(--muted)]">${e.n} destinatários · ${e.d}</p></div><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500"></i></div>`).join('');
+  const data=[
+    {s:'Boas-vindas — turma de junho',n:21,d:'há 2 dias',ch:'email'},
+    {s:'Lembrete: contrato pendente',n:7,d:'há 5 dias',ch:'wa'},
+    {s:'Festa junina da escola 🎉',n:96,d:'há 12 dias',ch:'both'},
+  ];
+  const chIcon=ch=> ch==='wa' ? `<span style="color:#1faa53">${WA('w-4 h-4')}</span>`
+    : ch==='both' ? `<span class="flex items-center gap-0.5"><i data-lucide="mail" class="w-3.5 h-3.5 text-brand-light"></i><span style="color:#1faa53">${WA('w-3.5 h-3.5')}</span></span>`
+    : `<i data-lucide="mail" class="w-4 h-4 text-brand-light"></i>`;
+  document.getElementById('emailHistory').innerHTML=data.map(e=>`<div class="flex items-center gap-3 p-3 rounded-xl" style="background:var(--hover)"><div class="w-9 h-9 rounded-lg grid place-content-center bg-[var(--card)]">${chIcon(e.ch)}</div><div class="flex-1 min-w-0"><p class="text-sm font-medium truncate">${e.s}</p><p class="text-xs text-[var(--muted)]">${e.n} famílias · ${e.d}</p></div><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500"></i></div>`).join('');
   lucide.createIcons();
 }
 const USERS=[{n:'Priscylla Martins',e:'priscylla@englishpatio.com.br',r:'Administrador',c:'#1E3765'},{n:'Gabriel Teles',e:'gabriel@englishpatio.com.br',r:'Administrador',c:'#2F539A'},{n:'Stefany Oliveira',e:'stefany@englishpatio.com.br',r:'Secretaria',c:'#B5860B'},{n:'Beatriz Souza',e:'beatriz@englishpatio.com.br',r:'Secretaria',c:'#0d9488'}];
@@ -1858,6 +1874,7 @@ function init(){
   renderTableHead();
   document.getElementById('emailToWrap').innerHTML=cselect('emailTo',[{v:'all',l:'Todos os responsáveis (96)'},{v:'sq',l:'Apenas turma Seg/Qua (71)'},{v:'tq',l:'Apenas turma Ter/Qui (57)'},{v:'pend',l:'Contratos pendentes (7)'}],{block:true});
   // conteúdo
+  document.querySelectorAll('.wa-slot').forEach(s=>s.innerHTML=WA('w-4 h-4'));
   renderRecent(); renderTable(); renderContracts(); renderEmails(); renderUsers();
   renderBirthdays(); renderHoods(); renderPayLegend(); renderHealth(); renderNotifs();
   renderEditorTabs(); setEditorPage('home');
@@ -1993,26 +2010,70 @@ function insertVar(token){
   ta.focus(); ta.selectionStart=ta.selectionEnd=pos+token.length;
 }
 
-/* --- pré-visualizar e-mail --- */
-function openEmailPreview(){
+/* --- canais do comunicado (e-mail / WhatsApp / ambos) --- */
+let commChannel='email';
+function setCommChannel(ch){
+  commChannel=ch;
+  document.querySelectorAll('#chSeg [data-ch]').forEach(b=>{
+    const on=b.dataset.ch===ch;
+    b.className='flex items-center gap-1.5 px-3 h-9 rounded-lg text-[13px] font-medium transition '+(on?'bg-[var(--card)] shadow-sm':'text-[var(--muted)]');
+  });
+  const btn=document.getElementById('sendBtn');
+  if(ch==='wa'){
+    btn.innerHTML=`${WA('w-4 h-4')} Preparar WhatsApp`;
+    btn.style.background='#25D366';
+  } else {
+    btn.innerHTML=`<i data-lucide="send" class="w-4 h-4"></i> ${ch==='both'?'Enviar e-mail + WhatsApp':'Enviar e-mail'}`;
+    btn.style.background='linear-gradient(135deg,#1E3765,#2F539A)';
+  }
+  lucide.createIcons();
+}
+function sendComm(){
+  const msg = commChannel==='email' ? 'Comunicado enviado por e-mail para 96 responsáveis!'
+    : commChannel==='wa' ? 'Mensagens preparadas — 96 conversas de WhatsApp na fila!'
+    : 'E-mails enviados e 96 conversas de WhatsApp preparadas!';
+  toast(msg);
+}
+function commTexts(){
   const subj=document.getElementById('emailSubject')?.value||'';
   const body=(document.getElementById('emailBody')?.value||'')
     .replace(/\{\{nome_responsavel\}\}/g,'Mariana').replace(/\{\{nome_aluno\}\}/g,'Helena');
-  openModal(`${modalHeader('Pré-visualização do e-mail')}
-  <div class="p-5">
-    <div class="rounded-xl border overflow-hidden" style="border-color:var(--border)">
-      <div class="px-4 py-3 text-xs border-b" style="border-color:var(--border);background:var(--hover)">
-        <p><span class="text-[var(--muted)]">De:</span> <strong>English Patio</strong> &lt;contato@englishpatio.com.br&gt;</p>
-        <p class="mt-0.5"><span class="text-[var(--muted)]">Para:</span> Mariana Duarte Lima</p>
-      </div>
-      <div class="p-5 bg-white text-slate-800">
-        <img src="assets/logo-index.webp" alt="English Patio" class="h-10 w-auto mb-4">
-        <p class="font-semibold mb-3">${esc(subj)}</p>
-        <p class="text-sm leading-relaxed whitespace-pre-line">${esc(body)}</p>
-        <p class="text-[11px] text-slate-400 mt-6 pt-4 border-t border-slate-100">Você recebeu este e-mail porque é responsável por um aluno da English Patio.</p>
-      </div>
+  return {subj,body};
+}
+function emailPreviewCard(subj,body){
+  return `<div class="rounded-xl border overflow-hidden" style="border-color:var(--border)">
+    <div class="px-4 py-3 text-xs border-b" style="border-color:var(--border);background:var(--hover)">
+      <p><span class="text-[var(--muted)]">De:</span> <strong>English Patio</strong> &lt;contato@englishpatio.com.br&gt;</p>
+      <p class="mt-0.5"><span class="text-[var(--muted)]">Para:</span> Mariana Duarte Lima</p>
     </div>
-    <p class="text-xs text-[var(--muted)] mt-3 flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3.5 h-3.5" style="color:#F5B700"></i> As variáveis {{nome_responsavel}} e {{nome_aluno}} foram substituídas por dados de exemplo.</p>
+    <div class="p-5 bg-white text-slate-800">
+      <img src="assets/logo-index.webp" alt="English Patio" class="h-10 w-auto mb-4">
+      <p class="font-semibold mb-3">${esc(subj)}</p>
+      <p class="text-sm leading-relaxed whitespace-pre-line">${esc(body)}</p>
+      <p class="text-[11px] text-slate-400 mt-6 pt-4 border-t border-slate-100">Você recebeu este e-mail porque é responsável por um aluno da English Patio.</p>
+    </div>
+  </div>`;
+}
+function waPreviewCard(body){
+  return `<div class="rounded-xl overflow-hidden border" style="border-color:var(--border)">
+    <div class="px-4 py-2.5 flex items-center gap-2.5" style="background:#075E54">
+      <div class="w-8 h-8 rounded-full grid place-content-center text-white text-[11px] font-bold shrink-0" style="background:#128C7E">MD</div>
+      <div class="leading-tight"><p class="text-white text-sm font-medium">Mariana Duarte Lima</p><p class="text-[10px] text-white/70">online</p></div>
+    </div>
+    <div class="p-4" style="background:#e5ddd5">
+      <div class="max-w-[88%] rounded-xl rounded-tl-none bg-white p-3 text-[13px] text-slate-800 shadow whitespace-pre-line">${esc(body)}<span class="block text-right text-[10px] text-slate-400 mt-1">16h32 ✓✓</span></div>
+    </div>
+  </div>`;
+}
+function openCommPreview(){
+  const {subj,body}=commTexts();
+  let inner='';
+  if(commChannel!=='wa') inner+=`<p class="text-[10px] font-bold uppercase tracking-wider text-[var(--muted)] mb-2">Por e-mail</p>`+emailPreviewCard(subj,body);
+  if(commChannel!=='email') inner+=`${commChannel==='both'?'<p class="text-[10px] font-bold uppercase tracking-wider text-[var(--muted)] mt-5 mb-2">No WhatsApp</p>':''}`+waPreviewCard(body);
+  openModal(`${modalHeader('Como a família recebe')}
+  <div class="p-5">
+    ${inner}
+    <p class="text-xs text-[var(--muted)] mt-3 flex items-center gap-1.5"><i data-lucide="info" class="w-3.5 h-3.5"></i> {{nome_responsavel}} e {{nome_aluno}} foram substituídos por dados de exemplo.</p>
   </div>
   <div class="p-5 pt-0"><button onclick="closeModal()" class="w-full h-11 rounded-xl border border-[var(--border)] font-medium text-sm">Fechar</button></div>`,'max-w-lg');
 }
@@ -2270,7 +2331,7 @@ function elLabel(el){
     || '<'+el.tagName.toLowerCase()+'>';
 }
 function currentView(){ return document.querySelector('[data-view].view-active')?.dataset.view||'overview'; }
-const VIEW_LABEL={overview:'Visão geral',alunos:'Alunos',detalhe:'Detalhe do aluno',contratos:'Contratos',emails:'E-mails',editor:'Editor do site',usuarios:'Usuários',config:'Configurações',notifs:'Notificações'};
+const VIEW_LABEL={overview:'Visão geral',alunos:'Alunos',detalhe:'Detalhe do aluno',contratos:'Contratos',emails:'Comunicados',editor:'Editor do site',usuarios:'Usuários',config:'Configurações',notifs:'Notificações'};
 
 function toggleCommentMode(){
   commentMode=!commentMode;

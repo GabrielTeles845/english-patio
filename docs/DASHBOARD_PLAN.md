@@ -105,7 +105,8 @@ A **idempotência** (`submission_id`) já resolve o débito técnico de matrícu
    etária), filtros de período, últimas matrículas
 4. **Alunos** — lista (tabela com design próprio, busca + filtros) e **detalhe** completo
 5. **Contratos** — listar/visualizar/baixar (assinatura digital = fase futura)
-6. **E-mails** — campanhas/disparos gerais com filtro de público + transacionais (reset senha)
+6. **Comunicados** — aviso escrito 1x e entregue por **e-mail e/ou WhatsApp** (mensagens
+   preparadas por família; API oficial do WhatsApp em fase futura) + transacionais (reset senha)
 7. **Editor de site** — edição de **todos os textos** de todas as páginas (inclui telas de
    matrícula), com **hover de borda pontilhada** + painel lateral, como no projeto casamento
 8. **Usuários & permissões** — gerenciar admins/gestores
