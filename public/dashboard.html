@@ -467,7 +467,7 @@
           <div class="surface rounded-2xl p-5 flex flex-col">
             <h3 class="font-heading font-semibold text-lg mb-1">Faixa etária</h3>
             <p class="text-xs text-[var(--muted)] mb-4">Idade dos alunos</p>
-            <div class="flex-1 min-h-[200px]"><canvas id="chartAge"></canvas></div>
+            <div class="relative h-56"><canvas id="chartAge"></canvas></div>
           </div>
           <!-- últimas matrículas -->
           <div class="surface rounded-2xl p-5 lg:col-span-2">
@@ -487,8 +487,8 @@
                 <p class="text-xs text-[var(--muted)]">Horário em que as matrículas chegam pelo site</p></div>
               <span class="text-xs px-2.5 py-1 rounded-full font-semibold" style="background:rgba(245,183,0,.16);color:#B5860B">Pico: 20h</span>
             </div>
-            <div class="flex-1 min-h-[220px]"><canvas id="chartHours"></canvas></div>
-            <p class="text-xs text-[var(--muted)] mt-3 flex items-center gap-1.5"><i data-lucide="lightbulb" class="w-3.5 h-3.5" style="color:#F5B700"></i> A maioria das famílias matricula à noite — bom horário para impulsionar posts e responder rápido no WhatsApp.</p>
+            <div class="relative h-64"><canvas id="chartHours"></canvas></div>
+            <p class="text-xs text-[var(--muted)] mt-auto pt-3 flex items-center gap-1.5"><i data-lucide="lightbulb" class="w-3.5 h-3.5" style="color:#F5B700"></i> A maioria das famílias matricula à noite — bom horário para impulsionar posts e responder rápido no WhatsApp.</p>
           </div>
           <div class="surface rounded-2xl p-5">
             <h3 class="font-heading font-semibold text-lg mb-1">Próximos aniversariantes 🎂</h3>
@@ -507,14 +507,14 @@
           <div class="surface rounded-2xl p-5 flex flex-col">
             <h3 class="font-heading font-semibold text-lg mb-1">Autorização de imagem</h3>
             <p class="text-xs text-[var(--muted)] mb-4">Quem permite fotos nas redes da escola</p>
-            <div class="flex-1 min-h-[160px]"><canvas id="chartPay"></canvas></div>
-            <div id="payLegend" class="mt-4 space-y-2"></div>
+            <div class="relative h-44"><canvas id="chartPay"></canvas></div>
+            <div id="payLegend" class="mt-auto pt-4 space-y-2"></div>
           </div>
           <div class="surface rounded-2xl p-5 flex flex-col">
             <h3 class="font-heading font-semibold text-lg mb-1">Distribuição por horário</h3>
             <p class="text-xs text-[var(--muted)] mb-4">Dias das aulas</p>
-            <div class="flex-1 min-h-[170px]"><canvas id="chartSchedule"></canvas></div>
-            <div class="mt-4 space-y-2 text-sm">
+            <div class="relative h-44"><canvas id="chartSchedule"></canvas></div>
+            <div class="mt-auto pt-4 space-y-2 text-sm">
               <div class="flex items-center justify-between"><span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full" style="background:#2F539A"></span>Seg/Qua</span><span class="font-semibold">71</span></div>
               <div class="flex items-center justify-between"><span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full" style="background:#F5B700"></span>Ter/Qui</span><span class="font-semibold">57</span></div>
             </div>
@@ -1431,7 +1431,7 @@ function renderHoods(){
   const data=[['Setor Bueno',26],['Jardim Goiás',19],['Setor Marista',15],['Setor Sul',12],['Jardim América',9],['Setor Oeste',8],['Jardim Atlântico',7],['Setor Pedro Ludovico',6]];
   const max=data[0][1];
   document.getElementById('hoodList').innerHTML=data.map(([n,v],i)=>`<div>
-    <div class="flex justify-between text-sm mb-1.5"><span class="font-medium">${n}</span><span class="text-[var(--muted)]">${v} alunos</span></div>
+    <div class="flex justify-between gap-3 text-sm mb-1.5"><span class="font-medium truncate">${n}</span><span class="text-[var(--muted)] whitespace-nowrap shrink-0">${v} alunos</span></div>
     <div class="h-2 rounded-full overflow-hidden" style="background:var(--hover)"><div class="h-full rounded-full" style="width:${Math.round(v/max*100)}%;background:${i===0?'#F5B700':'#2F539A'}"></div></div></div>`).join('');
 }
 /* autorização de uso de imagem (pagamento é sempre boleto/carnê, conforme o contrato) */
@@ -1975,7 +1975,7 @@ function buildDashGrid(){
   [...grid.children].forEach((c,i)=>{ c.classList.add('dash-card'); if(!c.dataset.w) c.dataset.w='w'+i; });
   dashDefault=[...grid.children].map(c=>c.dataset.w);
   try{                                                    // aplica ordem salva
-    const saved=JSON.parse(localStorage.getItem('ep-dash-order')||'null');
+    const saved=JSON.parse(localStorage.getItem('ep-dash-order-v2')||'null');
     if(Array.isArray(saved)) saved.forEach(w=>{ const el=grid.querySelector(`[data-w="${w}"]`); if(el) grid.appendChild(el); });
   }catch(_){}
   grid.addEventListener('dragstart',e=>{
@@ -2008,7 +2008,7 @@ function toggleCustomize(){
   lucide.createIcons();
   if(customizing) toast('Arraste os cartões — eles se encaixam sozinhos, sem deixar buraco.');
   else {
-    localStorage.setItem('ep-dash-order', JSON.stringify([...grid.children].map(c=>c.dataset.w)));
+    localStorage.setItem('ep-dash-order-v2', JSON.stringify([...grid.children].map(c=>c.dataset.w)));
     toast('Layout salvo!');
     refreshCharts();
   }
@@ -2016,7 +2016,7 @@ function toggleCustomize(){
 function resetDash(){
   const grid=document.getElementById('dashGrid'); if(!grid) return;
   dashDefault.forEach(w=>{ const el=grid.querySelector(`[data-w="${w}"]`); if(el) grid.appendChild(el); });
-  localStorage.removeItem('ep-dash-order');
+  localStorage.removeItem('ep-dash-order-v2');
   toast('Layout padrão restaurado.');
 }
 
