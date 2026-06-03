@@ -620,6 +620,15 @@
               <div><h3 class="font-heading font-semibold">Escrever aviso</h3><p class="text-xs text-[var(--muted)]">Cada responsável recebe no próprio e-mail, com o próprio nome</p></div>
             </div>
             <div class="p-5">
+              <div class="mb-4">
+                <span class="text-sm font-medium">Comece por um modelo <span class="font-normal text-xs text-[var(--muted)]">(opcional — já vem escrito)</span></span>
+                <div class="flex flex-wrap gap-2 mt-2">
+                  <button onclick="applyEmailTpl('recesso')" class="flex items-center gap-2 h-9 px-3 rounded-xl border border-[var(--border)] text-[13px] font-medium hover:bg-[var(--hover)] transition"><i data-lucide="sun" class="w-4 h-4" style="color:#F5B700"></i>Recesso / Vacation Classes</button>
+                  <button onclick="applyEmailTpl('contrato')" class="flex items-center gap-2 h-9 px-3 rounded-xl border border-[var(--border)] text-[13px] font-medium hover:bg-[var(--hover)] transition"><i data-lucide="file-clock" class="w-4 h-4" style="color:#B5860B"></i>Lembrete de contrato</button>
+                  <button onclick="applyEmailTpl('aviso')" class="flex items-center gap-2 h-9 px-3 rounded-xl border border-[var(--border)] text-[13px] font-medium hover:bg-[var(--hover)] transition"><i data-lucide="megaphone" class="w-4 h-4 text-brand-light"></i>Comunicado geral</button>
+                </div>
+              </div>
+              <div class="h-px mb-4" style="background:var(--border)"></div>
               <div class="mb-3"><span class="text-sm font-medium">Para quem vai</span>
                 <div class="mt-1.5" id="emailToWrap"></div></div>
               <label class="block mb-3"><span class="text-sm font-medium">Assunto</span>
@@ -640,25 +649,6 @@
           </div>
 
           <div class="lg:col-span-2 space-y-4">
-            <!-- modelos prontos -->
-            <div class="surface rounded-2xl overflow-hidden">
-              <div class="flex items-center gap-3 px-5 py-4 border-b" style="border-color:var(--border)">
-                <div class="w-10 h-10 rounded-xl grid place-content-center" style="background:rgba(245,183,0,.14)"><i data-lucide="sparkles" class="w-5 h-5" style="color:#B5860B"></i></div>
-                <div><h3 class="font-heading font-semibold">Modelos prontos</h3><p class="text-xs text-[var(--muted)]">Um clique e o aviso já vem escrito</p></div>
-              </div>
-              <div class="p-3 space-y-1">
-                <button onclick="applyEmailTpl('recesso')" class="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-[var(--hover)] transition text-left">
-                  <i data-lucide="sun" class="w-4 h-4 shrink-0" style="color:#F5B700"></i>
-                  <span class="min-w-0"><span class="block text-sm font-medium">Recesso / Vacation Classes</span><span class="block text-xs text-[var(--muted)] truncate">Aviso sobre julho e as vivências</span></span></button>
-                <button onclick="applyEmailTpl('contrato')" class="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-[var(--hover)] transition text-left">
-                  <i data-lucide="file-clock" class="w-4 h-4 shrink-0" style="color:#B5860B"></i>
-                  <span class="min-w-0"><span class="block text-sm font-medium">Lembrete de contrato</span><span class="block text-xs text-[var(--muted)] truncate">Para quem ainda não assinou</span></span></button>
-                <button onclick="applyEmailTpl('aviso')" class="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-[var(--hover)] transition text-left">
-                  <i data-lucide="megaphone" class="w-4 h-4 shrink-0 text-brand-light"></i>
-                  <span class="min-w-0"><span class="block text-sm font-medium">Comunicado geral</span><span class="block text-xs text-[var(--muted)] truncate">Estrutura pronta, é só preencher</span></span></button>
-              </div>
-            </div>
-
             <!-- últimos envios -->
             <div class="surface rounded-2xl overflow-hidden">
               <div class="flex items-center gap-3 px-5 py-4 border-b" style="border-color:var(--border)">
