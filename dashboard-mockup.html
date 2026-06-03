@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>English Patio · Dashboard (Preview)</title>
+
+<!-- Mesmas bibliotecas de design previstas para a versão final:
+     Tailwind (utilitários) · Lucide (ícones) · Chart.js (gráficos, equivalente ao Recharts).
+     Componentes montados no estilo shadcn/ui. -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        fontFamily: {
+          heading: ['Fredoka', 'ui-sans-serif', 'system-ui'],
+          sans: ['Inter', 'ui-sans-serif', 'system-ui'],
+        },
+        colors: {
+          brand:  { DEFAULT: '#1E3765', light: '#2F539A', 50:'#eef2f9', 700:'#1E3765', 900:'#13243f' },
+          accent: { DEFAULT: '#F5B700', light: '#FFE17A', 50:'#fff8e1' },
+        },
+      },
+    },
+  }
+</script>
+
+<style>
+  :root{
+    --bg:#F8F9FA; --card:#FFFFFF; --text:#16233f; --muted:#64748B;
+    --border:#E7ECF3; --hover:#F3F6FB; --ring:#2F539A;
+    --sidebar-1:#1E3765; --sidebar-2:#15294d; --sidebar-text:#cdd7e8;
+  }
+  html.dark{
+    --bg:#0B1220; --card:#101b30; --text:#E8EEF7; --muted:#93a2bd;
+    --border:#1d2c47; --hover:#16223a; --ring:#F5B700;
+    --sidebar-1:#0c1731; --sidebar-2:#070f22; --sidebar-text:#aab8d4;
+  }
+  body{ background:var(--bg); color:var(--text); font-family:'Inter',system-ui,sans-serif; }
+  h1,h2,h3,.font-heading{ font-family:'Fredoka',system-ui,sans-serif; }
+  ::-webkit-scrollbar{ width:10px; height:10px; }
+  ::-webkit-scrollbar-thumb{ background:var(--border); border-radius:999px; }
+  .surface{ background:var(--card); border:1px solid var(--border); }
+  .nav-item.active{ background:rgba(255,255,255,.10); }
+  .nav-item.active .bar{ opacity:1; }
+  /* Editor de site — borda pontilhada no hover */
+  .editable{ position:relative; border-radius:8px; outline:2px dashed transparent; outline-offset:4px;
+    transition:outline-color .15s ease, background-color .15s ease; cursor:pointer; }
+  .editor-on .editable:hover{ outline-color:#F5B700; background:rgba(245,183,0,.06); }
+  .editor-on .editable:hover::after{ content:"editar"; position:absolute; top:-10px; right:-6px;
+    font-size:10px; font-weight:600; background:#F5B700; color:#15294d; padding:1px 7px; border-radius:999px;
+    font-family:'Inter'; box-shadow:0 2px 6px rgba(0,0,0,.18); }
+  .fade-in{ animation:fade .35s ease both; }
+  @keyframes fade{ from{ opacity:0; transform:translateY(6px);} to{ opacity:1; transform:none;} }
+  [data-view]{ display:none; }
+  [data-view].view-active{ display:block; }
+</style>
+</head>
+
+<body class="min-h-screen antialiased">
+
+<!-- ============================= LOGIN ============================= -->
+<div id="login" class="min-h-screen grid lg:grid-cols-2">
+  <!-- lado da marca -->
+  <div class="relative hidden lg:flex flex-col justify-between p-12 text-white overflow-hidden"
+       style="background:linear-gradient(155deg,#1E3765,#2F539A 70%,#1E3765)">
+    <div class="absolute -top-16 -right-10 w-72 h-72 rounded-full" style="background:rgba(245,183,0,.18)"></div>
+    <div class="absolute bottom-10 -left-10 w-60 h-60 rounded-full" style="background:rgba(255,255,255,.06)"></div>
+    <div class="flex items-center gap-3 relative">
+      <div class="w-11 h-11 rounded-2xl grid place-content-center font-heading text-xl font-bold"
+           style="background:#F5B700;color:#15294d">EP</div>
+      <span class="font-heading text-xl font-semibold">English Patio</span>
+    </div>
+    <div class="relative">
+      <h1 class="font-heading text-4xl leading-tight font-semibold">Tudo da escola,<br>num só lugar.</h1>
+      <p class="mt-4 text-white/70 max-w-sm">Matrículas, alunos, contratos, e-mails e o conteúdo do site — organizado, seguro e bonito.</p>
+      <div class="mt-8 flex gap-2">
+        <span class="h-1.5 w-8 rounded-full bg-accent"></span>
+        <span class="h-1.5 w-2.5 rounded-full bg-white/30"></span>
+        <span class="h-1.5 w-2.5 rounded-full bg-white/30"></span>
+      </div>
+    </div>
+    <p class="relative text-white/50 text-sm">Preview · dados fictícios</p>
+  </div>
+  <!-- lado do formulário -->
+  <div class="flex items-center justify-center p-6 sm:p-10">
+    <div class="w-full max-w-sm">
+      <div class="lg:hidden flex items-center gap-3 mb-8">
+        <div class="w-10 h-10 rounded-xl grid place-content-center font-heading font-bold" style="background:#F5B700;color:#15294d">EP</div>
+        <span class="font-heading text-lg font-semibold">English Patio</span>
+      </div>
+      <h2 class="font-heading text-2xl font-semibold">Bem-vinda de volta 👋</h2>
+      <p class="text-[var(--muted)] mt-1 text-sm">Entre para acessar a dashboard.</p>
+
+      <div class="mt-7 space-y-4">
+        <label class="block">
+          <span class="text-sm font-medium">E-mail</span>
+          <div class="mt-1.5 flex items-center gap-2 surface rounded-xl px-3 h-11 focus-within:ring-2 ring-brand-light">
+            <i data-lucide="mail" class="w-4 h-4 text-[var(--muted)]"></i>
+            <input type="email" value="claudia@englishpatio.com.br" class="flex-1 bg-transparent outline-none text-sm">
+          </div>
+        </label>
+        <label class="block">
+          <span class="text-sm font-medium">Senha</span>
+          <div class="mt-1.5 flex items-center gap-2 surface rounded-xl px-3 h-11 focus-within:ring-2 ring-brand-light">
+            <i data-lucide="lock" class="w-4 h-4 text-[var(--muted)]"></i>
+            <input type="password" value="••••••••••" class="flex-1 bg-transparent outline-none text-sm">
+          </div>
+        </label>
+        <div class="flex items-center justify-between text-sm">
+          <label class="flex items-center gap-2 text-[var(--muted)]"><input type="checkbox" class="accent-brand"> Lembrar de mim</label>
+          <a href="#" onclick="openForgot(event)" class="font-medium text-brand-light hover:underline">Esqueci a senha</a>
+        </div>
+        <button onclick="doLogin()" class="w-full h-11 rounded-xl font-semibold text-white shadow-lg shadow-brand/20 hover:brightness-110 transition"
+                style="background:linear-gradient(135deg,#1E3765,#2F539A)">Entrar</button>
+      </div>
+      <p class="text-xs text-[var(--muted)] mt-6 flex items-center gap-1.5">
+        <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Acesso protegido · dados de menores tratados conforme a LGPD.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- "Esqueci a senha" -->
+<div id="forgot" class="fixed inset-0 z-[60] hidden items-center justify-center bg-black/50 p-4">
+  <div class="surface rounded-2xl w-full max-w-sm p-6 fade-in">
+    <div class="w-12 h-12 rounded-2xl grid place-content-center mb-4" style="background:var(--hover)"><i data-lucide="key-round" class="w-5 h-5 text-brand-light"></i></div>
+    <h3 class="font-heading text-xl font-semibold">Recuperar senha</h3>
+    <p class="text-sm text-[var(--muted)] mt-1">Enviaremos um link de redefinição para o e-mail cadastrado.</p>
+    <div class="mt-4 flex items-center gap-2 surface rounded-xl px-3 h-11">
+      <i data-lucide="mail" class="w-4 h-4 text-[var(--muted)]"></i>
+      <input type="email" placeholder="seu@email.com" class="flex-1 bg-transparent outline-none text-sm">
+    </div>
+    <div class="mt-5 flex gap-2">
+      <button onclick="closeForgot()" class="flex-1 h-10 rounded-xl border border-[var(--border)] font-medium text-sm">Cancelar</button>
+      <button onclick="closeForgot(); toast('Link de redefinição enviado!')" class="flex-1 h-10 rounded-xl text-white font-semibold text-sm" style="background:#1E3765">Enviar link</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================= APP ============================= -->
+<div id="app" class="hidden">
+<div class="lg:flex min-h-screen">
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside id="sidebar" class="fixed lg:sticky top-0 z-50 h-screen w-[256px] shrink-0 -translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col"
+         style="background:linear-gradient(180deg,var(--sidebar-1),var(--sidebar-2));color:var(--sidebar-text)">
+    <div class="h-16 flex items-center gap-3 px-5 border-b border-white/10">
+      <div class="w-9 h-9 rounded-xl grid place-content-center font-heading font-bold text-lg" style="background:#F5B700;color:#15294d">EP</div>
+      <div class="leading-tight">
+        <p class="font-heading text-white font-semibold">English Patio</p>
+        <p class="text-[11px] text-white/40">Painel administrativo</p>
+      </div>
+    </div>
+
+    <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-6">
+      <div>
+        <p class="px-3 text-[10px] uppercase tracking-wider text-white/35 font-semibold mb-2">Principal</p>
+        <div class="space-y-1">
+          <a class="nav-item active group relative flex items-center gap-3 px-3 h-10 rounded-xl hover:bg-white/10 transition cursor-pointer" onclick="go('overview', this)">
+            <span class="bar absolute left-0 top-2 bottom-2 w-1 rounded-full bg-accent opacity-0 transition"></span>
+            <i data-lucide="layout-dashboard" class="w-[18px] h-[18px]"></i><span class="text-sm font-medium">Visão geral</span></a>
+          <a class="nav-item group relative flex items-center gap-3 px-3 h-10 rounded-xl hover:bg-white/10 transition cursor-pointer" onclick="go('alunos', this)">
+            <span class="bar absolute left-0 top-2 bottom-2 w-1 rounded-full bg-accent opacity-0 transition"></span>
+            <i data-lucide="graduation-cap" class="w-[18px] h-[18px]"></i><span class="text-sm font-medium">Alunos</span>
+            <span class="ml-auto text-[11px] bg-white/10 px-2 py-0.5 rounded-full">128</span></a>
+          <a class="nav-item group relative flex items-center gap-3 px-3 h-10 rounded-xl hover:bg-white/10 transition cursor-pointer" onclick="go('contratos', this)">
+            <span class="bar absolute left-0 top-2 bottom-2 w-1 rounded-full bg-accent opacity-0 transition"></span>
+            <i data-lucide="file-text" class="w-[18px] h-[18px]"></i><span class="text-sm font-medium">Contratos</span>
+            <span class="ml-auto text-[11px] bg-accent/90 text-[#15294d] px-2 py-0.5 rounded-full font-semibold">7</span></a>
+          <a class="nav-item group relative flex items-center gap-3 px-3 h-10 rounded-xl hover:bg-white/10 transition cursor-pointer" onclick="go('emails', this)">
+            <span class="bar absolute left-0 top-2 bottom-2 w-1 rounded-full bg-accent opacity-0 transition"></span>
+            <i data-lucide="mail" class="w-[18px] h-[18px]"></i><span class="text-sm font-medium">E-mails</span></a>
+        </div>
+      </div>
+      <div>
+        <p class="px-3 text-[10px] uppercase tracking-wider text-white/35 font-semibold mb-2">Conteúdo</p>
+        <div class="space-y-1">
+          <a class="nav-item group relative flex items-center gap-3 px-3 h-10 rounded-xl hover:bg-white/10 transition cursor-pointer" onclick="go('editor', this)">
+            <span class="bar absolute left-0 top-2 bottom-2 w-1 rounded-full bg-accent opacity-0 transition"></span>
+            <i data-lucide="pencil-ruler" class="w-[18px] h-[18px]"></i><span class="text-sm font-medium">Editor do site</span></a>
+        </div>
+      </div>
+      <div>
+        <p class="px-3 text-[10px] uppercase tracking-wider text-white/35 font-semibold mb-2">Administração</p>
+        <div class="space-y-1">
+          <a class="nav-item group relative flex items-center gap-3 px-3 h-10 rounded-xl hover:bg-white/10 transition cursor-pointer" onclick="go('usuarios', this)">
+            <span class="bar absolute left-0 top-2 bottom-2 w-1 rounded-full bg-accent opacity-0 transition"></span>
+            <i data-lucide="users-round" class="w-[18px] h-[18px]"></i><span class="text-sm font-medium">Usuários</span></a>
+          <a class="nav-item group relative flex items-center gap-3 px-3 h-10 rounded-xl hover:bg-white/10 transition cursor-pointer" onclick="go('config', this)">
+            <span class="bar absolute left-0 top-2 bottom-2 w-1 rounded-full bg-accent opacity-0 transition"></span>
+            <i data-lucide="settings" class="w-[18px] h-[18px]"></i><span class="text-sm font-medium">Configurações</span></a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="p-3 border-t border-white/10">
+      <div class="flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-white/10 cursor-pointer">
+        <div class="w-9 h-9 rounded-full grid place-content-center font-semibold text-[#15294d]" style="background:#FFE17A">CM</div>
+        <div class="leading-tight min-w-0">
+          <p class="text-sm font-medium text-white truncate">Cláudia Martins</p>
+          <p class="text-[11px] text-white/40">Administradora</p>
+        </div>
+        <i data-lucide="log-out" class="w-4 h-4 ml-auto text-white/50 hover:text-white" onclick="logout()"></i>
+      </div>
+    </div>
+  </aside>
+  <div id="overlay" onclick="toggleSidebar(false)" class="fixed inset-0 z-40 bg-black/40 hidden lg:hidden"></div>
+
+  <!-- ===== MAIN ===== -->
+  <div class="flex-1 min-w-0 flex flex-col">
+
+    <!-- topbar -->
+    <header class="sticky top-0 z-30 h-16 flex items-center gap-3 px-4 sm:px-6 border-b" style="background:var(--card);border-color:var(--border)">
+      <button onclick="toggleSidebar(true)" class="lg:hidden p-2 -ml-2 rounded-lg hover:bg-[var(--hover)]"><i data-lucide="menu" class="w-5 h-5"></i></button>
+      <div class="flex items-center gap-2 surface rounded-xl px-3 h-10 w-full max-w-md">
+        <i data-lucide="search" class="w-4 h-4 text-[var(--muted)]"></i>
+        <input id="globalSearch" placeholder="Buscar aluno, responsável, CPF…" class="flex-1 bg-transparent outline-none text-sm">
+        <kbd class="hidden sm:block text-[10px] text-[var(--muted)] border border-[var(--border)] rounded px-1.5 py-0.5">Ctrl K</kbd>
+      </div>
+      <div class="ml-auto flex items-center gap-1">
+        <button onclick="toggleTheme()" class="p-2.5 rounded-xl hover:bg-[var(--hover)]" title="Tema claro/escuro">
+          <i id="themeIcon" data-lucide="moon" class="w-[18px] h-[18px]"></i></button>
+        <button class="relative p-2.5 rounded-xl hover:bg-[var(--hover)]"><i data-lucide="bell" class="w-[18px] h-[18px]"></i>
+          <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-accent ring-2" style="--tw-ring-color:var(--card)"></span></button>
+        <div class="w-9 h-9 rounded-full grid place-content-center font-semibold text-[#15294d] ml-1" style="background:#FFE17A">CM</div>
+      </div>
+    </header>
+
+    <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1400px] w-full mx-auto">
+
+      <!-- ====================== VISÃO GERAL ====================== -->
+      <section data-view="overview" class="view-active fade-in">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+          <div>
+            <h1 class="font-heading text-2xl sm:text-3xl font-semibold">Visão geral</h1>
+            <p class="text-[var(--muted)] text-sm mt-0.5">Olá, Cláudia! Aqui está o resumo da escola.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 surface rounded-xl px-3 h-10 text-sm">
+              <i data-lucide="calendar" class="w-4 h-4 text-[var(--muted)]"></i>
+              <select class="bg-transparent outline-none text-sm pr-1"><option>Últimos 6 meses</option><option>Este ano</option><option>Este mês</option></select>
+            </div>
+            <button class="flex items-center gap-2 h-10 px-4 rounded-xl text-white text-sm font-semibold" style="background:#1E3765">
+              <i data-lucide="download" class="w-4 h-4"></i><span class="hidden sm:inline">Exportar</span></button>
+          </div>
+        </div>
+
+        <!-- KPIs -->
+        <div class="grid grid-cols-2 xl:grid-cols-4 gap-4">
+          <div class="surface rounded-2xl p-5">
+            <div class="flex items-center justify-between"><span class="text-sm text-[var(--muted)]">Alunos ativos</span>
+              <div class="w-9 h-9 rounded-xl grid place-content-center" style="background:var(--hover)"><i data-lucide="graduation-cap" class="w-[18px] h-[18px] text-brand-light"></i></div></div>
+            <p class="font-heading text-3xl font-semibold mt-3">128</p>
+            <p class="text-xs mt-1 text-emerald-500 font-medium flex items-center gap-1"><i data-lucide="trending-up" class="w-3.5 h-3.5"></i> +12 este mês</p>
+          </div>
+          <div class="surface rounded-2xl p-5">
+            <div class="flex items-center justify-between"><span class="text-sm text-[var(--muted)]">Novos esta semana</span>
+              <div class="w-9 h-9 rounded-xl grid place-content-center" style="background:var(--hover)"><i data-lucide="user-plus" class="w-[18px] h-[18px] text-brand-light"></i></div></div>
+            <p class="font-heading text-3xl font-semibold mt-3">9</p>
+            <p class="text-xs mt-1 text-emerald-500 font-medium flex items-center gap-1"><i data-lucide="trending-up" class="w-3.5 h-3.5"></i> +3 vs. semana passada</p>
+          </div>
+          <div class="surface rounded-2xl p-5">
+            <div class="flex items-center justify-between"><span class="text-sm text-[var(--muted)]">Contratos pendentes</span>
+              <div class="w-9 h-9 rounded-xl grid place-content-center" style="background:#FFF6DC"><i data-lucide="file-clock" class="w-[18px] h-[18px]" style="color:#B5860B"></i></div></div>
+            <p class="font-heading text-3xl font-semibold mt-3">7</p>
+            <p class="text-xs mt-1 text-[var(--muted)] font-medium">aguardando assinatura</p>
+          </div>
+          <div class="surface rounded-2xl p-5">
+            <div class="flex items-center justify-between"><span class="text-sm text-[var(--muted)]">Matrículas no mês</span>
+              <div class="w-9 h-9 rounded-xl grid place-content-center" style="background:var(--hover)"><i data-lucide="trending-up" class="w-[18px] h-[18px] text-brand-light"></i></div></div>
+            <p class="font-heading text-3xl font-semibold mt-3">21</p>
+            <p class="text-xs mt-1 text-emerald-500 font-medium flex items-center gap-1"><i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i> melhor mês do ano</p>
+          </div>
+        </div>
+
+        <!-- charts -->
+        <div class="grid lg:grid-cols-3 gap-4 mt-4">
+          <div class="surface rounded-2xl p-5 lg:col-span-2">
+            <div class="flex items-center justify-between mb-4">
+              <div><h3 class="font-heading font-semibold text-lg">Matrículas por mês</h3><p class="text-xs text-[var(--muted)]">Evolução no semestre</p></div>
+              <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 font-medium">↑ 38%</span>
+            </div>
+            <div class="h-64"><canvas id="chartEnroll"></canvas></div>
+          </div>
+          <div class="surface rounded-2xl p-5">
+            <h3 class="font-heading font-semibold text-lg mb-1">Distribuição por horário</h3>
+            <p class="text-xs text-[var(--muted)] mb-4">Dias das aulas</p>
+            <div class="h-44"><canvas id="chartSchedule"></canvas></div>
+            <div class="mt-4 space-y-2 text-sm">
+              <div class="flex items-center justify-between"><span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full" style="background:#2F539A"></span>Seg/Qua</span><span class="font-semibold">71</span></div>
+              <div class="flex items-center justify-between"><span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full" style="background:#F5B700"></span>Ter/Qui</span><span class="font-semibold">57</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-4 mt-4">
+          <div class="surface rounded-2xl p-5">
+            <h3 class="font-heading font-semibold text-lg mb-1">Faixa etária</h3>
+            <p class="text-xs text-[var(--muted)] mb-4">Idade dos alunos</p>
+            <div class="h-56"><canvas id="chartAge"></canvas></div>
+          </div>
+          <!-- últimas matrículas -->
+          <div class="surface rounded-2xl p-5 lg:col-span-2">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-heading font-semibold text-lg">Últimas matrículas</h3>
+              <button onclick="go('alunos')" class="text-sm font-medium text-brand-light hover:underline flex items-center gap-1">Ver todos <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
+            </div>
+            <div id="recentList" class="space-y-1.5"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================== ALUNOS (LISTA) ====================== -->
+      <section data-view="alunos" class="fade-in">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+          <div><h1 class="font-heading text-2xl sm:text-3xl font-semibold">Alunos</h1>
+            <p class="text-[var(--muted)] text-sm mt-0.5">128 alunos em 96 matrículas ativas</p></div>
+          <div class="flex items-center gap-2">
+            <button class="flex items-center gap-2 h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)]"><i data-lucide="download" class="w-4 h-4"></i><span class="hidden sm:inline">Exportar CSV</span></button>
+            <button class="flex items-center gap-2 h-10 px-4 rounded-xl text-white text-sm font-semibold" style="background:linear-gradient(135deg,#1E3765,#2F539A)"><i data-lucide="plus" class="w-4 h-4"></i>Nova matrícula</button>
+          </div>
+        </div>
+
+        <!-- filtros -->
+        <div class="surface rounded-2xl p-3 mb-4 flex flex-wrap items-center gap-2">
+          <div class="flex items-center gap-2 rounded-xl px-3 h-10 flex-1 min-w-[200px]" style="background:var(--hover)">
+            <i data-lucide="search" class="w-4 h-4 text-[var(--muted)]"></i>
+            <input id="alunoSearch" oninput="renderTable()" placeholder="Buscar por nome, responsável ou bairro…" class="flex-1 bg-transparent outline-none text-sm">
+          </div>
+          <select id="fSchedule" onchange="renderTable()" class="h-10 px-3 rounded-xl text-sm border border-[var(--border)] bg-[var(--card)]"><option value="">Todos os horários</option><option value="seg-qua">Seg/Qua</option><option value="ter-qui">Ter/Qui</option></select>
+          <select id="fStatus" onchange="renderTable()" class="h-10 px-3 rounded-xl text-sm border border-[var(--border)] bg-[var(--card)]"><option value="">Contrato: todos</option><option value="signed">Assinado</option><option value="sent">Enviado</option><option value="pending">Pendente</option></select>
+          <select id="fPay" onchange="renderTable()" class="h-10 px-3 rounded-xl text-sm border border-[var(--border)] bg-[var(--card)]"><option value="">Pagamento: todos</option><option>PIX</option><option>Boleto</option><option>Cartão</option><option>Dinheiro</option></select>
+        </div>
+
+        <!-- tabela com design próprio -->
+        <div class="surface rounded-2xl overflow-hidden">
+          <div class="hidden md:grid grid-cols-[1.6fr_1.4fr_.8fr_.9fr_.9fr_40px] gap-3 px-5 py-3 text-[11px] uppercase tracking-wider text-[var(--muted)] font-semibold border-b" style="border-color:var(--border)">
+            <span>Aluno</span><span>Responsável</span><span>Horário</span><span>Pagamento</span><span>Contrato</span><span></span>
+          </div>
+          <div id="tableBody"></div>
+          <div class="flex items-center justify-between px-5 py-3 border-t text-sm text-[var(--muted)]" style="border-color:var(--border)">
+            <span id="tableCount">—</span>
+            <div class="flex items-center gap-1">
+              <button class="w-8 h-8 rounded-lg border border-[var(--border)] grid place-content-center"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+              <button class="w-8 h-8 rounded-lg text-white grid place-content-center" style="background:#1E3765">1</button>
+              <button class="w-8 h-8 rounded-lg border border-[var(--border)] grid place-content-center">2</button>
+              <button class="w-8 h-8 rounded-lg border border-[var(--border)] grid place-content-center"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================== DETALHE DO ALUNO ====================== -->
+      <section data-view="detalhe" class="fade-in">
+        <button onclick="go('alunos')" class="flex items-center gap-2 text-sm font-medium text-[var(--muted)] hover:text-[var(--text)] mb-4"><i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar para alunos</button>
+        <div id="detailContent"></div>
+      </section>
+
+      <!-- ====================== CONTRATOS ====================== -->
+      <section data-view="contratos" class="fade-in">
+        <h1 class="font-heading text-2xl sm:text-3xl font-semibold mb-1">Contratos</h1>
+        <p class="text-[var(--muted)] text-sm mb-5">Visualize e baixe os contratos. <span class="text-[var(--text)] font-medium">Assinatura digital integrada chega numa próxima fase.</span></p>
+        <div class="grid sm:grid-cols-2 xl:grid-cols-3 gap-4" id="contractGrid"></div>
+      </section>
+
+      <!-- ====================== E-MAILS ====================== -->
+      <section data-view="emails" class="fade-in">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+          <div><h1 class="font-heading text-2xl sm:text-3xl font-semibold">E-mails</h1>
+            <p class="text-[var(--muted)] text-sm mt-0.5">Disparos gerais para responsáveis + e-mails automáticos</p></div>
+        </div>
+        <div class="grid lg:grid-cols-5 gap-4">
+          <!-- composer -->
+          <div class="surface rounded-2xl p-5 lg:col-span-3">
+            <h3 class="font-heading font-semibold text-lg mb-4 flex items-center gap-2"><i data-lucide="send" class="w-5 h-5 text-brand-light"></i> Novo disparo</h3>
+            <label class="block mb-3"><span class="text-sm font-medium">Para</span>
+              <select class="mt-1.5 w-full h-11 rounded-xl border border-[var(--border)] bg-[var(--card)] px-3 text-sm">
+                <option>Todos os responsáveis (96)</option><option>Apenas turma Seg/Qua (71)</option><option>Apenas turma Ter/Qui (57)</option><option>Contratos pendentes (7)</option></select></label>
+            <label class="block mb-3"><span class="text-sm font-medium">Assunto</span>
+              <input value="Recesso de julho — calendário atualizado 📅" class="mt-1.5 w-full h-11 rounded-xl border border-[var(--border)] bg-[var(--card)] px-3 text-sm outline-none focus:ring-2 ring-brand-light"></label>
+            <label class="block"><span class="text-sm font-medium">Mensagem</span>
+              <textarea rows="6" class="mt-1.5 w-full rounded-xl border border-[var(--border)] bg-[var(--card)] p-3 text-sm outline-none focus:ring-2 ring-brand-light resize-none">Olá, {{nome_responsavel}}! Passando para avisar sobre o calendário de julho...</textarea></label>
+            <div class="flex items-center justify-between mt-4">
+              <span class="text-xs text-[var(--muted)] flex items-center gap-1.5"><i data-lucide="info" class="w-3.5 h-3.5"></i> Use {{nome_responsavel}} e {{nome_aluno}} para personalizar.</span>
+              <div class="flex gap-2">
+                <button class="h-10 px-4 rounded-xl border border-[var(--border)] text-sm font-medium">Pré-visualizar</button>
+                <button onclick="toast('Disparo agendado para 96 responsáveis!')" class="h-10 px-4 rounded-xl text-white text-sm font-semibold flex items-center gap-2" style="background:linear-gradient(135deg,#1E3765,#2F539A)"><i data-lucide="send" class="w-4 h-4"></i> Enviar</button>
+              </div>
+            </div>
+          </div>
+          <!-- histórico -->
+          <div class="surface rounded-2xl p-5 lg:col-span-2">
+            <h3 class="font-heading font-semibold text-lg mb-4">Últimos envios</h3>
+            <div class="space-y-3" id="emailHistory"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================== EDITOR DO SITE ====================== -->
+      <section data-view="editor" class="fade-in">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div><h1 class="font-heading text-2xl sm:text-3xl font-semibold">Editor do site</h1>
+            <p class="text-[var(--muted)] text-sm mt-0.5">Passe o mouse sobre qualquer texto e clique para editar. As mudanças aparecem no site real.</p></div>
+          <div class="flex items-center gap-2">
+            <div class="flex items-center bg-[var(--hover)] rounded-xl p-1 text-sm">
+              <button class="px-3 py-1.5 rounded-lg bg-[var(--card)] shadow-sm font-medium">Home</button>
+              <button class="px-3 py-1.5 rounded-lg text-[var(--muted)]">Metodologia</button>
+              <button class="px-3 py-1.5 rounded-lg text-[var(--muted)]">Matrículas</button>
+            </div>
+            <button onclick="toast('Alterações publicadas no site!')" class="h-10 px-4 rounded-xl text-white text-sm font-semibold flex items-center gap-2" style="background:#1E3765"><i data-lucide="rocket" class="w-4 h-4"></i> Publicar</button>
+          </div>
+        </div>
+
+        <!-- moldura de navegador -->
+        <div class="surface rounded-2xl overflow-hidden editor-on">
+          <div class="flex items-center gap-2 px-4 h-10 border-b" style="border-color:var(--border);background:var(--hover)">
+            <span class="w-3 h-3 rounded-full bg-red-400"></span><span class="w-3 h-3 rounded-full bg-yellow-400"></span><span class="w-3 h-3 rounded-full bg-green-400"></span>
+            <span class="ml-3 text-xs text-[var(--muted)] bg-[var(--card)] rounded-md px-3 py-1">englishpatio.com.br</span>
+          </div>
+          <!-- página fake editável -->
+          <div class="p-8 sm:p-12 text-center" style="background:linear-gradient(180deg,#eef2f9,var(--card))">
+            <span class="inline-block editable text-xs font-semibold px-3 py-1 rounded-full mb-4" data-key="badge" style="background:#FFE17A;color:#15294d">INGLÊS PARA CRIANÇAS E ADOLESCENTES</span>
+            <h2 class="editable font-heading text-3xl sm:text-4xl font-semibold text-[#1E3765] max-w-2xl mx-auto" data-key="hero-title">Aprender inglês brincando, com método e carinho</h2>
+            <p class="editable text-[var(--muted)] mt-4 max-w-xl mx-auto" data-key="hero-sub">Na English Patio, seu filho desenvolve fluência em um ambiente acolhedor, com turmas pequenas e professores apaixonados por ensinar.</p>
+            <div class="mt-6 flex items-center justify-center gap-3">
+              <span class="editable text-white font-semibold text-sm px-5 py-2.5 rounded-xl" data-key="cta1" style="background:#1E3765">Fazer matrícula</span>
+              <span class="editable font-semibold text-sm px-5 py-2.5 rounded-xl border-2" data-key="cta2" style="border-color:#1E3765;color:#1E3765">Conhecer o método</span>
+            </div>
+          </div>
+        </div>
+        <p class="text-xs text-[var(--muted)] mt-3 flex items-center gap-1.5"><i data-lucide="mouse-pointer-click" class="w-3.5 h-3.5"></i> Dica: passe o mouse nos textos acima — a borda pontilhada amarela mostra o que dá para editar.</p>
+      </section>
+
+      <!-- ====================== USUÁRIOS ====================== -->
+      <section data-view="usuarios" class="fade-in">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+          <div><h1 class="font-heading text-2xl sm:text-3xl font-semibold">Usuários & permissões</h1>
+            <p class="text-[var(--muted)] text-sm mt-0.5">Quem tem acesso ao painel</p></div>
+          <button class="h-10 px-4 rounded-xl text-white text-sm font-semibold flex items-center gap-2" style="background:linear-gradient(135deg,#1E3765,#2F539A)"><i data-lucide="user-plus" class="w-4 h-4"></i> Convidar</button>
+        </div>
+        <div class="surface rounded-2xl divide-y" style="border-color:var(--border)" id="userList"></div>
+        <div class="grid sm:grid-cols-2 gap-4 mt-4">
+          <div class="surface rounded-2xl p-5"><div class="flex items-center gap-2 mb-2"><i data-lucide="shield-check" class="w-5 h-5 text-brand-light"></i><h3 class="font-heading font-semibold">Administrador</h3></div>
+            <p class="text-sm text-[var(--muted)]">Acesso total: alunos, matrículas, contratos, e-mails, editor do site e usuários.</p></div>
+          <div class="surface rounded-2xl p-5"><div class="flex items-center gap-2 mb-2"><i data-lucide="pencil-ruler" class="w-5 h-5 text-brand-light"></i><h3 class="font-heading font-semibold">Gestor de conteúdo</h3></div>
+            <p class="text-sm text-[var(--muted)]">Edita apenas os textos do site. Não vê dados de alunos nem matrículas.</p></div>
+        </div>
+      </section>
+
+      <!-- ====================== CONFIGURAÇÕES ====================== -->
+      <section data-view="config" class="fade-in">
+        <h1 class="font-heading text-2xl sm:text-3xl font-semibold mb-5">Configurações</h1>
+        <div class="grid lg:grid-cols-2 gap-4">
+          <div class="surface rounded-2xl p-5">
+            <h3 class="font-heading font-semibold text-lg mb-4">Aparência</h3>
+            <div class="flex items-center justify-between py-2"><div><p class="font-medium text-sm">Modo escuro</p><p class="text-xs text-[var(--muted)]">Claro por padrão</p></div>
+              <button onclick="toggleTheme()" class="w-12 h-7 rounded-full relative transition" style="background:var(--hover)"><span id="switchKnob" class="absolute top-1 left-1 w-5 h-5 rounded-full bg-brand transition-all"></span></button></div>
+            <div class="flex items-center justify-between py-2 border-t" style="border-color:var(--border)"><p class="font-medium text-sm">Cor de destaque</p>
+              <div class="flex gap-2"><span class="w-6 h-6 rounded-full ring-2 ring-offset-2" style="background:#F5B700;--tw-ring-color:#F5B700"></span><span class="w-6 h-6 rounded-full" style="background:#2F539A"></span><span class="w-6 h-6 rounded-full" style="background:#16a34a"></span></div></div>
+          </div>
+          <div class="surface rounded-2xl p-5">
+            <h3 class="font-heading font-semibold text-lg mb-4 flex items-center gap-2"><i data-lucide="lock" class="w-5 h-5 text-brand-light"></i> Segurança</h3>
+            <div class="flex items-center justify-between py-2"><div><p class="font-medium text-sm">Autenticação em 2 fatores</p><p class="text-xs text-[var(--muted)]">Camada extra de proteção</p></div><span class="text-xs px-2 py-1 rounded-full bg-[var(--hover)] text-[var(--muted)]">Em breve</span></div>
+            <div class="flex items-center justify-between py-2 border-t" style="border-color:var(--border)"><div><p class="font-medium text-sm">Registro de acessos (LGPD)</p><p class="text-xs text-[var(--muted)]">Quem viu dados de alunos</p></div><i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-500"></i></div>
+            <div class="flex items-center justify-between py-2 border-t" style="border-color:var(--border)"><div><p class="font-medium text-sm">Trocar senha</p></div><i data-lucide="chevron-right" class="w-4 h-4 text-[var(--muted)]"></i></div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+</div>
+
+<!-- ===== ONBOARDING ===== -->
+<div id="onboarding" class="fixed inset-0 z-[70] hidden items-center justify-center bg-black/60 p-4">
+  <div class="surface rounded-3xl w-full max-w-md p-7 fade-in text-center">
+    <div id="obStep"></div>
+    <div class="flex items-center justify-center gap-1.5 my-6" id="obDots"></div>
+    <div class="flex gap-2">
+      <button onclick="closeOnboarding()" class="flex-1 h-11 rounded-xl border border-[var(--border)] font-medium text-sm">Pular</button>
+      <button id="obNext" onclick="nextOnboarding()" class="flex-1 h-11 rounded-xl text-white font-semibold text-sm" style="background:linear-gradient(135deg,#1E3765,#2F539A)">Próximo</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== EDIT PANEL (editor do site) ===== -->
+<div id="editPanel" class="fixed inset-y-0 right-0 z-[80] w-full max-w-sm translate-x-full transition-transform duration-300 surface border-l shadow-2xl flex flex-col" style="border-color:var(--border)">
+  <div class="h-16 flex items-center justify-between px-5 border-b" style="border-color:var(--border)">
+    <h3 class="font-heading font-semibold text-lg">Editar texto</h3>
+    <button onclick="closeEdit()" class="p-2 rounded-lg hover:bg-[var(--hover)]"><i data-lucide="x" class="w-5 h-5"></i></button>
+  </div>
+  <div class="p-5 flex-1">
+    <label class="text-sm font-medium">Conteúdo</label>
+    <textarea id="editArea" rows="5" class="mt-2 w-full rounded-xl border border-[var(--border)] bg-[var(--card)] p-3 text-sm outline-none focus:ring-2 ring-brand-light resize-none"></textarea>
+    <p class="text-xs text-[var(--muted)] mt-3 flex items-center gap-1.5"><i data-lucide="info" class="w-3.5 h-3.5"></i> O texto é atualizado ao vivo na pré-visualização.</p>
+  </div>
+  <div class="p-5 border-t flex gap-2" style="border-color:var(--border)">
+    <button onclick="closeEdit()" class="flex-1 h-11 rounded-xl border border-[var(--border)] font-medium text-sm">Cancelar</button>
+    <button onclick="saveEdit()" class="flex-1 h-11 rounded-xl text-white font-semibold text-sm" style="background:#1E3765">Salvar</button>
+  </div>
+</div>
+
+<!-- toast -->
+<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[90] translate-y-24 transition-transform duration-300">
+  <div class="flex items-center gap-2 px-4 py-3 rounded-xl text-white text-sm font-medium shadow-xl" style="background:#16a34a">
+    <i data-lucide="check-circle-2" class="w-4 h-4"></i><span id="toastMsg"></span></div>
+</div>
+
+<script>
+/* ====================== DADOS FICTÍCIOS (Goiânia) ====================== */
+const STUDENTS = [
+  { id:1, kids:[{n:'Helena Duarte Lima', age:8, b:'14/02/2018'}], resp:{n:'Mariana Duarte Lima', cpf:'047.812.336-50', phone:'(62) 99214-8870', email:'mariana.duarte@gmail.com', rel:'Mãe', b:'09/05/1989'}, second:{n:'Rafael Lima', phone:'(62) 98112-4471', rel:'Pai'}, fin:'Mariana Duarte Lima', addr:{cep:'74230-110', street:'Rua T-55', num:'180', comp:'Apto 902', bairro:'Setor Bueno', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'15h00–16h30', pay:'PIX', status:'signed', media:true, date:'02/06/2026' },
+  { id:2, kids:[{n:'Théo Andrade Rocha', age:10, b:'22/08/2015'},{n:'Lara Andrade Rocha', age:7, b:'30/11/2018'}], resp:{n:'Patrícia Andrade', cpf:'118.553.701-22', phone:'(62) 99980-1245', email:'patricia.andrade@hotmail.com', rel:'Mãe', b:'17/03/1986'}, second:{n:'Bruno Rocha', phone:'(62) 99771-3380', rel:'Pai'}, fin:'Bruno Rocha', addr:{cep:'74115-030', street:'Av. T-9', num:'1240', comp:'', bairro:'Jardim Goiás', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'17h00–18h30', pay:'Boleto', status:'pending', media:true, date:'31/05/2026' },
+  { id:3, kids:[{n:'Miguel Ferreira Souza', age:12, b:'05/01/2014'}], resp:{n:'Camila Ferreira', cpf:'203.447.882-09', phone:'(62) 98341-6622', email:'camila.fsouza@gmail.com', rel:'Mãe', b:'25/07/1984'}, second:null, fin:'Camila Ferreira', addr:{cep:'74080-010', street:'Rua 90', num:'455', comp:'Casa 2', bairro:'Setor Sul', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'16h30–18h00', pay:'Cartão', status:'signed', media:false, date:'30/05/2026' },
+  { id:4, kids:[{n:'Sofia Mendes Castro', age:9, b:'19/09/2016'}], resp:{n:'Juliana Castro', cpf:'355.221.940-71', phone:'(62) 99657-2218', email:'ju.castro@outlook.com', rel:'Mãe', b:'12/12/1990'}, second:{n:'André Mendes', phone:'(62) 98220-9981', rel:'Pai'}, fin:'André Mendes', addr:{cep:'74810-100', street:'Rua C-140', num:'78', comp:'', bairro:'Jardim América', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'14h00–15h30', pay:'PIX', status:'sent', media:true, date:'29/05/2026' },
+  { id:5, kids:[{n:'Bernardo Pires Alves', age:6, b:'03/04/2020'}], resp:{n:'Fernanda Pires', cpf:'412.889.503-44', phone:'(62) 99102-7755', email:'fernanda.pires@gmail.com', rel:'Mãe', b:'28/02/1992'}, second:null, fin:'Fernanda Pires', addr:{cep:'74663-520', street:'Rua VP-7D', num:'320', comp:'Qd 12 Lt 4', bairro:'Vila São João', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'14h00–15h30', pay:'Dinheiro', status:'signed', media:true, date:'28/05/2026' },
+  { id:6, kids:[{n:'Alice Barbosa Nunes', age:11, b:'27/06/2015'}], resp:{n:'Renata Nunes', cpf:'509.334.118-60', phone:'(62) 98876-4400', email:'renata.nunes@yahoo.com', rel:'Mãe', b:'05/09/1983'}, second:{n:'Carlos Barbosa', phone:'(62) 99443-1102', rel:'Pai'}, fin:'Renata Nunes', addr:{cep:'74125-160', street:'Av. Mutirão', num:'2540', comp:'Apto 1503', bairro:'Setor Marista', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'16h30–18h00', pay:'PIX', status:'signed', media:true, date:'27/05/2026' },
+  { id:7, kids:[{n:'Davi Cardoso Melo', age:13, b:'11/03/2013'}], resp:{n:'Aline Melo', cpf:'620.778.245-31', phone:'(62) 99320-8845', email:'aline.melo@gmail.com', rel:'Mãe', b:'19/11/1981'}, second:null, fin:'Aline Melo', addr:{cep:'74305-040', street:'Rua 1136', num:'95', comp:'', bairro:'Setor Pedro Ludovico', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'18h00–19h30', pay:'Boleto', status:'pending', media:false, date:'26/05/2026' },
+  { id:8, kids:[{n:'Manuela Teixeira Gomes', age:7, b:'08/07/2018'},{n:'Pedro Teixeira Gomes', age:9, b:'16/05/2016'}], resp:{n:'Vanessa Teixeira', cpf:'731.005.667-88', phone:'(62) 98990-3321', email:'va.teixeira@hotmail.com', rel:'Mãe', b:'03/06/1988'}, second:{n:'Marcos Gomes', phone:'(62) 99558-7700', rel:'Pai'}, fin:'Marcos Gomes', addr:{cep:'74884-120', street:'Av. Rio Verde', num:'1180', comp:'Cond. Jardins', bairro:'Jardim Atlântico', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'15h00–16h30', pay:'Cartão', status:'sent', media:true, date:'25/05/2026' },
+  { id:9, kids:[{n:'Isabela Ribeiro Dias', age:14, b:'02/02/2012'}], resp:{n:'Cristina Dias', cpf:'845.119.302-15', phone:'(62) 99701-2266', email:'cristina.dias@gmail.com', rel:'Mãe', b:'21/08/1979'}, second:null, fin:'Cristina Dias', addr:{cep:'74215-908', street:'Av. 136', num:'960', comp:'Sala 408', bairro:'Setor Sul', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'18h00–19h30', pay:'PIX', status:'signed', media:false, date:'24/05/2026' },
+  { id:10, kids:[{n:'Arthur Moraes Pinto', age:8, b:'29/10/2017'}], resp:{n:'Letícia Moraes', cpf:'956.443.870-02', phone:'(62) 98112-9943', email:'leticia.moraes@outlook.com', rel:'Mãe', b:'14/04/1991'}, second:{n:'Felipe Pinto', phone:'(62) 99887-6610', rel:'Pai'}, fin:'Felipe Pinto', addr:{cep:'74070-060', street:'Rua 22', num:'310', comp:'', bairro:'Setor Aeroporto', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'17h00–18h30', pay:'Boleto', status:'pending', media:true, date:'23/05/2026' },
+  { id:11, kids:[{n:'Laura Cavalcante Reis', age:10, b:'12/12/2015'}], resp:{n:'Daniela Reis', cpf:'063.778.221-49', phone:'(62) 99334-1180', email:'dani.reis@gmail.com', rel:'Mãe', b:'30/01/1987'}, second:null, fin:'Daniela Reis', addr:{cep:'74343-230', street:'Rua RF-12', num:'140', comp:'Qd 8', bairro:'Residencial Forte', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'15h00–16h30', pay:'PIX', status:'signed', media:true, date:'22/05/2026' },
+  { id:12, kids:[{n:'Gabriel Fonseca Lopes', age:11, b:'07/08/2014'}], resp:{n:'Simone Fonseca', cpf:'174.882.605-77', phone:'(62) 98445-2290', email:'simone.fonseca@yahoo.com', rel:'Mãe', b:'08/10/1982'}, second:{n:'Thiago Lopes', phone:'(62) 99221-5544', rel:'Pai'}, fin:'Thiago Lopes', addr:{cep:'74150-020', street:'Av. T-63', num:'880', comp:'Apto 701', bairro:'Setor Bueno', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'16h30–18h00', pay:'Cartão', status:'sent', media:true, date:'21/05/2026' },
+];
+
+const palette = ['#1E3765','#2F539A','#F5B700','#7C9AD6','#B5860B','#16a34a','#9333ea','#0891b2','#dc2626','#ea580c','#0d9488','#65a30d'];
+const initials = n => n.split(' ').filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase();
+const STATUS = { signed:{t:'Assinado',c:'#16a34a',bg:'rgba(22,163,74,.12)'}, sent:{t:'Enviado',c:'#2F539A',bg:'rgba(47,83,154,.12)'}, pending:{t:'Pendente',c:'#B5860B',bg:'rgba(245,183,0,.16)'} };
+const schLabel = s => s==='seg-qua' ? 'Seg/Qua' : 'Ter/Qui';
+const maskCPF = c => c.slice(0,4)+'•••.•••'+c.slice(-3);
+
+/* ====================== NAVEGAÇÃO ====================== */
+function go(view, el){
+  document.querySelectorAll('[data-view]').forEach(s=>s.classList.toggle('view-active', s.dataset.view===view));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(el){ el.classList.add('active'); }
+  else { // ativa o item do menu correspondente
+    const map={overview:0,alunos:1,contratos:2,emails:3};
+    const idx=map[view]; if(idx!=null) document.querySelectorAll('.nav-item')[idx]?.classList.add('active');
+  }
+  toggleSidebar(false);
+  window.scrollTo(0,0);
+  lucide.createIcons();
+}
+function toggleSidebar(open){
+  const sb=document.getElementById('sidebar'), ov=document.getElementById('overlay');
+  if(window.innerWidth>=1024) return;
+  sb.classList.toggle('-translate-x-full', !open);
+  ov.classList.toggle('hidden', !open);
+}
+
+/* ====================== TEMA ====================== */
+function toggleTheme(){
+  const dark = document.documentElement.classList.toggle('dark');
+  document.getElementById('themeIcon').setAttribute('data-lucide', dark?'sun':'moon');
+  document.getElementById('switchKnob').style.left = dark?'1.5rem':'0.25rem';
+  lucide.createIcons();
+  refreshCharts();
+}
+
+/* ====================== LOGIN ====================== */
+function doLogin(){
+  document.getElementById('login').style.display='none';
+  document.getElementById('app').classList.remove('hidden');
+  lucide.createIcons();
+  initCharts();
+  setTimeout(openOnboarding, 400);
+}
+function logout(){ document.getElementById('app').classList.add('hidden'); document.getElementById('login').style.display='grid'; }
+function openForgot(e){ e.preventDefault(); document.getElementById('forgot').classList.replace('hidden','flex'); lucide.createIcons(); }
+function closeForgot(){ document.getElementById('forgot').classList.replace('flex','hidden'); }
+
+/* ====================== ONBOARDING ====================== */
+const OB=[
+  {icon:'party-popper', t:'Bem-vinda à sua dashboard! 🎉', d:'Aqui você acompanha matrículas, alunos, contratos e ainda edita os textos do site — tudo num lugar só.'},
+  {icon:'graduation-cap', t:'Todos os alunos organizados', d:'Veja a lista completa com busca e filtros, e abra a ficha de cada aluno com responsáveis, endereço e contrato.'},
+  {icon:'pencil-ruler', t:'Edite o site sem programar', d:'No Editor do site, passe o mouse sobre qualquer texto, clique e altere. Simples assim.'},
+];
+let obI=0;
+function openOnboarding(){ obI=0; renderOb(); document.getElementById('onboarding').classList.replace('hidden','flex'); }
+function renderOb(){
+  const s=OB[obI];
+  document.getElementById('obStep').innerHTML=`<div class="w-16 h-16 rounded-2xl grid place-content-center mx-auto mb-5" style="background:linear-gradient(135deg,#FFE17A,#F5B700)"><i data-lucide="${s.icon}" class="w-8 h-8" style="color:#15294d"></i></div><h3 class="font-heading text-2xl font-semibold">${s.t}</h3><p class="text-[var(--muted)] mt-2 text-sm leading-relaxed">${s.d}</p>`;
+  document.getElementById('obDots').innerHTML=OB.map((_,i)=>`<span class="h-1.5 rounded-full transition-all ${i===obI?'w-6 bg-accent':'w-1.5 bg-[var(--border)]'}"></span>`).join('');
+  document.getElementById('obNext').textContent = obI===OB.length-1?'Começar':'Próximo';
+  lucide.createIcons();
+}
+function nextOnboarding(){ if(obI<OB.length-1){obI++;renderOb();} else closeOnboarding(); }
+function closeOnboarding(){ document.getElementById('onboarding').classList.replace('flex','hidden'); }
+
+/* ====================== TABELA DE ALUNOS ====================== */
+function rowHTML(s){
+  const more = s.kids.length>1 ? `<span class="text-[11px] px-1.5 py-0.5 rounded-md font-medium" style="background:var(--hover);color:var(--muted)">+1 irmão</span>` : '';
+  const st=STATUS[s.status];
+  const schColor = s.sch==='seg-qua' ? '#2F539A' : '#B5860B';
+  const schBg = s.sch==='seg-qua' ? 'rgba(47,83,154,.10)' : 'rgba(245,183,0,.14)';
+  return `<div onclick="openDetail(${s.id})" class="grid grid-cols-1 md:grid-cols-[1.6fr_1.4fr_.8fr_.9fr_.9fr_40px] gap-3 px-5 py-3.5 items-center cursor-pointer hover:bg-[var(--hover)] transition border-b last:border-0" style="border-color:var(--border)">
+    <div class="flex items-center gap-3 min-w-0">
+      <div class="w-10 h-10 rounded-xl grid place-content-center text-white font-semibold text-sm shrink-0" style="background:linear-gradient(135deg,${palette[s.id%palette.length]},#2F539A)">${initials(s.kids[0].n)}</div>
+      <div class="min-w-0"><p class="font-medium truncate flex items-center gap-2">${s.kids[0].n} ${more}</p>
+        <p class="text-xs text-[var(--muted)]">${s.kids[0].age} anos · ${s.addr.bairro}</p></div>
+    </div>
+    <div class="min-w-0"><p class="text-sm truncate">${s.resp.n}</p><p class="text-xs text-[var(--muted)]">${s.resp.rel} · ${s.resp.phone}</p></div>
+    <div><span class="text-xs font-medium px-2.5 py-1 rounded-lg whitespace-nowrap" style="color:${schColor};background:${schBg}">${schLabel(s.sch)}</span></div>
+    <div><span class="text-sm">${s.pay}</span></div>
+    <div><span class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap" style="color:${st.c};background:${st.bg}"><span class="w-1.5 h-1.5 rounded-full" style="background:${st.c}"></span>${st.t}</span></div>
+    <div class="hidden md:block text-right"><i data-lucide="chevron-right" class="w-4 h-4 text-[var(--muted)]"></i></div>
+  </div>`;
+}
+function renderTable(){
+  const q=(document.getElementById('alunoSearch')?.value||'').toLowerCase();
+  const fs=document.getElementById('fSchedule')?.value||'', fst=document.getElementById('fStatus')?.value||'', fp=document.getElementById('fPay')?.value||'';
+  const rows=STUDENTS.filter(s=>{
+    const hay=(s.kids.map(k=>k.n).join(' ')+' '+s.resp.n+' '+s.addr.bairro).toLowerCase();
+    return hay.includes(q) && (!fs||s.sch===fs) && (!fst||s.status===fst) && (!fp||s.pay===fp);
+  });
+  document.getElementById('tableBody').innerHTML = rows.length ? rows.map(rowHTML).join('') : `<div class="px-5 py-12 text-center text-[var(--muted)] text-sm">Nenhum aluno encontrado com esses filtros.</div>`;
+  document.getElementById('tableCount').textContent = `Mostrando ${rows.length} de ${STUDENTS.length} (demo)`;
+  lucide.createIcons();
+}
+
+/* ====================== DETALHE ====================== */
+function infoRow(label,val){ return `<div class="flex justify-between gap-4 py-2 border-b last:border-0" style="border-color:var(--border)"><span class="text-sm text-[var(--muted)]">${label}</span><span class="text-sm font-medium text-right">${val}</span></div>`; }
+function card(title,icon,body){ return `<div class="surface rounded-2xl p-5"><h3 class="font-heading font-semibold flex items-center gap-2 mb-3"><i data-lucide="${icon}" class="w-[18px] h-[18px] text-brand-light"></i>${title}</h3>${body}</div>`; }
+function openDetail(id){
+  const s=STUDENTS.find(x=>x.id===id); const st=STATUS[s.status];
+  const kidsCards = s.kids.map(k=>`<div class="flex items-center gap-3 p-3 rounded-xl" style="background:var(--hover)"><div class="w-10 h-10 rounded-xl grid place-content-center text-white font-semibold text-sm" style="background:linear-gradient(135deg,${palette[s.id%palette.length]},#2F539A)">${initials(k.n)}</div><div><p class="font-medium text-sm">${k.n}</p><p class="text-xs text-[var(--muted)]">${k.age} anos · nasc. ${k.b}</p></div></div>`).join('');
+  document.getElementById('detailContent').innerHTML=`
+    <div class="surface rounded-2xl p-6 mb-4">
+      <div class="flex flex-wrap items-start justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <div class="w-16 h-16 rounded-2xl grid place-content-center text-white font-heading text-2xl font-semibold" style="background:linear-gradient(135deg,${palette[s.id%palette.length]},#2F539A)">${initials(s.kids[0].n)}</div>
+          <div><h1 class="font-heading text-2xl font-semibold">${s.kids[0].n}</h1>
+            <p class="text-[var(--muted)] text-sm">${s.kids.length>1?'2 alunos (irmãos)':'1 aluno'} · matriculado em ${s.date}</p>
+            <div class="flex items-center gap-2 mt-2"><span class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full" style="color:${st.c};background:${st.bg}"><span class="w-1.5 h-1.5 rounded-full" style="background:${st.c}"></span>Contrato ${st.t.toLowerCase()}</span>
+              <span class="text-xs font-medium px-2.5 py-1 rounded-lg" style="color:#2F539A;background:rgba(47,83,154,.10)">${schLabel(s.sch)} · ${s.t}</span></div></div>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="toast('Abrindo WhatsApp de ${s.resp.n.split(' ')[0]}…')" class="h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium flex items-center gap-2"><i data-lucide="message-circle" class="w-4 h-4"></i> WhatsApp</button>
+          <button class="h-10 px-4 rounded-xl text-white text-sm font-semibold flex items-center gap-2" style="background:#1E3765"><i data-lucide="file-text" class="w-4 h-4"></i> Ver contrato</button>
+        </div>
+      </div>
+    </div>
+    <div class="grid lg:grid-cols-3 gap-4">
+      <div class="lg:col-span-2 space-y-4">
+        ${card('Alunos','users', `<div class="grid sm:grid-cols-2 gap-3">${kidsCards}</div>`)}
+        ${card('Responsável legal','user-round', infoRow('Nome',s.resp.n)+infoRow('Parentesco',s.resp.rel)+infoRow('CPF',maskCPF(s.resp.cpf)+" <i data-lucide='eye' class='w-3.5 h-3.5 inline opacity-50'></i>")+infoRow('Telefone',s.resp.phone)+infoRow('E-mail',s.resp.email)+infoRow('Nascimento',s.resp.b))}
+        ${s.second?card('Segundo responsável','user-round', infoRow('Nome',s.second.n)+infoRow('Parentesco',s.second.rel)+infoRow('Telefone',s.second.phone)):''}
+        ${card('Endereço','map-pin', infoRow('CEP',s.addr.cep)+infoRow('Logradouro',`${s.addr.street}, ${s.addr.num}${s.addr.comp?' - '+s.addr.comp:''}`)+infoRow('Bairro',s.addr.bairro)+infoRow('Cidade/UF',`${s.addr.city}/${s.addr.uf}`))}
+      </div>
+      <div class="space-y-4">
+        ${card('Financeiro','wallet', infoRow('Responsável financeiro',s.fin)+infoRow('Forma de pagamento',s.pay))}
+        ${card('Autorizações','shield-check', infoRow('Uso de imagem', s.media?"<span class='text-emerald-500'>Autorizado</span>":"<span class='text-[var(--muted)]'>Não autorizado</span>")+infoRow('Aceite do contrato',"<span class='text-emerald-500'>Sim</span>")+infoRow('Horário confirmado',"<span class='text-emerald-500'>Sim</span>"))}
+        ${card('Contrato','file-text', `<div class="rounded-xl p-4 text-center" style="background:var(--hover)"><i data-lucide="file-text" class="w-8 h-8 mx-auto text-brand-light mb-2"></i><p class="text-sm font-medium">Contrato_${s.kids[0].n.split(' ')[0]}.pdf</p><p class="text-xs text-[var(--muted)] mb-3">gerado em ${s.date}</p><button class="w-full h-9 rounded-lg border border-[var(--border)] text-sm font-medium flex items-center justify-center gap-2"><i data-lucide="download" class="w-4 h-4"></i> Baixar</button></div>`)}
+      </div>
+    </div>`;
+  go('detalhe');
+  lucide.createIcons();
+}
+
+/* ====================== LISTAS AUXILIARES ====================== */
+function renderRecent(){
+  document.getElementById('recentList').innerHTML = STUDENTS.slice(0,5).map(s=>{
+    const st=STATUS[s.status];
+    return `<div onclick="openDetail(${s.id})" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-[var(--hover)] cursor-pointer transition">
+      <div class="w-9 h-9 rounded-lg grid place-content-center text-white text-xs font-semibold" style="background:linear-gradient(135deg,${palette[s.id%palette.length]},#2F539A)">${initials(s.kids[0].n)}</div>
+      <div class="min-w-0 flex-1"><p class="text-sm font-medium truncate">${s.kids[0].n}</p><p class="text-xs text-[var(--muted)]">${s.resp.n} · ${s.date}</p></div>
+      <span class="text-xs font-medium px-2 py-0.5 rounded-full whitespace-nowrap" style="color:${st.c};background:${st.bg}">${st.t}</span></div>`;
+  }).join('');
+}
+function renderContracts(){
+  document.getElementById('contractGrid').innerHTML = STUDENTS.map(s=>{
+    const st=STATUS[s.status];
+    return `<div class="surface rounded-2xl p-5">
+      <div class="flex items-start justify-between"><div class="w-11 h-11 rounded-xl grid place-content-center" style="background:var(--hover)"><i data-lucide="file-text" class="w-5 h-5 text-brand-light"></i></div>
+        <span class="text-xs font-medium px-2.5 py-1 rounded-full" style="color:${st.c};background:${st.bg}">${st.t}</span></div>
+      <p class="font-medium mt-3 truncate">Contrato_${s.kids[0].n.split(' ')[0]}.pdf</p>
+      <p class="text-xs text-[var(--muted)]">${s.resp.n} · ${s.date}</p>
+      <div class="flex gap-2 mt-4">
+        <button onclick="openDetail(${s.id})" class="flex-1 h-9 rounded-lg border border-[var(--border)] text-sm font-medium">Abrir</button>
+        <button class="w-9 h-9 rounded-lg border border-[var(--border)] grid place-content-center"><i data-lucide="download" class="w-4 h-4"></i></button>
+        <button onclick="toast('WhatsApp pronto para envio!')" class="w-9 h-9 rounded-lg grid place-content-center text-white" style="background:#16a34a"><i data-lucide="message-circle" class="w-4 h-4"></i></button>
+      </div></div>`;
+  }).join('');
+  lucide.createIcons();
+}
+function renderEmails(){
+  const data=[{s:'Boas-vindas — turma de junho',n:21,d:'há 2 dias',ic:'mail-check'},{s:'Lembrete: contrato pendente',n:7,d:'há 5 dias',ic:'clock'},{s:'Festa junina da escola 🎉',n:96,d:'há 12 dias',ic:'party-popper'}];
+  document.getElementById('emailHistory').innerHTML=data.map(e=>`<div class="flex items-center gap-3 p-3 rounded-xl" style="background:var(--hover)"><div class="w-9 h-9 rounded-lg grid place-content-center bg-[var(--card)]"><i data-lucide="${e.ic}" class="w-4 h-4 text-brand-light"></i></div><div class="flex-1 min-w-0"><p class="text-sm font-medium truncate">${e.s}</p><p class="text-xs text-[var(--muted)]">${e.n} destinatários · ${e.d}</p></div><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500"></i></div>`).join('');
+  lucide.createIcons();
+}
+function renderUsers(){
+  const u=[{n:'Cláudia Martins',e:'claudia@englishpatio.com.br',r:'Administradora',c:'#1E3765'},{n:'Gabriel Teles',e:'gabriel@englishpatio.com.br',r:'Administrador',c:'#2F539A'},{n:'Beatriz Souza',e:'beatriz@englishpatio.com.br',r:'Gestora de conteúdo',c:'#B5860B'}];
+  document.getElementById('userList').innerHTML=u.map(x=>`<div class="flex items-center gap-3 p-4"><div class="w-10 h-10 rounded-full grid place-content-center text-white font-semibold" style="background:${x.c}">${initials(x.n)}</div><div class="flex-1 min-w-0"><p class="font-medium truncate">${x.n}</p><p class="text-xs text-[var(--muted)] truncate">${x.e}</p></div><span class="text-xs font-medium px-2.5 py-1 rounded-full" style="background:var(--hover)">${x.r}</span><button class="p-2 rounded-lg hover:bg-[var(--hover)]"><i data-lucide="more-vertical" class="w-4 h-4 text-[var(--muted)]"></i></button></div>`).join('');
+  lucide.createIcons();
+}
+
+/* ====================== EDITOR DO SITE ====================== */
+let editTarget=null;
+document.addEventListener('click', e=>{
+  const t=e.target.closest('.editor-on .editable');
+  if(t){ editTarget=t; document.getElementById('editArea').value=t.textContent.trim();
+    document.getElementById('editPanel').style.transform='translateX(0)'; }
+});
+function closeEdit(){ document.getElementById('editPanel').style.transform='translateX(100%)'; editTarget=null; }
+function saveEdit(){ if(editTarget) editTarget.textContent=document.getElementById('editArea').value; closeEdit(); toast('Texto atualizado!'); }
+
+/* ====================== CHARTS ====================== */
+let charts={};
+function chartColors(){ const dark=document.documentElement.classList.contains('dark'); return { grid:dark?'rgba(255,255,255,.06)':'rgba(0,0,0,.05)', text:dark?'#93a2bd':'#64748B' }; }
+function initCharts(){ renderRecent(); renderTable(); renderContracts(); renderEmails(); renderUsers(); buildCharts(); }
+function buildCharts(){
+  const c=chartColors();
+  Chart.defaults.font.family='Inter'; Chart.defaults.color=c.text;
+  const ctxE=document.getElementById('chartEnroll');
+  const grad=ctxE.getContext('2d').createLinearGradient(0,0,0,260); grad.addColorStop(0,'rgba(47,83,154,.35)'); grad.addColorStop(1,'rgba(47,83,154,0)');
+  charts.enroll=new Chart(ctxE,{type:'line',data:{labels:['Jan','Fev','Mar','Abr','Mai','Jun'],datasets:[{data:[8,11,9,14,17,21],fill:true,backgroundColor:grad,borderColor:'#2F539A',borderWidth:3,tension:.4,pointBackgroundColor:'#F5B700',pointBorderColor:'#fff',pointBorderWidth:2,pointRadius:5,pointHoverRadius:7}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:c.grid},border:{display:false}},x:{grid:{display:false},border:{display:false}}}}});
+  charts.sch=new Chart(document.getElementById('chartSchedule'),{type:'doughnut',data:{labels:['Seg/Qua','Ter/Qui'],datasets:[{data:[71,57],backgroundColor:['#2F539A','#F5B700'],borderWidth:0,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:false}}}});
+  charts.age=new Chart(document.getElementById('chartAge'),{type:'bar',data:{labels:['4–6','7–9','10–12','13–15','16+'],datasets:[{data:[18,42,39,22,7],backgroundColor:['#FFE17A','#F5B700','#2F539A','#1E3765','#7C9AD6'],borderRadius:8,borderSkipped:false,barThickness:34}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:c.grid},border:{display:false}},x:{grid:{display:false},border:{display:false}}}}});
+}
+function refreshCharts(){ if(!charts.enroll) return; const c=chartColors(); Chart.defaults.color=c.text; Object.values(charts).forEach(ch=>{ if(ch.options.scales){['x','y'].forEach(a=>{ if(ch.options.scales[a]?.grid) ch.options.scales[a].grid.color=c.grid; });} ch.update(); }); }
+
+/* keyboard + init */
+document.addEventListener('keydown',e=>{ if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();document.getElementById('globalSearch')?.focus();} if(e.key==='Escape'){closeEdit();closeForgot();} });
+lucide.createIcons();
+</script>
+</body>
+</html>

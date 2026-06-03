@@ -92,7 +92,7 @@ const Navbar = () => {
         <div className="bg-primary/5 border-b border-primary/10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="py-1 text-xs sm:text-sm text-center text-primary font-medium">
-              Matrículas abertas para o primeiro semestre de 2026!
+              Matrículas abertas para o segundo semestre de 2026!
             </div>
           </div>
         </div>
