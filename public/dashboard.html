@@ -128,21 +128,13 @@
   #dashGrid.customizing .dash-card > *{ pointer-events:none; }
   #dashGrid .dash-card.dragging{ opacity:.35; outline-style:solid; }
   @keyframes wiggle{ from{ transform:rotate(-.15deg);} to{ transform:rotate(.15deg);} }
-  /* tooltip customizado da marca (toda title= vira isso automaticamente) */
-  .tip{ position:relative; }
-  .tip:hover::after{ content:attr(data-tip); position:absolute; bottom:calc(100% + 8px); left:50%;
-    transform:translateX(-50%); background:#15294d; color:#fff; font-size:11px; font-weight:600;
+  /* tooltip da marca: balão ÚNICO global (via JS) — imune a overflow:hidden dos pais */
+  #tipBubble{ position:fixed; z-index:97; background:#15294d; color:#fff; font-size:11px; font-weight:600;
     font-family:'Inter'; padding:6px 10px; border-radius:10px; width:max-content; max-width:230px;
-    white-space:normal; text-align:center; line-height:1.35;
-    box-shadow:0 8px 20px rgba(0,0,0,.28); z-index:96; pointer-events:none; }
-  .tip:hover::before{ content:''; position:absolute; bottom:calc(100% + 3px); left:50%;
-    transform:translateX(-50%); border:5px solid transparent; border-top-color:#15294d; z-index:96; pointer-events:none; }
-  .tip-bottom:hover::after{ bottom:auto; top:calc(100% + 8px); }
-  .tip-bottom:hover::before{ bottom:auto; top:calc(100% + 3px); border-top-color:transparent; border-bottom-color:#15294d; }
-  .tip-end:hover::after{ left:auto; right:0; transform:none; }
-  .tip-end:hover::before{ left:auto; right:14px; transform:none; }
-  .tip-start:hover::after{ left:0; right:auto; transform:none; }
-  .tip-start:hover::before{ left:14px; right:auto; transform:none; }
+    text-align:center; line-height:1.35; box-shadow:0 8px 20px rgba(0,0,0,.28); pointer-events:none; display:none; }
+  #tipBubble::after{ content:''; position:absolute; top:100%; left:var(--ax,50%); transform:translateX(-50%);
+    border:5px solid transparent; border-top-color:#15294d; }
+  #tipBubble.below::after{ top:auto; bottom:100%; border-top-color:transparent; border-bottom-color:#15294d; }
   /* transição circular do modo claro/escuro (View Transitions) */
   ::view-transition-old(root), ::view-transition-new(root){ animation:none; mix-blend-mode:normal; }
   /* select customizado */
@@ -534,19 +526,24 @@
         </div>
 
         <!-- filtros -->
-        <div class="surface rounded-2xl p-3 mb-4 flex flex-wrap items-center gap-2" data-tour="filtros">
-          <div class="flex items-center gap-2 rounded-xl px-3 h-10 flex-1 min-w-[200px]" style="background:var(--hover)">
-            <i data-lucide="search" class="w-4 h-4 text-[var(--muted)]"></i>
-            <input id="alunoSearch" oninput="renderTable()" placeholder="Buscar por nome, responsável ou bairro…" class="flex-1 bg-transparent outline-none text-sm">
+        <div class="surface rounded-2xl p-3 mb-4 space-y-2.5" data-tour="filtros">
+          <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 rounded-xl px-3 h-10 flex-1 min-w-0" style="background:var(--hover)">
+              <i data-lucide="search" class="w-4 h-4 text-[var(--muted)]"></i>
+              <input id="alunoSearch" oninput="renderTable()" placeholder="Buscar por nome, responsável ou bairro…" class="flex-1 bg-transparent outline-none text-sm">
+            </div>
+            <button id="fClear" onclick="clearFilters()" class="hidden h-10 px-3 rounded-xl text-sm font-semibold transition items-center gap-1.5 shrink-0" style="background:rgba(245,183,0,.14);color:#B5860B"><i data-lucide="filter-x" class="w-4 h-4"></i>Limpar <span id="fClearN"></span></button>
           </div>
-          <span id="fScheduleWrap"></span>
-          <span id="fStatusWrap"></span>
-          <span id="fActiveWrap"></span>
-          <span id="fHoodWrap"></span>
-          <span id="fAgeWrap"></span>
-          <span id="fMediaWrap"></span>
-          <span id="fSibWrap"></span>
-          <button onclick="clearFilters()" class="h-10 px-3 rounded-xl text-sm font-medium text-[var(--muted)] hover:bg-[var(--hover)] transition flex items-center gap-1.5"><i data-lucide="filter-x" class="w-4 h-4"></i>Limpar</button>
+          <div class="flex flex-wrap items-center gap-2 pt-2.5 border-t" style="border-color:var(--border)">
+            <span class="hidden md:flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-[var(--muted)] mr-1"><i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>Filtros</span>
+            <span id="fScheduleWrap"></span>
+            <span id="fStatusWrap"></span>
+            <span id="fActiveWrap"></span>
+            <span id="fHoodWrap"></span>
+            <span id="fAgeWrap"></span>
+            <span id="fMediaWrap"></span>
+            <span id="fSibWrap"></span>
+          </div>
         </div>
 
         <!-- tabela com design próprio (cabeçalho ordenável renderizado via JS) -->
@@ -1256,7 +1253,16 @@ function renderTableHead(){
     return `<button onclick="setSort('${c.k}')" class="flex items-center gap-1 text-left uppercase tracking-wider font-semibold transition hover:text-[var(--text)] ${on?'text-[var(--text)]':''}" title="Ordenar por ${c.l}">${c.l}<span class="text-[9px] leading-none">${on?(sortDir===1?'▲':'▼'):'↕'}</span></button>`;
   }).join('')+'<span class="text-right">Ações</span>';
 }
+function updateClearBtn(){
+  const btn=document.getElementById('fClear'); if(!btn) return;
+  const q=(document.getElementById('alunoSearch')?.value||'').trim();
+  const n=['fSchedule','fStatus','fActive','fHood','fAge','fMedia','fSib'].filter(id=>SEL[id]?.value).length + (q?1:0);
+  btn.classList.toggle('hidden', n===0);
+  btn.classList.toggle('flex', n>0);
+  const cnt=document.getElementById('fClearN'); if(cnt) cnt.textContent=n>0?`(${n})`:'';
+}
 function renderTable(){
+  updateClearBtn();
   const rows=filteredStudents().slice().sort((a,b)=>{
     const va=SORT_VAL[sortKey](a), vb=SORT_VAL[sortKey](b);
     return (va<vb?-1:va>vb?1:0)*sortDir;
@@ -2305,14 +2311,32 @@ function upgradeTooltips(){
     el.removeAttribute('title');
     el.setAttribute('data-tip',t);
     el.classList.add('tip');
-    const r=el.getBoundingClientRect();
-    if(r.top<80) el.classList.add('tip-bottom');
-    if(r.right>innerWidth-130) el.classList.add('tip-end');
-    else if(r.left<130) el.classList.add('tip-start');
   });
 }
 const __createIcons=lucide.createIcons.bind(lucide);
 lucide.createIcons=opts=>{ __createIcons(opts); upgradeTooltips(); };
+
+/* balão único global: nunca é cortado por overflow, flipa e se ajusta às bordas */
+const tipBubble=document.createElement('div');
+tipBubble.id='tipBubble';
+document.body.appendChild(tipBubble);
+function hideTip(){ tipBubble.style.display='none'; }
+document.addEventListener('mouseover',e=>{
+  const t=e.target.closest ? e.target.closest('.tip') : null;
+  if(!t || !t.dataset.tip){ hideTip(); return; }
+  tipBubble.textContent=t.dataset.tip;
+  tipBubble.classList.remove('below');
+  tipBubble.style.display='block';
+  const r=t.getBoundingClientRect();
+  const b=tipBubble.getBoundingClientRect();
+  let top=r.top-b.height-9;
+  if(top<8){ top=r.bottom+9; tipBubble.classList.add('below'); }
+  const left=Math.min(Math.max(8, r.left+r.width/2-b.width/2), innerWidth-b.width-8);
+  tipBubble.style.top=top+'px';
+  tipBubble.style.left=left+'px';
+  tipBubble.style.setProperty('--ax',(r.left+r.width/2-left)+'px');
+});
+window.addEventListener('scroll',hideTip,true);
 
 applySidebarTheme();
 lucide.createIcons();
