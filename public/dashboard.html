@@ -97,6 +97,16 @@
     transform:translate(-50%,-100%); transition:transform .15s ease; font-family:'Inter'; }
   .cm-pin:hover{ transform:translate(-50%,-100%) scale(1.15); }
   .cm-flash{ outline:3px solid #7C3AED !important; outline-offset:4px; border-radius:8px; }
+  /* enquanto o balão de comentário está aberto: cursor normal + pin de rascunho */
+  body.comment-mode.cm-composing, body.comment-mode.cm-composing *{ cursor:auto !important; }
+  body.comment-mode.cm-composing #cmComposer input, body.comment-mode.cm-composing #cmComposer textarea{ cursor:text !important; }
+  body.comment-mode.cm-composing #cmComposer button, body.comment-mode.cm-composing .cm-pin{ cursor:pointer !important; }
+  #cmDraftPin{ position:fixed; z-index:84; animation:draft-bounce 1.2s ease-in-out infinite; }
+  @keyframes draft-bounce{ 0%,100%{ transform:translate(-50%,-100%);} 50%{ transform:translate(-50%,-135%);} }
+  /* tour de boas-vindas */
+  @keyframes tour-pulse{ 0%,100%{ box-shadow:0 0 0 4px rgba(245,183,0,.32);} 50%{ box-shadow:0 0 0 11px rgba(245,183,0,.10);} }
+  /* transição circular do modo claro/escuro (View Transitions) */
+  ::view-transition-old(root), ::view-transition-new(root){ animation:none; mix-blend-mode:normal; }
   /* select customizado */
   .cs-btn{ display:flex; align-items:center; gap:8px; height:40px; padding:0 12px; border-radius:12px;
     border:1px solid var(--border); background:var(--card); font-size:14px; cursor:pointer;
@@ -212,19 +222,20 @@
   <!-- ===== SIDEBAR ===== -->
   <aside id="sidebar" class="fixed lg:sticky top-0 z-50 h-screen w-[256px] shrink-0 -translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col"
          style="background:linear-gradient(180deg,var(--sb-1),var(--sb-2));color:var(--sb-text)">
-    <div class="h-[92px] flex flex-col justify-center gap-1.5 px-5 border-b" style="border-color:var(--sb-border)">
-      <img id="sbLogo" src="assets/logo-sidebar-azul.svg" alt="English Patio" class="h-11 w-auto self-start">
-      <span class="text-[9px] font-bold uppercase tracking-[0.16em] px-2 py-0.5 rounded-full w-fit" style="background:var(--sb-hover);color:var(--sb-muted)">Gestão escolar</span>
+    <div class="h-20 flex items-center px-5 border-b" style="border-color:var(--sb-border)">
+      <img id="sbLogo" src="assets/logo-sidebar-azul.svg" alt="English Patio" class="h-12 w-auto">
+      <div class="h-7 w-px mx-3" style="background:var(--sb-border)"></div>
+      <span class="font-heading text-[15px] font-medium tracking-wide" style="color:var(--sb-strong)">Dashboard</span>
     </div>
 
-    <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-6">
+    <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-6" data-tour="sidebar">
       <div>
         <p class="px-3 text-[10px] uppercase tracking-wider font-semibold mb-2" style="color:var(--sb-muted)">Principal</p>
         <div class="space-y-1">
           <a class="nav-item sb-item active group relative flex items-center gap-3 px-3 h-10 rounded-xl transition cursor-pointer" onclick="go('overview', this)">
             <span class="bar absolute left-0 top-2 bottom-2 w-1 rounded-full opacity-0 transition" style="background:var(--sb-accent)"></span>
             <i data-lucide="layout-dashboard" class="w-[18px] h-[18px]"></i><span class="text-sm font-medium">Visão geral</span></a>
-          <a class="nav-item sb-item group relative flex items-center gap-3 px-3 h-10 rounded-xl transition cursor-pointer" onclick="go('alunos', this)">
+          <a class="nav-item sb-item group relative flex items-center gap-3 px-3 h-10 rounded-xl transition cursor-pointer" data-tour="nav-alunos" onclick="go('alunos', this)">
             <span class="bar absolute left-0 top-2 bottom-2 w-1 rounded-full opacity-0 transition" style="background:var(--sb-accent)"></span>
             <i data-lucide="graduation-cap" class="w-[18px] h-[18px]"></i><span class="text-sm font-medium">Alunos</span>
             <span id="navNewBadge" class="ml-auto text-[11px] px-2 py-0.5 rounded-full font-bold" style="background:var(--sb-accent);color:var(--sb-accent-text)">3 novas</span></a>
@@ -240,7 +251,7 @@
       <div>
         <p class="px-3 text-[10px] uppercase tracking-wider font-semibold mb-2" style="color:var(--sb-muted)">Conteúdo</p>
         <div class="space-y-1">
-          <a class="nav-item sb-item group relative flex items-center gap-3 px-3 h-10 rounded-xl transition cursor-pointer" onclick="go('editor', this)">
+          <a class="nav-item sb-item group relative flex items-center gap-3 px-3 h-10 rounded-xl transition cursor-pointer" data-tour="nav-editor" onclick="go('editor', this)">
             <span class="bar absolute left-0 top-2 bottom-2 w-1 rounded-full opacity-0 transition" style="background:var(--sb-accent)"></span>
             <i data-lucide="pencil-ruler" class="w-[18px] h-[18px]"></i><span class="text-sm font-medium">Editor do site</span></a>
         </div>
@@ -258,6 +269,13 @@
       </div>
     </nav>
 
+    <div class="px-4 py-3 border-t" style="border-color:var(--sb-border)">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2" id="sbThemeDots"></div>
+        <button onclick="toggleTheme(event)" class="sb-item w-8 h-8 rounded-lg grid place-content-center transition" title="Modo claro/escuro">
+          <i id="sbThemeIcon" data-lucide="moon" class="w-4 h-4"></i></button>
+      </div>
+    </div>
     <div class="p-3 border-t" style="border-color:var(--sb-border)">
       <div class="sb-item flex items-center gap-3 px-2 py-2 rounded-xl cursor-pointer" onclick="openAccountModal()">
         <div class="w-9 h-9 rounded-full grid place-content-center font-semibold" style="background:var(--sb-accent);color:var(--sb-accent-text)">PM</div>
@@ -280,10 +298,10 @@
       <span class="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full" style="background:rgba(245,183,0,.15);color:#B5860B" title="Este é um preview para aprovação — nenhum dado aqui é real">
         <i data-lucide="flask-conical" class="w-3 h-3"></i><span class="hidden sm:inline">Preview ·</span> dados fictícios</span>
       <div class="ml-auto flex items-center gap-1">
-        <button onclick="toggleTheme()" class="p-2.5 rounded-xl hover:bg-[var(--hover)]" title="Tema claro/escuro">
+        <button onclick="toggleTheme(event)" class="p-2.5 rounded-xl hover:bg-[var(--hover)]" title="Tema claro/escuro" data-tour="theme">
           <i id="themeIcon" data-lucide="moon" class="w-[18px] h-[18px]"></i></button>
         <!-- sino de notificações -->
-        <div class="relative">
+        <div class="relative" data-tour="bell">
           <button onclick="toggleNotif(event)" class="relative p-2.5 rounded-xl hover:bg-[var(--hover)]" title="Notificações">
             <i data-lucide="bell" class="w-[18px] h-[18px]"></i>
             <span id="bellBadge" class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-accent text-[#15294d] text-[10px] font-bold grid place-content-center">4</span>
@@ -320,7 +338,7 @@
         </div>
 
         <!-- KPIs -->
-        <div class="grid grid-cols-2 xl:grid-cols-4 gap-4">
+        <div class="grid grid-cols-2 xl:grid-cols-4 gap-4" data-tour="kpis">
           <div class="surface rounded-2xl p-5">
             <div class="flex items-center justify-between"><span class="text-sm text-[var(--muted)]">Alunos ativos</span>
               <div class="w-9 h-9 rounded-xl grid place-content-center" style="background:var(--hover)"><i data-lucide="graduation-cap" class="w-[18px] h-[18px] text-brand-light"></i></div></div>
@@ -536,15 +554,41 @@
           </div>
         </div>
 
-        <!-- moldura de navegador / celular -->
-        <div class="surface rounded-2xl overflow-hidden editor-on" id="editorFrame">
-          <div class="flex items-center gap-2 px-4 h-10 border-b" id="browserChrome" style="border-color:var(--border);background:var(--hover)">
-            <span class="w-3 h-3 rounded-full bg-red-400"></span><span class="w-3 h-3 rounded-full bg-yellow-400"></span><span class="w-3 h-3 rounded-full bg-green-400"></span>
-            <span class="ml-3 text-xs text-[var(--muted)] bg-[var(--card)] rounded-md px-3 py-1" id="editorUrl">englishpatio.com.br</span>
-            <span class="ml-auto text-[10px] font-semibold uppercase tracking-wider text-[var(--muted)] hidden sm:flex items-center gap-1"><i data-lucide="eye" class="w-3 h-3"></i> pré-visualização ao vivo</span>
+        <!-- moldura desktop (janela mac, chrome escuro) -->
+        <div class="rounded-2xl overflow-hidden editor-on shadow-xl" id="editorFrame" style="border:1px solid #16213a">
+          <div class="flex items-center gap-2 px-4 h-10" id="browserChrome" style="background:linear-gradient(180deg,#1c2740,#141d33)">
+            <span class="w-3 h-3 rounded-full" style="background:#ff5f57"></span><span class="w-3 h-3 rounded-full" style="background:#febc2e"></span><span class="w-3 h-3 rounded-full" style="background:#28c840"></span>
+            <span class="ml-3 text-xs rounded-md px-3 py-1 flex items-center gap-1.5" style="background:rgba(255,255,255,.08);color:#9fb0cf"><i data-lucide="lock" class="w-3 h-3"></i><span id="editorUrl">englishpatio.com.br</span></span>
+            <span class="ml-auto text-[10px] font-semibold uppercase tracking-wider hidden sm:flex items-center gap-1" style="color:#62749a"><i data-lucide="eye" class="w-3 h-3"></i> pré-visualização ao vivo</span>
           </div>
-          <div id="phoneNotch" class="hidden h-7 place-content-center" style="background:#0f172a"><span class="w-20 h-2 rounded-full bg-white/20"></span></div>
-          <div id="editorPage"></div>
+          <div id="deskScreen" style="background:var(--card)"><div id="editorPage"></div></div>
+        </div>
+
+        <!-- mockup iPhone (calibração lp-valhalla: viewBox cropado + safe area 6.5%) -->
+        <div id="phoneWrap" class="hidden relative mx-auto editor-on" style="width:min(380px,90vw);aspect-ratio:373.5/772.5">
+          <div class="absolute overflow-hidden bg-black" style="top:1.58%;left:3.96%;width:92.10%;height:96.83%;border-radius:9%;z-index:1">
+            <div id="phoneScreen" class="absolute inset-x-0 overflow-y-auto bg-white" style="top:6.5%;bottom:0"></div>
+            <div aria-hidden="true" class="pointer-events-none absolute inset-x-0" style="top:6.5%;height:4%;background:linear-gradient(to bottom,rgba(0,0,0,.5) 0%,rgba(0,0,0,.25) 40%,rgba(0,0,0,.08) 75%,rgba(0,0,0,0) 100%);z-index:2"></div>
+          </div>
+          <svg viewBox="533.2 18.8 373.5 772.5" preserveAspectRatio="xMidYMid meet" width="100%" height="100%" class="pointer-events-none absolute inset-0" style="z-index:2" aria-hidden="true">
+            <image href="assets/iphone.svg" x="0" y="0" width="1440" height="810"/>
+            <text x="608" y="59" text-anchor="middle" fill="#ffffff" font-family="-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,sans-serif" font-size="20" font-weight="600">9:41</text>
+            <g transform="translate(810, 47)">
+              <g fill="#ffffff">
+                <rect x="0" y="11" width="3.5" height="3.5" rx="0.5"/><rect x="5" y="8" width="3.5" height="6.5" rx="0.5"/>
+                <rect x="10" y="4.5" width="3.5" height="10" rx="0.5"/><rect x="15" y="1" width="3.5" height="13.5" rx="0.5"/>
+              </g>
+              <g transform="translate(24, 2)" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round">
+                <path d="M 1 6 Q 8 0 15 6"/><path d="M 3.5 8.5 Q 8 4.5 12.5 8.5"/><circle cx="8" cy="11.5" r="1.4" fill="#ffffff" stroke="none"/>
+              </g>
+              <g transform="translate(46, 2)">
+                <rect x="0" y="1.5" width="22" height="11" rx="2.5" fill="none" stroke="#ffffff" stroke-width="1.2" opacity="0.55"/>
+                <rect x="22.5" y="5" width="1.6" height="4" rx="0.6" fill="#ffffff" opacity="0.55"/>
+                <rect x="1.6" y="3.1" width="16" height="7.8" rx="1.2" fill="#ffffff"/>
+              </g>
+            </g>
+            <rect x="660" y="768" width="120" height="5" rx="2.5" fill="#ffffff" opacity="0.92"/>
+          </svg>
         </div>
         <p class="text-xs text-[var(--muted)] mt-3 flex items-center gap-1.5"><i data-lucide="mouse-pointer-click" class="w-3.5 h-3.5"></i> Dica: a borda pontilhada amarela mostra o que dá para editar. As mudanças aparecem na hora na pré-visualização.</p>
       </section>
@@ -572,11 +616,15 @@
           <div class="surface rounded-2xl p-5">
             <h3 class="font-heading font-semibold text-lg mb-4">Aparência</h3>
             <div class="flex items-center justify-between py-2"><div><p class="font-medium text-sm">Modo escuro</p><p class="text-xs text-[var(--muted)]">Claro por padrão</p></div>
-              <button onclick="toggleTheme()" class="w-12 h-7 rounded-full relative transition" style="background:var(--hover)"><span id="switchKnob" class="absolute top-1 left-1 w-5 h-5 rounded-full bg-brand transition-all"></span></button></div>
+              <button onclick="toggleTheme(event)" class="w-12 h-7 rounded-full relative transition" style="background:var(--hover)"><span id="switchKnob" class="absolute top-1 left-1 w-5 h-5 rounded-full bg-brand transition-all"></span></button></div>
             <div class="py-3 border-t" style="border-color:var(--border)">
               <p class="font-medium text-sm">Tema da sidebar</p>
-              <p class="text-xs text-[var(--muted)] mb-3">Combinado com claro/escuro, são 6 visuais</p>
+              <p class="text-xs text-[var(--muted)] mb-3">Combinado com claro/escuro, são 6 visuais — também dá pra trocar nas bolinhas no rodapé da sidebar</p>
               <div class="flex gap-4" id="sbThemePicker"></div>
+            </div>
+            <div onclick="startTour()" class="flex items-center justify-between py-2 border-t cursor-pointer hover:bg-[var(--hover)] -mx-2 px-2 rounded-lg transition" style="border-color:var(--border)">
+              <div><p class="font-medium text-sm">Rever o tour de boas-vindas</p><p class="text-xs text-[var(--muted)]">Apresentação guiada das telas</p></div>
+              <i data-lucide="play-circle" class="w-5 h-5 text-brand-light"></i>
             </div>
           </div>
           <div class="surface rounded-2xl p-5">
@@ -640,17 +688,8 @@
 <div id="rowMenu" class="hidden fixed z-[86] w-64 surface rounded-xl shadow-2xl p-1.5"></div>
 </div>
 
-<!-- ===== ONBOARDING ===== -->
-<div id="onboarding" class="fixed inset-0 z-[70] hidden items-center justify-center bg-black/60 p-4">
-  <div class="surface rounded-3xl w-full max-w-md p-7 fade-in text-center">
-    <div id="obStep"></div>
-    <div class="flex items-center justify-center gap-1.5 my-6" id="obDots"></div>
-    <div class="flex gap-2">
-      <button onclick="closeOnboarding()" class="flex-1 h-11 rounded-xl border border-[var(--border)] font-medium text-sm">Pular</button>
-      <button id="obNext" onclick="nextOnboarding()" class="flex-1 h-11 rounded-xl text-white font-semibold text-sm" style="background:linear-gradient(135deg,#1E3765,#2F539A)">Próximo</button>
-    </div>
-  </div>
-</div>
+<!-- pin de rascunho do comentário (mostra onde a pessoa clicou) -->
+<div id="cmDraftPin" class="cm-pin hidden">✎</div>
 
 <!-- ===== EDIT PANEL (editor do site) ===== -->
 <div id="editPanel" class="fixed inset-y-0 right-0 z-[80] w-full max-w-sm translate-x-full transition-transform duration-300 surface border-l shadow-2xl flex flex-col" style="border-color:var(--border)">
@@ -756,14 +795,28 @@ function toggleSidebar(open){
   ov.classList.toggle('hidden', !open);
 }
 
-/* ====================== TEMA ====================== */
-function toggleTheme(){
+/* ====================== TEMA (com animação circular) ====================== */
+function applyDarkToggle(){
   const dark = document.documentElement.classList.toggle('dark');
-  document.getElementById('themeIcon').setAttribute('data-lucide', dark?'sun':'moon');
-  document.getElementById('switchKnob').style.left = dark?'1.5rem':'0.25rem';
+  document.getElementById('themeIcon')?.setAttribute('data-lucide', dark?'sun':'moon');
+  document.getElementById('sbThemeIcon')?.setAttribute('data-lucide', dark?'sun':'moon');
+  const knob=document.getElementById('switchKnob'); if(knob) knob.style.left = dark?'1.5rem':'0.25rem';
   applySidebarTheme();
   lucide.createIcons();
   refreshCharts();
+}
+function toggleTheme(ev){
+  const e=ev||window.event;
+  const x=e?.clientX??(innerWidth-40), y=e?.clientY??40;
+  if(!document.startViewTransition){ applyDarkToggle(); return; }
+  const radius=Math.hypot(Math.max(x,innerWidth-x), Math.max(y,innerHeight-y));
+  const t=document.startViewTransition(applyDarkToggle);
+  t.ready.then(()=>{
+    document.documentElement.animate(
+      { clipPath:[`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
+      { duration:520, easing:'ease-in-out', pseudoElement:'::view-transition-new(root)' }
+    );
+  }).catch(()=>{});
 }
 
 /* ====================== LOGIN ====================== */
@@ -773,7 +826,7 @@ function doLogin(){
   document.getElementById('app').classList.remove('hidden');
   if(!inited){ init(); inited=true; }
   lucide.createIcons();
-  setTimeout(openOnboarding, 400);
+  setTimeout(maybeStartTour, 600);
 }
 function logout(){ document.getElementById('app').classList.add('hidden'); document.getElementById('login').style.display='grid'; }
 function openForgot(e){ e.preventDefault(); document.getElementById('forgot').classList.replace('hidden','flex'); lucide.createIcons(); }
@@ -812,27 +865,116 @@ function toggleNotif(e){ e&&e.stopPropagation(); document.getElementById('notifP
 function notifClick(i){ const n=NOTIFS[i]; n.unread=false; renderNotifs(); toggleNotif(); if(n.sid) openDetail(n.sid); }
 function markAllRead(){ NOTIFS.forEach(n=>n.unread=false); renderNotifs(); }
 
-/* ====================== ONBOARDING ====================== */
-const OB=[
-  {logo:true, t:'Bem-vinda à sua dashboard! 🎉', d:'Aqui você acompanha matrículas, alunos, contratos e ainda edita os textos do site — tudo num lugar só.'},
-  {icon:'bell', t:'Nada passa despercebido', d:'Cada matrícula nova aparece no sininho e na lateral. É só clicar para abrir a ficha completa do aluno.'},
-  {icon:'graduation-cap', t:'Todos os alunos organizados', d:'Lista completa com busca e filtros, e a ficha de cada aluno com responsáveis, endereço e contrato.'},
-  {icon:'pencil-ruler', t:'Edite o site sem programar', d:'No Editor do site você vê a página real, passa o mouse sobre um texto, clica e altera. Simples assim.'},
+/* ====================== TOUR DE BOAS-VINDAS (spotlight nos elementos reais) ====================== */
+const TOUR_STEPS=[
+  { target:null, title:'Bem-vinda à sua dashboard! 🎉', body:'Esta é a central da English Patio: matrículas, alunos, contratos, e-mails e o site — tudo num lugar só. Vamos fazer um tour rapidinho pelas coisas mais importantes?', placement:'center', logo:true },
+  { target:'[data-tour="sidebar"]', title:'Tudo começa aqui', body:'Use o menu lateral para navegar entre as telas. Os aviso amarelos mostram quando algo precisa da sua atenção.', placement:'right', pre:()=>toggleSidebar(true) },
+  { target:'[data-tour="nav-alunos"]', title:'Alunos', body:'A lista completa: busca, filtros, e ações rápidas em cada aluno — inclusive enviar o contrato pelo WhatsApp com um clique.', placement:'right', pre:()=>toggleSidebar(true) },
+  { target:'[data-tour="nav-editor"]', title:'Editor do site', body:'Aqui você muda os textos do site de verdade: passa o mouse, clica no que quer mudar e escreve. Sem precisar de programador.', placement:'right', pre:()=>toggleSidebar(true) },
+  { target:'[data-tour="kpis"]', title:'O resumo da escola', body:'Alunos ativos, novos da semana, contratos pendentes… os números mais importantes, sempre à vista.', placement:'bottom', pre:()=>toggleSidebar(false) },
+  { target:'[data-tour="bell"]', title:'Novas matrículas avisam aqui', body:'Cada matrícula feita no site aparece neste sininho na hora. É só clicar para abrir a ficha do aluno.', placement:'bottom' },
+  { target:'[data-tour="theme"]', title:'Do seu jeito', body:'Modo claro ou escuro. E lá embaixo na barra lateral você escolhe a cor dela: azul, branca ou amarela.', placement:'bottom' },
+  { target:'#cmFab', title:'O botão mais importante deste preview 💜', body:'Viu algo que quer mudar? Clique em "Comentar", depois clique em qualquer parte da tela e escreva sua sugestão. Tudo chega direto para a equipe!', placement:'top' },
+  { target:null, title:'Pronto, é só explorar! ✨', body:'Clique à vontade — os dados são fictícios, nada aqui quebra. E qualquer ideia que tiver, use o botão roxo de comentários.', placement:'center', last:true },
 ];
-let obI=0;
-function openOnboarding(){ obI=0; renderOb(); document.getElementById('onboarding').classList.replace('hidden','flex'); }
-function renderOb(){
-  const s=OB[obI];
-  const visual = s.logo
-    ? `<img src="${document.documentElement.classList.contains('dark')?LOGOS.blue:LOGOS.colored}" alt="English Patio" class="h-16 w-auto mx-auto mb-5">`
-    : `<div class="w-16 h-16 rounded-2xl grid place-content-center mx-auto mb-5" style="background:linear-gradient(135deg,#FFE17A,#F5B700)"><i data-lucide="${s.icon}" class="w-8 h-8" style="color:#15294d"></i></div>`;
-  document.getElementById('obStep').innerHTML=`${visual}<h3 class="font-heading text-2xl font-semibold">${s.t}</h3><p class="text-[var(--muted)] mt-2 text-sm leading-relaxed">${s.d}</p>`;
-  document.getElementById('obDots').innerHTML=OB.map((_,i)=>`<span class="h-1.5 rounded-full transition-all ${i===obI?'w-6 bg-accent':'w-1.5 bg-[var(--border)]'}"></span>`).join('');
-  document.getElementById('obNext').textContent = obI===OB.length-1?'Começar':'Próximo';
-  lucide.createIcons();
+let tourI=0, tourActive=false, tourBuilt=false;
+function maybeStartTour(){ if(!localStorage.getItem('ep-tour-done')) startTour(); }
+function startTour(){
+  tourI=0; tourActive=true;
+  go('overview');
+  if(!tourBuilt) buildTourDom();
+  document.getElementById('tourOverlay').style.display='block';
+  setTimeout(tourRender,80);
 }
-function nextOnboarding(){ if(obI<OB.length-1){obI++;renderOb();} else closeOnboarding(); }
-function closeOnboarding(){ document.getElementById('onboarding').classList.replace('flex','hidden'); }
+function buildTourDom(){
+  const o=document.createElement('div');
+  o.id='tourOverlay';
+  o.style.cssText='position:fixed;inset:0;z-index:95;display:none;pointer-events:none;';
+  o.innerHTML=`
+    <div id="tourDim" style="position:fixed;inset:0;background:rgba(11,19,38,.78);pointer-events:auto;display:none;"></div>
+    <div id="tourSpot" style="position:fixed;border-radius:14px;box-shadow:0 0 0 100vmax rgba(11,19,38,.78);transition:all .22s ease-out;pointer-events:none;display:none;"></div>
+    <div id="tourB1" style="position:fixed;pointer-events:auto;display:none;"></div>
+    <div id="tourB2" style="position:fixed;pointer-events:auto;display:none;"></div>
+    <div id="tourB3" style="position:fixed;pointer-events:auto;display:none;"></div>
+    <div id="tourB4" style="position:fixed;pointer-events:auto;display:none;"></div>
+    <div id="tourHalo" style="position:fixed;border:2px solid #F5B700;border-radius:14px;pointer-events:none;transition:all .22s ease-out;display:none;animation:tour-pulse 1.8s ease-in-out infinite;"></div>
+    <div id="tourCard" class="surface" style="position:fixed;width:min(330px,calc(100vw - 24px));border-radius:18px;padding:18px;box-shadow:0 16px 40px rgba(0,0,0,.4);pointer-events:auto;transition:left .22s ease-out, top .22s ease-out;"></div>`;
+  document.body.appendChild(o);
+  window.addEventListener('resize',()=>{ if(tourActive) tourRender(); });
+  window.addEventListener('scroll',()=>{ if(tourActive) tourRender(); },true);
+  tourBuilt=true;
+}
+function tourRender(){
+  const s=TOUR_STEPS[tourI]; if(!s) return;
+  if(s.pre) s.pre();
+  const dim=document.getElementById('tourDim'), spot=document.getElementById('tourSpot'),
+        halo=document.getElementById('tourHalo'), card=document.getElementById('tourCard');
+  const blks=['tourB1','tourB2','tourB3','tourB4'].map(id=>document.getElementById(id));
+  let r=null;
+  if(s.target){
+    const el=document.querySelector(s.target);
+    if(el){ el.scrollIntoView({behavior:'smooth',block:'nearest'}); r=el.getBoundingClientRect(); }
+  }
+  const P=8;
+  if(r){
+    dim.style.display='none';
+    const h={top:r.top-P, left:r.left-P, w:r.width+P*2, h:r.height+P*2};
+    spot.style.display='block';
+    Object.assign(spot.style,{top:h.top+'px',left:h.left+'px',width:h.w+'px',height:h.h+'px'});
+    halo.style.display='block';
+    Object.assign(halo.style,{top:h.top+'px',left:h.left+'px',width:h.w+'px',height:h.h+'px'});
+    Object.assign(blks[0].style,{display:'block',top:'0',left:'0',width:'100vw',height:Math.max(h.top,0)+'px'});
+    Object.assign(blks[1].style,{display:'block',top:(h.top+h.h)+'px',left:'0',width:'100vw',height:Math.max(innerHeight-(h.top+h.h),0)+'px'});
+    Object.assign(blks[2].style,{display:'block',top:Math.max(h.top,0)+'px',left:'0',width:Math.max(h.left,0)+'px',height:h.h+'px'});
+    Object.assign(blks[3].style,{display:'block',top:Math.max(h.top,0)+'px',left:(h.left+h.w)+'px',width:Math.max(innerWidth-(h.left+h.w),0)+'px',height:h.h+'px'});
+  } else {
+    dim.style.display='block';
+    spot.style.display='none'; halo.style.display='none';
+    blks.forEach(b=>b.style.display='none');
+  }
+  card.innerHTML=`
+    ${s.logo?`<img src="${document.documentElement.classList.contains('dark')?LOGOS.blue:LOGOS.colored}" alt="English Patio" class="h-12 w-auto mb-3">`:''}
+    <p class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider">${s.target?`Passo ${tourI+1} de ${TOUR_STEPS.length}`:(s.last?'Fim do tour':'Tour rápido')}</p>
+    <h3 class="font-heading text-lg font-semibold mt-1">${s.title}</h3>
+    <p class="text-sm text-[var(--muted)] mt-1.5 leading-relaxed">${s.body}</p>
+    <div class="flex items-center gap-1.5 mt-3.5">${TOUR_STEPS.map((_,i)=>`<span class="h-1 rounded-full transition-all ${i===tourI?'w-5':'w-1.5'}" style="background:${i===tourI?'#F5B700':'var(--border)'}"></span>`).join('')}</div>
+    <div class="flex items-center justify-between gap-2 mt-4">
+      <button onclick="endTour(false)" class="text-xs font-medium text-[var(--muted)] hover:underline">${s.last?'':'Pular tour'}</button>
+      <div class="flex gap-2">
+        ${tourI>0&&!s.last?`<button onclick="tourPrev()" class="h-9 px-3 rounded-lg border border-[var(--border)] text-sm font-medium">Voltar</button>`:''}
+        <button onclick="${s.last?'endTour(true)':'tourNext()'}" class="h-9 px-4 rounded-lg text-white text-sm font-semibold" style="background:linear-gradient(135deg,#1E3765,#2F539A)">${s.last?'Começar a usar 🎉':(tourI===0?'Fazer o tour':'Próximo')}</button>
+      </div>
+    </div>`;
+  positionTourCard(card,s,r);
+}
+function positionTourCard(card,s,r){
+  const W=Math.min(330,innerWidth-24), G=14, M=12;
+  const H=card.offsetHeight||220;
+  if(!r||s.placement==='center'){
+    card.style.left=Math.max((innerWidth-W)/2,M)+'px';
+    card.style.top=Math.max((innerHeight-H)/2,M)+'px';
+    return;
+  }
+  const fits={ top:r.top-H-G>=M, bottom:r.bottom+H+G<=innerHeight-M, left:r.left-W-G>=M, right:r.right+W+G<=innerWidth-M };
+  let p=s.placement;
+  if(!fits[p]){ const opp={top:'bottom',bottom:'top',left:'right',right:'left'}[p]; p=fits[opp]?opp:(fits.bottom?'bottom':fits.top?'top':fits.right?'right':'left'); }
+  let left,top;
+  if(p==='top'){ left=r.left+r.width/2-W/2; top=r.top-H-G; }
+  else if(p==='bottom'){ left=r.left+r.width/2-W/2; top=r.bottom+G; }
+  else if(p==='left'){ left=r.left-W-G; top=r.top+r.height/2-H/2; }
+  else { left=r.right+G; top=r.top+r.height/2-H/2; }
+  card.style.left=Math.max(M,Math.min(left,innerWidth-W-M))+'px';
+  card.style.top=Math.max(M,Math.min(top,innerHeight-H-M))+'px';
+}
+function tourNext(){ if(tourI<TOUR_STEPS.length-1){ tourI++; tourRender(); } else endTour(true); }
+function tourPrev(){ if(tourI>0){ tourI--; tourRender(); } }
+function endTour(done){
+  tourActive=false;
+  localStorage.setItem('ep-tour-done', done?'completed':'skipped');
+  const o=document.getElementById('tourOverlay'); if(o) o.style.display='none';
+  toggleSidebar(false);
+  if(done) toast('Tour concluído! Explore à vontade 🎉');
+}
 
 /* ====================== TABELA DE ALUNOS ====================== */
 function rowHTML(s){
@@ -1036,18 +1178,17 @@ function setEditorDevice(d){
   editorDevice=d;
   document.getElementById('devDesk').className='px-3 py-2 rounded-lg '+(d==='desktop'?'bg-[var(--card)] shadow-sm':'text-[var(--muted)]');
   document.getElementById('devMob').className='px-3 py-2 rounded-lg '+(d==='mobile'?'bg-[var(--card)] shadow-sm':'text-[var(--muted)]');
-  const frame=document.getElementById('editorFrame'), page=document.getElementById('editorPage');
+  const page=document.getElementById('editorPage');
+  const frame=document.getElementById('editorFrame'), phone=document.getElementById('phoneWrap');
   if(d==='mobile'){
-    frame.className='editor-on overflow-hidden mx-auto w-full max-w-[400px] rounded-[2.4rem] shadow-2xl';
-    frame.style.border='7px solid #0f172a';
-    document.getElementById('browserChrome').classList.add('hidden');
-    const notch=document.getElementById('phoneNotch'); notch.classList.remove('hidden'); notch.classList.add('grid');
+    frame.classList.add('hidden');
+    phone.classList.remove('hidden');
+    document.getElementById('phoneScreen').appendChild(page);   // move a página real pra dentro do iPhone
     page.classList.add('mob');
   } else {
-    frame.className='surface rounded-2xl overflow-hidden editor-on';
-    frame.style.border='';
-    document.getElementById('browserChrome').classList.remove('hidden');
-    const notch=document.getElementById('phoneNotch'); notch.classList.add('hidden'); notch.classList.remove('grid');
+    phone.classList.add('hidden');
+    frame.classList.remove('hidden');
+    document.getElementById('deskScreen').appendChild(page);
     page.classList.remove('mob');
   }
   lucide.createIcons();
@@ -1427,6 +1568,11 @@ function applySidebarTheme(){
   const logo=document.getElementById('sbLogo');
   if(logo) logo.src = sbTheme==='yellow' ? LOGOS.yellow : (sbTheme==='white' && !dark) ? LOGOS.colored : LOGOS.blue;
   const ll=document.getElementById('loginLogo'); if(ll) ll.src=dark?LOGOS.blue:LOGOS.colored;
+  const dots=document.getElementById('sbThemeDots');
+  if(dots){
+    const opts=[['blue','linear-gradient(135deg,#1E3765,#2F539A)','Sidebar azul'],['white','linear-gradient(135deg,#fff,#e8edf5)','Sidebar branca'],['yellow','linear-gradient(135deg,#F5B700,#E3A600)','Sidebar amarela']];
+    dots.innerHTML=opts.map(([k,bg,t])=>`<button onclick="setSidebarTheme('${k}')" title="${t}" class="w-5 h-5 rounded-full transition hover:scale-110" style="background:${bg};border:2px solid ${k===sbTheme?'var(--sb-strong)':'var(--sb-border)'}"></button>`).join('');
+  }
   renderSbPicker();
 }
 function setSidebarTheme(t){ sbTheme=t; localStorage.setItem('ep-sb-theme',t); applySidebarTheme(); toast('Tema aplicado!'); }
@@ -1497,6 +1643,9 @@ function markSigned(id){
 
 /* ====================== COMENTÁRIOS (estilo Adobe XD) ====================== */
 const FEEDBACK_URL=''; // ← cole aqui a URL do Web App (Apps Script) p/ os comentários caírem na planilha
+/* Quando a equipe ajustar algo, o id do comentário (coluna da planilha) entra aqui com a resposta.
+   No navegador de quem comentou, o pin fica VERDE e o painel mostra "Resolvido" + a resposta. */
+const RESOLVED={ /* exemplo → 1764800000000: 'Aumentamos a fonte do título, obrigado!' */ };
 const esc=s=>String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 let commentMode=false, cmDraft=null;
 let comments=[]; try{ comments=JSON.parse(localStorage.getItem('ep-feedbacks')||'[]'); }catch(_){ comments=[]; }
@@ -1528,7 +1677,7 @@ function toggleCommentMode(){
 }
 function cmHideHighlight(){ document.getElementById('cmHighlight').classList.add('hidden'); }
 document.addEventListener('mousemove',e=>{
-  if(!commentMode) return;
+  if(!commentMode || document.body.classList.contains('cm-composing')) return;
   const t=e.target;
   if(t.closest('#cmComposer,#commentPanel,#cmLayer,#cmFab,#cmListBtn')||t===document.body||t===document.documentElement){ cmHideHighlight(); return; }
   const r=t.getBoundingClientRect(), h=document.getElementById('cmHighlight');
@@ -1538,18 +1687,30 @@ document.addEventListener('mousemove',e=>{
 });
 document.addEventListener('click',e=>{
   if(!commentMode) return;
-  if(e.target.closest('#cmFab,#cmListBtn,#cmComposer,#commentPanel,#cmLayer')) return;
+  if(e.target.closest('#cmFab,#cmListBtn,#cmComposer,#commentPanel,#cmLayer,#cmDraftPin')) return;
   e.preventDefault(); e.stopPropagation();
+  // preserva o texto se a pessoa só mudou o lugar do clique
+  const keepText=document.body.classList.contains('cm-composing')?document.getElementById('cmText').value:'';
   cmDraft={ el:e.target };
+  document.body.classList.add('cm-composing');           // cursor volta ao normal
+  cmHideHighlight();
+  const dp=document.getElementById('cmDraftPin');        // pin de rascunho no local clicado
+  dp.classList.remove('hidden');
+  dp.style.left=e.clientX+'px'; dp.style.top=e.clientY+'px';
   const c=document.getElementById('cmComposer');
   c.classList.remove('hidden');
-  c.style.left=Math.max(12, Math.min(e.clientX, innerWidth-300))+'px';
-  c.style.top=Math.max(12, Math.min(e.clientY+12, innerHeight-260))+'px';
+  c.style.left=Math.max(12, Math.min(e.clientX+14, innerWidth-300))+'px';
+  c.style.top=Math.max(12, Math.min(e.clientY+14, innerHeight-280))+'px';
   document.getElementById('cmName').value=localStorage.getItem('ep-fb-name')||'';
-  document.getElementById('cmText').value='';
+  document.getElementById('cmText').value=keepText;
   (document.getElementById('cmName').value?document.getElementById('cmText'):document.getElementById('cmName')).focus();
 },true);
-function cmCancel(){ document.getElementById('cmComposer').classList.add('hidden'); cmDraft=null; }
+function cmCancel(){
+  document.getElementById('cmComposer').classList.add('hidden');
+  document.getElementById('cmDraftPin')?.classList.add('hidden');
+  document.body.classList.remove('cm-composing');
+  cmDraft=null;
+}
 function cmSubmit(){
   const name=document.getElementById('cmName').value.trim()||'Anônimo';
   const text=document.getElementById('cmText').value.trim();
@@ -1565,7 +1726,7 @@ function cmSubmit(){
 function cmRender(){
   document.getElementById('cmCount').textContent=comments.length;
   document.getElementById('cmLayer').innerHTML=comments.map((c,i)=>
-    `<button class="cm-pin" id="pin-${c.id}" onclick="openCommentPanel(${c.id})" title="${esc(c.name)}">${i+1}</button>`).join('');
+    `<button class="cm-pin" id="pin-${c.id}" onclick="openCommentPanel(${c.id})" title="${esc(c.name)}"${RESOLVED[c.id]?' style="background:#16a34a;box-shadow:0 4px 10px rgba(22,163,74,.45)"':''}>${RESOLVED[c.id]?'✓':i+1}</button>`).join('');
   cmReposition();
   renderCmList();
 }
@@ -1593,6 +1754,10 @@ function renderCmList(){
       </div>
       <p class="text-[11px] text-[var(--muted)] mb-1.5 truncate">${VIEW_LABEL[c.view]||c.view} · ${esc(c.label)}</p>
       <p class="text-sm leading-snug">${esc(c.text)}</p>
+      ${RESOLVED[c.id]?`<div class="mt-2 rounded-lg p-2.5 text-xs" style="background:rgba(22,163,74,.10)">
+        <p class="font-semibold flex items-center gap-1.5" style="color:#16a34a"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Resolvido pela equipe</p>
+        ${typeof RESOLVED[c.id]==='string'?`<p class="mt-1 leading-snug">${esc(RESOLVED[c.id])}</p>`:''}
+      </div>`:''}
     </div>`).join('')
   : `<div class="text-center text-sm text-[var(--muted)] py-10 px-4">Nenhum comentário ainda.<br><br>Clique em <strong>Comentar</strong> (botão roxo) e depois em qualquer parte da tela para deixar o primeiro. 💜</div>`;
   lucide.createIcons();
@@ -1624,6 +1789,7 @@ document.addEventListener('keydown',e=>{
     closeEdit();closeForgot();closeModal();closeCommentPanel();csCloseAll();cmCancel();closeRowMenu();
     document.getElementById('notifPanel')?.classList.add('hidden');
     if(commentMode) toggleCommentMode();
+    if(tourActive) endTour(false);
   }
 });
 document.addEventListener('click',e=>{ if(!e.target.closest('#rowMenu')) closeRowMenu(); });
