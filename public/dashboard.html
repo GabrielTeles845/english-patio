@@ -420,10 +420,10 @@
               <span class="flex items-center gap-1.5"><span class="w-4 h-0.5 rounded-full" style="background:#F5B700"></span> Rematrículas</span>
             </div>
           </div>
-          <div class="surface rounded-2xl p-5" data-tour="health">
-            <h3 class="font-heading font-semibold text-lg mb-1">Saúde dos contratos</h3>
-            <p class="text-xs text-[var(--muted)] mb-5">Status das 128 matrículas</p>
-            <div class="space-y-4" id="contractHealth"></div>
+          <div class="surface rounded-2xl p-5 flex flex-col" data-tour="health">
+            <h3 class="font-heading font-semibold text-lg mb-1">Andamento dos contratos</h3>
+            <p class="text-xs text-[var(--muted)] mb-4">Status das 128 matrículas</p>
+            <div class="flex-1 flex flex-col justify-evenly gap-4" id="contractHealth"></div>
           </div>
         </div>
 
@@ -461,25 +461,13 @@
             </div>
             <p class="text-xs text-[var(--muted)] mt-4 flex items-center gap-1.5"><i data-lucide="lightbulb" class="w-3.5 h-3.5" style="color:#F5B700"></i> Ter/Qui 14h é o horário mais vazio — boa opção para sugerir a quem pedir matrícula.</p>
           </div>
-          <div class="surface rounded-2xl p-5">
-            <h3 class="font-heading font-semibold text-lg mb-1">Financeiro do mês</h3>
-            <p class="text-xs text-[var(--muted)]">Estimativa · mensalidade R$ 460</p>
-            <p class="font-heading text-3xl font-semibold mt-4">R$ 58.880</p>
-            <p class="text-xs text-emerald-500 font-medium flex items-center gap-1 mt-1"><i data-lucide="trending-up" class="w-3.5 h-3.5"></i> + R$ 5.520 vs. maio</p>
-            <div class="mt-4 space-y-1">
-              <div class="flex justify-between gap-4 py-2 border-b" style="border-color:var(--border)"><span class="text-sm text-[var(--muted)]">Ticket médio</span><span class="text-sm font-medium">R$ 460</span></div>
-              <div class="flex justify-between gap-4 py-2 border-b" style="border-color:var(--border)"><span class="text-sm text-[var(--muted)]">Garantido (assinados)</span><span class="text-sm font-medium">R$ 52.440</span></div>
-              <div class="flex justify-between gap-4 py-2"><span class="text-sm text-[var(--muted)]">Previsão do semestre</span><span class="text-sm font-medium">R$ 353.280</span></div>
-            </div>
-            <p class="text-xs text-[var(--muted)] mt-3 flex items-center gap-1.5"><i data-lucide="info" class="w-3.5 h-3.5 shrink-0"></i> Com o banco de dados, estes números virão dos valores reais de cada contrato.</p>
-          </div>
         </div>
 
         <div class="dash-row grid lg:grid-cols-3 gap-4 mt-4">
-          <div class="surface rounded-2xl p-5">
+          <div class="surface rounded-2xl p-5 flex flex-col">
             <h3 class="font-heading font-semibold text-lg mb-1">Faixa etária</h3>
             <p class="text-xs text-[var(--muted)] mb-4">Idade dos alunos</p>
-            <div class="h-56"><canvas id="chartAge"></canvas></div>
+            <div class="flex-1 min-h-[200px]"><canvas id="chartAge"></canvas></div>
           </div>
           <!-- últimas matrículas -->
           <div class="surface rounded-2xl p-5 lg:col-span-2">
@@ -493,13 +481,13 @@
 
         <!-- horário das matrículas + aniversariantes -->
         <div class="dash-row grid lg:grid-cols-3 gap-4 mt-4">
-          <div class="surface rounded-2xl p-5 lg:col-span-2">
+          <div class="surface rounded-2xl p-5 lg:col-span-2 flex flex-col">
             <div class="flex items-center justify-between mb-4">
               <div><h3 class="font-heading font-semibold text-lg">Que horas o pessoal matricula?</h3>
                 <p class="text-xs text-[var(--muted)]">Horário em que as matrículas chegam pelo site</p></div>
               <span class="text-xs px-2.5 py-1 rounded-full font-semibold" style="background:rgba(245,183,0,.16);color:#B5860B">Pico: 20h</span>
             </div>
-            <div class="h-56"><canvas id="chartHours"></canvas></div>
+            <div class="flex-1 min-h-[220px]"><canvas id="chartHours"></canvas></div>
             <p class="text-xs text-[var(--muted)] mt-3 flex items-center gap-1.5"><i data-lucide="lightbulb" class="w-3.5 h-3.5" style="color:#F5B700"></i> A maioria das famílias matricula à noite — bom horário para impulsionar posts e responder rápido no WhatsApp.</p>
           </div>
           <div class="surface rounded-2xl p-5">
@@ -511,21 +499,21 @@
 
         <!-- bairros + pagamento + saúde dos contratos -->
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-          <div class="surface rounded-2xl p-5">
+          <div class="surface rounded-2xl p-5 lg:col-span-2 flex flex-col">
             <h3 class="font-heading font-semibold text-lg mb-1">De onde vêm os alunos</h3>
-            <p class="text-xs text-[var(--muted)] mb-5">Top bairros · Goiânia</p>
-            <div id="hoodList" class="space-y-4"></div>
+            <p class="text-xs text-[var(--muted)] mb-5">Bairros com mais matrículas · Goiânia</p>
+            <div id="hoodList" class="flex-1 grid sm:grid-cols-2 gap-x-10 gap-y-4 content-center"></div>
           </div>
-          <div class="surface rounded-2xl p-5">
+          <div class="surface rounded-2xl p-5 flex flex-col">
             <h3 class="font-heading font-semibold text-lg mb-1">Autorização de imagem</h3>
             <p class="text-xs text-[var(--muted)] mb-4">Quem permite fotos nas redes da escola</p>
-            <div class="h-40"><canvas id="chartPay"></canvas></div>
+            <div class="flex-1 min-h-[160px]"><canvas id="chartPay"></canvas></div>
             <div id="payLegend" class="mt-4 space-y-2"></div>
           </div>
-          <div class="surface rounded-2xl p-5 sm:col-span-2 lg:col-span-1">
+          <div class="surface rounded-2xl p-5 flex flex-col">
             <h3 class="font-heading font-semibold text-lg mb-1">Distribuição por horário</h3>
             <p class="text-xs text-[var(--muted)] mb-4">Dias das aulas</p>
-            <div class="h-44"><canvas id="chartSchedule"></canvas></div>
+            <div class="flex-1 min-h-[170px]"><canvas id="chartSchedule"></canvas></div>
             <div class="mt-4 space-y-2 text-sm">
               <div class="flex items-center justify-between"><span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full" style="background:#2F539A"></span>Seg/Qua</span><span class="font-semibold">71</span></div>
               <div class="flex items-center justify-between"><span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full" style="background:#F5B700"></span>Ter/Qui</span><span class="font-semibold">57</span></div>
@@ -585,16 +573,31 @@
 
       <!-- ====================== CONTRATOS ====================== -->
       <section data-view="contratos" class="fade-in">
-        <div class="flex flex-wrap items-end justify-between gap-3 mb-5">
+        <div class="flex flex-wrap items-end justify-between gap-3 mb-4">
           <div>
             <h1 class="font-heading text-2xl sm:text-3xl font-semibold mb-1">Contratos</h1>
-            <p class="text-[var(--muted)] text-sm">Visualize e baixe os contratos. <span class="text-[var(--text)] font-medium">Assinatura digital integrada chega numa próxima fase.</span></p>
+            <p class="text-[var(--muted)] text-sm">A fila de trabalho da secretaria: enviar, acompanhar e confirmar assinaturas. <span class="text-[var(--text)] font-medium">Assinatura digital integrada chega numa próxima fase.</span></p>
           </div>
           <div class="flex items-center bg-[var(--hover)] rounded-xl p-1">
-            <button id="cvGrid" onclick="setContractView('grid')" class="px-3 py-1.5 rounded-lg bg-[var(--card)] shadow-sm" title="Ver em cartões"><i data-lucide="layout-grid" class="w-4 h-4"></i></button>
-            <button id="cvList" onclick="setContractView('list')" class="px-3 py-1.5 rounded-lg text-[var(--muted)]" title="Ver em lista"><i data-lucide="rows-3" class="w-4 h-4"></i></button>
+            <button id="cvGrid" onclick="setContractView('grid')" class="px-3 py-1.5 rounded-lg text-[var(--muted)]" title="Ver em cartões"><i data-lucide="layout-grid" class="w-4 h-4"></i></button>
+            <button id="cvList" onclick="setContractView('list')" class="px-3 py-1.5 rounded-lg bg-[var(--card)] shadow-sm" title="Ver em lista"><i data-lucide="rows-3" class="w-4 h-4"></i></button>
           </div>
         </div>
+
+        <!-- contadores clicáveis por status -->
+        <div id="cStats" class="flex flex-wrap gap-2 mb-4"></div>
+
+        <!-- busca + filtro -->
+        <div class="surface rounded-2xl p-3 mb-4 flex flex-wrap items-center gap-2">
+          <div class="flex items-center gap-2 rounded-xl px-3 h-10 flex-1 min-w-[200px]" style="background:var(--hover)">
+            <i data-lucide="search" class="w-4 h-4 text-[var(--muted)]"></i>
+            <input id="contractSearch" oninput="renderContracts()" placeholder="Buscar por aluno ou responsável…" class="flex-1 bg-transparent outline-none text-sm">
+          </div>
+          <span id="cStatusWrap"></span>
+          <span id="cActiveWrap"></span>
+          <button onclick="clearContractFilters()" class="h-10 px-3 rounded-xl text-sm font-medium text-[var(--muted)] hover:bg-[var(--hover)] transition flex items-center gap-1.5"><i data-lucide="filter-x" class="w-4 h-4"></i>Limpar</button>
+        </div>
+
         <div id="contractGrid"></div>
       </section>
 
@@ -1045,7 +1048,7 @@ const TOURS={
   overview:[
     { target:null, title:'Boas-vindas ao preview da dashboard!', body:'Explore à vontade — os dados são fictícios e nada aqui quebra. Cada tela tem o seu próprio mini-tour com o que não é óbvio.', placement:'center', logo:true },
     { target:'#custBtn', title:'Monte a dashboard do seu jeito', body:'O Personalizar deixa você arrastar os cartões e mudar a ordem de tudo — eles se encaixam sozinhos, sem deixar buraco. A ordem fica salva pra você.', placement:'bottom' },
-    { target:'[data-tour="health"]', title:'Cobrança sem dor de cabeça', body:'A "Saúde dos contratos" mostra quem ainda não assinou — e o botão verde leva direto para a lista já filtrada nos pendentes.', placement:'left' },
+    { target:'[data-tour="health"]', title:'Cobrança sem dor de cabeça', body:'O "Andamento dos contratos" mostra quem ainda não assinou — e o botão verde leva direto para a lista já filtrada nos pendentes.', placement:'left' },
     { target:'#cmFab', title:'O botão mais importante', body:'Viu algo que quer mudar? Clique em "Comentar", depois em qualquer parte da tela, e escreva sua sugestão. Quando for ajustado, o alfinete fica verde com a resposta.', placement:'top', last:true },
   ],
   alunos:[
@@ -1314,19 +1317,53 @@ function renderRecent(){
   }).join('');
 }
 
-/* ====================== CONTRATOS (grade + lista) ====================== */
-let contractView='grid';
+/* ====================== CONTRATOS (lista por padrão; fila de trabalho) ====================== */
+let contractView='list';
 function setContractView(v){
   contractView=v;
   document.getElementById('cvGrid').className='px-3 py-1.5 rounded-lg '+(v==='grid'?'bg-[var(--card)] shadow-sm':'text-[var(--muted)]');
   document.getElementById('cvList').className='px-3 py-1.5 rounded-lg '+(v==='list'?'bg-[var(--card)] shadow-sm':'text-[var(--muted)]');
   renderContracts();
 }
+function filteredContracts(){
+  const q=(document.getElementById('contractSearch')?.value||'').toLowerCase();
+  const st=SEL.cStatus?.value||'', fa=SEL.cActive?.value||'';
+  return STUDENTS.filter(s=>{
+    const hay=(s.kids.map(k=>k.n).join(' ')+' '+s.resp.n).toLowerCase();
+    const act = fa==='' ? true : fa==='on' ? s.active!==false : s.active===false;
+    return hay.includes(q) && (!st||s.status===st) && act;
+  }).slice().sort((a,b)=> SORT_VAL.date(b)<SORT_VAL.date(a) ? -1 : 1); // mais recentes primeiro
+}
+function clearContractFilters(){
+  const inp=document.getElementById('contractSearch'); if(inp) inp.value='';
+  csSet('cStatus',''); csSet('cActive','');
+  renderContracts();
+}
+function renderContractStats(){
+  const el=document.getElementById('cStats'); if(!el) return;
+  const counts={signed:0,sent:0,pending:0};
+  STUDENTS.forEach(s=>counts[s.status]++);
+  const cur=SEL.cStatus?.value||'';
+  const chip=(v,label,n,c,bg)=>`<button onclick="csSet('cStatus','${v}')" class="flex items-center gap-2 px-3.5 h-10 rounded-xl text-sm font-medium border transition ${cur===v?'shadow-sm':''}" style="border-color:${cur===v?c:'var(--border)'};background:${cur===v?bg:'var(--card)'};color:var(--text)">
+    <span class="w-2 h-2 rounded-full" style="background:${c}"></span>${label}<span class="font-bold" style="color:${c}">${n}</span></button>`;
+  el.innerHTML=
+    chip('','Todos',STUDENTS.length,'#64748B','var(--hover)')+
+    chip('pending','Pendentes',counts.pending,'#B5860B','rgba(245,183,0,.12)')+
+    chip('sent','Aguardando assinatura',counts.sent,'#2F539A','rgba(47,83,154,.10)')+
+    chip('signed','Assinados',counts.signed,'#16a34a','rgba(22,163,74,.08)');
+}
 function renderContracts(){
+  renderContractStats();
+  const rows=filteredContracts();
   const el=document.getElementById('contractGrid');
+  if(!rows.length){
+    el.className='surface rounded-2xl';
+    el.innerHTML='<div class="px-5 py-12 text-center text-[var(--muted)] text-sm">Nenhum contrato encontrado com esses filtros.</div>';
+    lucide.createIcons(); return;
+  }
   if(contractView==='grid'){
     el.className='grid sm:grid-cols-2 xl:grid-cols-3 gap-4';
-    el.innerHTML=STUDENTS.map(s=>{
+    el.innerHTML=rows.map(s=>{
       const st=STATUS[s.status];
       return `<div class="surface rounded-2xl p-5">
         <div class="flex items-start justify-between"><div class="w-11 h-11 rounded-xl grid place-content-center" style="background:var(--hover)"><i data-lucide="file-text" class="w-5 h-5 text-brand-light"></i></div>
@@ -1341,13 +1378,13 @@ function renderContracts(){
     }).join('');
   } else {
     el.className='surface rounded-2xl overflow-hidden';
-    el.innerHTML=STUDENTS.map(s=>{
+    el.innerHTML=rows.map(s=>{
       const st=STATUS[s.status];
       return `<div class="flex items-center gap-3 px-4 sm:px-5 py-3 border-b last:border-0 hover:bg-[var(--hover)] transition" style="border-color:var(--border)">
         <div class="w-10 h-10 rounded-xl grid place-content-center shrink-0" style="background:var(--hover)"><i data-lucide="file-text" class="w-[18px] h-[18px] text-brand-light"></i></div>
         <div class="flex-1 min-w-0">
-          <p class="font-medium text-sm truncate">Contrato_${s.kids[0].n.split(' ')[0]}.pdf</p>
-          <p class="text-xs text-[var(--muted)] truncate">${s.resp.n} · ${s.date}</p>
+          <p class="font-medium text-sm truncate">${s.kids.map(k=>k.n.split(' ')[0]).join(' e ')} <span class="text-[var(--muted)] font-normal">· Contrato_${s.kids[0].n.split(' ')[0]}.pdf</span></p>
+          <p class="text-xs text-[var(--muted)] truncate">${s.resp.n} · ${s.date}${s.hora?' às '+s.hora:''}</p>
         </div>
         <span class="hidden sm:inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap" style="color:${st.c};background:${st.bg}"><span class="w-1.5 h-1.5 rounded-full" style="background:${st.c}"></span>${st.t}</span>
         <div class="flex items-center gap-1.5 shrink-0">
@@ -1391,7 +1428,7 @@ function renderBirthdays(){
   lucide.createIcons();
 }
 function renderHoods(){
-  const data=[['Setor Bueno',26],['Jardim Goiás',19],['Setor Marista',15],['Setor Sul',12],['Jardim América',9]];
+  const data=[['Setor Bueno',26],['Jardim Goiás',19],['Setor Marista',15],['Setor Sul',12],['Jardim América',9],['Setor Oeste',8],['Jardim Atlântico',7],['Setor Pedro Ludovico',6]];
   const max=data[0][1];
   document.getElementById('hoodList').innerHTML=data.map(([n,v],i)=>`<div>
     <div class="flex justify-between text-sm mb-1.5"><span class="font-medium">${n}</span><span class="text-[var(--muted)]">${v} alunos</span></div>
@@ -1668,6 +1705,8 @@ function init(){
   document.getElementById('fAgeWrap').innerHTML=cselect('fAge',[{v:'',l:'Idade: todas'},{v:'4-6',l:'4 a 6 anos'},{v:'7-9',l:'7 a 9 anos'},{v:'10-12',l:'10 a 12 anos'},{v:'13+',l:'13 anos ou mais'}],{onChange:renderTable});
   document.getElementById('fMediaWrap').innerHTML=cselect('fMedia',[{v:'',l:'Imagem: todos'},{v:'yes',l:'Autorizou imagem'},{v:'no',l:'Não autorizou'}],{onChange:renderTable});
   document.getElementById('fSibWrap').innerHTML=cselect('fSib',[{v:'',l:'Irmãos: todos'},{v:'multi',l:'Com irmãos'},{v:'single',l:'Aluno único'}],{onChange:renderTable});
+  document.getElementById('cStatusWrap').innerHTML=cselect('cStatus',[{v:'',l:'Status: todos'},{v:'pending',l:'Pendentes'},{v:'sent',l:'Aguardando assinatura'},{v:'signed',l:'Assinados'}],{onChange:renderContracts});
+  document.getElementById('cActiveWrap').innerHTML=cselect('cActive',[{v:'',l:'Situação: todas'},{v:'on',l:'Ativas'},{v:'off',l:'Inativas'}],{onChange:renderContracts});
   renderTableHead();
   document.getElementById('emailToWrap').innerHTML=cselect('emailTo',[{v:'all',l:'Todos os responsáveis (96)'},{v:'sq',l:'Apenas turma Seg/Qua (71)'},{v:'tq',l:'Apenas turma Ter/Qui (57)'},{v:'pend',l:'Contratos pendentes (7)'}],{block:true});
   // conteúdo
