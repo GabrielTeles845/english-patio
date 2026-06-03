@@ -104,6 +104,10 @@
   #editorPage.mob .ep-grid{ padding:1.5rem 1.25rem !important; }
   #editorPage.mob .ep-grid h2{ font-size:1.6rem !important; line-height:1.2 !important; }
   #editorPage.mob .ep-grid > div > p{ font-size:.9rem !important; }
+  #editorPage.mob .ep-cols{ grid-template-columns:1fr !important; }
+  #editorPage.mob .ep-row{ flex-direction:column !important; }
+  #editorPage.mob .ep-title{ font-size:1.4rem !important; }
+  #editorPage.mob .ep-sec{ padding:2rem 1.25rem !important; }
   #phoneScreen{ scrollbar-width:none; }
   #phoneScreen::-webkit-scrollbar{ display:none; }
   /* Editor de site — borda pontilhada no hover */
@@ -392,7 +396,7 @@
         </div>
 
         <!-- mini-indicadores -->
-        <div class="surface rounded-2xl px-5 py-3 flex flex-wrap items-center gap-x-8 gap-y-2 text-sm lg:col-span-3">
+        <div class="surface rounded-2xl mt-4 px-5 py-3 flex flex-wrap items-center gap-x-8 gap-y-2 text-sm lg:col-span-3">
           <span class="flex items-center gap-2"><i data-lucide="cake" class="w-4 h-4 text-brand-light"></i>Média de idade <strong>9,6 anos</strong></span>
           <span class="flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-brand-light"></i><strong>32 famílias</strong> com irmãos matriculados</span>
           <span class="flex items-center gap-2"><i data-lucide="armchair" class="w-4 h-4 text-brand-light"></i>Ocupação das turmas <strong>85%</strong></span>
@@ -1602,6 +1606,111 @@ function renderHomePage(){
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- infraestrutura (AboutSection) -->
+    <div class="ep-sec p-8 sm:p-12" style="background:linear-gradient(180deg,#eff6ff,#fff)">
+      <div class="text-center max-w-2xl mx-auto mb-8">
+        ${ED('Infra — título','Infraestrutura que Estimula o Aprendizado','h2','ep-title font-heading text-3xl font-semibold block')}
+        ${ED('Infra — subtítulo','A English Patio oferece um ambiente cuidadosamente planejado para promover o aprendizado com conforto, criatividade e acolhimento.','p','mt-3 text-gray-500 block')}
+      </div>
+      <div class="ep-cols grid lg:grid-cols-2 gap-8 items-center">
+        <div class="grid sm:grid-cols-2 gap-3">
+          ${[['Salas Interativas','Layout com mesas redondas, livros literários, decoração lúdica e climatização'],['Ambiente Imersivo','Murais artísticos e decoração temática que remetem à cultura de língua inglesa'],['Fun Space','Sala multiuso com karaokê, cozinha e palco para apresentações em inglês'],['Pátio Amplo','Espaço acolhedor com bancos, música ambiente, cesta de basquete e pergolado']].map(([t,d])=>`
+          <div class="bg-white rounded-xl p-4 shadow-md">
+            ${ED('Infra — '+t,t,'h4','font-semibold text-[#1E3765] text-sm block')}
+            ${ED('Infra — desc. '+t,d,'p','mt-1 text-xs text-gray-500 leading-relaxed block')}
+          </div>`).join('')}
+        </div>
+        <div class="rounded-2xl overflow-hidden shadow-xl"><img src="${CLOUD('DSC07678.jpg')}" alt="Infraestrutura da English Patio" class="w-full h-64 sm:h-80 object-cover" loading="lazy"></div>
+      </div>
+    </div>
+
+    <!-- vacation classes (preview) -->
+    <div class="ep-sec p-8 sm:p-12" style="background:linear-gradient(180deg,#fff,#fff8e1)">
+      <div class="ep-row flex flex-col lg:flex-row gap-8 items-center">
+        <div class="rounded-2xl overflow-hidden shadow-xl shrink-0 w-full lg:w-64"><img src="${CLOUD('IMG_1250.jpg')}" alt="Vacation Classes" class="w-full h-64 lg:h-80 object-cover" loading="lazy"></div>
+        <div class="min-w-0">
+          ${ED('Vacation — título','Vacation Classes','h2','ep-title font-heading text-3xl font-semibold block')}
+          ${ED('Vacation — subtítulo','Experiências externas que proporcionam aos alunos o uso real e prático do inglês em ambientes do cotidiano','p','mt-2 text-gray-500 block')}
+          <div class="grid sm:grid-cols-2 gap-3 mt-5">
+            ${[['8 Encontros por Ano','2 horas cada'],['Vivências Práticas','Parques, supermercados, floriculturas e outros espaços reais'],['Atividades Criativas','Culinária, teatro, artesanato, pintura e muito mais'],['100% em Inglês','Imersão total no idioma em contextos práticos']].map(([t,d])=>`
+            <div class="bg-white rounded-xl p-3.5 shadow-md">
+              ${ED('Vacation — '+t,t,'h4','font-semibold text-[#1E3765] text-sm block')}
+              ${ED('Vacation — desc. '+t,d,'p','mt-1 text-xs text-gray-500 block')}
+            </div>`).join('')}
+          </div>
+          <span class="editable inline-block mt-5 text-white font-semibold text-sm px-5 py-2.5 rounded-xl" data-label="Vacation — botão" style="background:#1E3765">Conheça as Vacation Classes</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- níveis (CoursesSection) -->
+    <div class="ep-sec p-8 sm:p-12 bg-white">
+      <div class="text-center max-w-2xl mx-auto mb-8">
+        ${ED('Níveis — título','Nossos Níveis','h2','ep-title font-heading text-3xl font-semibold block')}
+        ${ED('Níveis — subtítulo','Programa estruturado em níveis progressivos para o desenvolvimento contínuo do aluno','p','mt-3 text-gray-500 block')}
+      </div>
+      <div class="ep-cols grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        ${[['FUN CONVERSATION','Primeiros contatos com o inglês, em uma abordagem totalmente lúdica, com jogos, músicas e atividades interativas. Para crianças de 4 e 5 anos.',['Fun 1','Fun 2'],'#F5B700'],['CONVERSATION SERIES','Desenvolvimento da escuta e da fala, com introdução gradual à leitura em inglês.',['Conv. 1','Conv. 2','Conv. 3'],'#2F539A'],['POWER TRACK','Módulos que desenvolvem as quatro habilidades essenciais, com início das avaliações orais e escritas.',['POWER 1–6'],'#16a34a'],['SPRINT FLUENCY','Desafios práticos com foco em fluência, interpretação e produção escrita. Início da preparação Cambridge.',['SPRINT 1–4'],'#9333ea'],['CAMBRIDGE PREPARATION','Prepare-se para certificações internacionalmente reconhecidas.',['KET','PET','FCE'],'#dc2626']].map(([t,d,lv,c])=>`
+        <div class="rounded-xl border overflow-hidden shadow-sm" style="border-color:#e5e7eb">
+          <div class="px-4 py-2.5" style="background:${c}">${ED('Nível — '+t,t,'h4','font-bold text-white text-sm tracking-wide block')}</div>
+          <div class="p-4">
+            ${ED('Nível — desc. '+t,d,'p','text-xs text-gray-500 leading-relaxed block')}
+            <div class="flex flex-wrap gap-1.5 mt-3">${lv.map(l=>`<span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background:${c}1a;color:${c}">${l}</span>`).join('')}</div>
+          </div>
+        </div>`).join('')}
+      </div>
+      <div class="text-center mt-7">
+        <span class="editable inline-block font-semibold text-sm px-5 py-2.5 rounded-xl" data-label="Níveis — botão" style="background:#F5B700;color:#15294d">Agende um teste de nível</span>
+      </div>
+    </div>
+
+    <!-- contato -->
+    <div class="ep-sec p-8 sm:p-12" style="background:linear-gradient(180deg,#eff6ff,#fff)">
+      ${ED('Contato — título','Fale Conosco','h2','ep-title font-heading text-3xl font-semibold text-center block')}
+      <div class="ep-cols grid md:grid-cols-2 gap-4 max-w-2xl mx-auto mt-7">
+        <div class="bg-white rounded-xl p-5 shadow-md text-center">
+          ${ED('Contato — telefone','(62) 3636-7775','p','font-semibold text-[#1E3765] block')}
+          ${ED('Contato — horário 1','Seg a Sex: 8:00 - 18:30','p','text-xs text-gray-500 mt-1 block')}
+        </div>
+        <div class="bg-white rounded-xl p-5 shadow-md text-center">
+          ${ED('Contato — endereço','Av. F, 1541 - Quadra 01 Lote 12, Água Branca, Goiânia - GO','p','font-semibold text-[#1E3765] text-sm block')}
+          ${ED('Contato — horário 2','Seg a Sex: 8:00 - 18:30','p','text-xs text-gray-500 mt-1 block')}
+        </div>
+      </div>
+      <div class="text-center mt-5">
+        <span class="editable inline-flex items-center gap-2 text-white font-semibold text-sm px-5 py-2.5 rounded-xl" data-label="Contato — botão WhatsApp" style="background:#25D366">Fale conosco no WhatsApp</span>
+      </div>
+    </div>
+
+    <!-- instagram -->
+    <div class="ep-sec p-8 sm:p-12 bg-white text-center">
+      ${ED('Instagram — título','Siga-nos no Instagram','h2','ep-title font-heading text-3xl font-semibold block')}
+      ${ED('Instagram — subtítulo','Acompanhe nosso dia a dia e fique por dentro das novidades!','p','mt-2 text-gray-500 block')}
+      <div class="ep-cols grid md:grid-cols-3 gap-4 max-w-3xl mx-auto mt-7">
+        ${['DSC07612.jpg','DSC07695.jpg','DSC07398.jpg'].map(f=>`<div class="rounded-xl overflow-hidden shadow-lg"><img src="${CLOUD(f)}" alt="Post do Instagram" class="w-full h-44 object-cover" loading="lazy"></div>`).join('')}
+      </div>
+      <span class="editable inline-block mt-6 text-white font-semibold text-sm px-5 py-2.5 rounded-xl" data-label="Instagram — botão" style="background:linear-gradient(135deg,#ec4899,#9333ea)">Ver Mais no Instagram</span>
+    </div>
+
+    <!-- footer -->
+    <div class="ep-sec p-8 sm:p-10" style="background:#f8fafc">
+      <div class="ep-cols grid md:grid-cols-3 gap-8">
+        <div>
+          <img src="assets/logo-index.webp" alt="English Patio" class="h-10 w-auto mb-3">
+          ${ED('Footer — descrição','Somos a English Patio, uma escola de inglês dedicada a construir a fluência com leveza e propósito.','p','text-xs text-gray-500 leading-relaxed block')}
+        </div>
+        <div>
+          ${ED('Footer — título links','Links Rápidos','h4','font-semibold text-[#1E3765] text-sm block mb-2')}
+          <p class="text-xs text-gray-500 leading-6">${ED('Footer — link 1','Início')}<br>${ED('Footer — link 2','Metodologia')}<br>${ED('Footer — link 3','Vacation Classes')}<br>${ED('Footer — link 4','Matrículas')}</p>
+        </div>
+        <div>
+          ${ED('Footer — título contato','Entre em Contato','h4','font-semibold text-[#1E3765] text-sm block mb-2')}
+          <p class="text-xs text-gray-500 leading-6">${ED('Footer — telefone','(62) 3636-7775')}<br>${ED('Footer — e-mail','englishpatio@yahoo.com')}<br>${ED('Footer — instagram','@englishpatio')}</p>
+        </div>
+      </div>
+      <p class="text-center text-[11px] text-gray-400 mt-8 pt-4 border-t border-gray-200">${ED('Footer — copyright','© 2026 English Patio. Todos os direitos reservados.')}</p>
     </div>
   </div>`;
 }
