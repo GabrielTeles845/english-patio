@@ -362,7 +362,7 @@
           </div>
           <div class="flex items-center gap-2">
             <span id="periodSelWrap"></span>
-            <button onclick="exportCSV(false)" class="flex items-center gap-2 h-10 px-4 rounded-xl text-white text-sm font-semibold" style="background:#1E3765" title="Baixa uma planilha com todos os alunos (abre no Excel ou Google Planilhas)">
+            <button onclick="exportCSV(false)" data-tour="export" class="flex items-center gap-2 h-10 px-4 rounded-xl text-white text-sm font-semibold" style="background:#1E3765" title="Baixa uma planilha com todos os alunos (abre no Excel ou Google Planilhas)">
               <i data-lucide="sheet" class="w-4 h-4"></i><span class="hidden sm:inline">Exportar planilha</span></button>
           </div>
         </div>
@@ -396,7 +396,7 @@
         </div>
 
         <!-- mini-indicadores -->
-        <div class="surface rounded-2xl mt-4 px-5 py-3 flex flex-wrap items-center gap-x-8 gap-y-2 text-sm lg:col-span-3">
+        <div class="surface rounded-2xl mt-4 px-5 py-3 flex flex-wrap items-center gap-x-8 gap-y-2 text-sm lg:col-span-3" data-tour="strip">
           <span class="flex items-center gap-2"><i data-lucide="cake" class="w-4 h-4 text-brand-light"></i>Média de idade <strong>9,6 anos</strong></span>
           <span class="flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-brand-light"></i><strong>32 famílias</strong> com irmãos matriculados</span>
           <span class="flex items-center gap-2"><i data-lucide="armchair" class="w-4 h-4 text-brand-light"></i>Ocupação das turmas <strong>85%</strong></span>
@@ -406,7 +406,7 @@
 
         <!-- charts -->
         <div class="dash-row grid lg:grid-cols-3 gap-4 mt-4">
-          <div class="surface rounded-2xl p-5 lg:col-span-2">
+          <div class="surface rounded-2xl p-5 lg:col-span-2" data-tour="enroll">
             <div class="flex items-center justify-between mb-4">
               <div><h3 class="font-heading font-semibold text-lg">Matrículas</h3><p class="text-xs text-[var(--muted)]" id="enrollSub">Evolução no semestre</p></div>
               <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 font-medium" id="enrollChip">↑ 38%</span>
@@ -426,7 +426,7 @@
 
         <!-- vagas por horário + financeiro -->
         <div class="dash-row grid lg:grid-cols-3 gap-4 mt-4">
-          <div class="surface rounded-2xl p-5 lg:col-span-2">
+          <div class="surface rounded-2xl p-5 lg:col-span-2 flex flex-col" data-tour="vagas">
             <div class="flex items-center justify-between mb-4">
               <div><h3 class="font-heading font-semibold text-lg">Vagas por horário</h3>
                 <p class="text-xs text-[var(--muted)]">Turmas de até 6 alunos · capacidade total de 150 vagas</p></div>
@@ -466,7 +466,7 @@
         </div>
 
         <div class="dash-row grid lg:grid-cols-3 gap-4 mt-4">
-          <div class="surface rounded-2xl p-5 flex flex-col">
+          <div class="surface rounded-2xl p-5 flex flex-col" data-tour="bday">
             <h3 class="font-heading font-semibold text-lg mb-1">Próximos aniversariantes 🎂</h3>
             <p class="text-xs text-[var(--muted)] mb-3">Os 5 próximos da fila</p>
             <div id="birthdayList" class="flex-1 flex flex-col justify-evenly gap-1"></div>
@@ -526,7 +526,7 @@
             <p class="text-[var(--muted)] text-sm mt-0.5">128 alunos em 96 matrículas ativas</p></div>
           <div class="flex items-center gap-2">
             <button onclick="exportCSV(true)" class="flex items-center gap-2 h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)]" title="Baixa um arquivo que abre no Excel ou Google Planilhas"><i data-lucide="sheet" class="w-4 h-4"></i><span class="hidden sm:inline">Exportar planilha</span></button>
-            <button onclick="openNewEnrollment()" class="flex items-center gap-2 h-10 px-4 rounded-xl text-white text-sm font-semibold" style="background:linear-gradient(135deg,#1E3765,#2F539A)"><i data-lucide="plus" class="w-4 h-4"></i>Nova matrícula</button>
+            <button onclick="openNewEnrollment()" data-tour="nova" class="flex items-center gap-2 h-10 px-4 rounded-xl text-white text-sm font-semibold" style="background:linear-gradient(135deg,#1E3765,#2F539A)"><i data-lucide="plus" class="w-4 h-4"></i>Nova matrícula</button>
           </div>
         </div>
 
@@ -587,7 +587,7 @@
         </div>
 
         <!-- busca + filtros (mesma estrutura da tela de Alunos) -->
-        <div class="surface rounded-2xl p-3 mb-4 space-y-2.5">
+        <div class="surface rounded-2xl p-3 mb-4 space-y-2.5" data-tour="cfiltros">
           <div class="flex items-center gap-2">
             <div class="flex items-center gap-2 rounded-xl px-3 h-10 flex-1 min-w-0" style="background:var(--hover)">
               <i data-lucide="search" class="w-4 h-4 text-[var(--muted)]"></i>
@@ -620,7 +620,7 @@
               <div><h3 class="font-heading font-semibold">Escrever comunicado</h3><p class="text-xs text-[var(--muted)]">Cada responsável recebe com o próprio nome, no canal que você escolher</p></div>
             </div>
             <div class="p-5">
-              <div class="mb-4">
+              <div class="mb-4" id="tplRow">
                 <span class="text-sm font-medium">Comece por um modelo <span class="font-normal text-xs text-[var(--muted)]">(opcional — já vem escrito)</span></span>
                 <div class="flex flex-wrap gap-2 mt-2">
                   <button onclick="applyEmailTpl('recesso')" class="flex items-center gap-2 h-9 px-3 rounded-xl border border-[var(--border)] text-[13px] font-medium hover:bg-[var(--hover)] transition"><i data-lucide="sun" class="w-4 h-4" style="color:#F5B700"></i>Recesso / Vacation Classes</button>
@@ -651,7 +651,7 @@
               </div>
               <textarea id="emailBody" rows="7" class="w-full rounded-xl border border-[var(--border)] bg-[var(--card)] p-3 text-sm outline-none focus:ring-2 ring-brand-light resize-none">Olá, {{nome_responsavel}}! Passando para avisar sobre o calendário de julho...</textarea>
               <div class="flex items-center justify-end gap-2 mt-4">
-                <button onclick="openCommPreview()" class="h-10 px-4 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)] flex items-center gap-2"><i data-lucide="eye" class="w-4 h-4"></i> Ver como chega</button>
+                <button onclick="openCommPreview()" data-tour="prevbtn" class="h-10 px-4 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)] flex items-center gap-2"><i data-lucide="eye" class="w-4 h-4"></i> Ver como chega</button>
                 <button id="sendBtn" onclick="sendComm()" class="h-10 px-4 rounded-xl text-white text-sm font-semibold flex items-center gap-2" style="background:linear-gradient(135deg,#1E3765,#2F539A)"><i data-lucide="send" class="w-4 h-4"></i> Enviar e-mail</button>
               </div>
             </div>
@@ -756,10 +756,10 @@
         <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
           <div><h1 class="font-heading text-2xl sm:text-3xl font-semibold">Usuários & permissões</h1>
             <p class="text-[var(--muted)] text-sm mt-0.5">Quem tem acesso ao painel</p></div>
-          <button onclick="openInvite()" class="h-10 px-4 rounded-xl text-white text-sm font-semibold flex items-center gap-2" style="background:linear-gradient(135deg,#1E3765,#2F539A)"><i data-lucide="user-plus" class="w-4 h-4"></i> Convidar</button>
+          <button onclick="openInvite()" data-tour="convidar" class="h-10 px-4 rounded-xl text-white text-sm font-semibold flex items-center gap-2" style="background:linear-gradient(135deg,#1E3765,#2F539A)"><i data-lucide="user-plus" class="w-4 h-4"></i> Convidar</button>
         </div>
         <div class="surface rounded-2xl divide-y" style="border-color:var(--border)" id="userList"></div>
-        <div class="grid sm:grid-cols-2 gap-4 mt-4">
+        <div class="grid sm:grid-cols-2 gap-4 mt-4" data-tour="papeis">
           <div class="surface rounded-2xl p-5"><div class="flex items-center gap-2 mb-2"><i data-lucide="shield-check" class="w-5 h-5 text-brand-light"></i><h3 class="font-heading font-semibold">Administrador</h3></div>
             <p class="text-sm text-[var(--muted)]">Acesso total: alunos, contratos, e-mails, editor do site, usuários e configurações.</p></div>
           <div class="surface rounded-2xl p-5"><div class="flex items-center gap-2 mb-2"><i data-lucide="clipboard-list" class="w-5 h-5 text-brand-light"></i><h3 class="font-heading font-semibold">Secretaria</h3></div>
@@ -791,7 +791,7 @@
           </div>
 
           <!-- conta -->
-          <div class="surface rounded-2xl overflow-hidden">
+          <div class="surface rounded-2xl overflow-hidden" data-tour="conta">
             <div class="flex items-center gap-3 px-5 py-4 border-b" style="border-color:var(--border)">
               <div class="w-10 h-10 rounded-xl grid place-content-center" style="background:rgba(47,83,154,.10)"><i data-lucide="user-round" class="w-5 h-5 text-brand-light"></i></div>
               <div><h3 class="font-heading font-semibold">Minha conta</h3><p class="text-xs text-[var(--muted)]">Quem está usando o painel</p></div>
@@ -819,7 +819,7 @@
           </div>
 
           <!-- ajuda -->
-          <div class="surface rounded-2xl overflow-hidden">
+          <div class="surface rounded-2xl overflow-hidden" data-tour="ajuda">
             <div class="flex items-center gap-3 px-5 py-4 border-b" style="border-color:var(--border)">
               <div class="w-10 h-10 rounded-xl grid place-content-center" style="background:rgba(124,58,237,.10)"><i data-lucide="life-buoy" class="w-5 h-5" style="color:#7C3AED"></i></div>
               <div><h3 class="font-heading font-semibold">Ajuda e dicas</h3><p class="text-xs text-[var(--muted)]">Tours guiados por tela</p></div>
@@ -1097,27 +1097,52 @@ function markAllRead(){ NOTIFS.forEach(n=>n.unread=false); renderNotifs(); }
 /* tours POR TELA — cada tela mostra o seu, 1x (opt-out global em 'ep-tours-off') */
 const TOURS={
   overview:[
-    { target:null, title:'Boas-vindas ao preview da dashboard!', body:'Explore à vontade — os dados são fictícios e nada aqui quebra. Cada tela tem o seu próprio mini-tour com o que não é óbvio.', placement:'center', logo:true },
+    { target:null, title:'Boas-vindas ao preview da dashboard!', body:'Explore à vontade — os dados são fictícios e nada aqui quebra. Cada tela tem o seu próprio tour completo; se preferir, dá para fechar e nunca mais ver.', placement:'center', logo:true },
+    { target:'#periodSelWrap', title:'Escolha o período', body:'Os gráficos respondem a este filtro: últimos 6 meses, 12 meses ou só este mês.', placement:'bottom' },
+    { target:'[data-tour="kpis"]', title:'Os números de hoje', body:'Alunos ativos, novos da semana, contratos aguardando assinatura e matrículas do mês — sempre atualizados.', placement:'bottom' },
+    { target:'[data-tour="strip"]', title:'Indicadores rápidos', body:'Média de idade, famílias com irmãos, ocupação das turmas, assinaturas e rematrículas — a régua da escola numa linha.', placement:'bottom' },
+    { target:'[data-tour="enroll"]', title:'Novas × rematrículas', body:'A linha azul são as matrículas novas; a tracejada amarela, as rematrículas do semestre.', placement:'right' },
     { target:'[data-tour="health"]', title:'Cobrança sem dor de cabeça', body:'O "Andamento dos contratos" mostra quem ainda não assinou — e o botão verde leva direto para a lista já filtrada nos pendentes.', placement:'left' },
+    { target:'[data-tour="vagas"]', title:'Onde ainda cabe aluno', body:'Ocupação por horário, com a etiqueta CHEIA nas turmas lotadas e a dica do horário mais vazio para indicar a quem pedir matrícula.', placement:'right' },
+    { target:'[data-tour="hours"]', title:'A hora do clique', body:'Mostra em que horário as famílias costumam matricular pelo site — útil para saber quando responder rápido e impulsionar posts.', placement:'right' },
+    { target:'[data-tour="bday"]', title:'Mimos que fidelizam', body:'Os próximos aniversariantes, com botão que prepara as mensagens de parabéns no WhatsApp.', placement:'left' },
+    { target:'[data-tour="export"]', title:'Leve para o Excel', body:'Exporta todos os alunos numa planilha que abre no Excel ou Google Planilhas.', placement:'bottom' },
     { target:'#cmFab', title:'O botão mais importante', body:'Viu algo que quer mudar? Clique em "Comentar", depois em qualquer parte da tela, e escreva sua sugestão. Quando for ajustado, o alfinete fica verde com a resposta.', placement:'top', last:true },
   ],
   alunos:[
-    { target:'[data-tour="row-menu"]', title:'Tudo mora nos três pontinhos', body:'Cada linha tem um menu completo: ficha do aluno, ver e baixar contrato, enviar no WhatsApp, copiar telefone e marcar como assinado.', placement:'left' },
-    { target:'#tableHead', title:'Ordene por qualquer coluna', body:'Clique no título de uma coluna para ordenar (vem por nome). Clique de novo para inverter a ordem.', placement:'bottom' },
-    { target:'[data-tour="filtros"]', title:'Busca e filtros', body:'Filtre por horário, status do contrato e situação (ativas/inativas) — e exporte a lista filtrada como planilha.', placement:'bottom', last:true },
+    { target:'[data-tour="row-menu"]', title:'Tudo mora nos três pontinhos', body:'Cada linha tem um menu completo: ficha do aluno, ver e baixar contrato, enviar no WhatsApp, copiar telefone e marcar como enviado/assinado.', placement:'left' },
+    { target:'#tableHead', title:'Ordene por qualquer coluna', body:'Clique no título de uma coluna para ordenar (vem por nome). Clique de novo para inverter. Ordenando por Responsável, os irmãos de matrículas separadas ficam juntos.', placement:'bottom' },
+    { target:'[data-tour="filtros"]', title:'Busca e filtros', body:'Por horário, contrato, situação, bairro, idade, autorização de imagem e irmãos — o "Limpar" zera tudo de uma vez.', placement:'bottom' },
+    { target:'[data-tip="Autorizou uso de imagem"]', title:'Câmera verde, câmera vermelha', body:'A camerazinha ao lado do nome mostra se a família autorizou fotos: verde = pode postar, vermelha = não pode.', placement:'right' },
+    { target:'[data-tour="nova"]', title:'Matrícula manual', body:'A secretaria pode adicionar uma matrícula direto por aqui, sem passar pelo site.', placement:'bottom' },
+    { target:'[data-tour="export-al"]', title:'Planilha da lista filtrada', body:'Exporta exatamente o que está na tela — com os filtros aplicados.', placement:'bottom', last:true },
   ],
   editor:[
     { target:'#editorTabs', title:'Todas as páginas do site', body:'Escolha qual página editar — até as telas de matrícula entram aqui no produto final.', placement:'bottom' },
-    { target:'#devMob', title:'Veja como fica no celular', body:'Este botão mostra a página dentro de um iPhone, do jeito que as famílias veem.', placement:'bottom' },
-    { target:'[data-tour="publish"]', title:'Nada vai ao ar sem querer', body:'As mudanças ficam só na pré-visualização até você clicar em Publicar.', placement:'bottom', last:true },
+    { target:'#editorPage .editable', title:'Clique em qualquer texto', body:'A borda pontilhada amarela mostra o que dá para editar. Clicou, escreveu, o texto muda ao vivo na pré-visualização.', placement:'bottom' },
+    { target:'#devMob', title:'Veja como fica no celular', body:'Este botão mostra a página dentro de um iPhone de verdade, do jeito que as famílias veem.', placement:'bottom' },
+    { target:'[data-tour="publish"]', title:'Nada vai ao ar sem querer', body:'As mudanças ficam só na pré-visualização até você clicar em Publicar — o contador mostra quantas alterações estão pendentes.', placement:'bottom', last:true },
   ],
   contratos:[
-    { target:'#cvList', title:'Cartões ou lista', body:'Alterne entre ver os contratos em cartões ou um por linha.', placement:'bottom' },
-    { target:'#contractGrid', title:'Envio em um clique', body:'Cada contrato tem o botão verde que prepara o envio pelo WhatsApp da família.', placement:'top', last:true },
+    { target:'#cvList', title:'Cartões ou lista', body:'Alterne entre ver os contratos em cartões ou um por linha (a lista é a visão de trabalho).', placement:'bottom' },
+    { target:'[data-tour="cfiltros"]', title:'Ache qualquer contrato', body:'Busque por aluno ou responsável e filtre por status (pendente, aguardando, assinado) e situação.', placement:'bottom' },
+    { target:'#contractGrid', title:'Envio em um clique', body:'Cada contrato tem o botão verde que prepara o envio pelo WhatsApp da família — e dá para abrir e baixar o PDF.', placement:'top', last:true },
   ],
   emails:[
-    { target:'#chSeg', title:'E-mail, WhatsApp ou os dois', body:'Escreva o comunicado uma vez e escolha por onde cada família recebe — dá até para ver a prévia nos dois formatos.', placement:'bottom' },
-    { target:'#emailBody', title:'Mensagens personalizadas', body:'Use os botões de variável — cada família recebe a mensagem com o próprio nome.', placement:'top', last:true },
+    { target:'#chSeg', title:'E-mail, WhatsApp ou os dois', body:'Escreva o comunicado uma vez e escolha por onde cada família recebe.', placement:'bottom' },
+    { target:'#tplRow', title:'Modelos prontos', body:'Recesso, lembrete de contrato ou comunicado geral — um clique e o texto já vem escrito, é só ajustar.', placement:'bottom' },
+    { target:'#emailBody', title:'Mensagens personalizadas', body:'Use os botões de variável — cada família recebe a mensagem com o próprio nome.', placement:'top' },
+    { target:'[data-tour="prevbtn"]', title:'Veja antes de enviar', body:'Mostra exatamente como a família recebe: o e-mail montado e a bolha do WhatsApp.', placement:'top', last:true },
+  ],
+  contratos_extra:null,
+  usuarios:[
+    { target:'[data-tour="convidar"]', title:'Chame o time', body:'Convide alguém por e-mail — a pessoa cria a própria senha no primeiro acesso.', placement:'bottom' },
+    { target:'[data-tour="papeis"]', title:'Dois papéis, sem confusão', body:'Administrador faz tudo; Secretaria só vê alunos e envia contratos. Cada pessoa enxerga apenas o que precisa.', placement:'top', last:true },
+  ],
+  config:[
+    { target:'#sbThemePicker', title:'6 combinações de visual', body:'Três cores de sidebar (azul, branca, amarela) vezes claro/escuro — e as bolinhas no rodapé da sidebar trocam de qualquer tela.', placement:'bottom' },
+    { target:'[data-tour="conta"]', title:'Sua conta', body:'Troque e-mail e senha por aqui (ou clicando no seu nome na sidebar).', placement:'left' },
+    { target:'[data-tour="ajuda"]', title:'Dicas sob seu controle', body:'Reveja o tour de qualquer tela ou reative as dicas em todas — e o botão "?" no canto faz o tour da tela atual.', placement:'left', last:true },
   ],
 };
 let tourSteps=TOURS.overview, tourI=0, tourActive=false, tourBuilt=false;
@@ -2041,16 +2066,32 @@ function commTexts(){
   return {subj,body};
 }
 function emailPreviewCard(subj,body){
-  return `<div class="rounded-xl border overflow-hidden" style="border-color:var(--border)">
-    <div class="px-4 py-3 text-xs border-b" style="border-color:var(--border);background:var(--hover)">
-      <p><span class="text-[var(--muted)]">De:</span> <strong>English Patio</strong> &lt;contato@englishpatio.com.br&gt;</p>
-      <p class="mt-0.5"><span class="text-[var(--muted)]">Para:</span> Mariana Duarte Lima</p>
+  return `<div class="rounded-xl border overflow-hidden bg-white" style="border-color:var(--border)">
+    <!-- barra do cliente de e-mail (estilo Gmail) -->
+    <div class="px-4 py-3 flex items-center gap-3 border-b border-slate-100">
+      <div class="w-9 h-9 rounded-full grid place-content-center text-white text-xs font-bold shrink-0" style="background:#1E3765">EP</div>
+      <div class="min-w-0 flex-1 leading-tight">
+        <p class="text-[13px] text-slate-800 truncate"><strong>English Patio</strong> <span class="text-slate-400 font-normal">&lt;contato@englishpatio.com.br&gt;</span></p>
+        <p class="text-[11px] text-slate-400">para Mariana Duarte Lima ▾</p>
+      </div>
+      <span class="text-[11px] text-slate-400 shrink-0">16h32 ☆</span>
     </div>
-    <div class="p-5 bg-white text-slate-800">
-      <img src="assets/logo-index.webp" alt="English Patio" class="h-10 w-auto mb-4">
-      <p class="font-semibold mb-3">${esc(subj)}</p>
-      <p class="text-sm leading-relaxed whitespace-pre-line">${esc(body)}</p>
-      <p class="text-[11px] text-slate-400 mt-6 pt-4 border-t border-slate-100">Você recebeu este e-mail porque é responsável por um aluno da English Patio.</p>
+    <!-- o e-mail em si: template da marca -->
+    <div class="p-4 sm:p-5" style="background:#eef1f6">
+      <div class="max-w-[400px] mx-auto rounded-xl overflow-hidden shadow-md bg-white">
+        <div class="px-5 py-4" style="background:linear-gradient(135deg,#1E3765,#2F539A)">
+          <img src="assets/logo-sidebar-azul.svg" alt="English Patio" class="h-8 w-auto">
+        </div>
+        <div class="px-5 py-5 text-slate-800">
+          <p class="font-heading font-semibold text-[15px] mb-3" style="color:#1E3765">${esc(subj)}</p>
+          <p class="text-[13px] leading-relaxed whitespace-pre-line">${esc(body)}</p>
+          <span class="inline-block mt-4 text-[12px] font-bold px-4 py-2 rounded-lg" style="background:#F5B700;color:#15294d">Falar com a escola</span>
+        </div>
+        <div class="px-5 py-3.5 text-center text-[10px] leading-relaxed text-slate-400 border-t border-slate-100" style="background:#f8fafc">
+          English Patio · Av. F, 1541 — Água Branca, Goiânia/GO<br>
+          Você recebeu este e-mail porque é responsável por um aluno da escola.
+        </div>
+      </div>
     </div>
   </div>`;
 }
