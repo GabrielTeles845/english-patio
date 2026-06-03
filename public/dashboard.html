@@ -418,7 +418,7 @@
                 <p class="text-xs text-[var(--muted)]">Turmas de até 6 alunos · capacidade total de 150 vagas</p></div>
               <span class="text-xs px-2.5 py-1 rounded-full font-semibold" style="background:rgba(22,163,74,.10);color:#16a34a">22 vagas livres</span>
             </div>
-            <div class="grid sm:grid-cols-2 gap-x-8 gap-y-3">
+            <div class="flex-1 content-center grid sm:grid-cols-2 gap-x-8 gap-y-3">
               <div class="space-y-3">
                 <p class="text-[10px] font-bold uppercase tracking-wider text-[var(--muted)]">Segunda / Quarta</p>
                 <div><div class="flex justify-between text-[13px] mb-1"><span class="font-medium">14h00–15h30</span><span class="text-[var(--muted)]">16/18</span></div>
@@ -442,28 +442,28 @@
                   <div class="h-2 rounded-full overflow-hidden" style="background:var(--hover)"><div class="h-full rounded-full" style="width:67%;background:#2F539A"></div></div></div>
               </div>
             </div>
-            <p class="text-xs text-[var(--muted)] mt-4 flex items-center gap-1.5"><i data-lucide="lightbulb" class="w-3.5 h-3.5" style="color:#F5B700"></i> Ter/Qui 14h é o horário mais vazio — boa opção para sugerir a quem pedir matrícula.</p>
+            <p class="text-xs text-[var(--muted)] mt-auto pt-4 flex items-center gap-1.5"><i data-lucide="lightbulb" class="w-3.5 h-3.5" style="color:#F5B700"></i> Ter/Qui 14h é o horário mais vazio — boa opção para sugerir a quem pedir matrícula.</p>
           </div>
-          <div class="surface rounded-2xl p-5">
-            <h3 class="font-heading font-semibold text-lg mb-1">Próximos aniversariantes 🎂</h3>
-            <p class="text-xs text-[var(--muted)] mb-4">Os 5 próximos da fila</p>
-            <div id="birthdayList" class="space-y-2"></div>
-          </div>
-        </div>
-
-        <div class="dash-row grid lg:grid-cols-3 gap-4 mt-4">
           <div class="surface rounded-2xl p-5 flex flex-col">
             <h3 class="font-heading font-semibold text-lg mb-1">Faixa etária</h3>
             <p class="text-xs text-[var(--muted)] mb-4">Idade dos alunos</p>
             <div class="relative h-56"><canvas id="chartAge"></canvas></div>
           </div>
+        </div>
+
+        <div class="dash-row grid lg:grid-cols-3 gap-4 mt-4">
+          <div class="surface rounded-2xl p-5 flex flex-col">
+            <h3 class="font-heading font-semibold text-lg mb-1">Próximos aniversariantes 🎂</h3>
+            <p class="text-xs text-[var(--muted)] mb-3">Os 5 próximos da fila</p>
+            <div id="birthdayList" class="flex-1 flex flex-col justify-evenly gap-1"></div>
+          </div>
           <!-- últimas matrículas -->
-          <div class="surface rounded-2xl p-5 lg:col-span-2">
+          <div class="surface rounded-2xl p-5 lg:col-span-2 flex flex-col">
             <div class="flex items-center justify-between mb-4">
               <h3 class="font-heading font-semibold text-lg">Últimas matrículas</h3>
               <button onclick="go('alunos')" class="text-sm font-medium text-brand-light hover:underline flex items-center gap-1">Ver todos <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
             </div>
-            <div id="recentList" class="space-y-1.5"></div>
+            <div id="recentList" class="flex-1 flex flex-col justify-evenly"></div>
           </div>
         </div>
 
@@ -571,9 +571,6 @@
             <button id="cvList" onclick="setContractView('list')" class="px-3 py-1.5 rounded-lg bg-[var(--card)] shadow-sm" title="Ver em lista"><i data-lucide="rows-3" class="w-4 h-4"></i></button>
           </div>
         </div>
-
-        <!-- contadores clicáveis por status -->
-        <div id="cStats" class="flex flex-wrap gap-2 mb-4"></div>
 
         <!-- busca + filtros (mesma estrutura da tela de Alunos) -->
         <div class="surface rounded-2xl p-3 mb-4 space-y-2.5">
@@ -1193,7 +1190,7 @@ function rowHTML(s){
         : '<span class="tip inline-grid place-content-center w-5 h-5 rounded-md shrink-0" data-tip="Autorizou uso de imagem" style="background:rgba(22,163,74,.10);color:#16a34a"><i data-lucide="camera" class="w-3 h-3"></i></span>'}</p>
         <p class="text-xs text-[var(--muted)]">${s.kids[0].age} anos · ${s.addr.bairro}</p></div>
     </div>
-    <div class="min-w-0"><p class="text-sm truncate">${s.resp.n}</p><p class="text-xs text-[var(--muted)]">${s.resp.rel} · ${s.resp.phone}</p></div>
+    <div class="min-w-0"><p class="text-sm truncate flex items-center gap-1.5">${s.resp.n}${(()=>{const fam=STUDENTS.filter(x=>x.resp.cpf===s.resp.cpf).length;return fam>1?`<span class="tip inline-grid place-content-center w-5 h-5 rounded-md shrink-0" data-tip="Mesma família: este responsável tem ${fam} matrículas" style="background:rgba(47,83,154,.12);color:#2F539A"><i data-lucide="users" class="w-3 h-3"></i></span>`:'';})()}</p><p class="text-xs text-[var(--muted)]">${s.resp.rel} · ${s.resp.phone}</p></div>
     <div><span class="text-xs font-medium px-2.5 py-1 rounded-lg whitespace-nowrap" style="color:${schColor};background:${schBg}">${schLabel(s.sch)}</span></div>
     <div><span class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap" style="color:${st.c};background:${st.bg}"><span class="w-1.5 h-1.5 rounded-full" style="background:${st.c}"></span>${st.t}</span></div>
     <div><span class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap" style="${inactive?'color:#64748B;background:rgba(100,116,139,.14)':'color:#16a34a;background:rgba(22,163,74,.10)'}"><span class="w-1.5 h-1.5 rounded-full" style="background:${inactive?'#94a3b8':'#16a34a'}"></span>${inactive?'Inativa':'Ativa'}</span></div>
@@ -1309,7 +1306,7 @@ function openDetail(id){
 
 /* ====================== LISTAS AUXILIARES ====================== */
 function renderRecent(){
-  document.getElementById('recentList').innerHTML = STUDENTS.slice(0,5).map(s=>{
+  document.getElementById('recentList').innerHTML = STUDENTS.slice(0,6).map(s=>{
     const st=STATUS[s.status];
     return `<div onclick="openDetail(${s.id})" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-[var(--hover)] cursor-pointer transition">
       <div class="w-9 h-9 rounded-lg grid place-content-center text-white text-xs font-semibold" style="background:linear-gradient(135deg,${palette[s.id%palette.length]},#2F539A)">${initials(s.kids[0].n)}</div>
@@ -1340,21 +1337,7 @@ function clearContractFilters(){
   csSet('cStatus',''); csSet('cActive','');
   renderContracts();
 }
-function renderContractStats(){
-  const el=document.getElementById('cStats'); if(!el) return;
-  const counts={signed:0,sent:0,pending:0};
-  STUDENTS.forEach(s=>counts[s.status]++);
-  const cur=SEL.cStatus?.value||'';
-  const chip=(v,label,n,c,bg)=>`<button onclick="csSet('cStatus','${v}')" class="flex items-center gap-2 px-3.5 h-10 rounded-xl text-sm font-medium border transition ${cur===v?'shadow-sm':''}" style="border-color:${cur===v?c:'var(--border)'};background:${cur===v?bg:'var(--card)'};color:var(--text)">
-    <span class="w-2 h-2 rounded-full" style="background:${c}"></span>${label}<span class="font-bold" style="color:${c}">${n}</span></button>`;
-  el.innerHTML=
-    chip('','Todos',STUDENTS.length,'#64748B','var(--hover)')+
-    chip('pending','Pendentes',counts.pending,'#B5860B','rgba(245,183,0,.12)')+
-    chip('sent','Aguardando assinatura',counts.sent,'#2F539A','rgba(47,83,154,.10)')+
-    chip('signed','Assinados',counts.signed,'#16a34a','rgba(22,163,74,.08)');
-}
 function renderContracts(){
-  renderContractStats();
   const cBtn=document.getElementById('cClear');
   if(cBtn){
     const q=(document.getElementById('contractSearch')?.value||'').trim();
