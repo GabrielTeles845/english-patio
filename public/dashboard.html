@@ -305,7 +305,8 @@
   <div class="flex-1 min-w-0 flex flex-col">
 
     <!-- topbar -->
-    <header class="sticky top-0 z-30 h-16 flex items-center gap-3 px-4 sm:px-6 border-b" style="background:var(--card);border-color:var(--border)">
+    <header class="sticky top-0 z-30 h-16 border-b" style="background:var(--card);border-color:var(--border)">
+      <div class="h-full max-w-[1400px] mx-auto w-full px-4 sm:px-6 lg:px-8 flex items-center gap-3">
       <button onclick="toggleSidebar(true)" class="lg:hidden p-2 -ml-2 rounded-lg hover:bg-[var(--hover)]"><i data-lucide="menu" class="w-5 h-5"></i></button>
       <div class="min-w-0">
         <p class="font-heading font-semibold leading-tight truncate" id="headerTitle">Visão geral</p>
@@ -331,6 +332,7 @@
             </div>
           </div>
         </div>
+      </div>
       </div>
     </header>
 
@@ -856,7 +858,7 @@
 
 <!-- toast -->
 <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[90] translate-y-24 transition-transform duration-300">
-  <div class="flex items-center gap-2 px-4 py-3 rounded-xl text-white text-sm font-medium shadow-xl" style="background:#16a34a">
+  <div class="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold shadow-xl" style="background:#F5B700;color:#15294d">
     <i data-lucide="check-circle-2" class="w-4 h-4"></i><span id="toastMsg"></span></div>
 </div>
 
@@ -2000,16 +2002,28 @@ function renderDP(){
 /* ====================== MENU DE AÇÕES DA LINHA ====================== */
 function openRowMenu(e,id){
   e.stopPropagation();
+  const s=STUDENTS.find(x=>x.id===id); if(!s) return;
   const m=document.getElementById('rowMenu');
   const item=(ic,label,fn)=>`<button onclick="closeRowMenu();${fn}" class="w-full flex items-center gap-2.5 text-left text-sm px-3 py-2 rounded-lg hover:bg-[var(--hover)] transition"><i data-lucide="${ic}" class="w-4 h-4 text-[var(--muted)]"></i>${label}</button>`;
+  const waItem=label=>`<button onclick="closeRowMenu();toast('Contrato pronto para envio no WhatsApp!')" class="w-full flex items-center gap-2.5 text-left text-sm px-3 py-2 rounded-lg hover:bg-[var(--hover)] transition"><span style="color:#1faa53">${WA('w-4 h-4')}</span>${label}</button>`;
+  // ações dependem do status atual do contrato (sem transições redundantes)
+  let statusActions='';
+  if(s.status==='pending'){
+    statusActions = waItem('Enviar contrato no WhatsApp')
+      + `<div class="h-px my-1" style="background:var(--border)"></div>`
+      + item('send','Marcar como enviado',`markSent(${id})`)
+      + item('check-circle-2','Marcar como assinado',`markSigned(${id})`);
+  } else if(s.status==='sent'){
+    statusActions = waItem('Reenviar contrato no WhatsApp')
+      + `<div class="h-px my-1" style="background:var(--border)"></div>`
+      + item('check-circle-2','Marcar como assinado',`markSigned(${id})`);
+  }
   m.innerHTML=
     item('user-round','Ver ficha completa',`openDetail(${id})`)+
     item('file-text','Ver contrato',`openContractModal(${id})`)+
     item('download','Baixar contrato',`toast('Download iniciado (demo)')`)+
-    `<button onclick="closeRowMenu();toast('Contrato pronto para envio no WhatsApp!')" class="w-full flex items-center gap-2.5 text-left text-sm px-3 py-2 rounded-lg hover:bg-[var(--hover)] transition"><span style="color:#1faa53">${WA('w-4 h-4')}</span>Enviar contrato no WhatsApp</button>`+
     item('copy','Copiar telefone do responsável',`copyPhone(${id})`)+
-    `<div class="h-px my-1" style="background:var(--border)"></div>`+
-    item('check-circle-2','Marcar contrato como assinado',`markSigned(${id})`);
+    statusActions;
   m.classList.remove('hidden');
   const r=e.currentTarget.getBoundingClientRect();
   const mh=m.offsetHeight||300;
@@ -2028,6 +2042,12 @@ function markSigned(id){
   s.status='signed';
   renderTable(); renderRecent(); renderContracts();
   toast('Contrato marcado como assinado!');
+}
+function markSent(id){
+  const s=STUDENTS.find(x=>x.id===id); if(!s) return;
+  s.status='sent';
+  renderTable(); renderRecent(); renderContracts();
+  toast('Contrato marcado como enviado!');
 }
 
 /* ====================== COMENTÁRIOS (estilo Adobe XD) ====================== */
