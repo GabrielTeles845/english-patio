@@ -855,7 +855,7 @@
 
 <!-- ===== MODO COMENTÁRIO (estilo Adobe XD) ===== -->
 <div class="fixed bottom-6 right-6 z-[78] flex flex-col items-end gap-2">
-  <button onclick="startTour()" class="w-11 h-11 rounded-full surface shadow-xl grid place-content-center hover:scale-105 transition" title="Tour da tela — conheça os recursos">
+  <button onclick="startTour()" class="w-11 h-11 rounded-full surface shadow-xl hidden md:grid place-content-center hover:scale-105 transition" title="Tour da tela — conheça os recursos">
     <span class="font-heading font-semibold text-lg text-brand-light leading-none">?</span>
   </button>
   <button id="cmListBtn" onclick="openCommentPanel()" class="relative w-11 h-11 rounded-full surface shadow-xl grid place-content-center hover:scale-105 transition" title="Ver comentários">
@@ -1155,6 +1155,8 @@ const TOURS={
   ],
 };
 let tourSteps=TOURS.overview, tourI=0, tourActive=false, tourBuilt=false;
+/* tours são desktop-only — no mobile o spotlight/posicionamento não funciona bem */
+function tourMobile(){ return window.matchMedia('(max-width:767px)').matches; }
 function toursOff(){ return !!localStorage.getItem('ep-tours-off'); }
 function disableTours(){
   localStorage.setItem('ep-tours-off','1');
@@ -1163,12 +1165,14 @@ function disableTours(){
 }
 function maybeStartTour(){ maybeTourFor('overview'); }
 function maybeTourFor(view){
+  if(tourMobile()) return; /* não marca como visto — aparece quando abrir no computador */
   if(tourActive||toursOff()||!TOURS[view]) return;
   if(localStorage.getItem('ep-tour-seen-'+view)) return;
   localStorage.setItem('ep-tour-seen-'+view,'1');
   setTimeout(()=>{ if(!tourActive) startTour(view); },400);
 }
 function startTour(view){
+  if(tourMobile()){ toast('Os tours guiados ficam disponíveis no computador.'); return; }
   tourSteps=TOURS[view||currentView()]||TOURS.overview;
   tourI=0; tourActive=true;
   if(!tourBuilt) buildTourDom();
