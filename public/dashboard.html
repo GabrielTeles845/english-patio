@@ -508,8 +508,9 @@
       <section data-view="alunos" class="fade-in">
         <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
           <div><h1 class="font-heading text-2xl sm:text-3xl font-semibold">Alunos</h1>
-            <p class="text-[var(--muted)] text-sm mt-0.5">128 alunos em 96 matrículas ativas</p></div>
+            <p class="text-[var(--muted)] text-sm mt-0.5" id="alunosSub">—</p></div>
           <div class="flex items-center gap-2">
+            <button onclick="openImportModal()" class="flex items-center gap-2 h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)]" title="Traz os alunos da planilha atual de matrículas (remove linhas duplicadas sozinho)"><i data-lucide="file-up" class="w-4 h-4"></i><span class="hidden sm:inline">Importar planilha</span></button>
             <button onclick="exportCSV(true)" class="flex items-center gap-2 h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)]" title="Baixa um arquivo que abre no Excel ou Google Planilhas"><i data-lucide="sheet" class="w-4 h-4"></i><span class="hidden sm:inline">Exportar planilha</span></button>
             <button onclick="openNewEnrollment()" data-tour="nova" class="flex items-center gap-2 h-10 px-4 rounded-xl text-white text-sm font-semibold" style="background:linear-gradient(135deg,#1E3765,#2F539A)"><i data-lucide="plus" class="w-4 h-4"></i>Nova matrícula</button>
           </div>
@@ -561,9 +562,12 @@
             <h1 class="font-heading text-2xl sm:text-3xl font-semibold mb-1">Contratos</h1>
             <p class="text-[var(--muted)] text-sm">A fila de trabalho da secretaria: enviar, acompanhar e confirmar assinaturas. <span class="text-[var(--text)] font-medium">Assinatura digital integrada chega numa próxima fase.</span></p>
           </div>
-          <div class="flex items-center bg-[var(--hover)] rounded-xl p-1">
-            <button id="cvGrid" onclick="setContractView('grid')" class="px-3 py-1.5 rounded-lg text-[var(--muted)]" title="Ver em cartões"><i data-lucide="layout-grid" class="w-4 h-4"></i></button>
-            <button id="cvList" onclick="setContractView('list')" class="px-3 py-1.5 rounded-lg bg-[var(--card)] shadow-sm" title="Ver em lista"><i data-lucide="rows-3" class="w-4 h-4"></i></button>
+          <div class="flex items-center gap-2">
+            <button onclick="openModelos()" data-tour="cmodelos" class="flex items-center gap-2 h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)]" title="Gerenciar os modelos de contrato (PDF) usados nas matrículas"><i data-lucide="file-cog" class="w-4 h-4"></i><span class="hidden sm:inline">Modelos de contrato</span></button>
+            <div class="flex items-center bg-[var(--hover)] rounded-xl p-1">
+              <button id="cvGrid" onclick="setContractView('grid')" class="px-3 py-1.5 rounded-lg text-[var(--muted)]" title="Ver em cartões"><i data-lucide="layout-grid" class="w-4 h-4"></i></button>
+              <button id="cvList" onclick="setContractView('list')" class="px-3 py-1.5 rounded-lg bg-[var(--card)] shadow-sm" title="Ver em lista"><i data-lucide="rows-3" class="w-4 h-4"></i></button>
+            </div>
           </div>
         </div>
 
@@ -589,6 +593,12 @@
           <span id="contractCount">—</span>
           <div id="contractPager" class="flex items-center gap-1"></div>
         </div>
+      </section>
+
+      <!-- ====================== MODELOS DE CONTRATO ====================== -->
+      <section data-view="modelos" class="fade-in">
+        <button onclick="go('contratos')" class="flex items-center gap-2 text-sm font-medium text-[var(--muted)] hover:text-[var(--text)] mb-4"><i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar para contratos</button>
+        <div id="modelosContent"></div>
       </section>
 
       <!-- ====================== E-MAILS ====================== -->
@@ -815,7 +825,7 @@
                 <div><p class="font-medium text-sm">Rever as dicas desta tela</p><p class="text-xs text-[var(--muted)]">O botão "?" no canto faz o mesmo em qualquer tela</p></div>
                 <i data-lucide="play-circle" class="w-5 h-5 text-brand-light"></i>
               </div>
-              <div onclick="localStorage.removeItem('ep-tours-off');['overview','alunos','editor','contratos','emails'].forEach(v=>localStorage.removeItem('ep-tour-seen-'+v));toast('Dicas reativadas em todas as telas!')" class="flex items-center justify-between pt-3 border-t cursor-pointer hover:bg-[var(--hover)] -mx-2 px-2 py-1.5 rounded-lg transition" style="border-color:var(--border)">
+              <div onclick="localStorage.removeItem('ep-tours-off');['overview','alunos','editor','contratos','modelos','emails','usuarios','config'].forEach(v=>localStorage.removeItem('ep-tour-seen-'+v));toast('Dicas reativadas em todas as telas!')" class="flex items-center justify-between pt-3 border-t cursor-pointer hover:bg-[var(--hover)] -mx-2 px-2 py-1.5 rounded-lg transition" style="border-color:var(--border)">
                 <div><p class="font-medium text-sm">Reativar dicas em todas as telas</p><p class="text-xs text-[var(--muted)]">Volta a mostrar os tours uma vez por tela</p></div>
                 <i data-lucide="rotate-ccw" class="w-5 h-5 text-[var(--muted)]"></i>
               </div>
@@ -1233,7 +1243,13 @@ const TOURS={
   contratos:[
     { target:'#cvList', title:'Cartões ou lista', body:'Alterne entre ver os contratos em cartões ou um por linha (a lista é a visão de trabalho).', placement:'bottom' },
     { target:'[data-tour="cfiltros"]', title:'Ache qualquer contrato', body:'Busque por aluno ou responsável e filtre por status (pendente, aguardando, assinado) e situação.', placement:'bottom' },
+    { target:'[data-tour="cmodelos"]', title:'O PDF que as matrículas usam', body:'Aqui ficam os modelos de contrato: importe um PDF novo (editado no Google Docs), veja onde cada campo é carimbado e escolha qual modelo vale para as próximas matrículas.', placement:'bottom' },
     { target:'#contractGrid', title:'Envio em um clique', body:'Cada contrato tem o botão verde que prepara o envio pelo WhatsApp da família — e dá para abrir e baixar o PDF.', placement:'top', last:true },
+  ],
+  modelos:[
+    { target:'[data-tour="tpl-import"]', title:'Trocar o contrato é simples', body:'Edite o contrato no Google Docs, baixe como PDF e importe aqui. Não precisa mexer em código.', placement:'bottom' },
+    { target:'[data-tour="tpl-atual"]', title:'O modelo em uso', body:'Só um modelo fica "Em uso" por vez — é ele que as próximas matrículas preenchem. Os outros ficam arquivados como histórico.', placement:'bottom' },
+    { target:'[data-tour="tpl-card"]', title:'Mapeamento dos campos', body:'"Ver mapeamento" mostra onde cada dado da matrícula (nome, CPF, alunos, checkboxes) é carimbado no PDF — e dá para arrastar os marcadores. Um modelo com campos pendentes não pode ser usado.', placement:'top', last:true },
   ],
   emails:[
     { target:'#chSeg', title:'E-mail, WhatsApp ou os dois', body:'Escreva o comunicado uma vez e escolha por onde cada família recebe.', placement:'bottom' },
@@ -1534,7 +1550,8 @@ function openDetail(id){
             <div class="flex items-center gap-2 mt-2"><span class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full" style="color:${st.c};background:${st.bg}"><span class="w-1.5 h-1.5 rounded-full" style="background:${st.c}"></span>Contrato ${st.t.toLowerCase()}</span>
               <span class="text-xs font-medium px-2.5 py-1 rounded-lg" style="color:#2F539A;background:rgba(47,83,154,.10)">${schLabel(s.sch)} · ${s.t}</span></div></div>
         </div>
-        <div class="flex gap-2">
+        <div class="flex flex-wrap gap-2">
+          <button onclick="openEditEnrollment(${s.id})" class="h-10 px-3.5 rounded-xl border border-[var(--border)] text-sm font-semibold flex items-center gap-2 hover:bg-[var(--hover)] transition"><i data-lucide="pencil" class="w-4 h-4"></i> Editar</button>
           <button onclick="toast('Abrindo WhatsApp de ${s.resp.n.split(' ')[0]}…')" class="h-10 px-3.5 rounded-xl text-white text-sm font-semibold flex items-center gap-2 transition hover:brightness-105" style="background:#25D366">${WA('w-4 h-4')} WhatsApp</button>
           <button onclick="openContractModal(${s.id})" class="h-10 px-4 rounded-xl text-white text-sm font-semibold flex items-center gap-2" style="background:#1E3765"><i data-lucide="file-text" class="w-4 h-4"></i> Ver contrato</button>
         </div>
@@ -1748,6 +1765,7 @@ function refreshOverviewData(){
   set('stFam',Object.values(fams).filter(n=>n>1).length+' famílias');
   set('stOcc',Math.round(actKids.length/150*100)+'%');
   set('stSigned',Math.round(act.filter(s=>s.status==='signed').length/(act.length||1)*100)+'%');
+  set('alunosSub',`${actKids.length} alunos em ${act.length} matrículas ativas`);
   renderHealth(); renderPayLegend(); renderVagas(); renderHoods(); renderBirthdays(); renderRecent();
   /* gráficos que derivam da base */
   if(charts.sch){ charts.sch.data.datasets[0].data=['seg-qua','ter-qui'].map(sc=>act.filter(s=>s.sch===sc).reduce((a,s)=>a+s.kids.length,0)); charts.sch.update(); }
@@ -2214,6 +2232,97 @@ function submitNewEnrollment(){
   closeModal(); go('alunos'); toast(`Matrícula de ${name.split(' ')[0]} adicionada!`);
 }
 
+/* --- editar matrícula (CRUD) --- */
+function openEditEnrollment(id){
+  const s=STUDENTS.find(x=>x.id===id); if(!s) return;
+  const kidFields=s.kids.map((k,i)=>`
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <label class="block"><span class="text-sm font-medium">Aluno ${s.kids.length>1?i+1:''}</span>
+        <input id="edKid${i}" value="${k.n.replace(/"/g,'&quot;')}" class="${inputCls}"></label>
+      <label class="block relative"><span class="text-sm font-medium">Nascimento</span>
+        <input id="edKidB${i}" value="${k.b}" placeholder="dd/mm/aaaa" oninput="maskDate(this)" inputmode="numeric" class="${inputCls} pr-10">
+        <button type="button" onclick="openDatePicker(event,'edKidB${i}',2018)" class="dp-btn absolute right-2 bottom-[9px] p-1 rounded-md text-[var(--muted)] hover:text-brand-light hover:bg-[var(--hover)] transition" title="Abrir calendário"><i data-lucide="calendar" class="w-4 h-4"></i></button></label>
+    </div>`).join('');
+  openModal(`${modalHeader('Editar matrícula')}
+  <div class="p-5 space-y-3">
+    ${kidFields}
+    <label class="block"><span class="text-sm font-medium">Responsável legal</span>
+      <input id="edResp" value="${s.resp.n.replace(/"/g,'&quot;')}" class="${inputCls}"></label>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <label class="block"><span class="text-sm font-medium">Telefone</span>
+        <input id="edPhone" value="${s.resp.phone}" oninput="maskPhone(this)" inputmode="numeric" class="${inputCls}"></label>
+      <label class="block"><span class="text-sm font-medium">E-mail</span>
+        <input id="edEmail" type="email" value="${s.resp.email}" class="${inputCls}"></label>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <label class="block"><span class="text-sm font-medium">Bairro</span>
+        <input id="edHood" value="${s.addr.bairro.replace(/"/g,'&quot;')}" class="${inputCls}"></label>
+      <div><span class="text-sm font-medium">Dias</span><div class="mt-1.5" id="edSchWrap"></div></div>
+    </div>
+    <div><span class="text-sm font-medium">Turma (horário)</span><div class="mt-1.5" id="edTWrap"></div></div>
+  </div>
+  <div class="p-5 pt-0 flex gap-2">
+    <button onclick="closeModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] font-medium text-sm">Cancelar</button>
+    <button onclick="saveEditEnrollment(${id})" class="flex-1 h-11 rounded-xl text-white font-semibold text-sm" style="background:linear-gradient(135deg,#1E3765,#2F539A)">Salvar alterações</button>
+  </div>`,'max-w-lg');
+  const tOpts=sch=>Object.keys(TURMA_CAP[sch]).map(t=>({v:t,l:t}));
+  document.getElementById('edSchWrap').innerHTML=cselect('edSch',[{v:'seg-qua',l:'Seg/Qua'},{v:'ter-qui',l:'Ter/Qui'}],{block:true,value:s.sch,onChange:v=>{
+    document.getElementById('edTWrap').innerHTML=cselect('edT',tOpts(v),{block:true});
+    lucide.createIcons();
+  }});
+  document.getElementById('edTWrap').innerHTML=cselect('edT',tOpts(s.sch),{block:true,value:s.t});
+  lucide.createIcons();
+}
+function saveEditEnrollment(id){
+  const s=STUDENTS.find(x=>x.id===id); if(!s) return;
+  const ageFrom=b=>{ const p=b.split('/').map(Number); return p[2]>1900 ? 2026-p[2]-((p[1]*100+p[0])>603?1:0) : null; };
+  s.kids=s.kids.map((k,i)=>{
+    const n=document.getElementById('edKid'+i)?.value.trim()||k.n;
+    const b=document.getElementById('edKidB'+i)?.value.trim()||k.b;
+    return { ...k, n, b, age: ageFrom(b)??k.age };
+  });
+  s.resp.n=document.getElementById('edResp').value.trim()||s.resp.n;
+  s.resp.phone=document.getElementById('edPhone').value.trim()||s.resp.phone;
+  s.resp.email=document.getElementById('edEmail').value.trim()||s.resp.email;
+  s.addr.bairro=document.getElementById('edHood').value.trim()||s.addr.bairro;
+  s.sch=SEL.edSch?.value||s.sch;
+  s.t=SEL.edT?.value||s.t;
+  closeModal();
+  renderTable(); renderContracts(); refreshOverviewData();
+  if(currentView()==='detalhe') openDetail(id);
+  toast('Dados da matrícula atualizados!');
+}
+
+/* --- excluir matrícula (CRUD) — diferente de desligar: apaga de vez --- */
+function openDeleteModal(id){
+  const s=STUDENTS.find(x=>x.id===id); if(!s) return;
+  openModal(`${modalHeader('Excluir matrícula')}
+  <div class="p-5 space-y-4">
+    <div class="flex items-start gap-3 p-3 rounded-xl" style="background:rgba(220,38,38,.06)">
+      <div class="w-10 h-10 rounded-xl grid place-content-center shrink-0" style="background:rgba(220,38,38,.12)"><i data-lucide="trash-2" class="w-5 h-5" style="color:#DC2626"></i></div>
+      <div class="min-w-0"><p class="font-medium text-sm">${s.kids.map(k=>k.n.split(' ')[0]).join(' e ')} — apagar de vez?</p>
+      <p class="text-xs text-[var(--muted)] mt-0.5">A matrícula, os dados e o contrato somem da dashboard. <b>Não tem como desfazer.</b></p></div>
+    </div>
+    <div class="rounded-xl p-3 text-xs flex items-start gap-2" style="background:rgba(245,183,0,.10);color:#B5860B">
+      <i data-lucide="lightbulb" class="w-4 h-4 shrink-0 mt-0.5"></i>
+      <span>Use <b>excluir</b> só para cadastros errados ou de teste. Se o aluno saiu da escola, prefira <b>Desligar aluno</b> — o histórico fica guardado e dá para reativar depois.</span>
+    </div>
+    <div class="flex gap-2">
+      <button onclick="closeModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] text-sm font-semibold hover:bg-[var(--hover)] transition">Cancelar</button>
+      <button onclick="confirmDelete(${id})" class="flex-1 h-11 rounded-xl text-white text-sm font-semibold transition hover:brightness-110" style="background:#DC2626">Excluir de vez</button>
+    </div>
+  </div>`);
+}
+function confirmDelete(id){
+  const i=STUDENTS.findIndex(x=>x.id===id); if(i<0) return;
+  const nome=STUDENTS[i].kids[0].n.split(' ')[0];
+  STUDENTS.splice(i,1);
+  closeModal();
+  if(currentView()==='detalhe') go('alunos');
+  renderTable(); renderContracts(); refreshOverviewData();
+  toast(`Matrícula de ${nome} excluída.`);
+}
+
 /* --- convidar usuário --- */
 function openInvite(){
   openModal(`${modalHeader('Convidar para o painel')}
@@ -2405,6 +2514,419 @@ function exportCSV(useFilters){
   toast(`Planilha exportada com ${rows.length} matrícula${rows.length>1?'s':''}!`);
 }
 
+/* --- importar planilha (CSV) com deduplicação de verdade --- */
+/* Regra: linhas iguais em TUDO menos Data/Hora e Link do PDF são a mesma matrícula
+   (o bug de voltar e re-gerar o contrato cria essas repetições) — fica só a primeira. */
+function parseCSV(text,sep){
+  const rows=[]; let row=[], cell='', q=false;
+  for(let i=0;i<text.length;i++){
+    const ch=text[i];
+    if(q){ if(ch==='"'){ if(text[i+1]==='"'){ cell+='"'; i++; } else q=false; } else cell+=ch; }
+    else if(ch==='"') q=true;
+    else if(ch===sep){ row.push(cell); cell=''; }
+    else if(ch==='\n'||ch==='\r'){ if(ch==='\r'&&text[i+1]==='\n') i++; row.push(cell); cell='';
+      if(row.some(c=>c.trim()!=='')) rows.push(row); row=[]; }
+    else cell+=ch;
+  }
+  if(cell!==''||row.length){ row.push(cell); if(row.some(c=>c.trim()!=='')) rows.push(row); }
+  return rows;
+}
+const IMPORT_SAMPLE=[
+  'Data/Hora,Nome Aluno 1,Data Nasc. Aluno 1,Idade Aluno 1,Nome Aluno 2,Data Nasc. Aluno 2,Idade Aluno 2,Responsável Legal,CPF Responsável,Telefone Responsável,Email Responsável,Parentesco,Data Nasc. Responsável,Segundo Responsável,Tel. Segundo Responsável,Parentesco 2º Resp.,CPF Segundo Responsável,Responsável Financeiro,CPF Responsável Financeiro,CEP,Endereço Completo,Bairro,Cidade,Estado,Formato Aula,Forma Pagamento,Autorização Mídia,Autorização Contrato,Horário Confirmado,Link PDF Contrato',
+  '15/05/2026 19:42:10,Maria Fernanda Sousa Cardoso,12/03/2017,9,-,-,-,Juliana Sousa,389.214.557-30,(62) 99318-2244,juliana.sousa@gmail.com,Mãe,04/08/1988,Carlos Cardoso,(62) 98551-7733,Pai,521.336.904-88,Juliana Sousa,389.214.557-30,74333-120,"Rua C-205, 142 - Apto 301",Jardim América,Goiânia,GO,Presencial na Sede,Boleto,Sim,Sim,Sim,https://drive.google.com/file/d/abc123',
+  '16/05/2026 10:08:55,Otto Faria Neves,22/09/2018,7,Igor Faria Neves,14/01/2016,10,Camila Faria,654.880.123-09,(62) 99662-8800,camila.faria@hotmail.com,Mãe,19/02/1990,-, -,-,-,Camila Faria,654.880.123-09,74455-200,"Av. T-7, 988",Setor Oeste,Goiânia,GO,Presencial na Sede,Boleto,Não,Sim,Sim,https://drive.google.com/file/d/def456',
+  '16/05/2026 21:30:02,Maria Fernanda Sousa Cardoso,12/03/2017,9,-,-,-,Juliana Sousa,389.214.557-30,(62) 99318-2244,juliana.sousa@gmail.com,Mãe,04/08/1988,Carlos Cardoso,(62) 98551-7733,Pai,521.336.904-88,Juliana Sousa,389.214.557-30,74333-120,"Rua C-205, 142 - Apto 301",Jardim América,Goiânia,GO,Presencial na Sede,Boleto,Sim,Sim,Sim,https://drive.google.com/file/d/zzz999',
+  '18/05/2026 14:12:40,Larissa Prado Gonçalves,30/06/2015,10,-,-,-,Renato Gonçalves,112.774.469-01,(62) 98123-9050,renato.goncalves@outlook.com,Pai,11/11/1984,-,-,-,-,Renato Gonçalves,112.774.469-01,74140-070,"Rua 56, 75",Setor Marista,Goiânia,GO,Presencial na Sede,Boleto,Sim,Sim,Sim,https://drive.google.com/file/d/ghi789',
+  '02/06/2026 20:14:33,Helena Duarte Lima,14/02/2018,8,-,-,-,Mariana Duarte Lima,047.812.336-50,(62) 99214-8870,mariana.duarte@gmail.com,Mãe,09/05/1989,Rafael Lima,(62) 98112-4471,Pai,-,Mariana Duarte Lima,047.812.336-50,74230-110,"Rua T-55, 180 - Apto 902",Setor Bueno,Goiânia,GO,Presencial na Sede,Boleto,Sim,Sim,Sim,https://drive.google.com/file/d/jkl012',
+  '20/05/2026 09:45:21,Benjamin Castro Moura,08/12/2019,6,-,-,-,Paula Castro,778.290.541-66,(62) 99770-1188,paula.castro@gmail.com,Mãe,25/06/1993,-,-,-,-,Paula Castro,778.290.541-66,74810-330,"Av. 136, 1020",Setor Sul,Goiânia,GO,Presencial na Sede,Boleto,Não,Sim,Sim,https://drive.google.com/file/d/mno345',
+].join('\n');
+let pendingImport=null;
+function openImportModal(){
+  pendingImport=null;
+  openModal(`${modalHeader('Importar planilha de matrículas')}
+  <div class="p-5 space-y-4" id="importBody">
+    <p class="text-sm text-[var(--muted)]">Use o arquivo exportado do Google Planilhas (<b>.csv</b>) com as colunas da planilha de matrículas atual.</p>
+    <div id="importDrop" ondragover="event.preventDefault();this.style.borderColor='#2F539A'" ondragleave="this.style.borderColor='var(--border)'"
+      ondrop="event.preventDefault();this.style.borderColor='var(--border)';importDropped(event)"
+      onclick="document.getElementById('importFile').click()"
+      class="rounded-2xl border-2 border-dashed p-8 text-center cursor-pointer transition hover:bg-[var(--hover)]" style="border-color:var(--border)">
+      <i data-lucide="file-up" class="w-8 h-8 mx-auto text-brand-light mb-2"></i>
+      <p class="text-sm font-medium">Arraste o arquivo aqui ou <span class="text-brand-light">clique para escolher</span></p>
+      <p class="text-xs text-[var(--muted)] mt-1">Somente .csv — a planilha de matrículas exportada</p>
+      <input id="importFile" type="file" accept=".csv,text/csv" class="hidden" onchange="importPicked(this)">
+    </div>
+    <div class="rounded-xl p-3 text-xs flex items-start gap-2" style="background:rgba(245,183,0,.10);color:#B5860B">
+      <i data-lucide="copy-x" class="w-4 h-4 shrink-0 mt-0.5"></i>
+      <span><b>Linhas repetidas são removidas sozinhas:</b> quando a mesma matrícula aparece mais de uma vez (mesmos dados, só a data/hora e o link do PDF diferentes), só a primeira conta.</span>
+    </div>
+    <div id="importError"></div>
+    <button onclick="runImport(IMPORT_SAMPLE,'planilha de exemplo')" class="w-full h-10 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)] transition flex items-center justify-center gap-2"><i data-lucide="sparkle" class="w-4 h-4 text-brand-light"></i> Testar com uma planilha de exemplo</button>
+  </div>`,'max-w-lg');
+}
+function importError(msg){
+  const el=document.getElementById('importError');
+  if(el){ el.innerHTML=`<div class="rounded-xl p-3 text-sm flex items-start gap-2" style="background:rgba(220,38,38,.08);color:#DC2626"><i data-lucide="alert-circle" class="w-4 h-4 shrink-0 mt-0.5"></i><span>${msg}</span></div>`; lucide.createIcons(); }
+}
+function importPicked(input){
+  const f=input.files&&input.files[0]; if(!f) return;
+  importReadFile(f); input.value='';
+}
+function importDropped(e){
+  const f=e.dataTransfer.files&&e.dataTransfer.files[0]; if(!f) return;
+  importReadFile(f);
+}
+function importReadFile(f){
+  if(!/\.csv$/i.test(f.name)){ importError(`<b>${esc(f.name)}</b> não é um arquivo .csv. Exporte a planilha do Google Planilhas em "Arquivo → Fazer download → CSV".`); return; }
+  if(f.size>10*1024*1024){ importError('Arquivo muito grande (limite de 10 MB). Confira se é mesmo a planilha de matrículas.'); return; }
+  const r=new FileReader();
+  r.onload=()=>runImport(String(r.result||''), f.name);
+  r.onerror=()=>importError('Não foi possível ler o arquivo. Tente exportar a planilha de novo.');
+  r.readAsText(f,'utf-8');
+}
+function runImport(text, sourceName){
+  text=text.replace(/^﻿/,'');
+  const firstLine=text.split(/\r?\n/)[0]||'';
+  const sep=(firstLine.match(/;/g)||[]).length>(firstLine.match(/,/g)||[]).length?';':',';
+  const rows=parseCSV(text,sep);
+  if(rows.length<2){ importError('A planilha está vazia (só o cabeçalho ou nada). Confira o arquivo.'); return; }
+  const head=rows[0].map(h=>h.trim().toLowerCase());
+  const col=name=>head.findIndex(h=>h.includes(name));
+  const C={ ts:col('data/hora'), a1:col('nome aluno 1'), b1:col('nasc. aluno 1'), i1:col('idade aluno 1'),
+    a2:col('nome aluno 2'), b2:col('nasc. aluno 2'), i2:col('idade aluno 2'),
+    resp:col('responsável legal'), cpf:col('cpf responsável'), tel:col('telefone'), mail:col('email'),
+    rel:head.findIndex(h=>h==='parentesco'), rb:col('nasc. responsável'),
+    sr:col('segundo responsável'), srt:col('tel. segundo'), srr:col('parentesco 2'),
+    fin:col('responsável financeiro'), cep:col('cep'), end:col('endereço'), hood:col('bairro'),
+    city:col('cidade'), uf:col('estado'), media:col('mídia'), pdf:col('link') };
+  if(C.a1<0||C.resp<0){ importError('Esse arquivo não parece ser a planilha de matrículas — faltam as colunas <b>Nome Aluno 1</b> e <b>Responsável Legal</b>.'); return; }
+  /* dedup: compara a linha inteira IGNORANDO Data/Hora e Link do PDF */
+  const norm=v=>String(v??'').trim().toLowerCase().replace(/\s+/g,' ');
+  const keyOf=r=>r.filter((_,i)=>i!==C.ts&&i!==C.pdf).map(norm).join('|');
+  const existing=new Set(STUDENTS.flatMap(s=>s.kids.map(k=>norm(k.n)+'|'+norm(s.resp.n))));
+  const seen=new Set(); const novos=[]; let dups=0, jaExiste=0, incompletas=0;
+  const val=(r,i)=>{ const v=i>=0?String(r[i]??'').trim():''; return v==='-'?'':v; };
+  for(const r of rows.slice(1)){
+    const a1=val(r,C.a1), resp=val(r,C.resp);
+    if(!a1||!resp){ incompletas++; continue; }
+    const k=keyOf(r);
+    if(seen.has(k)){ dups++; continue; }
+    seen.add(k);
+    if(existing.has(norm(a1)+'|'+norm(resp))){ jaExiste++; continue; }
+    novos.push(r);
+  }
+  /* monta as matrículas (horário entra na turma com mais vagas — ajusta depois se precisar) */
+  const ageFrom=(b,fb)=>{ const p=b.split('/').map(Number); return p[2]>1900 ? 2026-p[2]-((p[1]*100+p[0])>603?1:0) : (parseInt(fb,10)||8); };
+  const occ={}; STUDENTS.forEach(s=>{ if(s.active!==false) occ[s.sch+'|'+s.t]=(occ[s.sch+'|'+s.t]||0)+s.kids.length; });
+  const freest=n=>{ let best=null,free=-1;
+    Object.entries(TURMA_CAP).forEach(([sch,ts])=>Object.entries(ts).forEach(([t,cap])=>{ const f=cap-(occ[sch+'|'+t]||0); if(f>=n&&f>free){ free=f; best={sch,t}; } }));
+    best=best||{sch:'seg-qua',t:'15h00–16h30'}; occ[best.sch+'|'+best.t]=(occ[best.sch+'|'+best.t]||0)+n; return best; };
+  let nid=Math.max(...STUDENTS.map(s=>s.id))+1;
+  pendingImport=novos.map(r=>{
+    const kids=[{n:val(r,C.a1), b:val(r,C.b1)||'—', age:ageFrom(val(r,C.b1),val(r,C.i1))}];
+    if(val(r,C.a2)) kids.push({n:val(r,C.a2), b:val(r,C.b2)||'—', age:ageFrom(val(r,C.b2),val(r,C.i2))});
+    const ts=val(r,C.ts), dParts=ts.split(' ');
+    const date=/^\d{2}\/\d{2}\/\d{4}$/.test(dParts[0])?dParts[0]:'03/06/2026';
+    const hora=/^\d{1,2}:\d{2}/.test(dParts[1]||'')?dParts[1].split(':').slice(0,2).join('h'):'';
+    const endRaw=val(r,C.end), ci=endRaw.indexOf(',');
+    const tu=freest(kids.length);
+    return { id:nid++, kids,
+      resp:{ n:val(r,C.resp), cpf:val(r,C.cpf)||'—', phone:val(r,C.tel)||'—', email:val(r,C.mail)||'—', rel:val(r,C.rel)||'Responsável', b:val(r,C.rb)||'—' },
+      second: val(r,C.sr)?{ n:val(r,C.sr), phone:val(r,C.srt)||'—', rel:val(r,C.srr)||'Responsável' }:null,
+      fin: val(r,C.fin)||val(r,C.resp),
+      addr:{ cep:val(r,C.cep)||'—', street:ci>0?endRaw.slice(0,ci):endRaw||'—', num:ci>0?endRaw.slice(ci+1).trim():'', comp:'', bairro:val(r,C.hood)||'—', city:val(r,C.city)||'Goiânia', uf:val(r,C.uf)||'GO' },
+      sch:tu.sch, t:tu.t, pay:'Boleto', status:'signed', media:norm(val(r,C.media))!=='não', date, hora };
+  });
+  /* resultado */
+  const stat=(n,label,c)=>`<div class="rounded-xl p-3 text-center" style="background:var(--hover)"><p class="font-heading text-2xl font-semibold" style="color:${c}">${n}</p><p class="text-[11px] text-[var(--muted)] leading-tight">${label}</p></div>`;
+  const names=pendingImport.slice(0,6).map(s=>`<li class="flex items-center gap-2"><i data-lucide="user-round-plus" class="w-3.5 h-3.5 text-emerald-500 shrink-0"></i>${esc(s.kids.map(k=>k.n).join(' e '))}</li>`).join('');
+  document.getElementById('importBody').innerHTML=`
+    <p class="text-sm"><b>${esc(sourceName)}</b> lida — confira antes de confirmar:</p>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+      ${stat(rows.length-1,'linhas lidas','var(--text)')}
+      ${stat(dups,'duplicadas removidas','#B5860B')}
+      ${stat(jaExiste,'já estavam aqui','#2F539A')}
+      ${stat(pendingImport.length,'novas matrículas','#16a34a')}
+    </div>
+    ${incompletas?`<p class="text-xs text-[var(--muted)]"><i data-lucide="info" class="w-3.5 h-3.5 inline"></i> ${incompletas} linha${incompletas>1?'s':''} sem aluno ou responsável ${incompletas>1?'foram ignoradas':'foi ignorada'}.</p>`:''}
+    ${pendingImport.length?`<ul class="text-sm space-y-1.5 rounded-xl p-3" style="background:var(--hover)">${names}${pendingImport.length>6?`<li class="text-xs text-[var(--muted)]">… e mais ${pendingImport.length-6}</li>`:''}</ul>`:'<p class="text-sm text-[var(--muted)]">Nada novo para importar — todas as linhas já estão na dashboard ou eram repetidas.</p>'}
+    <div class="flex gap-2">
+      <button onclick="openImportModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] text-sm font-semibold hover:bg-[var(--hover)] transition">Voltar</button>
+      ${pendingImport.length?`<button onclick="applyImport()" class="flex-1 h-11 rounded-xl text-white text-sm font-semibold" style="background:linear-gradient(135deg,#1E3765,#2F539A)">Importar ${pendingImport.length} matrícula${pendingImport.length>1?'s':''}</button>`:''}
+    </div>`;
+  lucide.createIcons();
+}
+function applyImport(){
+  if(!pendingImport||!pendingImport.length) return;
+  STUDENTS.push(...pendingImport);
+  const dv=s=>s.date.split('/').reverse().join('')+(s.hora||'');
+  STUDENTS.sort((a,b)=> dv(a)<dv(b)?1:dv(a)>dv(b)?-1:0);
+  const n=pendingImport.length; pendingImport=null;
+  closeModal();
+  tableChanged(); renderContracts(); refreshOverviewData();
+  toast(`${n} matrícula${n>1?'s importadas':' importada'} da planilha!`);
+}
+
+/* ====================== MODELOS DE CONTRATO ====================== */
+/* Os campos da matrícula são carimbados no PDF em posições fixas (como o site faz hoje
+   com o pdf-lib). Aqui dá pra VER e AJUSTAR onde cada campo cai em cada modelo. */
+const TPL_FIELDS=[
+  { k:'resp-nome',   label:'Nome do responsável',    src:'Matrícula → responsável legal',        page:1, x:34, y:22 },
+  { k:'resp-cpf',    label:'CPF do responsável',     src:'Matrícula → CPF do responsável',       page:1, x:72, y:22 },
+  { k:'resp-end',    label:'Endereço completo',      src:'Matrícula → rua, número, bairro',      page:1, x:42, y:30 },
+  { k:'resp-tel',    label:'Telefone',               src:'Matrícula → telefone do responsável',  page:1, x:74, y:38 },
+  { k:'alunos',      label:'Nome do(s) aluno(s)',    src:'Matrícula → aluno 1 (e aluno 2)',      page:1, x:36, y:47 },
+  { k:'formato',     label:'Checkbox do formato',    src:'Fixo → Presencial na Sede',            page:2, x:26, y:36 },
+  { k:'autorizacao', label:'Autorização de imagem',  src:'Matrícula → uso de imagem (checkbox)', page:4, x:32, y:34 },
+  { k:'data',        label:'Data da assinatura',     src:'Gerada no dia da matrícula',           page:4, x:38, y:76 },
+];
+const TEMPLATES=[
+  { id:1, name:'Contrato 2026.2 — Presencial', file:'contrato-2026-2.pdf', size:'248 KB', pages:4, by:'Priscylla Martins', date:'12/05/2026', active:true,  fields:TPL_FIELDS.map(f=>({...f,mapped:true})) },
+  { id:2, name:'Contrato 2026.1',              file:'contrato-2026-1.pdf', size:'241 KB', pages:4, by:'Priscylla Martins', date:'02/12/2025', active:false, fields:TPL_FIELDS.map(f=>({...f,mapped:true})) },
+  { id:3, name:'Contrato 2025.2 (layout antigo)', file:'contrato-2025-2.pdf', size:'236 KB', pages:4, by:'Gabriel Teles', date:'01/07/2025', active:false, fields:TPL_FIELDS.map(f=>({...f,mapped:f.k!=='resp-end'&&f.k!=='autorizacao'})) },
+];
+let tplMode='list', tplOpen=null, tplPage=1, tplFocus=null;
+function openModelos(){ tplMode='list'; go('modelos'); renderModelos(); }
+function tplById(id){ return TEMPLATES.find(t=>t.id===id); }
+function unmappedCount(t){ return t.fields.filter(f=>!f.mapped).length; }
+function renderModelos(){
+  const el=document.getElementById('modelosContent');
+  if(tplMode==='map'){ el.innerHTML=tplMapHTML(); lucide.createIcons(); return; }
+  const cards=TEMPLATES.map(t=>{
+    const um=unmappedCount(t);
+    const badge=t.active?`<span class="text-xs font-semibold px-2.5 py-1 rounded-full" style="color:#16a34a;background:rgba(22,163,74,.12)">Em uso</span>`
+      :`<span class="text-xs font-medium px-2.5 py-1 rounded-full" style="color:var(--muted);background:var(--hover)">Arquivado</span>`;
+    const warn=um?`<p class="text-xs mt-1.5 flex items-center gap-1.5" style="color:#B5860B"><i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i>${um} campo${um>1?'s':''} sem posição no PDF — ajuste no mapeamento</p>`:'';
+    return `<div class="surface rounded-2xl p-5" data-tour="${t.active?'tpl-atual':'tpl-card'}">
+      <div class="flex items-start justify-between gap-3">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-11 h-11 rounded-xl grid place-content-center shrink-0" style="background:${t.active?'rgba(22,163,74,.10)':'var(--hover)'}"><i data-lucide="file-text" class="w-5 h-5 ${t.active?'':'text-brand-light'}" ${t.active?'style="color:#16a34a"':''}></i></div>
+          <div class="min-w-0"><p class="font-medium truncate">${t.name}</p>
+            <p class="text-xs text-[var(--muted)]">${t.file} · ${t.size} · ${t.pages} páginas · enviado por ${t.by} em ${t.date}</p>${warn}</div>
+        </div>${badge}
+      </div>
+      <div class="flex flex-wrap gap-2 mt-4">
+        <button onclick="openTplMap(${t.id})" class="h-9 px-3.5 rounded-lg border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)] transition flex items-center gap-1.5"><i data-lucide="locate-fixed" class="w-4 h-4 text-brand-light"></i> Ver mapeamento</button>
+        ${t.active?'':`<button onclick="setActiveTpl(${t.id})" class="h-9 px-3.5 rounded-lg text-sm font-semibold transition flex items-center gap-1.5 ${um?'opacity-50 cursor-not-allowed border border-[var(--border)]':'text-white'}" ${um?`title="Posicione os ${um} campos pendentes antes de usar este modelo"`:'style="background:#1E3765"'}><i data-lucide="check-circle-2" class="w-4 h-4"></i> Usar nas matrículas</button>`}
+        <button onclick="toast('Download do PDF iniciado (demo)')" class="h-9 w-9 rounded-lg border border-[var(--border)] grid place-content-center hover:bg-[var(--hover)] transition" title="Baixar o PDF"><i data-lucide="download" class="w-4 h-4"></i></button>
+        <button onclick="deleteTpl(${t.id})" class="h-9 w-9 rounded-lg border border-[var(--border)] grid place-content-center hover:bg-[var(--hover)] transition" title="Excluir modelo"><i data-lucide="trash-2" class="w-4 h-4" style="color:#DC2626"></i></button>
+      </div>
+    </div>`;
+  }).join('');
+  el.innerHTML=`
+    <div class="flex flex-wrap items-end justify-between gap-3 mb-4">
+      <div><h1 class="font-heading text-2xl sm:text-3xl font-semibold mb-1">Modelos de contrato</h1>
+        <p class="text-[var(--muted)] text-sm">O PDF que cada matrícula preenche. Edite no Google Docs, baixe como PDF e importe aqui — depois confira onde cada campo é carimbado.</p></div>
+      <button onclick="openTplImport()" data-tour="tpl-import" class="flex items-center gap-2 h-10 px-4 rounded-xl text-white text-sm font-semibold" style="background:linear-gradient(135deg,#1E3765,#2F539A)"><i data-lucide="file-up" class="w-4 h-4"></i>Importar PDF</button>
+    </div>
+    <div class="space-y-3">${cards}</div>`;
+  lucide.createIcons();
+}
+/* --- importar novo modelo (PDF) com validações --- */
+let tplFile=null;
+function openTplImport(){
+  tplFile=null;
+  openModal(`${modalHeader('Importar modelo de contrato')}
+  <div class="p-5 space-y-4">
+    <label class="block"><span class="text-sm font-medium">Nome do modelo</span>
+      <input id="tplName" placeholder="Ex.: Contrato 2027.1" class="${inputCls}" oninput="tplImportValidate()"></label>
+    <div ondragover="event.preventDefault();this.style.borderColor='#2F539A'" ondragleave="this.style.borderColor='var(--border)'"
+      ondrop="event.preventDefault();this.style.borderColor='var(--border)';tplDropped(event)"
+      onclick="document.getElementById('tplFileInput').click()"
+      class="rounded-2xl border-2 border-dashed p-6 text-center cursor-pointer transition hover:bg-[var(--hover)]" style="border-color:var(--border)">
+      <i data-lucide="file-up" class="w-7 h-7 mx-auto text-brand-light mb-2"></i>
+      <p class="text-sm font-medium" id="tplDropLabel">Arraste o PDF aqui ou <span class="text-brand-light">clique para escolher</span></p>
+      <p class="text-xs text-[var(--muted)] mt-1">Somente .pdf · até 10 MB</p>
+      <input id="tplFileInput" type="file" accept=".pdf,application/pdf" class="hidden" onchange="tplPicked(this)">
+    </div>
+    <div id="tplImportError"></div>
+    <div class="rounded-xl p-3 text-xs flex items-start gap-2" style="background:rgba(47,83,154,.08);color:#2F539A">
+      <i data-lucide="lightbulb" class="w-4 h-4 shrink-0 mt-0.5"></i>
+      <span>Edita o contrato no <b>Google Docs</b>? Use "Arquivo → Fazer download → PDF" e importe aqui. Depois é só conferir o mapeamento dos campos.</span>
+    </div>
+    <div class="flex gap-2">
+      <button onclick="closeModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] text-sm font-semibold hover:bg-[var(--hover)] transition">Cancelar</button>
+      <button id="tplImportGo" onclick="confirmTplImport()" disabled class="flex-1 h-11 rounded-xl text-white text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed" style="background:linear-gradient(135deg,#1E3765,#2F539A)">Importar e mapear</button>
+    </div>
+  </div>`,'max-w-lg');
+}
+function tplImportError(msg){
+  const el=document.getElementById('tplImportError');
+  if(el){ el.innerHTML=msg?`<div class="rounded-xl p-3 text-sm flex items-start gap-2" style="background:rgba(220,38,38,.08);color:#DC2626"><i data-lucide="alert-circle" class="w-4 h-4 shrink-0 mt-0.5"></i><span>${msg}</span></div>`:''; lucide.createIcons(); }
+}
+function tplTake(f){
+  if(!f) return;
+  if(!/\.pdf$/i.test(f.name)){ tplFile=null; tplImportError(`<b>${esc(f.name)}</b> não é um PDF. No Google Docs use "Arquivo → Fazer download → PDF".`); tplImportValidate(); return; }
+  if(f.size>10*1024*1024){ tplFile=null; tplImportError('PDF muito grande (limite de 10 MB). Tente exportar de novo sem imagens pesadas.'); tplImportValidate(); return; }
+  tplFile=f; tplImportError('');
+  const lb=document.getElementById('tplDropLabel');
+  if(lb) lb.innerHTML=`<span class="inline-flex items-center gap-2 text-sm font-medium"><i data-lucide="file-check-2" class="w-4 h-4 text-emerald-500"></i>${esc(f.name)} <span class="text-xs text-[var(--muted)]">(${(f.size/1024).toFixed(0)} KB)</span></span>`;
+  lucide.createIcons(); tplImportValidate();
+}
+function tplPicked(input){ tplTake(input.files&&input.files[0]); input.value=''; }
+function tplDropped(e){ tplTake(e.dataTransfer.files&&e.dataTransfer.files[0]); }
+function tplImportValidate(){
+  const btn=document.getElementById('tplImportGo'); if(!btn) return;
+  const name=document.getElementById('tplName')?.value.trim()||'';
+  btn.disabled=!name||!tplFile;
+}
+function confirmTplImport(){
+  const name=document.getElementById('tplName').value.trim();
+  if(!name||!tplFile) return;
+  if(TEMPLATES.some(t=>t.name.toLowerCase()===name.toLowerCase())){ tplImportError(`Já existe um modelo chamado <b>${esc(name)}</b> — use outro nome.`); return; }
+  const id=Math.max(...TEMPLATES.map(t=>t.id))+1;
+  /* novo PDF: a maioria dos campos é reconhecida sozinha; o que mudar de lugar fica pendente */
+  TEMPLATES.unshift({ id, name, file:tplFile.name, size:(tplFile.size/1024).toFixed(0)+' KB', pages:4, by:'Priscylla Martins', date:'03/06/2026', active:false,
+    fields:TPL_FIELDS.map(f=>({...f, mapped:f.k!=='alunos'&&f.k!=='data'})) });
+  closeModal();
+  toast('Modelo importado! 6 de 8 campos reconhecidos — posicione os 2 pendentes.');
+  openTplMap(id);
+}
+/* --- ativar / excluir com validações --- */
+function setActiveTpl(id){
+  const t=tplById(id); if(!t||t.active) return;
+  const um=unmappedCount(t);
+  if(um){ openModal(`${modalHeader('Campos pendentes')}
+    <div class="p-5 space-y-4">
+      <p class="text-sm">O modelo <b>${t.name}</b> ainda tem <b style="color:#B5860B">${um} campo${um>1?'s':''} sem posição</b> no PDF. Se ele fosse usado assim, ${um>1?'esses dados não apareceriam':'esse dado não apareceria'} nos contratos.</p>
+      <div class="flex gap-2">
+        <button onclick="closeModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] text-sm font-semibold">Agora não</button>
+        <button onclick="closeModal();openTplMap(${id})" class="flex-1 h-11 rounded-xl text-white text-sm font-semibold" style="background:#1E3765">Abrir mapeamento</button>
+      </div>
+    </div>`); return; }
+  openModal(`${modalHeader('Usar este modelo')}
+  <div class="p-5 space-y-4">
+    <p class="text-sm">As <b>próximas matrículas</b> passam a preencher o <b>${t.name}</b>. O modelo atual fica arquivado (os contratos já gerados não mudam).</p>
+    <div class="flex gap-2">
+      <button onclick="closeModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] text-sm font-semibold">Cancelar</button>
+      <button onclick="confirmActiveTpl(${id})" class="flex-1 h-11 rounded-xl text-white text-sm font-semibold" style="background:#1E3765">Confirmar troca</button>
+    </div>
+  </div>`);
+}
+function confirmActiveTpl(id){
+  TEMPLATES.forEach(t=>t.active=t.id===id);
+  closeModal(); renderModelos();
+  toast('Modelo em uso atualizado — vale para as próximas matrículas!');
+}
+function deleteTpl(id){
+  const t=tplById(id); if(!t) return;
+  if(t.active){ openModal(`${modalHeader('Modelo em uso')}
+    <div class="p-5 space-y-4">
+      <p class="text-sm"><b>${t.name}</b> é o modelo das matrículas atuais — não dá para excluir. Defina outro como "em uso" primeiro.</p>
+      <button onclick="closeModal()" class="w-full h-11 rounded-xl border border-[var(--border)] text-sm font-semibold">Entendi</button>
+    </div>`); return; }
+  openModal(`${modalHeader('Excluir modelo')}
+  <div class="p-5 space-y-4">
+    <p class="text-sm">Excluir <b>${t.name}</b>? Os contratos já gerados com ele continuam guardados — só o arquivo do modelo some daqui.</p>
+    <div class="flex gap-2">
+      <button onclick="closeModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] text-sm font-semibold">Cancelar</button>
+      <button onclick="confirmDeleteTpl(${id})" class="flex-1 h-11 rounded-xl text-white text-sm font-semibold" style="background:#DC2626">Excluir modelo</button>
+    </div>
+  </div>`);
+}
+function confirmDeleteTpl(id){
+  const i=TEMPLATES.findIndex(t=>t.id===id); if(i<0) return;
+  const nome=TEMPLATES[i].name;
+  TEMPLATES.splice(i,1);
+  closeModal(); renderModelos();
+  toast(`Modelo "${nome}" excluído.`);
+}
+/* --- mapeamento: onde cada campo da matrícula cai no PDF (arraste os marcadores) --- */
+function openTplMap(id){ tplOpen=id; tplPage=1; tplFocus=null; tplMode='map'; go('modelos'); renderModelos(); }
+const TPL_PAGE_TEXT={
+  1:`<p class="text-center font-bold text-[11px] mb-3">CONTRATO DE PRESTAÇÃO DE SERVIÇOS EDUCACIONAIS</p>
+     <p><strong>CONTRATADA:</strong> ENGLISH PATIO LTDA, escola de idiomas com sede em Goiânia/GO.</p>
+     <p class="mt-2"><strong>CONTRATANTE:</strong> ______________________________ , CPF ______________ , residente em _________________________________________ , tel. ______________ .</p>
+     <p class="mt-2"><strong>ALUNO(S):</strong> ______________________________________________</p>
+     <p class="mt-3 text-slate-400"><strong>DAS MENSALIDADES.</strong> O pagamento dar-se-á por meio de boleto bancário emitido pela contratada; um carnê físico será entregue ao responsável no ato da matrícula, com 6 parcelas.</p>
+     <p class="mt-2 text-slate-400"><strong>DA VIGÊNCIA.</strong> O presente contrato terá vigência de 6 (seis) meses…</p>`,
+  2:`<p class="text-center font-bold text-[11px] mb-3">CLÁUSULA 4ª — DO FORMATO DAS AULAS</p>
+     <p class="text-slate-400">As aulas serão ministradas no formato assinalado abaixo:</p>
+     <p class="mt-3"><span class="inline-block w-3 h-3 border border-slate-400 rounded-sm align-middle"></span> Presencial na Sede</p>
+     <p class="mt-4 text-slate-400">Parágrafo único: o material didático…</p>`,
+  4:`<p class="text-center font-bold text-[11px] mb-3">AUTORIZAÇÕES E ASSINATURAS</p>
+     <p><span class="inline-block w-3 h-3 border border-slate-400 rounded-sm align-middle"></span> Autorizo o uso de imagem do(s) aluno(s) nas redes da escola.</p>
+     <p class="mt-6 text-slate-400">E por estarem justos e contratados, firmam o presente.</p>
+     <p class="mt-4">Goiânia, ______ de ______________ de ________.</p>
+     <div class="grid grid-cols-2 gap-4 mt-6 text-center text-[9px]"><div class="border-t border-slate-300 pt-1">Contratante</div><div class="border-t border-slate-300 pt-1">ENGLISH PATIO LTDA</div></div>`,
+};
+function tplMapHTML(){
+  const t=tplById(tplOpen); if(!t) return '';
+  const um=unmappedCount(t);
+  const pageTabs=[1,2,4].map(p=>{
+    const n=t.fields.filter(f=>f.page===p).length;
+    return `<button onclick="tplPage=${p};renderModelos()" class="px-3.5 h-9 rounded-lg text-sm font-medium transition ${tplPage===p?'text-white shadow-sm':'text-[var(--muted)] hover:bg-[var(--hover)]'}" ${tplPage===p?'style="background:#1E3765"':''}>Página ${p} <span class="text-[10px] opacity-70">(${n})</span></button>`;
+  }).join('');
+  const chips=t.fields.filter(f=>f.page===tplPage&&f.mapped).map(f=>`
+    <button id="chip-${f.k}" onpointerdown="chipDown(event,'${f.k}')" onclick="tplFocus='${f.k}';renderModelos()"
+      class="absolute -translate-x-1/2 -translate-y-1/2 px-2 py-1 rounded-md text-[10px] font-bold shadow-md cursor-grab select-none whitespace-nowrap transition-shadow"
+      style="left:${f.x}%;top:${f.y}%;background:${tplFocus===f.k?'#1E3765':'#FFE17A'};color:${tplFocus===f.k?'#FFE17A':'#15294d'};border:1.5px solid ${tplFocus===f.k?'#F5B700':'#B5860B'};touch-action:none">
+      ${f.label}</button>`).join('');
+  const fieldRows=t.fields.map(f=>`
+    <div onclick="tplFocus='${f.k}';tplPage=${f.page};renderModelos()" class="flex items-center gap-3 p-3 rounded-xl cursor-pointer transition ${tplFocus===f.k?'ring-2 ring-brand-light':''} hover:bg-[var(--hover)]" style="background:${tplFocus===f.k?'rgba(47,83,154,.06)':'var(--hover)'}">
+      <i data-lucide="${f.mapped?'check-circle-2':'alert-triangle'}" class="w-4 h-4 shrink-0" style="color:${f.mapped?'#16a34a':'#B5860B'}"></i>
+      <div class="min-w-0 flex-1"><p class="text-sm font-medium">${f.label}</p><p class="text-[11px] text-[var(--muted)] truncate">${f.src} · pág. ${f.page}</p></div>
+      ${f.mapped?`<span class="text-[10px] text-[var(--muted)] whitespace-nowrap">x ${Math.round(f.x)}% · y ${Math.round(f.y)}%</span>`
+        :`<button onclick="event.stopPropagation();tplPlaceField('${f.k}')" class="h-8 px-2.5 rounded-lg text-xs font-semibold text-white whitespace-nowrap" style="background:#B5860B">Posicionar</button>`}
+    </div>`).join('');
+  return `
+    <div class="flex flex-wrap items-end justify-between gap-3 mb-4">
+      <div><h1 class="font-heading text-2xl font-semibold mb-1 flex items-center gap-2"><i data-lucide="locate-fixed" class="w-6 h-6 text-brand-light"></i>${t.name}</h1>
+        <p class="text-[var(--muted)] text-sm">Cada marcador amarelo é um dado da matrícula carimbado no PDF. <b>Arraste</b> para ajustar a posição.</p></div>
+      <button onclick="tplMode='list';renderModelos()" class="flex items-center gap-2 h-10 px-4 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)]"><i data-lucide="arrow-left" class="w-4 h-4"></i> Todos os modelos</button>
+    </div>
+    ${um?`<div class="rounded-xl p-3 mb-4 text-sm flex items-center gap-2" style="background:rgba(245,183,0,.12);color:#B5860B"><i data-lucide="alert-triangle" class="w-4 h-4 shrink-0"></i><b>${um} campo${um>1?'s':''} sem posição</b> — use "Posicionar" na lista ao lado e arraste para o lugar certo.</div>`:''}
+    <div class="grid lg:grid-cols-5 gap-4 items-start">
+      <div class="lg:col-span-3 surface rounded-2xl p-4">
+        <div class="flex items-center gap-1.5 bg-[var(--hover)] rounded-xl p-1 w-max mb-3">${pageTabs}</div>
+        <div id="tplPageBox" class="relative bg-white text-slate-700 rounded-lg shadow-md p-6 text-[10px] leading-relaxed select-none" style="aspect-ratio:210/260;overflow:hidden">
+          ${TPL_PAGE_TEXT[tplPage]||''}
+          ${chips}
+        </div>
+        <p class="text-[11px] text-[var(--muted)] mt-2 flex items-center gap-1.5"><i data-lucide="move" class="w-3.5 h-3.5"></i> Posições em % da página — no produto final viram as coordenadas do PDF (pdf-lib).</p>
+      </div>
+      <div class="lg:col-span-2 surface rounded-2xl p-4">
+        <h3 class="font-heading font-semibold mb-3 flex items-center gap-2"><i data-lucide="list-checks" class="w-[18px] h-[18px] text-brand-light"></i>Campos da matrícula</h3>
+        <div class="space-y-2">${fieldRows}</div>
+      </div>
+    </div>`;
+}
+function tplPlaceField(k){
+  const t=tplById(tplOpen); if(!t) return;
+  const f=t.fields.find(x=>x.k===k); if(!f) return;
+  f.mapped=true; f.x=50; f.y=50; tplPage=f.page; tplFocus=k;
+  renderModelos();
+  toast(`"${f.label}" posicionado no centro da página ${f.page} — arraste para o lugar certo.`);
+}
+let tplDrag=null;
+function chipDown(e,fk){
+  const t=tplById(tplOpen); if(!t) return;
+  e.preventDefault();
+  const chip=document.getElementById('chip-'+fk), box=document.getElementById('tplPageBox');
+  if(!chip||!box) return;
+  tplDrag={fk,chip,box,t,moved:false};
+  document.addEventListener('pointermove',chipMove);
+  document.addEventListener('pointerup',chipUp);
+}
+function chipMove(e){
+  if(!tplDrag) return;
+  const r=tplDrag.box.getBoundingClientRect();
+  const x=Math.min(97,Math.max(3,(e.clientX-r.left)/r.width*100));
+  const y=Math.min(97,Math.max(3,(e.clientY-r.top)/r.height*100));
+  tplDrag.chip.style.left=x+'%'; tplDrag.chip.style.top=y+'%';
+  tplDrag.x=x; tplDrag.y=y; tplDrag.moved=true;
+}
+function chipUp(){
+  if(tplDrag&&tplDrag.moved){
+    const f=tplDrag.t.fields.find(f=>f.k===tplDrag.fk);
+    if(f){ f.x=tplDrag.x; f.y=tplDrag.y; }
+    tplFocus=tplDrag.fk; renderModelos();
+    toast('Posição do campo atualizada!');
+  }
+  document.removeEventListener('pointermove',chipMove);
+  document.removeEventListener('pointerup',chipUp);
+  tplDrag=null;
+}
+
 /* ====================== TEMAS DA SIDEBAR (6 combinações) ====================== */
 const LOGOS={ colored:'assets/logo-index.webp', blue:'assets/logo-sidebar-azul.svg', yellow:'assets/logo-sidebar-amarela.svg' };
 let sbTheme=localStorage.getItem('ep-sb-theme')||'blue';
@@ -2542,12 +3064,14 @@ function openRowMenu(e,id){
       + `<div class="h-px my-1" style="background:var(--border)"></div>`
       + item('check-circle-2','Marcar como assinado',`markSigned(${id})`);
   }
-  // desligar / reativar — só administradores fazem isso, direto pela dashboard
+  // desligar / reativar / excluir — só administradores fazem isso, direto pela dashboard
   const exitAction = `<div class="h-px my-1" style="background:var(--border)"></div>` + (s.active===false
     ? `<button onclick="closeRowMenu();reactivateStudent(${id})" class="w-full flex items-center gap-2.5 text-left text-sm px-3 py-2 rounded-lg hover:bg-[var(--hover)] transition" style="color:#16a34a"><i data-lucide="rotate-ccw" class="w-4 h-4"></i>Reativar aluno</button>`
-    : `<button onclick="closeRowMenu();openExitModal(${id})" class="w-full flex items-center gap-2.5 text-left text-sm px-3 py-2 rounded-lg hover:bg-[var(--hover)] transition" style="color:#DC2626"><i data-lucide="user-round-x" class="w-4 h-4"></i>Desligar aluno</button>`);
+    : `<button onclick="closeRowMenu();openExitModal(${id})" class="w-full flex items-center gap-2.5 text-left text-sm px-3 py-2 rounded-lg hover:bg-[var(--hover)] transition" style="color:#DC2626"><i data-lucide="user-round-x" class="w-4 h-4"></i>Desligar aluno</button>`)
+    + `<button onclick="closeRowMenu();openDeleteModal(${id})" class="w-full flex items-center gap-2.5 text-left text-sm px-3 py-2 rounded-lg hover:bg-[var(--hover)] transition" style="color:#DC2626;opacity:.75"><i data-lucide="trash-2" class="w-4 h-4"></i>Excluir matrícula</button>`;
   m.innerHTML=
     item('user-round','Ver ficha completa',`openDetail(${id})`)+
+    item('pencil','Editar dados',`openEditEnrollment(${id})`)+
     item('file-text','Ver contrato',`openContractModal(${id})`)+
     item('download','Baixar contrato',`toast('Download iniciado (demo)')`)+
     item('copy','Copiar telefone do responsável',`copyPhone(${id})`)+
@@ -2668,7 +3192,7 @@ function elLabel(el){
     || '<'+el.tagName.toLowerCase()+'>';
 }
 function currentView(){ return document.querySelector('[data-view].view-active')?.dataset.view||'overview'; }
-const VIEW_LABEL={overview:'Visão geral',alunos:'Alunos',detalhe:'Detalhe do aluno',contratos:'Contratos',emails:'Comunicados',editor:'Editor do site',usuarios:'Usuários',config:'Configurações',notifs:'Notificações'};
+const VIEW_LABEL={overview:'Visão geral',alunos:'Alunos',detalhe:'Detalhe do aluno',contratos:'Contratos',modelos:'Modelos de contrato',emails:'Comunicados',editor:'Editor do site',usuarios:'Usuários',config:'Configurações',notifs:'Notificações'};
 
 function toggleCommentMode(){
   commentMode=!commentMode;
