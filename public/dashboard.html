@@ -121,13 +121,6 @@
   @keyframes draft-bounce{ 0%,100%{ transform:translate(-50%,-100%);} 50%{ transform:translate(-50%,-135%);} }
   /* tour de boas-vindas */
   @keyframes tour-pulse{ 0%,100%{ box-shadow:0 0 0 4px rgba(245,183,0,.32);} 50%{ box-shadow:0 0 0 11px rgba(245,183,0,.10);} }
-  /* modo personalizar (arrastar cards da visão geral) */
-  #dashGrid.customizing .dash-card{ cursor:grab; outline:2px dashed rgba(47,83,154,.40); outline-offset:4px;
-    border-radius:18px; animation:wiggle .4s ease-in-out infinite alternate; }
-  #dashGrid.customizing .dash-card:active{ cursor:grabbing; }
-  #dashGrid.customizing .dash-card > *{ pointer-events:none; }
-  #dashGrid .dash-card.dragging{ opacity:.35; outline-style:solid; }
-  @keyframes wiggle{ from{ transform:rotate(-.15deg);} to{ transform:rotate(.15deg);} }
   /* tooltip da marca: balão ÚNICO global (via JS) — imune a overflow:hidden dos pais */
   #tipBubble{ position:fixed; z-index:97; background:#15294d; color:#fff; font-size:11px; font-weight:600;
     font-family:'Inter'; padding:6px 10px; border-radius:10px; width:max-content; max-width:230px;
@@ -355,8 +348,6 @@
           </div>
           <div class="flex items-center gap-2">
             <span id="periodSelWrap"></span>
-            <button id="custReset" onclick="resetDash()" class="hidden h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)]">Restaurar padrão</button>
-            <button id="custBtn" onclick="toggleCustomize()" class="flex items-center gap-2 h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)] transition" title="Arraste os cartões e monte a dashboard do seu jeito"><i data-lucide="layout-grid" class="w-4 h-4"></i><span class="hidden sm:inline">Personalizar</span></button>
             <button onclick="exportCSV(false)" class="flex items-center gap-2 h-10 px-4 rounded-xl text-white text-sm font-semibold" style="background:#1E3765" title="Baixa uma planilha com todos os alunos (abre no Excel ou Google Planilhas)">
               <i data-lucide="sheet" class="w-4 h-4"></i><span class="hidden sm:inline">Exportar planilha</span></button>
           </div>
@@ -453,6 +444,11 @@
             </div>
             <p class="text-xs text-[var(--muted)] mt-4 flex items-center gap-1.5"><i data-lucide="lightbulb" class="w-3.5 h-3.5" style="color:#F5B700"></i> Ter/Qui 14h é o horário mais vazio — boa opção para sugerir a quem pedir matrícula.</p>
           </div>
+          <div class="surface rounded-2xl p-5">
+            <h3 class="font-heading font-semibold text-lg mb-1">Próximos aniversariantes 🎂</h3>
+            <p class="text-xs text-[var(--muted)] mb-4">Os 5 próximos da fila</p>
+            <div id="birthdayList" class="space-y-2"></div>
+          </div>
         </div>
 
         <div class="dash-row grid lg:grid-cols-3 gap-4 mt-4">
@@ -482,10 +478,14 @@
             <div class="relative h-64"><canvas id="chartHours"></canvas></div>
             <p class="text-xs text-[var(--muted)] mt-auto pt-3 flex items-center gap-1.5"><i data-lucide="lightbulb" class="w-3.5 h-3.5" style="color:#F5B700"></i> A maioria das famílias matricula à noite — bom horário para impulsionar posts e responder rápido no WhatsApp.</p>
           </div>
-          <div class="surface rounded-2xl p-5">
-            <h3 class="font-heading font-semibold text-lg mb-1">Próximos aniversariantes 🎂</h3>
-            <p class="text-xs text-[var(--muted)] mb-4">Os 5 próximos da fila</p>
-            <div id="birthdayList" class="space-y-2"></div>
+          <div class="surface rounded-2xl p-5 flex flex-col">
+            <h3 class="font-heading font-semibold text-lg mb-1">Distribuição por horário</h3>
+            <p class="text-xs text-[var(--muted)] mb-4">Dias das aulas</p>
+            <div class="relative h-44"><canvas id="chartSchedule"></canvas></div>
+            <div class="mt-auto pt-4 space-y-2 text-sm">
+              <div class="flex items-center justify-between"><span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full" style="background:#2F539A"></span>Seg/Qua</span><span class="font-semibold">71</span></div>
+              <div class="flex items-center justify-between"><span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full" style="background:#F5B700"></span>Ter/Qui</span><span class="font-semibold">57</span></div>
+            </div>
           </div>
         </div>
 
@@ -501,15 +501,6 @@
             <p class="text-xs text-[var(--muted)] mb-4">Quem permite fotos nas redes da escola</p>
             <div class="relative h-44"><canvas id="chartPay"></canvas></div>
             <div id="payLegend" class="mt-auto pt-4 space-y-2"></div>
-          </div>
-          <div class="surface rounded-2xl p-5 flex flex-col">
-            <h3 class="font-heading font-semibold text-lg mb-1">Distribuição por horário</h3>
-            <p class="text-xs text-[var(--muted)] mb-4">Dias das aulas</p>
-            <div class="relative h-44"><canvas id="chartSchedule"></canvas></div>
-            <div class="mt-auto pt-4 space-y-2 text-sm">
-              <div class="flex items-center justify-between"><span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full" style="background:#2F539A"></span>Seg/Qua</span><span class="font-semibold">71</span></div>
-              <div class="flex items-center justify-between"><span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full" style="background:#F5B700"></span>Ter/Qui</span><span class="font-semibold">57</span></div>
-            </div>
           </div>
         </div>
       </section>
@@ -584,15 +575,20 @@
         <!-- contadores clicáveis por status -->
         <div id="cStats" class="flex flex-wrap gap-2 mb-4"></div>
 
-        <!-- busca + filtro -->
-        <div class="surface rounded-2xl p-3 mb-4 flex flex-wrap items-center gap-2">
-          <div class="flex items-center gap-2 rounded-xl px-3 h-10 flex-1 min-w-[200px]" style="background:var(--hover)">
-            <i data-lucide="search" class="w-4 h-4 text-[var(--muted)]"></i>
-            <input id="contractSearch" oninput="renderContracts()" placeholder="Buscar por aluno ou responsável…" class="flex-1 bg-transparent outline-none text-sm">
+        <!-- busca + filtros (mesma estrutura da tela de Alunos) -->
+        <div class="surface rounded-2xl p-3 mb-4 space-y-2.5">
+          <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 rounded-xl px-3 h-10 flex-1 min-w-0" style="background:var(--hover)">
+              <i data-lucide="search" class="w-4 h-4 text-[var(--muted)]"></i>
+              <input id="contractSearch" oninput="renderContracts()" placeholder="Buscar por aluno ou responsável…" class="flex-1 bg-transparent outline-none text-sm">
+            </div>
+            <button id="cClear" onclick="clearContractFilters()" class="hidden h-10 px-3 rounded-xl text-sm font-semibold transition items-center gap-1.5 shrink-0" style="background:rgba(245,183,0,.14);color:#B5860B"><i data-lucide="filter-x" class="w-4 h-4"></i>Limpar <span id="cClearN"></span></button>
           </div>
-          <span id="cStatusWrap"></span>
-          <span id="cActiveWrap"></span>
-          <button onclick="clearContractFilters()" class="h-10 px-3 rounded-xl text-sm font-medium text-[var(--muted)] hover:bg-[var(--hover)] transition flex items-center gap-1.5"><i data-lucide="filter-x" class="w-4 h-4"></i>Limpar</button>
+          <div class="flex flex-wrap items-center gap-2 pt-2.5 border-t" style="border-color:var(--border)">
+            <span class="hidden md:flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-[var(--muted)] mr-1"><i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>Filtros</span>
+            <span id="cStatusWrap"></span>
+            <span id="cActiveWrap"></span>
+          </div>
         </div>
 
         <div id="contractGrid"></div>
@@ -1044,7 +1040,6 @@ function markAllRead(){ NOTIFS.forEach(n=>n.unread=false); renderNotifs(); }
 const TOURS={
   overview:[
     { target:null, title:'Boas-vindas ao preview da dashboard!', body:'Explore à vontade — os dados são fictícios e nada aqui quebra. Cada tela tem o seu próprio mini-tour com o que não é óbvio.', placement:'center', logo:true },
-    { target:'#custBtn', title:'Monte a dashboard do seu jeito', body:'O Personalizar deixa você arrastar os cartões e mudar a ordem de tudo — eles se encaixam sozinhos, sem deixar buraco. A ordem fica salva pra você.', placement:'bottom' },
     { target:'[data-tour="health"]', title:'Cobrança sem dor de cabeça', body:'O "Andamento dos contratos" mostra quem ainda não assinou — e o botão verde leva direto para a lista já filtrada nos pendentes.', placement:'left' },
     { target:'#cmFab', title:'O botão mais importante', body:'Viu algo que quer mudar? Clique em "Comentar", depois em qualquer parte da tela, e escreva sua sugestão. Quando for ajustado, o alfinete fica verde com a resposta.', placement:'top', last:true },
   ],
@@ -1360,6 +1355,14 @@ function renderContractStats(){
 }
 function renderContracts(){
   renderContractStats();
+  const cBtn=document.getElementById('cClear');
+  if(cBtn){
+    const q=(document.getElementById('contractSearch')?.value||'').trim();
+    const n=['cStatus','cActive'].filter(id=>SEL[id]?.value).length + (q?1:0);
+    cBtn.classList.toggle('hidden', n===0);
+    cBtn.classList.toggle('flex', n>0);
+    const cnt=document.getElementById('cClearN'); if(cnt) cnt.textContent=n>0?`(${n})`:'';
+  }
   const rows=filteredContracts();
   const el=document.getElementById('contractGrid');
   if(!rows.length){
@@ -1700,7 +1703,6 @@ function toast(msg){
 
 /* ====================== INIT ====================== */
 function init(){
-  buildDashGrid();
   // selects customizados
   document.getElementById('periodSelWrap').innerHTML=cselect('period',[{v:'6m',l:'Últimos 6 meses'},{v:'ano',l:'Últimos 12 meses'},{v:'mes',l:'Este mês'}],{icon:'calendar',onChange:applyPeriod});
   document.getElementById('fScheduleWrap').innerHTML=cselect('fSchedule',[{v:'',l:'Todos os horários'},{v:'seg-qua',l:'Seg/Qua'},{v:'ter-qui',l:'Ter/Qui'}],{onChange:renderTable});
@@ -1962,68 +1964,6 @@ function openAccountModal(){
     <button onclick="closeModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] font-medium text-sm">Cancelar</button>
     <button onclick="closeModal();toast('Dados da conta atualizados!')" class="flex-1 h-11 rounded-xl text-white font-semibold text-sm" style="background:#1E3765">Salvar alterações</button>
   </div>`);
-}
-
-/* ====================== PERSONALIZAR (arrastar cards da visão geral) ====================== */
-let customizing=false, dragEl=null, dashDefault=[];
-function buildDashGrid(){
-  const sec=document.querySelector('[data-view="overview"]');
-  if(!sec || document.getElementById('dashGrid')) return;
-  const grid=document.createElement('div');
-  grid.id='dashGrid';
-  grid.className='grid grid-cols-1 lg:grid-cols-3 gap-4 mt-6';
-  grid.style.gridAutoFlow='dense';                       // compacta: nunca fica buraco no meio
-  [...sec.children].slice(1).forEach(b=>{                // pula o cabeçalho (título + botões)
-    if(b.classList.contains('dash-row')){ [...b.children].forEach(c=>grid.appendChild(c)); b.remove(); }
-    else grid.appendChild(b);
-  });
-  sec.appendChild(grid);
-  [...grid.children].forEach((c,i)=>{ c.classList.add('dash-card'); if(!c.dataset.w) c.dataset.w='w'+i; });
-  dashDefault=[...grid.children].map(c=>c.dataset.w);
-  try{                                                    // aplica ordem salva
-    const saved=JSON.parse(localStorage.getItem('ep-dash-order-v2')||'null');
-    if(Array.isArray(saved)) saved.forEach(w=>{ const el=grid.querySelector(`[data-w="${w}"]`); if(el) grid.appendChild(el); });
-  }catch(_){}
-  grid.addEventListener('dragstart',e=>{
-    const c=e.target.closest('.dash-card'); if(!c||!customizing) return;
-    dragEl=c; e.dataTransfer.effectAllowed='move';
-    setTimeout(()=>c.classList.add('dragging'),0);
-  });
-  grid.addEventListener('dragend',()=>{ if(dragEl){ dragEl.classList.remove('dragging'); dragEl=null; } });
-  grid.addEventListener('dragover',e=>{
-    if(!dragEl) return;
-    e.preventDefault(); e.dataTransfer.dropEffect='move';
-    const over=e.target.closest('.dash-card');
-    if(!over||over===dragEl) return;
-    const kids=[...grid.children];
-    grid.insertBefore(dragEl, kids.indexOf(dragEl)<kids.indexOf(over) ? over.nextSibling : over);
-  });
-  grid.addEventListener('drop',e=>e.preventDefault());
-}
-function toggleCustomize(){
-  customizing=!customizing;
-  const grid=document.getElementById('dashGrid'); if(!grid) return;
-  grid.classList.toggle('customizing',customizing);
-  [...grid.children].forEach(c=>{ c.draggable=customizing; });
-  document.getElementById('custReset').classList.toggle('hidden',!customizing);
-  const btn=document.getElementById('custBtn');
-  btn.innerHTML=customizing
-    ? '<i data-lucide="check" class="w-4 h-4"></i><span class="hidden sm:inline">Concluir</span>'
-    : '<i data-lucide="layout-grid" class="w-4 h-4"></i><span class="hidden sm:inline">Personalizar</span>';
-  btn.style.background=customizing?'#1E3765':''; btn.style.color=customizing?'#fff':''; btn.style.borderColor=customizing?'transparent':'';
-  lucide.createIcons();
-  if(customizing) toast('Arraste os cartões — eles se encaixam sozinhos, sem deixar buraco.');
-  else {
-    localStorage.setItem('ep-dash-order-v2', JSON.stringify([...grid.children].map(c=>c.dataset.w)));
-    toast('Layout salvo!');
-    refreshCharts();
-  }
-}
-function resetDash(){
-  const grid=document.getElementById('dashGrid'); if(!grid) return;
-  dashDefault.forEach(w=>{ const el=grid.querySelector(`[data-w="${w}"]`); if(el) grid.appendChild(el); });
-  localStorage.removeItem('ep-dash-order-v2');
-  toast('Layout padrão restaurado.');
 }
 
 /* ====================== MÁSCARAS DE INPUT ====================== */
@@ -2296,7 +2236,6 @@ document.addEventListener('keydown',e=>{
     document.getElementById('notifPanel')?.classList.add('hidden');
     if(commentMode) toggleCommentMode();
     if(tourActive) endTour(false);
-    if(customizing) toggleCustomize();
   }
 });
 document.addEventListener('click',e=>{
