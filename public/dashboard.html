@@ -38,7 +38,11 @@
   :root{
     --bg:#F8F9FA; --card:#FFFFFF; --text:#16233f; --muted:#64748B;
     --border:#E7ECF3; --hover:#F3F6FB; --ring:#2F539A;
+    /* acento global que acompanha o tema da sidebar (badges, notificações, destaques) */
+    --acc:#F5B700; --acc-text:#15294d;
   }
+  html[data-sidebar="yellow"]{ --acc:#1E3765; --acc-text:#ffffff; }
+  html.dark[data-sidebar="yellow"]{ --acc:#F5B700; --acc-text:#15294d; }
   html.dark{
     --bg:#0B1220; --card:#101b30; --text:#E8EEF7; --muted:#93a2bd;
     --border:#1d2c47; --hover:#16223a; --ring:#F5B700;
@@ -320,7 +324,7 @@
         <div class="relative" data-tour="bell">
           <button onclick="toggleNotif(event)" class="relative p-2.5 rounded-xl hover:bg-[var(--hover)]" title="Notificações">
             <i data-lucide="bell" class="w-[18px] h-[18px]"></i>
-            <span id="bellBadge" class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-accent text-[#15294d] text-[10px] font-bold grid place-content-center">4</span>
+            <span id="bellBadge" class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold grid place-content-center" style="background:var(--acc);color:var(--acc-text)">4</span>
           </button>
           <div id="notifPanel" class="hidden absolute right-0 top-[calc(100%+8px)] w-[340px] max-w-[88vw] surface rounded-2xl shadow-2xl z-50 overflow-hidden fade-in">
             <div class="flex items-center justify-between px-4 py-3 border-b" style="border-color:var(--border)">
@@ -595,30 +599,76 @@
       <section data-view="emails" class="fade-in">
         <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
           <div><h1 class="font-heading text-2xl sm:text-3xl font-semibold">E-mails</h1>
-            <p class="text-[var(--muted)] text-sm mt-0.5">Disparos gerais para responsáveis + e-mails automáticos</p></div>
+            <p class="text-[var(--muted)] text-sm mt-0.5">Mande um aviso para todas as famílias de uma vez — sem copiar e colar um por um</p></div>
         </div>
-        <div class="grid lg:grid-cols-5 gap-4">
-          <!-- composer -->
-          <div class="surface rounded-2xl p-5 lg:col-span-3">
-            <h3 class="font-heading font-semibold text-lg mb-4 flex items-center gap-2"><i data-lucide="send" class="w-5 h-5 text-brand-light"></i> Novo disparo</h3>
-            <div class="mb-3"><span class="text-sm font-medium">Para</span>
-              <div class="mt-1.5" id="emailToWrap"></div></div>
-            <label class="block mb-3"><span class="text-sm font-medium">Assunto</span>
-              <input id="emailSubject" value="Recesso de julho — calendário atualizado 📅" class="mt-1.5 w-full h-11 rounded-xl border border-[var(--border)] bg-[var(--card)] px-3 text-sm outline-none focus:ring-2 ring-brand-light"></label>
-            <label class="block"><span class="text-sm font-medium">Mensagem</span>
-              <textarea id="emailBody" rows="6" class="mt-1.5 w-full rounded-xl border border-[var(--border)] bg-[var(--card)] p-3 text-sm outline-none focus:ring-2 ring-brand-light resize-none">Olá, {{nome_responsavel}}! Passando para avisar sobre o calendário de julho...</textarea></label>
-            <div class="flex items-center justify-between mt-4">
-              <span class="text-xs text-[var(--muted)] flex items-center gap-1.5"><i data-lucide="info" class="w-3.5 h-3.5"></i> Use {{nome_responsavel}} e {{nome_aluno}} para personalizar.</span>
-              <div class="flex gap-2">
-                <button onclick="openEmailPreview()" class="h-10 px-4 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)]">Pré-visualizar</button>
-                <button onclick="toast('Disparo agendado para 96 responsáveis!')" class="h-10 px-4 rounded-xl text-white text-sm font-semibold flex items-center gap-2" style="background:linear-gradient(135deg,#1E3765,#2F539A)"><i data-lucide="send" class="w-4 h-4"></i> Enviar</button>
+        <div class="grid lg:grid-cols-5 gap-4 items-start">
+
+          <!-- escrever aviso -->
+          <div class="surface rounded-2xl overflow-hidden lg:col-span-3">
+            <div class="flex items-center gap-3 px-5 py-4 border-b" style="border-color:var(--border)">
+              <div class="w-10 h-10 rounded-xl grid place-content-center" style="background:rgba(47,83,154,.10)"><i data-lucide="send" class="w-5 h-5 text-brand-light"></i></div>
+              <div><h3 class="font-heading font-semibold">Escrever aviso</h3><p class="text-xs text-[var(--muted)]">Cada responsável recebe no próprio e-mail, com o próprio nome</p></div>
+            </div>
+            <div class="p-5">
+              <div class="mb-3"><span class="text-sm font-medium">Para quem vai</span>
+                <div class="mt-1.5" id="emailToWrap"></div></div>
+              <label class="block mb-3"><span class="text-sm font-medium">Assunto</span>
+                <input id="emailSubject" value="Recesso de julho — calendário atualizado 📅" class="mt-1.5 w-full h-11 rounded-xl border border-[var(--border)] bg-[var(--card)] px-3 text-sm outline-none focus:ring-2 ring-brand-light"></label>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-sm font-medium">Mensagem</span>
+                <div class="flex gap-1.5">
+                  <button onclick="insertVar('{{nome_responsavel}}')" class="text-[11px] font-semibold px-2 py-1 rounded-lg transition hover:brightness-95" style="background:rgba(245,183,0,.16);color:#B5860B" title="Insere o nome do responsável onde o cursor estiver">+ nome do responsável</button>
+                  <button onclick="insertVar('{{nome_aluno}}')" class="text-[11px] font-semibold px-2 py-1 rounded-lg transition hover:brightness-95" style="background:rgba(47,83,154,.12);color:#2F539A" title="Insere o nome do aluno onde o cursor estiver">+ nome do aluno</button>
+                </div>
+              </div>
+              <textarea id="emailBody" rows="7" class="w-full rounded-xl border border-[var(--border)] bg-[var(--card)] p-3 text-sm outline-none focus:ring-2 ring-brand-light resize-none">Olá, {{nome_responsavel}}! Passando para avisar sobre o calendário de julho...</textarea>
+              <div class="flex items-center justify-end gap-2 mt-4">
+                <button onclick="openEmailPreview()" class="h-10 px-4 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)] flex items-center gap-2"><i data-lucide="eye" class="w-4 h-4"></i> Ver como chega</button>
+                <button onclick="toast('Aviso enviado para 96 responsáveis!')" class="h-10 px-4 rounded-xl text-white text-sm font-semibold flex items-center gap-2" style="background:linear-gradient(135deg,#1E3765,#2F539A)"><i data-lucide="send" class="w-4 h-4"></i> Enviar</button>
               </div>
             </div>
           </div>
-          <!-- histórico -->
-          <div class="surface rounded-2xl p-5 lg:col-span-2">
-            <h3 class="font-heading font-semibold text-lg mb-4">Últimos envios</h3>
-            <div class="space-y-3" id="emailHistory"></div>
+
+          <div class="lg:col-span-2 space-y-4">
+            <!-- modelos prontos -->
+            <div class="surface rounded-2xl overflow-hidden">
+              <div class="flex items-center gap-3 px-5 py-4 border-b" style="border-color:var(--border)">
+                <div class="w-10 h-10 rounded-xl grid place-content-center" style="background:rgba(245,183,0,.14)"><i data-lucide="sparkles" class="w-5 h-5" style="color:#B5860B"></i></div>
+                <div><h3 class="font-heading font-semibold">Modelos prontos</h3><p class="text-xs text-[var(--muted)]">Um clique e o aviso já vem escrito</p></div>
+              </div>
+              <div class="p-3 space-y-1">
+                <button onclick="applyEmailTpl('recesso')" class="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-[var(--hover)] transition text-left">
+                  <i data-lucide="sun" class="w-4 h-4 shrink-0" style="color:#F5B700"></i>
+                  <span class="min-w-0"><span class="block text-sm font-medium">Recesso / Vacation Classes</span><span class="block text-xs text-[var(--muted)] truncate">Aviso sobre julho e as vivências</span></span></button>
+                <button onclick="applyEmailTpl('contrato')" class="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-[var(--hover)] transition text-left">
+                  <i data-lucide="file-clock" class="w-4 h-4 shrink-0" style="color:#B5860B"></i>
+                  <span class="min-w-0"><span class="block text-sm font-medium">Lembrete de contrato</span><span class="block text-xs text-[var(--muted)] truncate">Para quem ainda não assinou</span></span></button>
+                <button onclick="applyEmailTpl('aviso')" class="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-[var(--hover)] transition text-left">
+                  <i data-lucide="megaphone" class="w-4 h-4 shrink-0 text-brand-light"></i>
+                  <span class="min-w-0"><span class="block text-sm font-medium">Comunicado geral</span><span class="block text-xs text-[var(--muted)] truncate">Estrutura pronta, é só preencher</span></span></button>
+              </div>
+            </div>
+
+            <!-- últimos envios -->
+            <div class="surface rounded-2xl overflow-hidden">
+              <div class="flex items-center gap-3 px-5 py-4 border-b" style="border-color:var(--border)">
+                <div class="w-10 h-10 rounded-xl grid place-content-center" style="background:rgba(22,163,74,.10)"><i data-lucide="mail-check" class="w-5 h-5 text-emerald-500"></i></div>
+                <div><h3 class="font-heading font-semibold">Últimos envios</h3><p class="text-xs text-[var(--muted)]">O que já foi mandado</p></div>
+              </div>
+              <div class="p-3 space-y-2" id="emailHistory"></div>
+            </div>
+
+            <!-- automáticos -->
+            <div class="surface rounded-2xl overflow-hidden">
+              <div class="flex items-center gap-3 px-5 py-4 border-b" style="border-color:var(--border)">
+                <div class="w-10 h-10 rounded-xl grid place-content-center" style="background:rgba(124,58,237,.10)"><i data-lucide="zap" class="w-5 h-5" style="color:#7C3AED"></i></div>
+                <div><h3 class="font-heading font-semibold">Automáticos</h3><p class="text-xs text-[var(--muted)]">O sistema manda sozinho, sem você fazer nada</p></div>
+              </div>
+              <div class="p-5 space-y-3 text-sm">
+                <div class="flex items-center justify-between"><span>Confirmação de matrícula recebida</span><span class="text-xs font-semibold px-2.5 py-1 rounded-full" style="background:rgba(22,163,74,.10);color:#16a34a">Ativo</span></div>
+                <div class="flex items-center justify-between pt-3 border-t" style="border-color:var(--border)"><span>Recuperação de senha do painel</span><span class="text-xs font-semibold px-2.5 py-1 rounded-full" style="background:rgba(22,163,74,.10);color:#16a34a">Ativo</span></div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -1007,7 +1057,7 @@ function renderNotifs(){
         <p class="text-xs text-[var(--muted)] truncate">${n.desc}</p>
         <p class="text-[11px] text-[var(--muted)] mt-0.5">${n.time}</p>
       </div>
-      ${n.unread?'<span class="w-2 h-2 rounded-full bg-accent shrink-0 mt-2"></span>':''}
+      ${n.unread?'<span class="w-2 h-2 rounded-full shrink-0 mt-2" style="background:var(--acc)"></span>':''}
     </div>`;
   }).join('');
   const full=document.getElementById('notifFullList');
@@ -1017,7 +1067,7 @@ function renderNotifs(){
       return `<div onclick="notifClick(${i})" class="flex items-start gap-4 px-5 py-4 cursor-pointer hover:bg-[var(--hover)] transition border-b last:border-0" style="border-color:var(--border)">
         <div class="w-11 h-11 rounded-xl grid place-content-center shrink-0" style="background:${bg};color:${c}"><i data-lucide="${ic}" class="w-5 h-5"></i></div>
         <div class="min-w-0 flex-1"><p class="font-medium">${n.title}</p><p class="text-sm text-[var(--muted)]">${n.desc}</p><p class="text-xs text-[var(--muted)] mt-0.5">${n.time}</p></div>
-        ${n.unread?'<span class="w-2.5 h-2.5 rounded-full bg-accent shrink-0 mt-2"></span>':''}
+        ${n.unread?'<span class="w-2.5 h-2.5 rounded-full shrink-0 mt-2" style="background:var(--acc)"></span>':''}
       </div>`;
     }).join('');
   }
@@ -1135,7 +1185,7 @@ function tourRender(){
     <p class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider">${s.target?`Dica ${tourI+1} de ${tourSteps.length} · ${VIEW_LABEL[currentView()]||''}`:(s.last?'Fim do tour':'Tour rápido')}</p>
     <h3 class="font-heading text-lg font-semibold mt-1">${s.title}</h3>
     <p class="text-sm text-[var(--muted)] mt-1.5 leading-relaxed">${s.body}</p>
-    <div class="flex items-center gap-1.5 mt-3.5">${tourSteps.map((_,i)=>`<span class="h-1 rounded-full transition-all ${i===tourI?'w-5':'w-1.5'}" style="background:${i===tourI?'#F5B700':'var(--border)'}"></span>`).join('')}</div>
+    <div class="flex items-center gap-1.5 mt-3.5">${tourSteps.map((_,i)=>`<span class="h-1 rounded-full transition-all ${i===tourI?'w-5':'w-1.5'}" style="background:${i===tourI?'var(--acc)':'var(--border)'}"></span>`).join('')}</div>
     <div class="flex items-center justify-between gap-2 mt-4">
       ${s.last?'<span></span>':`<button onclick="endTour(false)" class="h-9 px-3 rounded-lg border border-[var(--border)] bg-[var(--card)] text-sm font-medium text-[var(--muted)] hover:bg-[var(--hover)] transition">Pular tour</button>`}
       <div class="flex gap-2">
@@ -1815,6 +1865,25 @@ function submitInvite(){
   if(!e){ document.getElementById('invEmail').focus(); return; }
   USERS.push({n, e, r:SEL.invRole?.value==='secretaria'?'Secretaria':'Administrador', c:'#0891b2', pending:true});
   renderUsers(); closeModal(); toast(`Convite enviado para ${e}!`);
+}
+
+/* --- modelos prontos + variáveis clicáveis --- */
+const EMAIL_TPLS={
+  recesso:{ s:'Recesso de julho — Vacation Classes 📅', b:'Olá, {{nome_responsavel}}!\n\nPassando para lembrar que em julho acontecem as Vacation Classes: as mensalidades do mês são convertidas integralmente em vivências divertidas e imersivas.\n\nEm breve mandamos a programação completa. Qualquer dúvida, é só responder este e-mail!\n\nAbraços,\nEquipe English Patio' },
+  contrato:{ s:'Falta pouco: contrato de {{nome_aluno}}', b:'Olá, {{nome_responsavel}}!\n\nNotamos que o contrato de {{nome_aluno}} ainda está aguardando assinatura. É rapidinho — qualquer dificuldade, respondemos por aqui ou pelo WhatsApp da escola.\n\nAbraços,\nEquipe English Patio' },
+  aviso:{ s:'Comunicado — English Patio', b:'Olá, {{nome_responsavel}}!\n\n[Escreva aqui o seu recado]\n\nAbraços,\nEquipe English Patio' },
+};
+function applyEmailTpl(k){
+  const t=EMAIL_TPLS[k]; if(!t) return;
+  document.getElementById('emailSubject').value=t.s;
+  document.getElementById('emailBody').value=t.b;
+  toast('Modelo aplicado — ajuste o texto e envie.');
+}
+function insertVar(token){
+  const ta=document.getElementById('emailBody'); if(!ta) return;
+  const pos=ta.selectionStart ?? ta.value.length;
+  ta.value=ta.value.slice(0,pos)+token+ta.value.slice(pos);
+  ta.focus(); ta.selectionStart=ta.selectionEnd=pos+token.length;
 }
 
 /* --- pré-visualizar e-mail --- */
