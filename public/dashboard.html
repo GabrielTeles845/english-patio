@@ -962,8 +962,8 @@ const STUDENTS = [
   { id:6, kids:[{n:'Alice Barbosa Nunes', age:11, b:'27/06/2015'}], resp:{n:'Renata Nunes', cpf:'509.334.118-60', phone:'(62) 98876-4400', email:'renata.nunes@yahoo.com', rel:'Mãe', b:'05/09/1983'}, second:{n:'Carlos Barbosa', phone:'(62) 99443-1102', rel:'Pai'}, fin:'Renata Nunes', addr:{cep:'74125-160', street:'Av. Mutirão', num:'2540', comp:'Apto 1503', bairro:'Setor Marista', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'16h30–18h00', pay:'PIX', status:'signed', media:true, date:'27/05/2026', hora:'18h39' },
   { id:7, kids:[{n:'Davi Cardoso Melo', age:13, b:'11/06/2013'}], resp:{n:'Aline Melo', cpf:'620.778.245-31', phone:'(62) 99320-8845', email:'aline.melo@gmail.com', rel:'Mãe', b:'19/11/1981'}, second:null, fin:'Aline Melo', addr:{cep:'74305-040', street:'Rua 1136', num:'95', comp:'', bairro:'Setor Pedro Ludovico', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'18h00–19h30', pay:'Boleto', status:'pending', media:false, date:'26/05/2026', hora:'20h51' },
   { id:8, kids:[{n:'Manuela Teixeira Gomes', age:7, b:'08/07/2018'},{n:'Pedro Teixeira Gomes', age:9, b:'16/05/2016'}], resp:{n:'Vanessa Teixeira', cpf:'731.005.667-88', phone:'(62) 98990-3321', email:'va.teixeira@hotmail.com', rel:'Mãe', b:'03/06/1988'}, second:{n:'Marcos Gomes', phone:'(62) 99558-7700', rel:'Pai'}, fin:'Marcos Gomes', addr:{cep:'74884-120', street:'Av. Rio Verde', num:'1180', comp:'Cond. Jardins', bairro:'Jardim Atlântico', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'15h00–16h30', pay:'Cartão', status:'sent', media:true, date:'25/05/2026', hora:'16h08' },
-  { id:9, kids:[{n:'Isabela Ribeiro Dias', age:14, b:'02/02/2012'}], resp:{n:'Cristina Dias', cpf:'845.119.302-15', phone:'(62) 99701-2266', email:'cristina.dias@gmail.com', rel:'Mãe', b:'21/08/1979'}, second:null, fin:'Cristina Dias', addr:{cep:'74215-908', street:'Av. 136', num:'960', comp:'Sala 408', bairro:'Setor Sul', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'18h00–19h30', pay:'PIX', status:'signed', media:false, active:false, date:'24/05/2026', hora:'19h15' },
-  { id:10, kids:[{n:'Arthur Moraes Pinto', age:8, b:'29/10/2017'}], resp:{n:'Letícia Moraes', cpf:'956.443.870-02', phone:'(62) 98112-9943', email:'leticia.moraes@outlook.com', rel:'Mãe', b:'14/04/1991'}, second:{n:'Felipe Pinto', phone:'(62) 99887-6610', rel:'Pai'}, fin:'Felipe Pinto', addr:{cep:'74070-060', street:'Rua 22', num:'310', comp:'', bairro:'Setor Aeroporto', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'17h00–18h30', pay:'Boleto', status:'pending', media:true, active:false, date:'23/05/2026', hora:'11h26' },
+  { id:9, kids:[{n:'Isabela Ribeiro Dias', age:14, b:'02/02/2012'}], resp:{n:'Cristina Dias', cpf:'845.119.302-15', phone:'(62) 99701-2266', email:'cristina.dias@gmail.com', rel:'Mãe', b:'21/08/1979'}, second:null, fin:'Cristina Dias', addr:{cep:'74215-908', street:'Av. 136', num:'960', comp:'Sala 408', bairro:'Setor Sul', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'18h00–19h30', pay:'PIX', status:'signed', media:false, active:false, exit:{ k:'moved', label:'Mudança de cidade ou bairro', note:'Família se mudou para Anápolis.', date:'28/05/2026' }, date:'24/05/2026', hora:'19h15' },
+  { id:10, kids:[{n:'Arthur Moraes Pinto', age:8, b:'29/10/2017'}], resp:{n:'Letícia Moraes', cpf:'956.443.870-02', phone:'(62) 98112-9943', email:'leticia.moraes@outlook.com', rel:'Mãe', b:'14/04/1991'}, second:{n:'Felipe Pinto', phone:'(62) 99887-6610', rel:'Pai'}, fin:'Felipe Pinto', addr:{cep:'74070-060', street:'Rua 22', num:'310', comp:'', bairro:'Setor Aeroporto', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'17h00–18h30', pay:'Boleto', status:'pending', media:true, active:false, exit:{ k:'financial', label:'Questões financeiras', note:'', date:'30/05/2026' }, date:'23/05/2026', hora:'11h26' },
   { id:11, kids:[{n:'Laura Cavalcante Reis', age:10, b:'12/12/2015'}], resp:{n:'Daniela Reis', cpf:'063.778.221-49', phone:'(62) 99334-1180', email:'dani.reis@gmail.com', rel:'Mãe', b:'30/01/1987'}, second:null, fin:'Daniela Reis', addr:{cep:'74343-230', street:'Rua RF-12', num:'140', comp:'Qd 8', bairro:'Residencial Forte', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'15h00–16h30', pay:'PIX', status:'signed', media:true, date:'22/05/2026', hora:'20h33' },
   { id:12, kids:[{n:'Gabriel Fonseca Lopes', age:11, b:'07/08/2014'}], resp:{n:'Simone Fonseca', cpf:'174.882.605-77', phone:'(62) 98445-2290', email:'simone.fonseca@yahoo.com', rel:'Mãe', b:'08/10/1982'}, second:{n:'Thiago Lopes', phone:'(62) 99221-5544', rel:'Pai'}, fin:'Thiago Lopes', addr:{cep:'74150-020', street:'Av. T-63', num:'880', comp:'Apto 701', bairro:'Setor Bueno', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'16h30–18h00', pay:'Cartão', status:'sent', media:true, date:'21/05/2026', hora:'17h44' },
   { id:13, kids:[{n:'Valentina Almeida Prado', age:9, b:'15/04/2017'},{n:'Henrique Almeida Prado', age:11, b:'20/09/2014'},{n:'Cecília Almeida Prado', age:6, b:'02/01/2020'}], resp:{n:'Roberta Almeida Prado', cpf:'288.443.190-66', phone:'(62) 99845-7733', email:'roberta.prado@gmail.com', rel:'Mãe', b:'11/07/1985'}, second:{n:'Eduardo Prado', phone:'(62) 99102-8844', rel:'Pai'}, fin:'Eduardo Prado', addr:{cep:'74110-100', street:'Rua 9', num:'520', comp:'Casa 1', bairro:'Setor Oeste', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'16h30–18h00', pay:'PIX', status:'signed', media:true, date:'20/05/2026', hora:'19h58' },
@@ -1120,7 +1120,7 @@ const TOURS={
     { target:'#cmFab', title:'O botão mais importante', body:'Viu algo que quer mudar? Clique em "Comentar", depois em qualquer parte da tela, e escreva sua sugestão. Quando for ajustado, o alfinete fica verde com a resposta.', placement:'top', last:true },
   ],
   alunos:[
-    { target:'[data-tour="row-menu"]', title:'Tudo mora nos três pontinhos', body:'Cada linha tem um menu completo: ficha do aluno, ver e baixar contrato, enviar no WhatsApp, copiar telefone e marcar como enviado/assinado.', placement:'left' },
+    { target:'[data-tour="row-menu"]', title:'Tudo mora nos três pontinhos', body:'Cada linha tem um menu completo: ficha do aluno, ver e baixar contrato, enviar no WhatsApp, copiar telefone, marcar como enviado/assinado e até desligar o aluno da escola (com registro do motivo).', placement:'left' },
     { target:'#tableHead', title:'Ordene por qualquer coluna', body:'Clique no título de uma coluna para ordenar (vem por nome). Clique de novo para inverter. Ordenando por Responsável, os irmãos de matrículas separadas ficam juntos.', placement:'bottom' },
     { target:'[data-tour="filtros"]', title:'Busca e filtros', body:'Por horário, contrato, situação, bairro, idade, autorização de imagem e irmãos — o "Limpar" zera tudo de uma vez.', placement:'bottom' },
     { target:'[data-tip="Autorizou uso de imagem"]', title:'Câmera verde, câmera vermelha', body:'A camerazinha ao lado do nome mostra se a família autorizou fotos: verde = pode postar, vermelha = não pode.', placement:'right' },
@@ -1289,7 +1289,8 @@ function rowHTML(s){
   const avatar=`<div class="w-10 h-10 rounded-xl grid place-content-center text-white font-semibold text-sm shrink-0" style="background:linear-gradient(135deg,${palette[s.id%palette.length]},#2F539A);${inactive?'filter:grayscale(.7)':''}">${initials(s.kids[0].n)}</div>`;
   const schChip=`<span class="text-xs font-medium px-2.5 py-1 rounded-lg whitespace-nowrap" style="color:${schColor};background:${schBg}">${schLabel(s.sch)}</span>`;
   const stPill=`<span class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap" style="color:${st.c};background:${st.bg}"><span class="w-1.5 h-1.5 rounded-full" style="background:${st.c}"></span>${st.t}</span>`;
-  const actPill=`<span class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap" style="${inactive?'color:#64748B;background:rgba(100,116,139,.14)':'color:#16a34a;background:rgba(22,163,74,.10)'}"><span class="w-1.5 h-1.5 rounded-full" style="background:${inactive?'#94a3b8':'#16a34a'}"></span>${inactive?'Inativa':'Ativa'}</span>`;
+  const exitTip = inactive&&s.exit ? ` title="Desligado em ${s.exit.date} — ${s.exit.label}"` : '';
+  const actPill=`<span${exitTip} class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap" style="${inactive?'color:#64748B;background:rgba(100,116,139,.14)':'color:#16a34a;background:rgba(22,163,74,.10)'}"><span class="w-1.5 h-1.5 rounded-full" style="background:${inactive?'#94a3b8':'#16a34a'}"></span>${inactive?'Inativa':'Ativa'}</span>`;
   const kebab=(extra='')=>`<button onclick="openRowMenu(event,${s.id})" ${extra} class="w-9 h-9 rounded-lg border border-[var(--border)] grid place-content-center hover:bg-[var(--card)] transition shrink-0" title="Todas as ações"><i data-lucide="more-vertical" class="w-4 h-4 text-[var(--muted)]"></i></button>`;
   return `<div onclick="openDetail(${s.id})" class="cursor-pointer transition md:border-b md:last:border-0 hover:bg-[var(--hover)] ${inactive?'opacity-60':''}" style="border-color:var(--border)">
     <!-- desktop: linha da tabela -->
@@ -1417,6 +1418,12 @@ function openDetail(id){
         </div>
       </div>
     </div>
+    ${s.active===false?`<div class="rounded-2xl p-4 mb-4 flex flex-wrap items-center gap-3" style="background:rgba(100,116,139,.10);border:1px solid rgba(100,116,139,.25)">
+      <div class="w-10 h-10 rounded-xl grid place-content-center shrink-0" style="background:rgba(100,116,139,.15)"><i data-lucide="user-round-x" class="w-5 h-5" style="color:#64748B"></i></div>
+      <div class="min-w-0 flex-1"><p class="text-sm font-semibold" style="color:#475569">Aluno desligado da escola${s.exit?' em '+s.exit.date:''}</p>
+        <p class="text-xs text-[var(--muted)]">${s.exit?`Motivo: <b>${s.exit.label}</b>${s.exit.note?' — “'+s.exit.note+'”':''}`:'Matrícula inativa.'}</p></div>
+      <button onclick="reactivateStudent(${s.id});openDetail(${s.id})" class="h-9 px-3.5 rounded-lg text-sm font-semibold border transition hover:bg-[var(--hover)]" style="border-color:rgba(22,163,74,.4);color:#16a34a"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5 inline -mt-0.5"></i> Reativar</button>
+    </div>`:''}
     <div class="grid lg:grid-cols-3 gap-4">
       <div class="lg:col-span-2 space-y-4">
         ${card('Alunos','users', `<div class="grid sm:grid-cols-2 gap-3">${kidsCards}</div>`)}
@@ -2360,12 +2367,17 @@ function openRowMenu(e,id){
       + `<div class="h-px my-1" style="background:var(--border)"></div>`
       + item('check-circle-2','Marcar como assinado',`markSigned(${id})`);
   }
+  // desligar / reativar — só administradores fazem isso, direto pela dashboard
+  const exitAction = `<div class="h-px my-1" style="background:var(--border)"></div>` + (s.active===false
+    ? `<button onclick="closeRowMenu();reactivateStudent(${id})" class="w-full flex items-center gap-2.5 text-left text-sm px-3 py-2 rounded-lg hover:bg-[var(--hover)] transition" style="color:#16a34a"><i data-lucide="rotate-ccw" class="w-4 h-4"></i>Reativar aluno</button>`
+    : `<button onclick="closeRowMenu();openExitModal(${id})" class="w-full flex items-center gap-2.5 text-left text-sm px-3 py-2 rounded-lg hover:bg-[var(--hover)] transition" style="color:#DC2626"><i data-lucide="user-round-x" class="w-4 h-4"></i>Desligar aluno</button>`);
   m.innerHTML=
     item('user-round','Ver ficha completa',`openDetail(${id})`)+
     item('file-text','Ver contrato',`openContractModal(${id})`)+
     item('download','Baixar contrato',`toast('Download iniciado (demo)')`)+
     item('copy','Copiar telefone do responsável',`copyPhone(${id})`)+
-    statusActions;
+    statusActions+
+    exitAction;
   m.classList.remove('hidden');
   const r=e.currentTarget.getBoundingClientRect();
   const mh=m.offsetHeight||300;
@@ -2390,6 +2402,80 @@ function markSent(id){
   s.status='sent';
   renderTable(); renderRecent(); renderContracts();
   toast('Contrato marcado como enviado!');
+}
+
+/* --- desligamento de aluno (com motivo) --- */
+const EXIT_REASONS=[
+  { k:'adapt',      ic:'puzzle',          l:'Não se adaptou à escola',        d:'Metodologia, turma ou ambiente não funcionaram para a criança' },
+  { k:'financial',  ic:'wallet',          l:'Questões financeiras',           d:'A família não consegue manter a mensalidade no momento' },
+  { k:'competitor', ic:'school',          l:'Optou por outra escola',         d:'A família encontrou outra opção de curso de inglês' },
+  { k:'moved',      ic:'truck',           l:'Mudança de cidade ou bairro',    d:'A distância tornou inviável continuar frequentando' },
+  { k:'schedule',   ic:'clock',           l:'Horários incompatíveis',         d:'A rotina da família não encaixa mais nos horários das turmas' },
+  { k:'completed',  ic:'graduation-cap',  l:'Concluiu o curso',               d:'O aluno alcançou o objetivo e encerrou o ciclo na escola' },
+  { k:'other',      ic:'pencil-line',     l:'Outro motivo',                   d:'Descreva abaixo o que aconteceu' },
+];
+let exitReasonKey=null;
+function openExitModal(id){
+  const s=STUDENTS.find(x=>x.id===id); if(!s) return;
+  exitReasonKey=null;
+  const cards=EXIT_REASONS.map(r=>`
+    <button type="button" id="exitR-${r.k}" onclick="pickExitReason('${r.k}')" class="w-full flex items-center gap-3 text-left p-3 rounded-xl border transition hover:bg-[var(--hover)]" style="border-color:var(--border)">
+      <div class="w-9 h-9 rounded-lg grid place-content-center shrink-0" style="background:var(--hover)"><i data-lucide="${r.ic}" class="w-4 h-4 text-[var(--muted)]"></i></div>
+      <div class="min-w-0 flex-1"><p class="text-sm font-medium">${r.l}</p><p class="text-xs text-[var(--muted)]">${r.d}</p></div>
+      <div class="exit-check w-5 h-5 rounded-full border grid place-content-center shrink-0 transition" style="border-color:var(--border)"></div>
+    </button>`).join('');
+  openModal(`${modalHeader('Desligar aluno')}
+    <div class="p-5 space-y-4">
+      <div class="flex items-center gap-3 p-3 rounded-xl" style="background:rgba(220,38,38,.06)">
+        <div class="w-10 h-10 rounded-xl grid place-content-center text-white font-semibold text-sm shrink-0" style="background:linear-gradient(135deg,${palette[s.id%palette.length]},#2F539A)">${initials(s.kids[0].n)}</div>
+        <div class="min-w-0"><p class="font-medium text-sm truncate">${s.kids[0].n}${s.kids.length>1?' +'+(s.kids.length-1):''}</p>
+        <p class="text-xs text-[var(--muted)]">A matrícula fica <b>inativa</b> — os dados e contratos continuam no histórico, e dá para reativar quando quiser.</p></div>
+      </div>
+      <div><p class="text-sm font-medium mb-2">Qual o motivo do desligamento?</p>
+        <div class="space-y-2">${cards}</div></div>
+      <label class="block"><span id="exitNoteLabel" class="text-sm font-medium">Observações <span class="text-[var(--muted)] font-normal">(opcional)</span></span>
+        <textarea id="exitNote" rows="3" placeholder="Algum detalhe que ajude a entender o caso…" class="${inputCls} h-auto py-2.5 resize-none" oninput="exitValidate()"></textarea></label>
+      <div class="flex gap-2 pt-1">
+        <button onclick="closeModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] text-sm font-semibold hover:bg-[var(--hover)] transition">Cancelar</button>
+        <button id="exitConfirm" onclick="confirmExit(${id})" disabled class="flex-1 h-11 rounded-xl text-white text-sm font-semibold transition disabled:opacity-40 disabled:cursor-not-allowed" style="background:#DC2626">Desligar aluno</button>
+      </div>
+    </div>`, 'max-w-lg');
+}
+function pickExitReason(k){
+  exitReasonKey=k;
+  EXIT_REASONS.forEach(r=>{
+    const el=document.getElementById('exitR-'+r.k); if(!el) return;
+    const on=r.k===k;
+    el.style.borderColor=on?'#DC2626':'var(--border)';
+    el.style.background=on?'rgba(220,38,38,.05)':'';
+    el.querySelector('.exit-check').innerHTML=on?'<span class="w-2.5 h-2.5 rounded-full" style="background:#DC2626"></span>':'';
+    el.querySelector('.exit-check').style.borderColor=on?'#DC2626':'var(--border)';
+  });
+  // com "Outro", a observação vira obrigatória
+  const lab=document.getElementById('exitNoteLabel');
+  lab.innerHTML = k==='other' ? 'Descreva o motivo <span style="color:#DC2626">*</span>'
+    : 'Observações <span class="text-[var(--muted)] font-normal">(opcional)</span>';
+  exitValidate();
+}
+function exitValidate(){
+  const btn=document.getElementById('exitConfirm'); if(!btn) return;
+  const note=document.getElementById('exitNote')?.value.trim()||'';
+  btn.disabled = !exitReasonKey || (exitReasonKey==='other' && !note);
+}
+function confirmExit(id){
+  const s=STUDENTS.find(x=>x.id===id); if(!s||!exitReasonKey) return;
+  const r=EXIT_REASONS.find(x=>x.k===exitReasonKey);
+  s.active=false;
+  s.exit={ k:r.k, label:r.l, note:document.getElementById('exitNote')?.value.trim()||'', date:'03/06/2026' };
+  closeModal();
+  renderTable(); renderRecent(); renderContracts();
+  toast(`${s.kids[0].n.split(' ')[0]} foi desligado da escola — motivo registrado.`);
+}
+function reactivateStudent(id){
+  const s=STUDENTS.find(x=>x.id===id); if(!s) return;
+  s.active=true; delete s.exit;
+  renderTable(); renderRecent(); renderContracts();
+  toast(`${s.kids[0].n.split(' ')[0]} voltou a ser aluno ativo!`);
 }
 
 /* ====================== COMENTÁRIOS (estilo Adobe XD) ====================== */
