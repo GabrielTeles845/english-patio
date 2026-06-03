@@ -947,13 +947,14 @@ function tourRender(){
     <p class="text-sm text-[var(--muted)] mt-1.5 leading-relaxed">${s.body}</p>
     <div class="flex items-center gap-1.5 mt-3.5">${TOUR_STEPS.map((_,i)=>`<span class="h-1 rounded-full transition-all ${i===tourI?'w-5':'w-1.5'}" style="background:${i===tourI?'#F5B700':'var(--border)'}"></span>`).join('')}</div>
     <div class="flex items-center justify-between gap-2 mt-4">
-      <button onclick="endTour(false)" class="text-xs font-medium text-[var(--muted)] hover:underline">${s.last?'':'Pular tour'}</button>
+      ${s.last?'<span></span>':`<button onclick="endTour(false)" class="h-9 px-3 rounded-lg border border-[var(--border)] bg-[var(--card)] text-sm font-medium text-[var(--muted)] hover:bg-[var(--hover)] transition">Pular tour</button>`}
       <div class="flex gap-2">
-        ${tourI>0&&!s.last?`<button onclick="tourPrev()" class="h-9 px-3 rounded-lg border border-[var(--border)] text-sm font-medium">Voltar</button>`:''}
+        ${tourI>0&&!s.last?`<button onclick="tourPrev()" class="h-9 px-3 rounded-lg border border-[var(--border)] bg-[var(--card)] text-sm font-medium hover:bg-[var(--hover)] transition">Voltar</button>`:''}
         <button onclick="${s.last?'endTour(true)':'tourNext()'}" class="h-9 px-4 rounded-lg text-white text-sm font-semibold" style="background:linear-gradient(135deg,#1E3765,#2F539A)">${s.last?'Começar a usar':(tourI===0?'Fazer o tour':'Próximo')}</button>
       </div>
     </div>`;
   positionTourCard(card,s,r);
+  lucide.createIcons();
 }
 function positionTourCard(card,s,r){
   const W=Math.min(330,innerWidth-24), G=14, M=12;
