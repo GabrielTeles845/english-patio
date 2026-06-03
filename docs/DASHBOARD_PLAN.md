@@ -69,8 +69,8 @@ Navegador (React SPA)
 
 | Papel | Pode | Não pode |
 |---|---|---|
-| **Admin** | Tudo: alunos, matrículas, contratos, e-mails, usuários, editor de site, config | — |
-| **Gestor de conteúdo** | Só o **editor de textos do site** | Ver dados de alunos/matrículas, e-mails, usuários |
+| **Administrador** | Tudo: alunos, matrículas, contratos, e-mails, usuários, editor de site, config | — |
+| **Secretaria** | Ver alunos/matrículas e **enviar contratos** (WhatsApp/download) | E-mails, editor do site, usuários, configurações |
 
 (Professores com acesso de leitura ficam como possibilidade futura — hoje fora de escopo.)
 

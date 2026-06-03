@@ -67,13 +67,19 @@
     --sb-edge:rgba(255,255,255,.07); --sb-shadow:6px 0 24px rgba(0,0,0,.45);
   }
   html[data-sidebar="yellow"]{
-    --sb-1:#FFC42E; --sb-2:#F0A800; --sb-text:#4a3a07; --sb-strong:#15294d;
-    --sb-muted:rgba(58,44,5,.55); --sb-hover:rgba(21,41,77,.10); --sb-border:rgba(120,84,0,.18);
-    --sb-badge-bg:rgba(21,41,77,.14); --sb-badge-text:#15294d; --sb-accent:#1E3765; --sb-accent-text:#ffffff;
-    --sb-active-bg:#1E3765; --sb-active-text:#ffffff; --sb-bar:#FFE17A;
-    --sb-edge:#d99e00; --sb-shadow:6px 0 26px rgba(120,84,0,.22);
+    --sb-1:#FFF6DB; --sb-2:#FFEBB5; --sb-text:#6e5a1c; --sb-strong:#15294d;
+    --sb-muted:#ab8c3e; --sb-hover:rgba(245,183,0,.18); --sb-border:rgba(180,134,11,.20);
+    --sb-badge-bg:rgba(245,183,0,.28); --sb-badge-text:#7a5c05; --sb-accent:#F5B700; --sb-accent-text:#15294d;
+    --sb-active-bg:#1E3765; --sb-active-text:#ffffff; --sb-bar:#F5B700;
+    --sb-edge:#eed79b; --sb-shadow:6px 0 26px rgba(180,134,11,.15);
   }
-  html.dark[data-sidebar="yellow"]{ --sb-1:#DBA400; --sb-2:#A87B00; --sb-edge:#8a6500; --sb-shadow:6px 0 26px rgba(0,0,0,.4); }
+  html.dark[data-sidebar="yellow"]{
+    --sb-1:#2e2607; --sb-2:#201a04; --sb-text:#d9c074; --sb-strong:#FFE17A;
+    --sb-muted:rgba(217,192,116,.55); --sb-hover:rgba(245,183,0,.12); --sb-border:rgba(245,183,0,.16);
+    --sb-badge-bg:rgba(245,183,0,.16); --sb-badge-text:#FFE17A;
+    --sb-active-bg:#F5B700; --sb-active-text:#15294d; --sb-bar:#FFE17A;
+    --sb-edge:#3d3208; --sb-shadow:6px 0 26px rgba(0,0,0,.45);
+  }
   #sidebar{ border-right:1px solid var(--sb-edge); box-shadow:var(--sb-shadow); }
   .sb-item{ color:var(--sb-text); }
   .sb-item:hover{ background:var(--sb-hover); }
@@ -220,9 +226,9 @@
   <!-- ===== SIDEBAR ===== -->
   <aside id="sidebar" class="fixed lg:sticky top-0 z-50 h-screen w-[256px] shrink-0 -translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col"
          style="background:linear-gradient(180deg,var(--sb-1),var(--sb-2));color:var(--sb-text)">
-    <div class="h-20 flex items-center px-5 border-b" style="border-color:var(--sb-border)">
-      <img id="sbLogo" src="assets/logo-sidebar-azul.svg" alt="English Patio" class="h-12 w-auto">
-      <div class="h-7 w-px mx-3" style="background:var(--sb-border)"></div>
+    <div class="h-16 flex items-center px-5 border-b" style="border-color:var(--sb-border)">
+      <img id="sbLogo" src="assets/logo-sidebar-azul.svg" alt="English Patio" class="h-10 w-auto">
+      <div class="h-6 w-px mx-3" style="background:var(--sb-border)"></div>
       <span class="font-heading text-[15px] font-medium tracking-wide" style="color:var(--sb-strong)">Dashboard</span>
     </div>
 
@@ -279,7 +285,7 @@
         <div class="w-9 h-9 rounded-full grid place-content-center font-semibold" style="background:var(--sb-accent);color:var(--sb-accent-text)">PM</div>
         <div class="leading-tight min-w-0">
           <p class="text-sm font-medium truncate" style="color:var(--sb-strong)">Priscylla Martins</p>
-          <p class="text-[11px]" style="color:var(--sb-muted)">Administradora</p>
+          <p class="text-[11px]" style="color:var(--sb-muted)">Administrador</p>
         </div>
         <i data-lucide="log-out" class="w-4 h-4 ml-auto hover:opacity-100 opacity-60" style="color:var(--sb-muted)" onclick="event.stopPropagation();logout()"></i>
       </div>
@@ -315,7 +321,6 @@
             </div>
           </div>
         </div>
-        <button onclick="openAccountModal()" class="w-9 h-9 rounded-full grid place-content-center font-semibold text-[#15294d] ml-1 ring-2 ring-transparent hover:ring-accent transition" style="background:#FFE17A" title="Minha conta">PM</button>
       </div>
     </header>
 
@@ -601,9 +606,9 @@
         <div class="surface rounded-2xl divide-y" style="border-color:var(--border)" id="userList"></div>
         <div class="grid sm:grid-cols-2 gap-4 mt-4">
           <div class="surface rounded-2xl p-5"><div class="flex items-center gap-2 mb-2"><i data-lucide="shield-check" class="w-5 h-5 text-brand-light"></i><h3 class="font-heading font-semibold">Administrador</h3></div>
-            <p class="text-sm text-[var(--muted)]">Acesso total: alunos, matrículas, contratos, e-mails, editor do site e usuários.</p></div>
-          <div class="surface rounded-2xl p-5"><div class="flex items-center gap-2 mb-2"><i data-lucide="pencil-ruler" class="w-5 h-5 text-brand-light"></i><h3 class="font-heading font-semibold">Gestor de conteúdo</h3></div>
-            <p class="text-sm text-[var(--muted)]">Edita apenas os textos do site. Não vê dados de alunos nem matrículas.</p></div>
+            <p class="text-sm text-[var(--muted)]">Acesso total: alunos, contratos, e-mails, editor do site, usuários e configurações.</p></div>
+          <div class="surface rounded-2xl p-5"><div class="flex items-center gap-2 mb-2"><i data-lucide="clipboard-list" class="w-5 h-5 text-brand-light"></i><h3 class="font-heading font-semibold">Secretaria</h3></div>
+            <p class="text-sm text-[var(--muted)]">Vê os alunos e envia contratos (WhatsApp/download). Não acessa e-mails, editor do site nem usuários.</p></div>
         </div>
       </section>
 
@@ -871,10 +876,10 @@ function markAllRead(){ NOTIFS.forEach(n=>n.unread=false); renderNotifs(); }
 
 /* ====================== TOUR DE BOAS-VINDAS (spotlight nos elementos reais) ====================== */
 const TOUR_STEPS=[
-  { target:null, title:'Bem-vinda ao preview da dashboard! 🎉', body:'Explore à vontade — os dados são fictícios e nada aqui quebra. Deixa eu te mostrar só o que não dá pra descobrir sozinha:', placement:'center', logo:true },
+  { target:null, title:'Bem-vinda ao preview da dashboard!', body:'Explore à vontade — os dados são fictícios e nada aqui quebra. Deixa eu te mostrar só o que não dá pra descobrir sozinha:', placement:'center', logo:true },
   { target:'[data-tour="nav-editor"]', title:'Editor do site', body:'Aqui você muda os textos do site real: passe o mouse sobre um texto (aparece uma borda pontilhada amarela), clique e escreva.', placement:'right', pre:()=>toggleSidebar(true) },
   { target:'#sbThemeDots', title:'Deixe com a sua cara', body:'Essas bolinhas trocam a cor da barra lateral — azul, branca ou amarela. E a luinha ao lado liga o modo escuro.', placement:'right', pre:()=>toggleSidebar(true) },
-  { target:'#cmFab', title:'O botão mais importante 💜', body:'Viu algo que quer mudar? Clique em "Comentar", depois em qualquer parte da tela, e escreva sua sugestão. Tudo chega para a equipe — e quando for ajustado, o alfinete fica verde com a resposta.', placement:'top', pre:()=>toggleSidebar(false), last:true },
+  { target:'#cmFab', title:'O botão mais importante', body:'Viu algo que quer mudar? Clique em "Comentar", depois em qualquer parte da tela, e escreva sua sugestão. Tudo chega para a equipe — e quando for ajustado, o alfinete fica verde com a resposta.', placement:'top', pre:()=>toggleSidebar(false), last:true },
 ];
 let tourI=0, tourActive=false, tourBuilt=false;
 function maybeStartTour(){ if(!localStorage.getItem('ep-tour-done')) startTour(); }
@@ -883,7 +888,10 @@ function startTour(){
   go('overview');
   if(!tourBuilt) buildTourDom();
   document.getElementById('tourOverlay').style.display='block';
-  setTimeout(tourRender,80);
+  // primeiro card nasce já centralizado (sem deslizar do canto)
+  const card=document.getElementById('tourCard');
+  card.style.transition='none';
+  setTimeout(()=>{ tourRender(); requestAnimationFrame(()=>{ card.style.transition='left .22s ease-out, top .22s ease-out'; }); },80);
 }
 function buildTourDom(){
   const o=document.createElement('div');
@@ -932,6 +940,7 @@ function tourRender(){
     blks.forEach(b=>b.style.display='none');
   }
   card.innerHTML=`
+    <button onclick="endTour(false)" class="absolute top-3 right-3 p-1.5 rounded-lg hover:bg-[var(--hover)] text-[var(--muted)] transition" title="Fechar tour"><i data-lucide="x" class="w-4 h-4"></i></button>
     ${s.logo?`<img src="${document.documentElement.classList.contains('dark')?LOGOS.blue:LOGOS.colored}" alt="English Patio" class="h-12 w-auto mb-3">`:''}
     <p class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider">${s.target?`Passo ${tourI+1} de ${TOUR_STEPS.length}`:(s.last?'Fim do tour':'Tour rápido')}</p>
     <h3 class="font-heading text-lg font-semibold mt-1">${s.title}</h3>
@@ -941,7 +950,7 @@ function tourRender(){
       <button onclick="endTour(false)" class="text-xs font-medium text-[var(--muted)] hover:underline">${s.last?'':'Pular tour'}</button>
       <div class="flex gap-2">
         ${tourI>0&&!s.last?`<button onclick="tourPrev()" class="h-9 px-3 rounded-lg border border-[var(--border)] text-sm font-medium">Voltar</button>`:''}
-        <button onclick="${s.last?'endTour(true)':'tourNext()'}" class="h-9 px-4 rounded-lg text-white text-sm font-semibold" style="background:linear-gradient(135deg,#1E3765,#2F539A)">${s.last?'Começar a usar 🎉':(tourI===0?'Fazer o tour':'Próximo')}</button>
+        <button onclick="${s.last?'endTour(true)':'tourNext()'}" class="h-9 px-4 rounded-lg text-white text-sm font-semibold" style="background:linear-gradient(135deg,#1E3765,#2F539A)">${s.last?'Começar a usar':(tourI===0?'Fazer o tour':'Próximo')}</button>
       </div>
     </div>`;
   positionTourCard(card,s,r);
@@ -972,7 +981,7 @@ function endTour(done){
   localStorage.setItem('ep-tour-done', done?'completed':'skipped');
   const o=document.getElementById('tourOverlay'); if(o) o.style.display='none';
   toggleSidebar(false);
-  if(done) toast('Tour concluído! Explore à vontade 🎉');
+  if(done) toast('Tour concluído! Explore à vontade.');
 }
 
 /* ====================== TABELA DE ALUNOS ====================== */
@@ -1117,7 +1126,7 @@ function renderEmails(){
   document.getElementById('emailHistory').innerHTML=data.map(e=>`<div class="flex items-center gap-3 p-3 rounded-xl" style="background:var(--hover)"><div class="w-9 h-9 rounded-lg grid place-content-center bg-[var(--card)]"><i data-lucide="${e.ic}" class="w-4 h-4 text-brand-light"></i></div><div class="flex-1 min-w-0"><p class="text-sm font-medium truncate">${e.s}</p><p class="text-xs text-[var(--muted)]">${e.n} destinatários · ${e.d}</p></div><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500"></i></div>`).join('');
   lucide.createIcons();
 }
-const USERS=[{n:'Priscylla Martins',e:'priscylla@englishpatio.com.br',r:'Administradora',c:'#1E3765'},{n:'Gabriel Teles',e:'gabriel@englishpatio.com.br',r:'Administrador',c:'#2F539A'},{n:'Beatriz Souza',e:'beatriz@englishpatio.com.br',r:'Gestora de conteúdo',c:'#B5860B'}];
+const USERS=[{n:'Priscylla Martins',e:'priscylla@englishpatio.com.br',r:'Administrador',c:'#1E3765'},{n:'Gabriel Teles',e:'gabriel@englishpatio.com.br',r:'Administrador',c:'#2F539A'},{n:'Beatriz Souza',e:'beatriz@englishpatio.com.br',r:'Secretaria',c:'#B5860B'}];
 function renderUsers(){
   document.getElementById('userList').innerHTML=USERS.map(x=>`<div class="flex items-center gap-3 p-4"><div class="w-10 h-10 rounded-full grid place-content-center text-white font-semibold" style="background:${x.c}">${initials(x.n)}</div><div class="flex-1 min-w-0"><p class="font-medium truncate">${x.n} ${x.pending?'<span class="text-[10px] font-semibold px-1.5 py-0.5 rounded-md align-middle" style="background:rgba(245,183,0,.16);color:#B5860B">convite pendente</span>':''}</p><p class="text-xs text-[var(--muted)] truncate">${x.e}</p></div><span class="text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap" style="background:var(--hover)">${x.r}</span><button class="p-2 rounded-lg hover:bg-[var(--hover)]"><i data-lucide="more-vertical" class="w-4 h-4 text-[var(--muted)]"></i></button></div>`).join('');
   lucide.createIcons();
@@ -1460,13 +1469,13 @@ function openInvite(){
     <label class="block"><span class="text-sm font-medium">E-mail</span>
       <input id="invEmail" type="email" placeholder="email@exemplo.com" class="${inputCls}"></label>
     <div><span class="text-sm font-medium">Papel</span><div class="mt-1.5" id="invRoleWrap"></div></div>
-    <p class="text-xs text-[var(--muted)] flex items-center gap-1.5"><i data-lucide="shield-check" class="w-3.5 h-3.5 shrink-0"></i> A pessoa recebe um e-mail para criar a própria senha. Gestor de conteúdo só edita textos do site.</p>
+    <p class="text-xs text-[var(--muted)] flex items-center gap-1.5"><i data-lucide="shield-check" class="w-3.5 h-3.5 shrink-0"></i> A pessoa recebe um e-mail para criar a própria senha. Secretaria só vê alunos e envia contratos.</p>
   </div>
   <div class="p-5 pt-0 flex gap-2">
     <button onclick="closeModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] font-medium text-sm">Cancelar</button>
     <button onclick="submitInvite()" class="flex-1 h-11 rounded-xl text-white font-semibold text-sm flex items-center justify-center gap-2" style="background:linear-gradient(135deg,#1E3765,#2F539A)"><i data-lucide="send" class="w-4 h-4"></i> Enviar convite</button>
   </div>`);
-  document.getElementById('invRoleWrap').innerHTML=cselect('invRole',[{v:'admin',l:'Administrador(a)'},{v:'content',l:'Gestor(a) de conteúdo'}],{block:true});
+  document.getElementById('invRoleWrap').innerHTML=cselect('invRole',[{v:'admin',l:'Administrador'},{v:'secretaria',l:'Secretaria'}],{block:true});
   lucide.createIcons();
   document.getElementById('invName').focus();
 }
@@ -1475,7 +1484,7 @@ function submitInvite(){
   const e=document.getElementById('invEmail').value.trim();
   if(!n){ document.getElementById('invName').focus(); return; }
   if(!e){ document.getElementById('invEmail').focus(); return; }
-  USERS.push({n, e, r:SEL.invRole?.value==='content'?'Gestor(a) de conteúdo':'Administrador(a)', c:'#0891b2', pending:true});
+  USERS.push({n, e, r:SEL.invRole?.value==='secretaria'?'Secretaria':'Administrador', c:'#0891b2', pending:true});
   renderUsers(); closeModal(); toast(`Convite enviado para ${e}!`);
 }
 
@@ -1566,11 +1575,11 @@ function applySidebarTheme(){
   document.documentElement.dataset.sidebar=sbTheme;
   const dark=document.documentElement.classList.contains('dark');
   const logo=document.getElementById('sbLogo');
-  if(logo) logo.src = sbTheme==='yellow' ? LOGOS.yellow : (sbTheme==='white' && !dark) ? LOGOS.colored : LOGOS.blue;
+  if(logo) logo.src = dark ? LOGOS.blue : (sbTheme==='blue' ? LOGOS.blue : LOGOS.colored);
   const ll=document.getElementById('loginLogo'); if(ll) ll.src=dark?LOGOS.blue:LOGOS.colored;
   const dots=document.getElementById('sbThemeDots');
   if(dots){
-    const opts=[['blue','linear-gradient(135deg,#1E3765,#2F539A)','Sidebar azul'],['white','linear-gradient(135deg,#fff,#e8edf5)','Sidebar branca'],['yellow','linear-gradient(135deg,#F5B700,#E3A600)','Sidebar amarela']];
+    const opts=[['blue','linear-gradient(135deg,#1E3765,#2F539A)','Sidebar azul'],['white','linear-gradient(135deg,#fff,#e8edf5)','Sidebar branca'],['yellow','linear-gradient(135deg,#FFF6DB,#F5B700)','Sidebar amarela']];
     dots.innerHTML=opts.map(([k,bg,t])=>`<button onclick="setSidebarTheme('${k}')" title="${t}" class="w-5 h-5 rounded-full transition hover:scale-110" style="background:${bg};border:2px solid ${k===sbTheme?'var(--sb-strong)':'var(--sb-border)'}"></button>`).join('');
   }
   renderSbPicker();
@@ -1578,7 +1587,7 @@ function applySidebarTheme(){
 function setSidebarTheme(t){ sbTheme=t; localStorage.setItem('ep-sb-theme',t); applySidebarTheme(); toast('Tema aplicado!'); }
 function renderSbPicker(){
   const el=document.getElementById('sbThemePicker'); if(!el) return;
-  const opts=[['blue','Azul','linear-gradient(135deg,#1E3765,#2F539A)'],['white','Branca','linear-gradient(135deg,#ffffff,#eef2f9)'],['yellow','Amarela','linear-gradient(135deg,#F5B700,#E3A600)']];
+  const opts=[['blue','Azul','linear-gradient(135deg,#1E3765,#2F539A)'],['white','Branca','linear-gradient(135deg,#ffffff,#eef2f9)'],['yellow','Amarela','linear-gradient(135deg,#FFF6DB,#F5B700)']];
   el.innerHTML=opts.map(([k,l,bg])=>`<button onclick="setSidebarTheme('${k}')" class="flex flex-col items-center gap-1.5">
     <span class="w-16 h-11 rounded-xl border transition ${k===sbTheme?'ring-2 ring-offset-2':''}" style="background:${bg};border-color:var(--border);${k===sbTheme?'--tw-ring-color:#2F539A;--tw-ring-offset-color:var(--card);':''}"></span>
     <span class="text-xs ${k===sbTheme?'font-semibold':'text-[var(--muted)]'}">${l}</span></button>`).join('');
@@ -1590,7 +1599,7 @@ function openAccountModal(){
   <div class="p-5 space-y-3">
     <div class="flex items-center gap-3 mb-1">
       <div class="w-12 h-12 rounded-full grid place-content-center font-semibold text-[#15294d]" style="background:#FFE17A">PM</div>
-      <div><p class="font-medium">Priscylla Martins</p><p class="text-xs text-[var(--muted)]">Administradora</p></div>
+      <div><p class="font-medium">Priscylla Martins</p><p class="text-xs text-[var(--muted)]">Administrador</p></div>
     </div>
     <label class="block"><span class="text-sm font-medium">E-mail de acesso</span>
       <input id="accEmail" type="email" value="priscylla@englishpatio.com.br" class="${inputCls}"></label>
@@ -1829,7 +1838,7 @@ function renderCmList(){
         ${typeof RESOLVED[c.id]==='string'?`<p class="mt-1 leading-snug">${esc(RESOLVED[c.id])}</p>`:''}
       </div>`:''}
     </div>`).join('')
-  : `<div class="text-center text-sm text-[var(--muted)] py-10 px-4">Nenhum comentário ainda.<br><br>Clique em <strong>Comentar</strong> (botão roxo) e depois em qualquer parte da tela para deixar o primeiro. 💜</div>`;
+  : `<div class="text-center text-sm text-[var(--muted)] py-10 px-4">Nenhum comentário ainda.<br><br>Clique em <strong>Comentar</strong> (botão roxo) e depois em qualquer parte da tela para deixar o primeiro.</div>`;
   lucide.createIcons();
 }
 function delComment(id){ comments=comments.filter(c=>c.id!==id); cmSave(); cmRender(); }
