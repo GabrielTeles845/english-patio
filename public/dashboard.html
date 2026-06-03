@@ -121,6 +121,13 @@
   @keyframes draft-bounce{ 0%,100%{ transform:translate(-50%,-100%);} 50%{ transform:translate(-50%,-135%);} }
   /* tour de boas-vindas */
   @keyframes tour-pulse{ 0%,100%{ box-shadow:0 0 0 4px rgba(245,183,0,.32);} 50%{ box-shadow:0 0 0 11px rgba(245,183,0,.10);} }
+  /* modo personalizar (arrastar cards da visão geral) */
+  #dashGrid.customizing .dash-card{ cursor:grab; outline:2px dashed rgba(47,83,154,.40); outline-offset:4px;
+    border-radius:18px; animation:wiggle .4s ease-in-out infinite alternate; }
+  #dashGrid.customizing .dash-card:active{ cursor:grabbing; }
+  #dashGrid.customizing .dash-card > *{ pointer-events:none; }
+  #dashGrid .dash-card.dragging{ opacity:.35; outline-style:solid; }
+  @keyframes wiggle{ from{ transform:rotate(-.15deg);} to{ transform:rotate(.15deg);} }
   /* transição circular do modo claro/escuro (View Transitions) */
   ::view-transition-old(root), ::view-transition-new(root){ animation:none; mix-blend-mode:normal; }
   /* select customizado */
@@ -338,13 +345,15 @@
           </div>
           <div class="flex items-center gap-2">
             <span id="periodSelWrap"></span>
+            <button id="custReset" onclick="resetDash()" class="hidden h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)]">Restaurar padrão</button>
+            <button id="custBtn" onclick="toggleCustomize()" class="flex items-center gap-2 h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)] transition" title="Arraste os cartões e monte a dashboard do seu jeito"><i data-lucide="layout-grid" class="w-4 h-4"></i><span class="hidden sm:inline">Personalizar</span></button>
             <button onclick="exportCSV(false)" class="flex items-center gap-2 h-10 px-4 rounded-xl text-white text-sm font-semibold" style="background:#1E3765" title="Baixa uma planilha com todos os alunos (abre no Excel ou Google Planilhas)">
               <i data-lucide="sheet" class="w-4 h-4"></i><span class="hidden sm:inline">Exportar planilha</span></button>
           </div>
         </div>
 
         <!-- KPIs -->
-        <div class="grid grid-cols-2 xl:grid-cols-4 gap-4" data-tour="kpis">
+        <div class="grid grid-cols-2 xl:grid-cols-4 gap-4 lg:col-span-3" data-tour="kpis">
           <div class="surface rounded-2xl p-5">
             <div class="flex items-center justify-between"><span class="text-sm text-[var(--muted)]">Alunos ativos</span>
               <div class="w-9 h-9 rounded-xl grid place-content-center" style="background:var(--hover)"><i data-lucide="graduation-cap" class="w-[18px] h-[18px] text-brand-light"></i></div></div>
@@ -372,7 +381,7 @@
         </div>
 
         <!-- mini-indicadores -->
-        <div class="surface rounded-2xl mt-4 px-5 py-3 flex flex-wrap items-center gap-x-8 gap-y-2 text-sm">
+        <div class="surface rounded-2xl px-5 py-3 flex flex-wrap items-center gap-x-8 gap-y-2 text-sm lg:col-span-3">
           <span class="flex items-center gap-2"><i data-lucide="cake" class="w-4 h-4 text-brand-light"></i>Média de idade <strong>9,6 anos</strong></span>
           <span class="flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-brand-light"></i><strong>32 famílias</strong> com irmãos matriculados</span>
           <span class="flex items-center gap-2"><i data-lucide="armchair" class="w-4 h-4 text-brand-light"></i>Ocupação das turmas <strong>85%</strong></span>
@@ -381,7 +390,7 @@
         </div>
 
         <!-- charts -->
-        <div class="grid lg:grid-cols-3 gap-4 mt-4">
+        <div class="dash-row grid lg:grid-cols-3 gap-4 mt-4">
           <div class="surface rounded-2xl p-5 lg:col-span-2">
             <div class="flex items-center justify-between mb-4">
               <div><h3 class="font-heading font-semibold text-lg">Matrículas</h3><p class="text-xs text-[var(--muted)]" id="enrollSub">Evolução no semestre</p></div>
@@ -401,7 +410,7 @@
         </div>
 
         <!-- vagas por horário + financeiro -->
-        <div class="grid lg:grid-cols-3 gap-4 mt-4">
+        <div class="dash-row grid lg:grid-cols-3 gap-4 mt-4">
           <div class="surface rounded-2xl p-5 lg:col-span-2">
             <div class="flex items-center justify-between mb-4">
               <div><h3 class="font-heading font-semibold text-lg">Vagas por horário</h3>
@@ -448,7 +457,7 @@
           </div>
         </div>
 
-        <div class="grid lg:grid-cols-3 gap-4 mt-4">
+        <div class="dash-row grid lg:grid-cols-3 gap-4 mt-4">
           <div class="surface rounded-2xl p-5">
             <h3 class="font-heading font-semibold text-lg mb-1">Faixa etária</h3>
             <p class="text-xs text-[var(--muted)] mb-4">Idade dos alunos</p>
@@ -465,7 +474,7 @@
         </div>
 
         <!-- horário das matrículas + aniversariantes -->
-        <div class="grid lg:grid-cols-3 gap-4 mt-4">
+        <div class="dash-row grid lg:grid-cols-3 gap-4 mt-4">
           <div class="surface rounded-2xl p-5 lg:col-span-2">
             <div class="flex items-center justify-between mb-4">
               <div><h3 class="font-heading font-semibold text-lg">Que horas o pessoal matricula?</h3>
@@ -1010,6 +1019,7 @@ function markAllRead(){ NOTIFS.forEach(n=>n.unread=false); renderNotifs(); }
 const TOURS={
   overview:[
     { target:null, title:'Boas-vindas ao preview da dashboard!', body:'Explore à vontade — os dados são fictícios e nada aqui quebra. Cada tela tem o seu próprio mini-tour com o que não é óbvio.', placement:'center', logo:true },
+    { target:'#custBtn', title:'Monte a dashboard do seu jeito', body:'O Personalizar deixa você arrastar os cartões e mudar a ordem de tudo — eles se encaixam sozinhos, sem deixar buraco. A ordem fica salva pra você.', placement:'bottom' },
     { target:'[data-tour="health"]', title:'Cobrança sem dor de cabeça', body:'A "Saúde dos contratos" mostra quem ainda não assinou — e o botão verde leva direto para a lista já filtrada nos pendentes.', placement:'left' },
     { target:'#cmFab', title:'O botão mais importante', body:'Viu algo que quer mudar? Clique em "Comentar", depois em qualquer parte da tela, e escreva sua sugestão. Quando for ajustado, o alfinete fica verde com a resposta.', placement:'top', last:true },
   ],
@@ -1609,6 +1619,7 @@ function toast(msg){
 
 /* ====================== INIT ====================== */
 function init(){
+  buildDashGrid();
   // selects customizados
   document.getElementById('periodSelWrap').innerHTML=cselect('period',[{v:'6m',l:'Últimos 6 meses'},{v:'ano',l:'Últimos 12 meses'},{v:'mes',l:'Este mês'}],{icon:'calendar',onChange:applyPeriod});
   document.getElementById('fScheduleWrap').innerHTML=cselect('fSchedule',[{v:'',l:'Todos os horários'},{v:'seg-qua',l:'Seg/Qua'},{v:'ter-qui',l:'Ter/Qui'}],{onChange:renderTable});
@@ -1852,6 +1863,68 @@ function openAccountModal(){
     <button onclick="closeModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] font-medium text-sm">Cancelar</button>
     <button onclick="closeModal();toast('Dados da conta atualizados!')" class="flex-1 h-11 rounded-xl text-white font-semibold text-sm" style="background:#1E3765">Salvar alterações</button>
   </div>`);
+}
+
+/* ====================== PERSONALIZAR (arrastar cards da visão geral) ====================== */
+let customizing=false, dragEl=null, dashDefault=[];
+function buildDashGrid(){
+  const sec=document.querySelector('[data-view="overview"]');
+  if(!sec || document.getElementById('dashGrid')) return;
+  const grid=document.createElement('div');
+  grid.id='dashGrid';
+  grid.className='grid grid-cols-1 lg:grid-cols-3 gap-4 mt-6';
+  grid.style.gridAutoFlow='dense';                       // compacta: nunca fica buraco no meio
+  [...sec.children].slice(1).forEach(b=>{                // pula o cabeçalho (título + botões)
+    if(b.classList.contains('dash-row')){ [...b.children].forEach(c=>grid.appendChild(c)); b.remove(); }
+    else grid.appendChild(b);
+  });
+  sec.appendChild(grid);
+  [...grid.children].forEach((c,i)=>{ c.classList.add('dash-card'); if(!c.dataset.w) c.dataset.w='w'+i; });
+  dashDefault=[...grid.children].map(c=>c.dataset.w);
+  try{                                                    // aplica ordem salva
+    const saved=JSON.parse(localStorage.getItem('ep-dash-order')||'null');
+    if(Array.isArray(saved)) saved.forEach(w=>{ const el=grid.querySelector(`[data-w="${w}"]`); if(el) grid.appendChild(el); });
+  }catch(_){}
+  grid.addEventListener('dragstart',e=>{
+    const c=e.target.closest('.dash-card'); if(!c||!customizing) return;
+    dragEl=c; e.dataTransfer.effectAllowed='move';
+    setTimeout(()=>c.classList.add('dragging'),0);
+  });
+  grid.addEventListener('dragend',()=>{ if(dragEl){ dragEl.classList.remove('dragging'); dragEl=null; } });
+  grid.addEventListener('dragover',e=>{
+    if(!dragEl) return;
+    e.preventDefault(); e.dataTransfer.dropEffect='move';
+    const over=e.target.closest('.dash-card');
+    if(!over||over===dragEl) return;
+    const kids=[...grid.children];
+    grid.insertBefore(dragEl, kids.indexOf(dragEl)<kids.indexOf(over) ? over.nextSibling : over);
+  });
+  grid.addEventListener('drop',e=>e.preventDefault());
+}
+function toggleCustomize(){
+  customizing=!customizing;
+  const grid=document.getElementById('dashGrid'); if(!grid) return;
+  grid.classList.toggle('customizing',customizing);
+  [...grid.children].forEach(c=>{ c.draggable=customizing; });
+  document.getElementById('custReset').classList.toggle('hidden',!customizing);
+  const btn=document.getElementById('custBtn');
+  btn.innerHTML=customizing
+    ? '<i data-lucide="check" class="w-4 h-4"></i><span class="hidden sm:inline">Concluir</span>'
+    : '<i data-lucide="layout-grid" class="w-4 h-4"></i><span class="hidden sm:inline">Personalizar</span>';
+  btn.style.background=customizing?'#1E3765':''; btn.style.color=customizing?'#fff':''; btn.style.borderColor=customizing?'transparent':'';
+  lucide.createIcons();
+  if(customizing) toast('Arraste os cartões — eles se encaixam sozinhos, sem deixar buraco.');
+  else {
+    localStorage.setItem('ep-dash-order', JSON.stringify([...grid.children].map(c=>c.dataset.w)));
+    toast('Layout salvo!');
+    refreshCharts();
+  }
+}
+function resetDash(){
+  const grid=document.getElementById('dashGrid'); if(!grid) return;
+  dashDefault.forEach(w=>{ const el=grid.querySelector(`[data-w="${w}"]`); if(el) grid.appendChild(el); });
+  localStorage.removeItem('ep-dash-order');
+  toast('Layout padrão restaurado.');
 }
 
 /* ====================== MÁSCARAS DE INPUT ====================== */
@@ -2106,6 +2179,7 @@ document.addEventListener('keydown',e=>{
     document.getElementById('notifPanel')?.classList.add('hidden');
     if(commentMode) toggleCommentMode();
     if(tourActive) endTour(false);
+    if(customizing) toggleCustomize();
   }
 });
 document.addEventListener('click',e=>{
