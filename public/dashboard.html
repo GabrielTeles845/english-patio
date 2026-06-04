@@ -368,7 +368,12 @@
             <h1 class="font-heading text-2xl sm:text-3xl font-semibold">Visão geral</h1>
             <p class="text-[var(--muted)] text-sm mt-0.5">Olá, Priscylla! Aqui está o resumo da escola.</p>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="flex items-center bg-[var(--hover)] rounded-xl p-1 text-sm" data-tour="cohort" title="Separa quem já está estudando de quem fez matrícula para o próximo período">
+              <button id="ovcAll" onclick="setOvCohort('')" class="px-3 py-1.5 rounded-lg bg-[var(--card)] shadow-sm font-medium">Todos</button>
+              <button id="ovcOn" onclick="setOvCohort('on')" class="px-3 py-1.5 rounded-lg text-[var(--muted)]">Estudando</button>
+              <button id="ovcNext" onclick="setOvCohort('next')" class="px-3 py-1.5 rounded-lg text-[var(--muted)]">2026.2</button>
+            </div>
             <span id="periodSelWrap"></span>
             <button onclick="exportCSV(false)" data-tour="export" class="flex items-center gap-2 h-10 px-4 rounded-xl text-white text-sm font-semibold" style="background:#1E3765" title="Baixa uma planilha com todos os alunos (abre no Excel ou Google Planilhas)">
               <i data-lucide="sheet" class="w-4 h-4"></i><span class="hidden sm:inline">Exportar planilha</span></button>
@@ -409,6 +414,7 @@
           <span class="flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-brand-light"></i><strong id="stFam">—</strong> com irmãos matriculados</span>
           <span class="flex items-center gap-2"><i data-lucide="armchair" class="w-4 h-4 text-brand-light"></i>Ocupação das turmas <strong id="stOcc">—</strong></span>
           <span class="flex items-center gap-2"><i data-lucide="file-check-2" class="w-4 h-4 text-brand-light"></i>Contratos assinados <strong id="stSigned">—</strong></span>
+          <span class="flex items-center gap-2"><i data-lucide="backpack" class="w-4 h-4" style="color:#2F539A"></i><strong id="stNext" style="color:#2F539A">—</strong> começam em Jul (2026.2)</span>
           <span class="flex items-center gap-2"><i data-lucide="refresh-ccw" class="w-4 h-4 text-brand-light"></i>Rematrículas do semestre <strong>91%</strong></span>
         </div>
 
@@ -535,6 +541,13 @@
             <span id="fAgeWrap"></span>
             <span id="fMediaWrap"></span>
             <span id="fSibWrap"></span>
+            <span class="flex items-center gap-1.5">
+              <span class="text-xs text-[var(--muted)] font-medium whitespace-nowrap">Matrícula:</span>
+              <span class="relative"><input id="fFrom" placeholder="de dd/mm/aaaa" oninput="maskDate(this);tableChanged()" inputmode="numeric" class="w-[136px] h-10 rounded-xl border border-[var(--border)] bg-[var(--card)] pl-3 pr-8 text-sm outline-none focus:ring-2 ring-brand-light">
+                <button type="button" onclick="openDatePicker(event,'fFrom',2026)" class="dp-btn absolute right-1.5 top-1/2 -translate-y-1/2 p-1 rounded-md text-[var(--muted)] hover:text-brand-light hover:bg-[var(--hover)] transition" title="Abrir calendário"><i data-lucide="calendar" class="w-3.5 h-3.5"></i></button></span>
+              <span class="relative"><input id="fTo" placeholder="até dd/mm/aaaa" oninput="maskDate(this);tableChanged()" inputmode="numeric" class="w-[136px] h-10 rounded-xl border border-[var(--border)] bg-[var(--card)] pl-3 pr-8 text-sm outline-none focus:ring-2 ring-brand-light">
+                <button type="button" onclick="openDatePicker(event,'fTo',2026)" class="dp-btn absolute right-1.5 top-1/2 -translate-y-1/2 p-1 rounded-md text-[var(--muted)] hover:text-brand-light hover:bg-[var(--hover)] transition" title="Abrir calendário"><i data-lucide="calendar" class="w-3.5 h-3.5"></i></button></span>
+            </span>
           </div>
         </div>
 
@@ -585,6 +598,13 @@
             <span class="hidden md:flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-[var(--muted)] mr-1"><i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>Filtros</span>
             <span id="cStatusWrap"></span>
             <span id="cActiveWrap"></span>
+            <span class="flex items-center gap-1.5">
+              <span class="text-xs text-[var(--muted)] font-medium whitespace-nowrap">Matrícula:</span>
+              <span class="relative"><input id="cFrom" placeholder="de dd/mm/aaaa" oninput="maskDate(this);contractsChanged()" inputmode="numeric" class="w-[136px] h-10 rounded-xl border border-[var(--border)] bg-[var(--card)] pl-3 pr-8 text-sm outline-none focus:ring-2 ring-brand-light">
+                <button type="button" onclick="openDatePicker(event,'cFrom',2026)" class="dp-btn absolute right-1.5 top-1/2 -translate-y-1/2 p-1 rounded-md text-[var(--muted)] hover:text-brand-light hover:bg-[var(--hover)] transition" title="Abrir calendário"><i data-lucide="calendar" class="w-3.5 h-3.5"></i></button></span>
+              <span class="relative"><input id="cTo" placeholder="até dd/mm/aaaa" oninput="maskDate(this);contractsChanged()" inputmode="numeric" class="w-[136px] h-10 rounded-xl border border-[var(--border)] bg-[var(--card)] pl-3 pr-8 text-sm outline-none focus:ring-2 ring-brand-light">
+                <button type="button" onclick="openDatePicker(event,'cTo',2026)" class="dp-btn absolute right-1.5 top-1/2 -translate-y-1/2 p-1 rounded-md text-[var(--muted)] hover:text-brand-light hover:bg-[var(--hover)] transition" title="Abrir calendário"><i data-lucide="calendar" class="w-3.5 h-3.5"></i></button></span>
+            </span>
           </div>
         </div>
 
@@ -1082,6 +1102,12 @@ const palette = ['#1E3765','#2F539A','#F5B700','#7C9AD6','#B5860B','#16a34a','#9
 const initials = n => n.split(' ').filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase();
 const STATUS = { signed:{t:'Assinado',c:'#16a34a',bg:'rgba(22,163,74,.12)'}, sent:{t:'Enviado',c:'#2F539A',bg:'rgba(47,83,154,.12)'}, pending:{t:'Pendente',c:'#B5860B',bg:'rgba(245,183,0,.16)'} };
 const schLabel = s => s==='seg-qua' ? 'Seg/Qua' : 'Ter/Qui';
+/* período: matrículas feitas a partir de Mai/2026 são do período aberto (começam em Jul/2026.2);
+   é a visão que a escola precisa em outubro, quando abrem as matrículas do ano seguinte */
+const dvNum = s => parseInt(s.date.split('/').reverse().join(''),10);
+const isFuture = s => dvNum(s)>=20260501;
+const dnum = v => { const m=(v||'').match(/^(\d{2})\/(\d{2})\/(\d{4})$/); return m?parseInt(m[3]+m[2]+m[1],10):null; };
+const inCohort = s => s.active!==false && (typeof ovCohort==='undefined'||ovCohort===''||(ovCohort==='on'?!isFuture(s):isFuture(s)));
 const maskCPF = c => c.slice(0,4)+'•••.•••'+c.slice(-3);
 const waBtn = (name,cls='w-8 h-8') => `<button onclick="event.stopPropagation();toast('Abrindo WhatsApp de ${name}…')" class="${cls} rounded-lg grid place-content-center transition hover:scale-105" style="background:rgba(37,211,102,.14);color:#1faa53" title="Chamar no WhatsApp">${WA('w-[17px] h-[17px]')}</button>`;
 
@@ -1215,6 +1241,7 @@ function markAllRead(){ NOTIFS.forEach(n=>n.unread=false); renderNotifs(); }
 const TOURS={
   overview:[
     { target:null, title:'Boas-vindas ao preview da dashboard!', body:'Explore à vontade — os dados são fictícios e nada aqui quebra. Cada tela tem o seu próprio tour completo; se preferir, dá para fechar e nunca mais ver.', placement:'center', logo:true },
+    { target:'[data-tour="cohort"]', title:'Estudando × próximo período', body:'Este seletor separa tudo: "Estudando" mostra quem está em aula agora; "2026.2" mostra as matrículas novas de quem começa em julho — a visão que importa quando abrem as matrículas do período seguinte.', placement:'bottom' },
     { target:'#periodSelWrap', title:'Escolha o período', body:'Os gráficos respondem a este filtro: últimos 6 meses, 12 meses ou só este mês.', placement:'bottom' },
     { target:'[data-tour="kpis"]', title:'Os números de hoje', body:'Alunos ativos, novos da semana, contratos aguardando assinatura e matrículas do mês — sempre atualizados.', placement:'bottom' },
     { target:'[data-tour="strip"]', title:'Indicadores rápidos', body:'Média de idade, famílias com irmãos, ocupação das turmas, assinaturas e rematrículas — a régua da escola numa linha.', placement:'bottom' },
@@ -1229,7 +1256,7 @@ const TOURS={
   alunos:[
     { target:'[data-tour="row-menu"]', title:'Tudo mora nos três pontinhos', body:'Cada linha tem um menu completo: ficha do aluno, ver e baixar contrato, enviar no WhatsApp, copiar telefone, marcar como enviado/assinado e até desligar o aluno da escola (com registro do motivo).', placement:'left' },
     { target:'#tableHead', title:'Ordene por qualquer coluna', body:'Clique no título de uma coluna para ordenar (vem por nome). Clique de novo para inverter. Ordenando por Responsável, os irmãos de matrículas separadas ficam juntos.', placement:'bottom' },
-    { target:'[data-tour="filtros"]', title:'Busca e filtros', body:'Por horário, contrato, situação, bairro, idade, autorização de imagem e irmãos — o "Limpar" zera tudo de uma vez.', placement:'bottom' },
+    { target:'[data-tour="filtros"]', title:'Busca e filtros', body:'Por horário, contrato, situação (estudando agora × começam no próximo período), bairro, idade, imagem, irmãos e período de matrícula (de/até) — o "Limpar" zera tudo de uma vez.', placement:'bottom' },
     { target:'[data-tip="Autorizou uso de imagem"]', title:'Câmera verde, câmera vermelha', body:'A camerazinha ao lado do nome mostra se a família autorizou fotos: verde = pode postar, vermelha = não pode.', placement:'right' },
     { target:'[data-tour="nova"]', title:'Matrícula manual', body:'A secretaria pode adicionar uma matrícula direto por aqui, sem passar pelo site.', placement:'bottom' },
     { target:'[data-tour="export-al"]', title:'Planilha da lista filtrada', body:'Exporta exatamente o que está na tela — com os filtros aplicados.', placement:'bottom', last:true },
@@ -1403,7 +1430,11 @@ function rowHTML(s){
   const schChip=`<span class="text-xs font-medium px-2.5 py-1 rounded-lg whitespace-nowrap" style="color:${schColor};background:${schBg}">${schLabel(s.sch)}</span>`;
   const stPill=`<span class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap" style="color:${st.c};background:${st.bg}"><span class="w-1.5 h-1.5 rounded-full" style="background:${st.c}"></span>${st.t}</span>`;
   const exitTip = inactive&&s.exit ? ` title="Desligado em ${s.exit.date} — ${s.exit.label}"` : '';
-  const actPill=`<span${exitTip} class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap" style="${inactive?'color:#64748B;background:rgba(100,116,139,.14)':'color:#16a34a;background:rgba(22,163,74,.10)'}"><span class="w-1.5 h-1.5 rounded-full" style="background:${inactive?'#94a3b8':'#16a34a'}"></span>${inactive?'Inativa':'Ativa'}</span>`;
+  const fut=!inactive&&isFuture(s);
+  const pillStyle=inactive?'color:#64748B;background:rgba(100,116,139,.14)':fut?'color:#2F539A;background:rgba(47,83,154,.12)':'color:#16a34a;background:rgba(22,163,74,.10)';
+  const pillDot=inactive?'#94a3b8':fut?'#2F539A':'#16a34a';
+  const pillTip=fut?' title="Matrícula do período aberto — as aulas começam em Julho (2026.2)"':'';
+  const actPill=`<span${exitTip}${pillTip} class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap" style="${pillStyle}"><span class="w-1.5 h-1.5 rounded-full" style="background:${pillDot}"></span>${inactive?'Inativa':fut?'Começa em Jul':'Estudando'}</span>`;
   const kebab=(extra='')=>`<button onclick="openRowMenu(event,${s.id})" ${extra} class="w-9 h-9 rounded-lg border border-[var(--border)] grid place-content-center hover:bg-[var(--card)] transition shrink-0" title="Todas as ações"><i data-lucide="more-vertical" class="w-4 h-4 text-[var(--muted)]"></i></button>`;
   return `<div onclick="openDetail(${s.id})" class="cursor-pointer transition md:border-b md:last:border-0 hover:bg-[var(--hover)] ${inactive?'opacity-60':''}" style="border-color:var(--border)">
     <!-- desktop: linha da tabela -->
@@ -1442,14 +1473,16 @@ function filteredStudents(){
   const q=(document.getElementById('alunoSearch')?.value||'').toLowerCase();
   const fs=SEL.fSchedule?.value||'', fst=SEL.fStatus?.value||'', fa=SEL.fActive?.value||'';
   const fh=SEL.fHood?.value||'', fage=SEL.fAge?.value||'', fm=SEL.fMedia?.value||'', fsib=SEL.fSib?.value||'';
+  const from=dnum(document.getElementById('fFrom')?.value), to=dnum(document.getElementById('fTo')?.value);
   return STUDENTS.filter(s=>{
     const hay=(s.kids.map(k=>k.n).join(' ')+' '+s.resp.n+' '+s.addr.bairro).toLowerCase();
-    const act = fa==='' ? true : fa==='on' ? s.active!==false : s.active===false;
+    const act = fa==='' ? true : fa==='on' ? (s.active!==false&&!isFuture(s)) : fa==='next' ? (s.active!==false&&isFuture(s)) : s.active===false;
     const ageOk = !fage || s.kids.some(k=>fage==='4-6'?k.age>=4&&k.age<=6 : fage==='7-9'?k.age>=7&&k.age<=9 : fage==='10-12'?k.age>=10&&k.age<=12 : k.age>=13);
     const mediaOk = !fm || (fm==='yes' ? s.media!==false : s.media===false);
     const sibOk = !fsib || (fsib==='multi' ? s.kids.length>1 : s.kids.length===1);
+    const dateOk = (!from||dvNum(s)>=from) && (!to||dvNum(s)<=to);
     return hay.includes(q) && (!fs||s.sch===fs) && (!fst||s.status===fst) && act
-      && (!fh||s.addr.bairro===fh) && ageOk && mediaOk && sibOk;
+      && (!fh||s.addr.bairro===fh) && ageOk && mediaOk && sibOk && dateOk;
   });
 }
 function toggleFilters(rowId,chevId){
@@ -1460,6 +1493,7 @@ function toggleFilters(rowId,chevId){
 }
 function clearFilters(){
   const inp=document.getElementById('alunoSearch'); if(inp) inp.value='';
+  ['fFrom','fTo'].forEach(id=>{ const e=document.getElementById(id); if(e) e.value=''; });
   ['fSchedule','fStatus','fActive','fHood','fAge','fMedia','fSib'].forEach(id=>csSet(id,''));
   tableChanged();
   toast('Filtros limpos.');
@@ -1474,7 +1508,7 @@ const SORT_VAL={
   resp:s=>s.resp.n.toLowerCase(),
   sch:s=>s.sch+s.t,
   status:s=>STATUS[s.status].t,
-  active:s=>s.active===false?1:0,
+  active:s=>s.active===false?2:isFuture(s)?1:0,
   date:s=>s.date.split('/').reverse().join('')+(s.hora||''),
 };
 let sortKey='name', sortDir=1;
@@ -1493,7 +1527,8 @@ function renderTableHead(){
 function updateClearBtn(){
   const btn=document.getElementById('fClear'); if(!btn) return;
   const q=(document.getElementById('alunoSearch')?.value||'').trim();
-  const n=['fSchedule','fStatus','fActive','fHood','fAge','fMedia','fSib'].filter(id=>SEL[id]?.value).length + (q?1:0);
+  const n=['fSchedule','fStatus','fActive','fHood','fAge','fMedia','fSib'].filter(id=>SEL[id]?.value).length + (q?1:0)
+    + (dnum(document.getElementById('fFrom')?.value)?1:0) + (dnum(document.getElementById('fTo')?.value)?1:0);
   btn.classList.toggle('hidden', n===0);
   btn.classList.toggle('flex', n>0);
   const cnt=document.getElementById('fClearN'); if(cnt) cnt.textContent=n>0?`(${n})`:'';
@@ -1547,8 +1582,9 @@ function openDetail(id){
           <div class="w-16 h-16 rounded-2xl grid place-content-center text-white font-heading text-2xl font-semibold" style="background:linear-gradient(135deg,${palette[s.id%palette.length]},#2F539A)">${initials(s.kids[0].n)}</div>
           <div><h1 class="font-heading text-2xl font-semibold">${s.kids[0].n}</h1>
             <p class="text-[var(--muted)] text-sm">${s.kids.length>1?s.kids.length+' alunos (irmãos)':'1 aluno'} · matrícula em ${s.date}${s.hora?' às '+s.hora:''}</p>
-            <div class="flex items-center gap-2 mt-2"><span class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full" style="color:${st.c};background:${st.bg}"><span class="w-1.5 h-1.5 rounded-full" style="background:${st.c}"></span>Contrato ${st.t.toLowerCase()}</span>
-              <span class="text-xs font-medium px-2.5 py-1 rounded-lg" style="color:#2F539A;background:rgba(47,83,154,.10)">${schLabel(s.sch)} · ${s.t}</span></div></div>
+            <div class="flex flex-wrap items-center gap-2 mt-2"><span class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full" style="color:${st.c};background:${st.bg}"><span class="w-1.5 h-1.5 rounded-full" style="background:${st.c}"></span>Contrato ${st.t.toLowerCase()}</span>
+              <span class="text-xs font-medium px-2.5 py-1 rounded-lg" style="color:#2F539A;background:rgba(47,83,154,.10)">${schLabel(s.sch)} · ${s.t}</span>
+              ${s.active!==false&&isFuture(s)?'<span class="text-xs font-semibold px-2.5 py-1 rounded-full" style="color:#fff;background:#2F539A">🎒 Começa em Jul/2026</span>':''}</div></div>
         </div>
         <div class="flex flex-wrap gap-2">
           <button onclick="openEditEnrollment(${s.id})" class="h-10 px-3.5 rounded-xl border border-[var(--border)] text-sm font-semibold flex items-center gap-2 hover:bg-[var(--hover)] transition"><i data-lucide="pencil" class="w-4 h-4"></i> Editar</button>
@@ -1602,14 +1638,17 @@ function setContractView(v){
 function filteredContracts(){
   const q=(document.getElementById('contractSearch')?.value||'').toLowerCase();
   const st=SEL.cStatus?.value||'', fa=SEL.cActive?.value||'';
+  const from=dnum(document.getElementById('cFrom')?.value), to=dnum(document.getElementById('cTo')?.value);
   return STUDENTS.filter(s=>{
     const hay=(s.kids.map(k=>k.n).join(' ')+' '+s.resp.n).toLowerCase();
-    const act = fa==='' ? true : fa==='on' ? s.active!==false : s.active===false;
-    return hay.includes(q) && (!st||s.status===st) && act;
+    const act = fa==='' ? true : fa==='on' ? (s.active!==false&&!isFuture(s)) : fa==='next' ? (s.active!==false&&isFuture(s)) : s.active===false;
+    const dateOk = (!from||dvNum(s)>=from) && (!to||dvNum(s)<=to);
+    return hay.includes(q) && (!st||s.status===st) && act && dateOk;
   }).slice().sort((a,b)=> SORT_VAL.date(b)<SORT_VAL.date(a) ? -1 : 1); // mais recentes primeiro
 }
 function clearContractFilters(){
   const inp=document.getElementById('contractSearch'); if(inp) inp.value='';
+  ['cFrom','cTo'].forEach(id=>{ const e=document.getElementById(id); if(e) e.value=''; });
   csSet('cStatus',''); csSet('cActive','');
   contractsChanged();
 }
@@ -1617,7 +1656,8 @@ function renderContracts(){
   const cBtn=document.getElementById('cClear');
   if(cBtn){
     const q=(document.getElementById('contractSearch')?.value||'').trim();
-    const n=['cStatus','cActive'].filter(id=>SEL[id]?.value).length + (q?1:0);
+    const n=['cStatus','cActive'].filter(id=>SEL[id]?.value).length + (q?1:0)
+      + (dnum(document.getElementById('cFrom')?.value)?1:0) + (dnum(document.getElementById('cTo')?.value)?1:0);
     cBtn.classList.toggle('hidden', n===0);
     cBtn.classList.toggle('flex', n>0);
     const cnt=document.getElementById('cClearN'); if(cnt) cnt.textContent=n>0?`(${n})`:'';
@@ -1695,7 +1735,7 @@ function renderBirthdays(){
   // próximos aniversários a partir de 03/06 (data do preview)
   const REF=6*100+3;
   const list=[];
-  STUDENTS.filter(s=>s.active!==false).forEach(s=>s.kids.forEach(k=>{
+  STUDENTS.filter(inCohort).forEach(s=>s.kids.forEach(k=>{
     const [d,m]=k.b.split('/').map(Number); if(!d||!m) return;
     const key=m*100+d;
     list.push({n:k.n, d, m, age:k.age+1, sid:s.id, order:(key>=REF?key:key+1200)});
@@ -1710,7 +1750,7 @@ function renderBirthdays(){
 }
 function renderHoods(){
   const cnt={};
-  STUDENTS.forEach(s=>{ if(s.active===false) return; cnt[s.addr.bairro]=(cnt[s.addr.bairro]||0)+s.kids.length; });
+  STUDENTS.forEach(s=>{ if(!inCohort(s)) return; cnt[s.addr.bairro]=(cnt[s.addr.bairro]||0)+s.kids.length; });
   const data=Object.entries(cnt).sort((a,b)=>b[1]-a[1]).slice(0,8);
   const max=data[0]?.[1]||1;
   document.getElementById('hoodList').innerHTML=data.map(([n,v],i)=>`<div>
@@ -1720,14 +1760,14 @@ function renderHoods(){
 /* autorização de uso de imagem — calculada da base (pagamento é sempre boleto/carnê) */
 function payData(){
   let yes=0,no=0;
-  STUDENTS.forEach(s=>{ if(s.active===false) return; if(s.media!==false) yes+=s.kids.length; else no+=s.kids.length; });
+  STUDENTS.forEach(s=>{ if(!inCohort(s)) return; if(s.media!==false) yes+=s.kids.length; else no+=s.kids.length; });
   return [['Autorizam fotos',yes,'#2F539A'],['Não autorizam',no,'#F5B700']];
 }
 function renderPayLegend(){
   document.getElementById('payLegend').innerHTML=payData().map(p=>`<div class="flex items-center justify-between"><span class="flex items-center gap-2 text-[13px]"><span class="w-2.5 h-2.5 rounded-full" style="background:${p[2]}"></span>${p[0]}</span><span class="font-semibold text-[13px]">${p[1]}</span></div>`).join('');
 }
 function renderHealth(){
-  const act=STUDENTS.filter(s=>s.active!==false);
+  const act=STUDENTS.filter(inCohort);
   const by=k=>act.filter(s=>s.status===k).length;
   const data=[{t:'Assinados',v:by('signed'),c:'#16a34a'},{t:'Enviados, aguardando',v:by('sent'),c:'#2F539A'},{t:'Pendentes de envio',v:by('pending'),c:'#B5860B'}];
   const sub=document.getElementById('healthSub'); if(sub) sub.textContent=`Status das ${act.length} matrículas ativas`;
@@ -1741,7 +1781,7 @@ const TURMA_CAP={ 'seg-qua':{'14h00–15h30':18,'15h00–16h30':18,'16h30–18h0
                   'ter-qui':{'14h00–15h30':18,'15h00–16h30':18,'16h30–18h00':18,'17h00–18h30':18} };
 function renderVagas(){
   const cnt={}; let tot=0;
-  STUDENTS.forEach(s=>{ if(s.active===false) return; cnt[s.sch+'|'+s.t]=(cnt[s.sch+'|'+s.t]||0)+s.kids.length; tot+=s.kids.length; });
+  STUDENTS.forEach(s=>{ if(!inCohort(s)) return; cnt[s.sch+'|'+s.t]=(cnt[s.sch+'|'+s.t]||0)+s.kids.length; tot+=s.kids.length; });
   const col=(sch,label)=>`<div class="space-y-3"><p class="text-[10px] font-bold uppercase tracking-wider text-[var(--muted)]">${label}</p>`+
     Object.entries(TURMA_CAP[sch]).map(([t,cap])=>{ const v=cnt[sch+'|'+t]||0; const full=v>=cap; const pct=Math.min(100,Math.round(v/cap*100));
       return `<div><div class="flex justify-between text-[13px] mb-1"><span class="font-medium">${t}${full?' <span class="text-[9px] font-bold px-1.5 py-0.5 rounded align-middle" style="background:rgba(245,183,0,.22);color:#B5860B">CHEIA</span>':''}</span><span class="text-[var(--muted)]">${v}/${cap}</span></div>
@@ -1749,23 +1789,36 @@ function renderVagas(){
   const grid=document.getElementById('vagasGrid'); if(grid) grid.innerHTML=col('seg-qua','Segunda / Quarta')+col('ter-qui','Terça / Quinta');
   const chip=document.getElementById('vagasChip'); if(chip) chip.textContent=`${Math.max(0,150-tot)} vagas livres`;
 }
-/* recalcula tudo que deriva da base (chamado no init e após desligar/reativar/nova matrícula) */
+/* recalcula tudo que deriva da base (chamado no init e após desligar/reativar/nova matrícula).
+   ovCohort: ''=todos · 'on'=estudando agora · 'next'=matrículas do período aberto (2026.2) */
+let ovCohort='';
+function setOvCohort(v){
+  ovCohort=v;
+  [['ovcAll',''],['ovcOn','on'],['ovcNext','next']].forEach(([id,k])=>{
+    const b=document.getElementById(id); if(!b) return;
+    b.className='px-3 py-1.5 rounded-lg '+(k===v?'bg-[var(--card)] shadow-sm font-medium':'text-[var(--muted)]');
+  });
+  refreshOverviewData();
+}
 function refreshOverviewData(){
-  const act=STUDENTS.filter(s=>s.active!==false);
+  const allAct=STUDENTS.filter(s=>s.active!==false);
+  const act=allAct.filter(s=>ovCohort===''||(ovCohort==='on'?!isFuture(s):isFuture(s)));
   const actKids=act.flatMap(s=>s.kids);
   const dv=s=>parseInt(s.date.split('/').reverse().join(''),10);
   const set=(id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v; };
-  const juneKids=act.filter(s=>dv(s)>=20260601).reduce((a,s)=>a+s.kids.length,0);
-  set('kpiActive',actKids.length); set('kpiActiveSub',`+${juneKids} em junho`);
+  const futKids=allAct.filter(isFuture).reduce((a,s)=>a+s.kids.length,0);
+  const allKids=allAct.reduce((a,s)=>a+s.kids.length,0);
+  set('kpiActive',actKids.length); set('kpiActiveSub',`${allKids-futKids} estudando · ${futKids} começam em Jul`);
   set('kpiWeek',act.filter(s=>{ const d=dv(s); return d>=20260528&&d<=20260603; }).length);
   set('kpiPending',act.filter(s=>s.status!=='signed').length);
   set('kpiMonth',act.filter(s=>dv(s)>=20260601).length);
+  set('stNext',futKids+(futKids===1?' aluno':' alunos'));
   set('stAge',(actKids.reduce((a,k)=>a+k.age,0)/(actKids.length||1)).toFixed(1).replace('.',',')+' anos');
   const fams={}; act.forEach(s=>{ fams[s.resp.cpf]=(fams[s.resp.cpf]||0)+s.kids.length; });
   set('stFam',Object.values(fams).filter(n=>n>1).length+' famílias');
   set('stOcc',Math.round(actKids.length/150*100)+'%');
   set('stSigned',Math.round(act.filter(s=>s.status==='signed').length/(act.length||1)*100)+'%');
-  set('alunosSub',`${actKids.length} alunos em ${act.length} matrículas ativas`);
+  set('alunosSub',`${allKids} alunos em ${allAct.length} matrículas ativas`);
   renderHealth(); renderPayLegend(); renderVagas(); renderHoods(); renderBirthdays(); renderRecent();
   /* gráficos que derivam da base */
   if(charts.sch){ charts.sch.data.datasets[0].data=['seg-qua','ter-qui'].map(sc=>act.filter(s=>s.sch===sc).reduce((a,s)=>a+s.kids.length,0)); charts.sch.update(); }
@@ -2130,14 +2183,14 @@ function init(){
   document.getElementById('periodSelWrap').innerHTML=cselect('period',[{v:'6m',l:'Últimos 6 meses'},{v:'ano',l:'Últimos 12 meses'},{v:'mes',l:'Este mês'}],{icon:'calendar',onChange:applyPeriod});
   document.getElementById('fScheduleWrap').innerHTML=cselect('fSchedule',[{v:'',l:'Todos os horários'},{v:'seg-qua',l:'Seg/Qua'},{v:'ter-qui',l:'Ter/Qui'}],{onChange:tableChanged});
   document.getElementById('fStatusWrap').innerHTML=cselect('fStatus',[{v:'',l:'Contrato: todos'},{v:'signed',l:'Assinado'},{v:'sent',l:'Enviado'},{v:'pending',l:'Pendente'}],{onChange:tableChanged});
-  document.getElementById('fActiveWrap').innerHTML=cselect('fActive',[{v:'',l:'Situação: todas'},{v:'on',l:'Ativas'},{v:'off',l:'Inativas'}],{onChange:tableChanged});
+  document.getElementById('fActiveWrap').innerHTML=cselect('fActive',[{v:'',l:'Situação: todas'},{v:'on',l:'Estudando agora'},{v:'next',l:'Começam em 2026.2'},{v:'off',l:'Inativas'}],{onChange:tableChanged});
   const hoods=[...new Set(STUDENTS.map(s=>s.addr.bairro))].sort();
   document.getElementById('fHoodWrap').innerHTML=cselect('fHood',[{v:'',l:'Bairro: todos'},...hoods.map(h=>({v:h,l:h}))],{onChange:tableChanged});
   document.getElementById('fAgeWrap').innerHTML=cselect('fAge',[{v:'',l:'Idade: todas'},{v:'4-6',l:'4 a 6 anos'},{v:'7-9',l:'7 a 9 anos'},{v:'10-12',l:'10 a 12 anos'},{v:'13+',l:'13 anos ou mais'}],{onChange:tableChanged});
   document.getElementById('fMediaWrap').innerHTML=cselect('fMedia',[{v:'',l:'Imagem: todos'},{v:'yes',l:'Autorizou imagem'},{v:'no',l:'Não autorizou'}],{onChange:tableChanged});
   document.getElementById('fSibWrap').innerHTML=cselect('fSib',[{v:'',l:'Irmãos: todos'},{v:'multi',l:'Com irmãos'},{v:'single',l:'Aluno único'}],{onChange:tableChanged});
   document.getElementById('cStatusWrap').innerHTML=cselect('cStatus',[{v:'',l:'Status: todos'},{v:'pending',l:'Pendentes'},{v:'sent',l:'Aguardando assinatura'},{v:'signed',l:'Assinados'}],{onChange:contractsChanged});
-  document.getElementById('cActiveWrap').innerHTML=cselect('cActive',[{v:'',l:'Situação: todas'},{v:'on',l:'Ativas'},{v:'off',l:'Inativas'}],{onChange:contractsChanged});
+  document.getElementById('cActiveWrap').innerHTML=cselect('cActive',[{v:'',l:'Situação: todas'},{v:'on',l:'Estudando agora'},{v:'next',l:'Começam em 2026.2'},{v:'off',l:'Inativas'}],{onChange:contractsChanged});
   renderTableHead();
   const actE=STUDENTS.filter(s=>s.active!==false);
   const kidsOf=sc=>actE.filter(s=>s.sch===sc).reduce((a,s)=>a+s.kids.length,0);
@@ -2505,7 +2558,7 @@ function exportCSV(useFilters){
   const rows=useFilters?filteredStudents():STUDENTS;
   const head=['Aluno','Idade','Nascimento','Responsável','Telefone','Horário','Status contrato','Situação','Bairro','Cidade','Matrícula em','Hora'];
   const csv=[head.join(';')].concat(rows.flatMap(s=>s.kids.map(k=>
-    [k.n,k.age,k.b,s.resp.n,s.resp.phone,schLabel(s.sch)+' '+s.t,STATUS[s.status].t,s.active===false?'Inativa':'Ativa',s.addr.bairro,s.addr.city,s.date,s.hora||''].join(';')
+    [k.n,k.age,k.b,s.resp.n,s.resp.phone,schLabel(s.sch)+' '+s.t,STATUS[s.status].t,s.active===false?'Inativa':isFuture(s)?'Começa em 2026.2':'Estudando',s.addr.bairro,s.addr.city,s.date,s.hora||''].join(';')
   ))).join('\n');
   const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'});
   const a=document.createElement('a');
@@ -3015,6 +3068,7 @@ function dpPickYear(y){ dpY=y; dpMode='days'; renderDP(); }
 function dpPick(d){
   if(!dpTarget) return;
   dpTarget.value=String(d).padStart(2,'0')+'/'+String(dpM+1).padStart(2,'0')+'/'+dpY;
+  dpTarget.dispatchEvent(new Event('input',{bubbles:true}));
   closeDP();
 }
 function renderDP(){
