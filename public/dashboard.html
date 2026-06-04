@@ -516,7 +516,7 @@
           <div><h1 class="font-heading text-2xl sm:text-3xl font-semibold">Alunos</h1>
             <p class="text-[var(--muted)] text-sm mt-0.5" id="alunosSub">—</p></div>
           <div class="flex items-center gap-2">
-            <button onclick="openImportModal()" class="flex items-center gap-2 h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)]" title="Traz os alunos da planilha atual de matrículas (remove linhas duplicadas sozinho)"><i data-lucide="file-up" class="w-4 h-4"></i><span class="hidden sm:inline">Importar planilha</span></button>
+            <button onclick="openImportModal()" data-tour="import-al" class="flex items-center gap-2 h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)]" title="Traz os alunos da planilha atual de matrículas (remove linhas duplicadas sozinho)"><i data-lucide="file-up" class="w-4 h-4"></i><span class="hidden sm:inline">Importar planilha</span></button>
             <button onclick="exportCSV(true)" data-tour="export-al" class="flex items-center gap-2 h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)]" title="Baixa um arquivo que abre no Excel ou Google Planilhas"><i data-lucide="sheet" class="w-4 h-4"></i><span class="hidden sm:inline">Exportar planilha</span></button>
             <button onclick="openNewEnrollment()" data-tour="nova" class="flex items-center gap-2 h-10 px-4 rounded-xl text-white text-sm font-semibold" style="background:linear-gradient(135deg,#1E3765,#2F539A)"><i data-lucide="plus" class="w-4 h-4"></i>Nova matrícula</button>
           </div>
@@ -1254,11 +1254,12 @@ const TOURS={
     { target:'#cmFab', title:'O botão mais importante', body:'Viu algo que quer mudar? Clique em "Comentar", depois em qualquer parte da tela, e escreva sua sugestão. Quando for ajustado, o alfinete fica verde com a resposta.', placement:'top', last:true },
   ],
   alunos:[
-    { target:'[data-tour="row-menu"]', title:'Tudo mora nos três pontinhos', body:'Cada linha tem um menu completo: ficha do aluno, ver e baixar contrato, enviar no WhatsApp, copiar telefone, marcar como enviado/assinado e até desligar o aluno da escola (com registro do motivo).', placement:'left' },
+    { target:'[data-tour="row-menu"]', title:'Tudo mora nos três pontinhos', body:'Cada linha tem um menu completo: ficha do aluno, editar os dados, ver e baixar contrato, enviar no WhatsApp, copiar telefone, marcar como enviado/assinado, desligar o aluno (com registro do motivo) e excluir cadastros errados.', placement:'left' },
     { target:'#tableHead', title:'Ordene por qualquer coluna', body:'Clique no título de uma coluna para ordenar (vem por nome). Clique de novo para inverter. Ordenando por Responsável, os irmãos de matrículas separadas ficam juntos.', placement:'bottom' },
     { target:'[data-tour="filtros"]', title:'Busca e filtros', body:'Por horário, contrato, situação (estudando agora × começam no próximo período), bairro, idade, imagem, irmãos e período de matrícula (de/até) — o "Limpar" zera tudo de uma vez.', placement:'bottom' },
     { target:'[data-tip="Autorizou uso de imagem"]', title:'Câmera verde, câmera vermelha', body:'A camerazinha ao lado do nome mostra se a família autorizou fotos: verde = pode postar, vermelha = não pode.', placement:'right' },
     { target:'[data-tour="nova"]', title:'Matrícula manual', body:'A secretaria pode adicionar uma matrícula direto por aqui, sem passar pelo site.', placement:'bottom' },
+    { target:'[data-tour="import-al"]', title:'Traga a planilha de hoje', body:'Importa o arquivo da planilha atual de matrículas. Linhas repetidas (o mesmo cadastro enviado duas vezes) são removidas sozinhas, e quem já está na dashboard não duplica.', placement:'bottom' },
     { target:'[data-tour="export-al"]', title:'Planilha da lista filtrada', body:'Exporta exatamente o que está na tela — com os filtros aplicados.', placement:'bottom', last:true },
   ],
   editor:[
