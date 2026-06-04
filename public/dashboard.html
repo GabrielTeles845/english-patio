@@ -474,7 +474,7 @@
 
         <!-- horário das matrículas + aniversariantes -->
         <div class="dash-row grid lg:grid-cols-3 gap-4 mt-4">
-          <div class="surface rounded-2xl p-5 lg:col-span-2 flex flex-col">
+          <div class="surface rounded-2xl p-5 lg:col-span-2 flex flex-col" data-tour="hours">
             <div class="flex items-center justify-between mb-4">
               <div><h3 class="font-heading font-semibold text-lg">Que horas o pessoal matricula?</h3>
                 <p class="text-xs text-[var(--muted)]">Horário em que as matrículas chegam pelo site</p></div>
@@ -517,7 +517,7 @@
             <p class="text-[var(--muted)] text-sm mt-0.5" id="alunosSub">—</p></div>
           <div class="flex items-center gap-2">
             <button onclick="openImportModal()" class="flex items-center gap-2 h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)]" title="Traz os alunos da planilha atual de matrículas (remove linhas duplicadas sozinho)"><i data-lucide="file-up" class="w-4 h-4"></i><span class="hidden sm:inline">Importar planilha</span></button>
-            <button onclick="exportCSV(true)" class="flex items-center gap-2 h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)]" title="Baixa um arquivo que abre no Excel ou Google Planilhas"><i data-lucide="sheet" class="w-4 h-4"></i><span class="hidden sm:inline">Exportar planilha</span></button>
+            <button onclick="exportCSV(true)" data-tour="export-al" class="flex items-center gap-2 h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)]" title="Baixa um arquivo que abre no Excel ou Google Planilhas"><i data-lucide="sheet" class="w-4 h-4"></i><span class="hidden sm:inline">Exportar planilha</span></button>
             <button onclick="openNewEnrollment()" data-tour="nova" class="flex items-center gap-2 h-10 px-4 rounded-xl text-white text-sm font-semibold" style="background:linear-gradient(135deg,#1E3765,#2F539A)"><i data-lucide="plus" class="w-4 h-4"></i>Nova matrícula</button>
           </div>
         </div>
@@ -2328,7 +2328,9 @@ function openEditEnrollment(id){
 }
 function saveEditEnrollment(id){
   const s=STUDENTS.find(x=>x.id===id); if(!s) return;
-  const ageFrom=b=>{ const p=b.split('/').map(Number); return p[2]>1900 ? 2026-p[2]-((p[1]*100+p[0])>603?1:0) : null; };
+  const ageFrom=b=>{ const p=b.split('/').map(Number);
+    if(p.length!==3||!(p[0]>=1&&p[0]<=31)||!(p[1]>=1&&p[1]<=12)||!(p[2]>=2000&&p[2]<=2026)) return null;
+    const a=2026-p[2]-((p[1]*100+p[0])>603?1:0); return (a>=1&&a<=25)?a:null; };
   s.kids=s.kids.map((k,i)=>{
     const n=document.getElementById('edKid'+i)?.value.trim()||k.n;
     const b=document.getElementById('edKidB'+i)?.value.trim()||k.b;
