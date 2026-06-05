@@ -297,6 +297,9 @@
           <a class="nav-item sb-item group relative flex items-center gap-3 px-3 h-10 rounded-xl transition cursor-pointer" onclick="go('usuarios', this)">
             <span class="bar absolute left-0 top-2 bottom-2 w-1 rounded-full opacity-0 transition" style="background:var(--sb-accent)"></span>
             <i data-lucide="users-round" class="w-[18px] h-[18px]"></i><span class="text-sm font-medium">Usuários</span></a>
+          <a class="nav-item sb-item group relative flex items-center gap-3 px-3 h-10 rounded-xl transition cursor-pointer" onclick="go('atividade', this)">
+            <span class="bar absolute left-0 top-2 bottom-2 w-1 rounded-full opacity-0 transition" style="background:var(--sb-accent)"></span>
+            <i data-lucide="history" class="w-[18px] h-[18px]"></i><span class="text-sm font-medium">Atividade</span></a>
           <a class="nav-item sb-item group relative flex items-center gap-3 px-3 h-10 rounded-xl transition cursor-pointer" onclick="go('config', this)">
             <span class="bar absolute left-0 top-2 bottom-2 w-1 rounded-full opacity-0 transition" style="background:var(--sb-accent)"></span>
             <i data-lucide="settings" class="w-[18px] h-[18px]"></i><span class="text-sm font-medium">Configurações</span></a>
@@ -576,7 +579,7 @@
         <div class="flex flex-wrap items-end justify-between gap-3 mb-4">
           <div>
             <h1 class="font-heading text-2xl sm:text-3xl font-semibold mb-1">Contratos</h1>
-            <p class="text-[var(--muted)] text-sm">A fila de trabalho da secretaria: enviar, acompanhar e confirmar assinaturas. <span class="text-[var(--text)] font-medium">Assinatura digital integrada chega numa próxima fase.</span></p>
+            <p class="text-[var(--muted)] text-sm" data-tour="cauto">Assinatura digital pelo <span class="text-[var(--text)] font-medium">Autentique</span>: o contrato vai sozinho quando a matrícula chega, a família assina pelo link no WhatsApp e o status atualiza aqui — sem subir documento nem perguntar se assinou.</p>
           </div>
           <div class="flex items-center gap-2">
             <button onclick="openModelos()" data-tour="cmodelos" class="flex items-center gap-2 h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)]" title="Gerenciar os modelos de contrato (PDF) usados nas matrículas"><i data-lucide="file-cog" class="w-4 h-4"></i><span class="hidden sm:inline">Modelos de contrato</span></button>
@@ -690,6 +693,8 @@
               </div>
               <div class="p-5 space-y-3 text-sm">
                 <div class="flex items-center justify-between"><span>Confirmação de matrícula recebida</span><span class="text-xs font-semibold px-2.5 py-1 rounded-full" style="background:rgba(22,163,74,.10);color:#16a34a">Ativo</span></div>
+                <div class="flex items-center justify-between pt-3 border-t" style="border-color:var(--border)"><span class="tip" data-tip="Assim que a matrícula chega, o Autentique manda o link de assinatura por WhatsApp e e-mail">Contrato → Autentique (link por WhatsApp + e-mail)</span><span class="text-xs font-semibold px-2.5 py-1 rounded-full" style="background:rgba(22,163,74,.10);color:#16a34a">Ativo</span></div>
+                <div class="flex items-center justify-between pt-3 border-t" style="border-color:var(--border)"><span class="tip" data-tip="Contrato enviado há 7 dias sem assinatura gera aviso no sininho">Aviso de contrato parado (7 dias sem assinar)</span><span class="text-xs font-semibold px-2.5 py-1 rounded-full" style="background:rgba(22,163,74,.10);color:#16a34a">Ativo</span></div>
                 <div class="flex items-center justify-between pt-3 border-t" style="border-color:var(--border)"><span>Recuperação de senha do painel</span><span class="text-xs font-semibold px-2.5 py-1 rounded-full" style="background:rgba(22,163,74,.10);color:#16a34a">Ativo</span></div>
               </div>
             </div>
@@ -776,10 +781,27 @@
         <div class="surface rounded-2xl divide-y" style="border-color:var(--border)" id="userList"></div>
         <div class="grid sm:grid-cols-2 gap-4 mt-4" data-tour="papeis">
           <div class="surface rounded-2xl p-5"><div class="flex items-center gap-2 mb-2"><i data-lucide="shield-check" class="w-5 h-5 text-brand-light"></i><h3 class="font-heading font-semibold">Administrador</h3></div>
-            <p class="text-sm text-[var(--muted)]">Acesso total: alunos, contratos, e-mails, editor do site, usuários e configurações.</p></div>
+            <p class="text-sm text-[var(--muted)]">Acesso total: alunos, contratos, comunicados, editor do site, usuários, registro de atividades e configurações.</p></div>
           <div class="surface rounded-2xl p-5"><div class="flex items-center gap-2 mb-2"><i data-lucide="clipboard-list" class="w-5 h-5 text-brand-light"></i><h3 class="font-heading font-semibold">Secretaria</h3></div>
-            <p class="text-sm text-[var(--muted)]">Vê os alunos e envia contratos (WhatsApp/download). Não acessa e-mails, editor do site nem usuários.</p></div>
+            <p class="text-sm text-[var(--muted)]">Vê os alunos e envia/cobra contratos (WhatsApp/download). Não acessa comunicados, editor do site, usuários nem o registro de atividades.</p></div>
         </div>
+      </section>
+
+      <!-- ====================== REGISTRO DE ATIVIDADES ====================== -->
+      <section data-view="atividade" class="fade-in">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+          <div><h1 class="font-heading text-2xl sm:text-3xl font-semibold">Registro de atividades</h1>
+            <p class="text-[var(--muted)] text-sm mt-0.5">Quem fez o quê no painel — cada ação fica guardada, inclusive as automáticas do sistema e do Autentique</p></div>
+        </div>
+        <div class="surface rounded-2xl p-3 mb-4 flex flex-wrap items-center gap-2" data-tour="act-filtros">
+          <div class="flex items-center gap-2 rounded-xl px-3 h-10 flex-1 min-w-[200px]" style="background:var(--hover)">
+            <i data-lucide="search" class="w-4 h-4 text-[var(--muted)]"></i>
+            <input id="actSearch" oninput="renderActivity()" placeholder="Buscar por pessoa, aluno ou ação…" class="flex-1 bg-transparent outline-none text-sm">
+          </div>
+          <span id="actWhoWrap"></span>
+        </div>
+        <div class="surface rounded-2xl overflow-hidden" id="actList" data-tour="act-list"></div>
+        <p class="text-xs text-[var(--muted)] mt-3 flex items-center gap-1.5"><i data-lucide="shield-check" class="w-3.5 h-3.5 shrink-0"></i> O registro não pode ser editado nem apagado — é a memória de segurança do painel.</p>
       </section>
 
       <!-- ====================== CONFIGURAÇÕES ====================== -->
@@ -827,7 +849,7 @@
               <div><h3 class="font-heading font-semibold">Segurança</h3><p class="text-xs text-[var(--muted)]">Proteção dos dados dos alunos</p></div>
             </div>
             <div class="p-5 space-y-3">
-              <div class="flex items-center justify-between"><div><p class="font-medium text-sm">Registro de acessos</p><p class="text-xs text-[var(--muted)]">Histórico de quem viu os dados</p></div><span class="text-xs font-semibold px-2.5 py-1 rounded-full" style="background:rgba(22,163,74,.10);color:#16a34a">Ativo</span></div>
+              <div onclick="go('atividade')" class="flex items-center justify-between cursor-pointer hover:bg-[var(--hover)] -mx-2 px-2 py-1.5 rounded-lg transition"><div><p class="font-medium text-sm">Registro de atividades</p><p class="text-xs text-[var(--muted)]">Quem fez o quê no painel — toque para ver</p></div><span class="flex items-center gap-1.5"><span class="text-xs font-semibold px-2.5 py-1 rounded-full" style="background:rgba(22,163,74,.10);color:#16a34a">Ativo</span><i data-lucide="chevron-right" class="w-4 h-4 text-[var(--muted)]"></i></span></div>
               <div class="flex items-center justify-between pt-3 border-t" style="border-color:var(--border)"><div><p class="font-medium text-sm">Autenticação em 2 fatores</p><p class="text-xs text-[var(--muted)]">Código extra no celular ao entrar</p></div><span class="text-xs px-2.5 py-1 rounded-full bg-[var(--hover)] text-[var(--muted)]">Em breve</span></div>
               <div class="flex items-center justify-between pt-3 border-t" style="border-color:var(--border)"><div><p class="font-medium text-sm">Sessões ativas</p><p class="text-xs text-[var(--muted)]">1 dispositivo conectado agora</p></div><i data-lucide="monitor-smartphone" class="w-5 h-5 text-[var(--muted)]"></i></div>
             </div>
@@ -844,7 +866,7 @@
                 <div><p class="font-medium text-sm">Rever as dicas desta tela</p><p class="text-xs text-[var(--muted)]">O botão "?" no canto faz o mesmo em qualquer tela</p></div>
                 <i data-lucide="play-circle" class="w-5 h-5 text-brand-light"></i>
               </div>
-              <div onclick="localStorage.removeItem('ep-tours-off');['overview','alunos','editor','contratos','modelos','emails','usuarios','config'].forEach(v=>localStorage.removeItem('ep-tour-seen-'+v));toast('Dicas reativadas em todas as telas!')" class="flex items-center justify-between pt-3 border-t cursor-pointer hover:bg-[var(--hover)] -mx-2 px-2 py-1.5 rounded-lg transition" style="border-color:var(--border)">
+              <div onclick="localStorage.removeItem('ep-tours-off');['overview','alunos','editor','contratos','modelos','emails','usuarios','atividade','config'].forEach(v=>localStorage.removeItem('ep-tour-seen-'+v));toast('Dicas reativadas em todas as telas!')" class="flex items-center justify-between pt-3 border-t cursor-pointer hover:bg-[var(--hover)] -mx-2 px-2 py-1.5 rounded-lg transition" style="border-color:var(--border)">
                 <div><p class="font-medium text-sm">Reativar dicas em todas as telas</p><p class="text-xs text-[var(--muted)]">Volta a mostrar os tours uma vez por tela</p></div>
                 <i data-lucide="rotate-ccw" class="w-5 h-5 text-[var(--muted)]"></i>
               </div>
@@ -969,19 +991,19 @@ const EXIT_REASONS=[
   { k:'other',      ic:'pencil-line',     l:'Outro motivo',                   d:'Descreva abaixo o que aconteceu' },
 ];
 const STUDENTS = [
-  { id:1, kids:[{n:'Helena Duarte Lima', age:8, b:'14/02/2018'}], resp:{n:'Mariana Duarte Lima', cpf:'047.812.336-50', phone:'(62) 99214-8870', email:'mariana.duarte@gmail.com', rel:'Mãe', b:'09/05/1989'}, second:{n:'Rafael Lima', phone:'(62) 98112-4471', rel:'Pai'}, fin:'Mariana Duarte Lima', addr:{cep:'74230-110', street:'Rua T-55', num:'180', comp:'Apto 902', bairro:'Setor Bueno', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'15h00–16h30', pay:'PIX', status:'signed', media:true, since:'03/02/2025', date:'02/06/2026', hora:'20h14' },
+  { id:1, kids:[{n:'Helena Duarte Lima', age:8, b:'14/02/2018'}], resp:{n:'Mariana Duarte Lima', cpf:'047.812.336-50', phone:'(62) 99214-8870', email:'mariana.duarte@gmail.com', rel:'Mãe', b:'09/05/1989'}, second:{n:'Rafael Lima', phone:'(62) 98112-4471', rel:'Pai'}, fin:'Mariana Duarte Lima', addr:{cep:'74230-110', street:'Rua T-55', num:'180', comp:'Apto 902', bairro:'Setor Bueno', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'15h00–16h30', pay:'Boleto', status:'signed', media:true, since:'03/02/2025', date:'02/06/2026', hora:'20h14' },
   { id:2, kids:[{n:'Théo Andrade Rocha', age:10, b:'22/08/2015'},{n:'Lara Andrade Rocha', age:7, b:'30/11/2018'}], resp:{n:'Patrícia Andrade', cpf:'118.553.701-22', phone:'(62) 99980-1245', email:'patricia.andrade@hotmail.com', rel:'Mãe', b:'17/03/1986'}, second:{n:'Bruno Rocha', phone:'(62) 99771-3380', rel:'Pai'}, fin:'Bruno Rocha', addr:{cep:'74115-030', street:'Av. T-9', num:'1240', comp:'', bairro:'Jardim Goiás', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'17h00–18h30', pay:'Boleto', status:'pending', media:true, since:'05/08/2024', date:'31/05/2026', hora:'19h32' },
-  { id:3, kids:[{n:'Miguel Ferreira Souza', age:12, b:'05/01/2014'}], resp:{n:'Camila Ferreira', cpf:'203.447.882-09', phone:'(62) 98341-6622', email:'camila.fsouza@gmail.com', rel:'Mãe', b:'25/07/1984'}, second:null, fin:'Camila Ferreira', addr:{cep:'74080-010', street:'Rua 90', num:'455', comp:'Casa 2', bairro:'Setor Sul', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'16h30–18h00', pay:'Cartão', status:'signed', media:false, since:'03/02/2025', date:'30/05/2026', hora:'10h05' },
-  { id:4, kids:[{n:'Sofia Mendes Castro', age:9, b:'19/09/2016'}], resp:{n:'Juliana Castro', cpf:'355.221.940-71', phone:'(62) 99657-2218', email:'ju.castro@outlook.com', rel:'Mãe', b:'12/12/1990'}, second:{n:'André Mendes', phone:'(62) 98220-9981', rel:'Pai'}, fin:'André Mendes', addr:{cep:'74810-100', street:'Rua C-140', num:'78', comp:'', bairro:'Jardim América', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'14h00–15h30', pay:'PIX', status:'sent', media:true, date:'29/05/2026', hora:'21h47' },
-  { id:5, kids:[{n:'Bernardo Pires Alves', age:6, b:'09/06/2020'}], resp:{n:'Fernanda Pires', cpf:'412.889.503-44', phone:'(62) 99102-7755', email:'fernanda.pires@gmail.com', rel:'Mãe', b:'28/02/1992'}, second:null, fin:'Fernanda Pires', addr:{cep:'74663-520', street:'Rua VP-7D', num:'320', comp:'Qd 12 Lt 4', bairro:'Vila São João', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'14h00–15h30', pay:'Dinheiro', status:'signed', media:true, date:'28/05/2026',hora:'14h22' },
-  { id:6, kids:[{n:'Alice Barbosa Nunes', age:11, b:'27/06/2015'}], resp:{n:'Renata Nunes', cpf:'509.334.118-60', phone:'(62) 98876-4400', email:'renata.nunes@yahoo.com', rel:'Mãe', b:'05/09/1983'}, second:{n:'Carlos Barbosa', phone:'(62) 99443-1102', rel:'Pai'}, fin:'Renata Nunes', addr:{cep:'74125-160', street:'Av. Mutirão', num:'2540', comp:'Apto 1503', bairro:'Setor Marista', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'16h30–18h00', pay:'PIX', status:'signed', media:true, since:'01/08/2022', date:'27/05/2026', hora:'18h39' },
+  { id:3, kids:[{n:'Miguel Ferreira Souza', age:12, b:'05/01/2014'}], resp:{n:'Camila Ferreira', cpf:'203.447.882-09', phone:'(62) 98341-6622', email:'camila.fsouza@gmail.com', rel:'Mãe', b:'25/07/1984'}, second:null, fin:'Camila Ferreira', addr:{cep:'74080-010', street:'Rua 90', num:'455', comp:'Casa 2', bairro:'Setor Sul', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'16h30–18h00', pay:'Boleto', status:'signed', media:false, since:'03/02/2025', date:'30/05/2026', hora:'10h05' },
+  { id:4, kids:[{n:'Sofia Mendes Castro', age:9, b:'19/09/2016'}], resp:{n:'Juliana Castro', cpf:'355.221.940-71', phone:'(62) 99657-2218', email:'ju.castro@outlook.com', rel:'Mãe', b:'12/12/1990'}, second:{n:'André Mendes', phone:'(62) 98220-9981', rel:'Pai'}, fin:'André Mendes', addr:{cep:'74810-100', street:'Rua C-140', num:'78', comp:'', bairro:'Jardim América', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'14h00–15h30', pay:'Boleto', status:'viewed', media:true, date:'29/05/2026', hora:'21h47' },
+  { id:5, kids:[{n:'Bernardo Pires Alves', age:6, b:'09/06/2020'}], resp:{n:'Fernanda Pires', cpf:'412.889.503-44', phone:'(62) 99102-7755', email:'fernanda.pires@gmail.com', rel:'Mãe', b:'28/02/1992'}, second:null, fin:'Fernanda Pires', addr:{cep:'74663-520', street:'Rua VP-7D', num:'320', comp:'Qd 12 Lt 4', bairro:'Vila São João', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'14h00–15h30', pay:'Boleto', status:'signed', media:true, date:'28/05/2026',hora:'14h22' },
+  { id:6, kids:[{n:'Alice Barbosa Nunes', age:11, b:'27/06/2015'}], resp:{n:'Renata Nunes', cpf:'509.334.118-60', phone:'(62) 98876-4400', email:'renata.nunes@yahoo.com', rel:'Mãe', b:'05/09/1983'}, second:{n:'Carlos Barbosa', phone:'(62) 99443-1102', rel:'Pai'}, fin:'Renata Nunes', addr:{cep:'74125-160', street:'Av. Mutirão', num:'2540', comp:'Apto 1503', bairro:'Setor Marista', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'16h30–18h00', pay:'Boleto', status:'signed', media:true, since:'01/08/2022', date:'27/05/2026', hora:'18h39' },
   { id:7, kids:[{n:'Davi Cardoso Melo', age:13, b:'11/06/2013'}], resp:{n:'Aline Melo', cpf:'620.778.245-31', phone:'(62) 99320-8845', email:'aline.melo@gmail.com', rel:'Mãe', b:'19/11/1981'}, second:null, fin:'Aline Melo', addr:{cep:'74305-040', street:'Rua 1136', num:'95', comp:'', bairro:'Setor Pedro Ludovico', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'18h00–19h30', pay:'Boleto', status:'pending', media:false, since:'05/02/2024', date:'26/05/2026', hora:'20h51' },
-  { id:8, kids:[{n:'Manuela Teixeira Gomes', age:7, b:'08/07/2018'},{n:'Pedro Teixeira Gomes', age:9, b:'16/05/2016'}], resp:{n:'Vanessa Teixeira', cpf:'731.005.667-88', phone:'(62) 98990-3321', email:'va.teixeira@hotmail.com', rel:'Mãe', b:'03/06/1988'}, second:{n:'Marcos Gomes', phone:'(62) 99558-7700', rel:'Pai'}, fin:'Marcos Gomes', addr:{cep:'74884-120', street:'Av. Rio Verde', num:'1180', comp:'Cond. Jardins', bairro:'Jardim Atlântico', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'15h00–16h30', pay:'Cartão', status:'sent', media:true, since:'05/02/2024', date:'25/05/2026', hora:'16h08' },
-  { id:9, kids:[{n:'Isabela Ribeiro Dias', age:14, b:'02/02/2012'}], resp:{n:'Cristina Dias', cpf:'845.119.302-15', phone:'(62) 99701-2266', email:'cristina.dias@gmail.com', rel:'Mãe', b:'21/08/1979'}, second:null, fin:'Cristina Dias', addr:{cep:'74215-908', street:'Av. 136', num:'960', comp:'Sala 408', bairro:'Setor Sul', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'18h00–19h30', pay:'PIX', status:'signed', media:false, active:false, exit:{ k:'moved', label:'Mudança de cidade ou bairro', note:'Família se mudou para Anápolis.', date:'28/05/2026' }, since:'06/02/2023', date:'24/05/2026', hora:'19h15' },
+  { id:8, kids:[{n:'Manuela Teixeira Gomes', age:7, b:'08/07/2018'},{n:'Pedro Teixeira Gomes', age:9, b:'16/05/2016'}], resp:{n:'Vanessa Teixeira', cpf:'731.005.667-88', phone:'(62) 98990-3321', email:'va.teixeira@hotmail.com', rel:'Mãe', b:'03/06/1988'}, second:{n:'Marcos Gomes', phone:'(62) 99558-7700', rel:'Pai'}, fin:'Marcos Gomes', addr:{cep:'74884-120', street:'Av. Rio Verde', num:'1180', comp:'Cond. Jardins', bairro:'Jardim Atlântico', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'15h00–16h30', pay:'Boleto', status:'sent', media:true, since:'05/02/2024', date:'25/05/2026', hora:'16h08' },
+  { id:9, kids:[{n:'Isabela Ribeiro Dias', age:14, b:'02/02/2012'}], resp:{n:'Cristina Dias', cpf:'845.119.302-15', phone:'(62) 99701-2266', email:'cristina.dias@gmail.com', rel:'Mãe', b:'21/08/1979'}, second:null, fin:'Cristina Dias', addr:{cep:'74215-908', street:'Av. 136', num:'960', comp:'Sala 408', bairro:'Setor Sul', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'18h00–19h30', pay:'Boleto', status:'signed', media:false, active:false, exit:{ k:'moved', label:'Mudança de cidade ou bairro', note:'Família se mudou para Anápolis.', date:'28/05/2026' }, since:'06/02/2023', date:'24/05/2026', hora:'19h15' },
   { id:10, kids:[{n:'Arthur Moraes Pinto', age:8, b:'29/10/2017'}], resp:{n:'Letícia Moraes', cpf:'956.443.870-02', phone:'(62) 98112-9943', email:'leticia.moraes@outlook.com', rel:'Mãe', b:'14/04/1991'}, second:{n:'Felipe Pinto', phone:'(62) 99887-6610', rel:'Pai'}, fin:'Felipe Pinto', addr:{cep:'74070-060', street:'Rua 22', num:'310', comp:'', bairro:'Setor Aeroporto', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'17h00–18h30', pay:'Boleto', status:'pending', media:true, active:false, exit:{ k:'financial', label:'Questões financeiras', note:'', date:'30/05/2026' }, date:'23/05/2026', hora:'11h26' },
-  { id:11, kids:[{n:'Laura Cavalcante Reis', age:10, b:'12/12/2015'}], resp:{n:'Daniela Reis', cpf:'063.778.221-49', phone:'(62) 99334-1180', email:'dani.reis@gmail.com', rel:'Mãe', b:'30/01/1987'}, second:null, fin:'Daniela Reis', addr:{cep:'74343-230', street:'Rua RF-12', num:'140', comp:'Qd 8', bairro:'Residencial Forte', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'15h00–16h30', pay:'PIX', status:'signed', media:true, since:'07/08/2023', date:'22/05/2026', hora:'20h33' },
-  { id:12, kids:[{n:'Gabriel Fonseca Lopes', age:11, b:'07/08/2014'}], resp:{n:'Simone Fonseca', cpf:'174.882.605-77', phone:'(62) 98445-2290', email:'simone.fonseca@yahoo.com', rel:'Mãe', b:'08/10/1982'}, second:{n:'Thiago Lopes', phone:'(62) 99221-5544', rel:'Pai'}, fin:'Thiago Lopes', addr:{cep:'74150-020', street:'Av. T-63', num:'880', comp:'Apto 701', bairro:'Setor Bueno', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'16h30–18h00', pay:'Cartão', status:'sent', media:true, date:'21/05/2026',hora:'17h44' },
-  { id:13, kids:[{n:'Valentina Almeida Prado', age:9, b:'15/04/2017'},{n:'Henrique Almeida Prado', age:11, b:'20/09/2014'},{n:'Cecília Almeida Prado', age:6, b:'02/01/2020'}], resp:{n:'Roberta Almeida Prado', cpf:'288.443.190-66', phone:'(62) 99845-7733', email:'roberta.prado@gmail.com', rel:'Mãe', b:'11/07/1985'}, second:{n:'Eduardo Prado', phone:'(62) 99102-8844', rel:'Pai'}, fin:'Eduardo Prado', addr:{cep:'74110-100', street:'Rua 9', num:'520', comp:'Casa 1', bairro:'Setor Oeste', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'16h30–18h00', pay:'PIX', status:'signed', media:true, since:'06/02/2023', date:'20/05/2026', hora:'19h58' },
+  { id:11, kids:[{n:'Laura Cavalcante Reis', age:10, b:'12/12/2015'}], resp:{n:'Daniela Reis', cpf:'063.778.221-49', phone:'(62) 99334-1180', email:'dani.reis@gmail.com', rel:'Mãe', b:'30/01/1987'}, second:null, fin:'Daniela Reis', addr:{cep:'74343-230', street:'Rua RF-12', num:'140', comp:'Qd 8', bairro:'Residencial Forte', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'15h00–16h30', pay:'Boleto', status:'signed', media:true, since:'07/08/2023', date:'22/05/2026', hora:'20h33' },
+  { id:12, kids:[{n:'Gabriel Fonseca Lopes', age:11, b:'07/08/2014'}], resp:{n:'Simone Fonseca', cpf:'174.882.605-77', phone:'(62) 98445-2290', email:'simone.fonseca@yahoo.com', rel:'Mãe', b:'08/10/1982'}, second:{n:'Thiago Lopes', phone:'(62) 99221-5544', rel:'Pai'}, fin:'Thiago Lopes', addr:{cep:'74150-020', street:'Av. T-63', num:'880', comp:'Apto 701', bairro:'Setor Bueno', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'16h30–18h00', pay:'Boleto', status:'viewed', media:true, date:'21/05/2026',hora:'17h44' },
+  { id:13, kids:[{n:'Valentina Almeida Prado', age:9, b:'15/04/2017'},{n:'Henrique Almeida Prado', age:11, b:'20/09/2014'},{n:'Cecília Almeida Prado', age:6, b:'02/01/2020'}], resp:{n:'Roberta Almeida Prado', cpf:'288.443.190-66', phone:'(62) 99845-7733', email:'roberta.prado@gmail.com', rel:'Mãe', b:'11/07/1985'}, second:{n:'Eduardo Prado', phone:'(62) 99102-8844', rel:'Pai'}, fin:'Eduardo Prado', addr:{cep:'74110-100', street:'Rua 9', num:'520', comp:'Casa 1', bairro:'Setor Oeste', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'16h30–18h00', pay:'Boleto', status:'signed', media:true, since:'06/02/2023', date:'20/05/2026', hora:'19h58' },
   // mesma mãe da Helena (id 1), em matrícula separada — agrupa ao ordenar por responsável
   { id:14, kids:[{n:'Lorenzo Duarte Lima', age:5, b:'09/10/2021'}], resp:{n:'Mariana Duarte Lima', cpf:'047.812.336-50', phone:'(62) 99214-8870', email:'mariana.duarte@gmail.com', rel:'Mãe', b:'09/05/1989'}, second:{n:'Rafael Lima', phone:'(62) 98112-4471', rel:'Pai'}, fin:'Mariana Duarte Lima', addr:{cep:'74230-110', street:'Rua T-55', num:'180', comp:'Apto 902', bairro:'Setor Bueno', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'14h00–15h30', pay:'Boleto', status:'sent', media:true, date:'19/05/2026',hora:'20h41' },
 ];
@@ -1061,9 +1083,11 @@ const STUDENTS = [
   const inactiveDates=[]; for(let i=19;i>=0;i--) inactiveDates.push(datePool.splice(Math.min(i*3,datePool.length-1),1)[0]);
   shuffle(datePool);
   const mkDate=({m,y})=>`${pad(m==='06'&&y===2026?int(1,3):m==='05'&&y===2026?int(2,26):int(1,28))}/${m}/${y}`;
-  const statusFor=({m,y})=> (y===2026&&m==='06') ? pick(['pending','pending','sent','sent','signed'])
-    : (y===2026&&m==='05') ? pick(['sent','pending','signed','signed','signed','signed'])
-    : rnd()<.97 ? 'signed' : pick(['sent','pending']);
+  /* status seguem o funil do Autentique: recentes ainda no meio do fluxo; antigas quase
+     todas assinadas — as poucas sent/viewed antigas são os contratos "parados" */
+  const statusFor=({m,y})=> (y===2026&&m==='06') ? pick(['pending','sent','sent','viewed','signed'])
+    : (y===2026&&m==='05') ? pick(['sent','viewed','pending','signed','signed','signed'])
+    : rnd()<.97 ? 'signed' : pick(['sent','viewed','pending']);
 
   let nextId=100;
   /* 96 matrículas ativas: 81 de 1 aluno + 14 duplas de irmãos + 1 trio = 112 alunos */
@@ -1116,7 +1140,13 @@ const STUDENTS = [
 
 const palette = ['#1E3765','#2F539A','#F5B700','#7C9AD6','#B5860B','#16a34a','#9333ea','#0891b2','#dc2626','#ea580c','#0d9488','#65a30d'];
 const initials = n => n.split(' ').filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase();
-const STATUS = { signed:{t:'Assinado',c:'#16a34a',bg:'rgba(22,163,74,.12)'}, sent:{t:'Enviado',c:'#2F539A',bg:'rgba(47,83,154,.12)'}, pending:{t:'Pendente',c:'#B5860B',bg:'rgba(245,183,0,.16)'} };
+/* status do contrato espelham o fluxo real do Autentique: pendente de envio → enviado
+   (link entregue por WhatsApp/e-mail) → visualizado (a família abriu o link) → assinado.
+   "Visualizado" e "Assinado" chegam sozinhos pelo webhook — ninguém marca na mão. */
+const STATUS = { signed:{t:'Assinado',c:'#16a34a',bg:'rgba(22,163,74,.12)'}, viewed:{t:'Visualizado',c:'#7C3AED',bg:'rgba(124,58,237,.12)'}, sent:{t:'Enviado',c:'#2F539A',bg:'rgba(47,83,154,.12)'}, pending:{t:'Pendente',c:'#B5860B',bg:'rgba(245,183,0,.16)'} };
+/* contrato "parado": enviado/visualizado há 7+ dias sem assinatura (ref. 03/06/2026) */
+const staleDays = s => { const [d,m,y]=s.date.split('/').map(Number); return Math.max(0,Math.round((new Date(2026,5,3)-new Date(y,m-1,d))/86400000)); };
+const isStale = s => s.active!==false && (s.status==='sent'||s.status==='viewed') && staleDays(s)>=7;
 const schLabel = s => s==='seg-qua' ? 'Seg/Qua' : 'Ter/Qui';
 /* período: matrículas feitas a partir de Mai/2026 são do período aberto (começam em Jul/2026.2);
    é a visão que a escola precisa em outubro, quando abrem as matrículas do ano seguinte */
@@ -1157,7 +1187,7 @@ function go(view, el){
   document.querySelectorAll('[data-view]').forEach(s=>s.classList.toggle('view-active', s.dataset.view===view));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   if(el){ el.classList.add('active'); }
-  else { const map={overview:0,alunos:1,contratos:2,emails:3,editor:4,usuarios:5,config:6};
+  else { const map={overview:0,alunos:1,contratos:2,emails:3,editor:4,usuarios:5,atividade:6,config:7};
     const idx=map[view]; if(idx!=null) document.querySelectorAll('.nav-item')[idx]?.classList.add('active'); }
   toggleSidebar(false); closeEdit();
   const ht=document.getElementById('headerTitle'); if(ht) ht.textContent=VIEW_LABEL[view]||'Visão geral';
@@ -1210,14 +1240,20 @@ function closeForgot(){ document.getElementById('forgot').classList.replace('fle
 
 /* ====================== NOTIFICAÇÕES ====================== */
 const NOTIFS=[
+  { type:'stale',  sid:12, title:'Contrato parado há 13 dias', desc:'Gabriel Fonseca Lopes — visualizado e sem assinatura', time:'hoje, 8h00', unread:true },
   { type:'enroll', sid:1, title:'Nova matrícula', desc:'Helena Duarte Lima · Setor Bueno', time:'há 2 horas', unread:true },
+  { type:'viewed', sid:4, title:'Contrato visualizado', desc:'Sofia Mendes Castro — a família abriu o link, falta assinar', time:'ontem', unread:true },
   { type:'enroll', sid:2, title:'Nova matrícula (2 irmãos)', desc:'Théo e Lara Andrade Rocha · Jardim Goiás', time:'ontem', unread:true },
   { type:'enroll', sid:3, title:'Nova matrícula', desc:'Miguel Ferreira Souza · Setor Sul', time:'há 3 dias', unread:true },
-  { type:'signed', sid:6, title:'Contrato assinado', desc:'Alice Barbosa Nunes', time:'há 4 dias', unread:true },
+  { type:'signed', sid:6, title:'Contrato assinado', desc:'Alice Barbosa Nunes — registrado sozinho pelo Autentique', time:'há 4 dias', unread:true },
   { type:'email',  sid:null, title:'Disparo concluído', desc:'"Boas-vindas — turma de junho" · 21 enviados', time:'há 5 dias', unread:false },
 ];
 function renderNotifs(){
-  const icon = t => t==='enroll' ? ['user-plus','#B5860B','rgba(245,183,0,.16)'] : t==='signed' ? ['file-check-2','#16a34a','rgba(22,163,74,.12)'] : ['mail-check','#2F539A','rgba(47,83,154,.12)'];
+  const icon = t => t==='enroll' ? ['user-plus','#B5860B','rgba(245,183,0,.16)']
+    : t==='signed' ? ['file-check-2','#16a34a','rgba(22,163,74,.12)']
+    : t==='viewed' ? ['eye','#7C3AED','rgba(124,58,237,.12)']
+    : t==='stale'  ? ['file-clock','#DC2626','rgba(220,38,38,.10)']
+    : ['mail-check','#2F539A','rgba(47,83,154,.12)'];
   document.getElementById('notifList').innerHTML = NOTIFS.map((n,i)=>{
     const [ic,c,bg]=icon(n.type);
     return `<div onclick="notifClick(${i})" class="flex items-start gap-3 px-4 py-3 cursor-pointer hover:bg-[var(--hover)] transition border-b last:border-0" style="border-color:var(--border)">
@@ -1262,7 +1298,7 @@ const TOURS={
     { target:'[data-tour="kpis"]', title:'Os números de hoje', body:'Alunos ativos, novos da semana, contratos aguardando assinatura e matrículas do mês — sempre atualizados.', placement:'bottom' },
     { target:'[data-tour="strip"]', title:'Indicadores rápidos', body:'Média de idade, famílias com irmãos, ocupação das turmas, assinaturas e rematrículas — a régua da escola numa linha.', placement:'bottom' },
     { target:'[data-tour="enroll"]', title:'Novas × rematrículas', body:'A linha azul são as matrículas novas; a tracejada amarela, as rematrículas do semestre.', placement:'right' },
-    { target:'[data-tour="health"]', title:'Cobrança sem dor de cabeça', body:'O "Andamento dos contratos" mostra quem ainda não assinou — e o botão verde leva direto para a lista já filtrada nos pendentes.', placement:'left' },
+    { target:'[data-tour="health"]', title:'Cobrança sem dor de cabeça', body:'O funil do Autentique em tempo real: assinados, visualizados, enviados e pendentes — com aviso de contrato parado há 7+ dias. O botão verde leva direto para a lista filtrada nos pendentes.', placement:'left' },
     { target:'[data-tour="vagas"]', title:'Onde ainda cabe aluno', body:'Ocupação por horário, com a etiqueta CHEIA nas turmas lotadas. No "Gerenciar" dá para criar horários novos, mudar capacidades e excluir turmas vazias.', placement:'right' },
     { target:'[data-tour="hours"]', title:'A hora do clique', body:'Mostra em que horário as famílias costumam matricular pelo site — útil para saber quando responder rápido e impulsionar posts.', placement:'right' },
     { target:'[data-tour="bday"]', title:'Mimos que fidelizam', body:'Os próximos aniversariantes, com botão que prepara as mensagens de parabéns no WhatsApp.', placement:'left' },
@@ -1286,10 +1322,15 @@ const TOURS={
     { target:'[data-tour="publish"]', title:'Nada vai ao ar sem querer', body:'As mudanças ficam só na pré-visualização até você clicar em Publicar — o contador mostra quantas alterações estão pendentes.', placement:'bottom', last:true },
   ],
   contratos:[
+    { target:'[data-tour="cauto"]', title:'Ninguém mais sobe documento', body:'Quando a matrícula chega pelo site, o contrato vai sozinho para o Autentique e a família recebe o link de assinatura no WhatsApp e no e-mail. Quando assina, o status muda aqui sozinho — sem conferência manual.', placement:'bottom' },
     { target:'#cvList', title:'Cartões ou lista', body:'Alterne entre ver os contratos em cartões ou um por linha (a lista é a visão de trabalho).', placement:'bottom' },
-    { target:'[data-tour="cfiltros"]', title:'Ache qualquer contrato', body:'Busque por aluno ou responsável e filtre por status (pendente, aguardando, assinado) e situação.', placement:'bottom' },
+    { target:'[data-tour="cfiltros"]', title:'Ache qualquer contrato', body:'Busque por aluno ou responsável e filtre por status — pendente de envio, enviado, visualizado (a família abriu o link) e assinado — e por situação.', placement:'bottom' },
     { target:'[data-tour="cmodelos"]', title:'O PDF que as matrículas usam', body:'Aqui ficam os modelos de contrato: importe um PDF novo (editado no Google Docs), veja onde cada campo é carimbado e escolha qual modelo vale para as próximas matrículas.', placement:'bottom' },
-    { target:'#contractGrid', title:'Envio em um clique', body:'Cada contrato tem o botão verde que prepara o envio pelo WhatsApp da família — e dá para abrir e baixar o PDF.', placement:'top', last:true },
+    { target:'#contractGrid', title:'Parado? Cobre em um clique', body:'Contrato sem assinatura há 7+ dias ganha a etiqueta vermelha "parado". O botão verde prepara a cobrança no WhatsApp com o link de assinatura — e em "Abrir" dá para ver a linha do tempo completa: enviado, visualizado, assinado.', placement:'top', last:true },
+  ],
+  atividade:[
+    { target:'[data-tour="act-list"]', title:'A memória do painel', body:'Toda ação fica registrada: o que cada pessoa fez, o que o sistema fez sozinho e o que o Autentique avisou (visualizações e assinaturas). Nada aqui pode ser editado ou apagado.', placement:'top' },
+    { target:'[data-tour="act-filtros"]', title:'Encontre qualquer ação', body:'Busque por aluno ou ação e filtre por pessoa — útil para responder "quem mexeu nisso?" em segundos.', placement:'bottom', last:true },
   ],
   modelos:[
     { target:'[data-tour="tpl-import"]', title:'Trocar o contrato é simples', body:'Edite o contrato no Google Docs, baixe como PDF e importe aqui. Não precisa mexer em código.', placement:'bottom' },
@@ -1636,7 +1677,7 @@ function openDetail(id){
       <div class="space-y-4">
         ${card('Financeiro','wallet', infoRow('Responsável financeiro',s.fin)+infoRow('Forma de pagamento','Boleto · carnê em 6 parcelas')+infoRow('Mensalidade','R$ 460,00'))}
         ${card('Autorizações','shield-check', infoRow('Uso de imagem', s.media?"<span class='text-emerald-500'>Autorizado</span>":"<span class='text-[var(--muted)]'>Não autorizado</span>")+infoRow('Aceite do contrato',"<span class='text-emerald-500'>Sim</span>")+infoRow('Horário confirmado',"<span class='text-emerald-500'>Sim</span>"))}
-        ${card('Contrato','file-text', `<div class="rounded-xl p-4 text-center" style="background:var(--hover)"><i data-lucide="file-text" class="w-8 h-8 mx-auto text-brand-light mb-2"></i><p class="text-sm font-medium">Contrato_${s.kids[0].n.split(' ')[0]}.pdf</p><p class="text-xs text-[var(--muted)] mb-3">gerado em ${s.date}</p><div class="flex gap-2"><button onclick="toast('Download iniciado (demo)')" class="flex-1 h-9 rounded-lg border border-[var(--border)] text-sm font-medium flex items-center justify-center gap-2"><i data-lucide="download" class="w-4 h-4"></i> Baixar</button><button onclick="toast('Contrato pronto para envio no WhatsApp!')" class="w-9 h-9 rounded-lg grid place-content-center text-white" style="background:#25D366">${WA('w-4 h-4')}</button></div></div>`)}
+        ${card('Contrato','file-text', `<div class="rounded-xl p-4 text-center" style="background:var(--hover)"><i data-lucide="file-text" class="w-8 h-8 mx-auto text-brand-light mb-2"></i><p class="text-sm font-medium">Contrato_${s.kids[0].n.split(' ')[0]}.pdf</p><p class="text-xs text-[var(--muted)]">gerado em ${s.date}</p><p class="text-xs font-medium mt-0.5 mb-3" style="color:${st.c}">${s.status==='pending'?'Pendente de envio ao Autentique':s.status==='sent'?'No Autentique — link ainda não aberto':s.status==='viewed'?'Visualizado pela família — falta assinar':'Assinado · registrado pelo Autentique'}</p>${isStale(s)?`<p class="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full mb-3" style="color:#DC2626;background:rgba(220,38,38,.10)"><i data-lucide="file-clock" class="w-3 h-3"></i>parado há ${staleDays(s)} dias</p>`:''}<div class="flex gap-2"><button onclick="toast('Download iniciado (demo)')" class="flex-1 h-9 rounded-lg border border-[var(--border)] text-sm font-medium flex items-center justify-center gap-2"><i data-lucide="download" class="w-4 h-4"></i> Baixar</button><button onclick="toast('${s.status==='pending'?'Contrato pronto para envio no WhatsApp!':'Cobrança preparada no WhatsApp — link de assinatura incluído!'}')" class="w-9 h-9 rounded-lg grid place-content-center text-white" style="background:#25D366">${WA('w-4 h-4')}</button></div></div>`)}
       </div>
     </div>`;
   go('detalhe');
@@ -1702,19 +1743,23 @@ function renderContracts(){
     el.innerHTML='<div class="px-5 py-12 text-center text-[var(--muted)] text-sm">Nenhum contrato encontrado com esses filtros.</div>';
     lucide.createIcons(); return;
   }
+  /* badge de contrato parado (enviado/visualizado há 7+ dias) + botão de cobrança em 1 clique */
+  const staleBadge=(s,extra='')=> isStale(s)?`<span class="${extra} tip inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full whitespace-nowrap" data-tip="Enviado há ${staleDays(s)} dias e ainda sem assinatura — vale cobrar" style="color:#DC2626;background:rgba(220,38,38,.10)"><i data-lucide="file-clock" class="w-3 h-3"></i>parado há ${staleDays(s)} dias</span>`:'';
+  const waTitle=s=> s.status==='pending'?'Enviar contrato no WhatsApp':'Cobrar assinatura no WhatsApp';
+  const waToast=s=> s.status==='pending'?'Contrato pronto para envio no WhatsApp!':'Cobrança preparada no WhatsApp — link de assinatura incluído!';
   if(contractView==='grid'){
     el.className='grid sm:grid-cols-2 xl:grid-cols-3 gap-4';
     el.innerHTML=rows.map(s=>{
       const st=STATUS[s.status];
       return `<div class="surface rounded-2xl p-5">
         <div class="flex items-start justify-between"><div class="w-11 h-11 rounded-xl grid place-content-center" style="background:var(--hover)"><i data-lucide="file-text" class="w-5 h-5 text-brand-light"></i></div>
-          <span class="text-xs font-medium px-2.5 py-1 rounded-full" style="color:${st.c};background:${st.bg}">${st.t}</span></div>
+          <span class="flex flex-wrap items-center justify-end gap-1.5"><span class="text-xs font-medium px-2.5 py-1 rounded-full" style="color:${st.c};background:${st.bg}">${st.t}</span>${staleBadge(s)}</span></div>
         <p class="font-medium mt-3 truncate">Contrato_${s.kids[0].n.split(' ')[0]}.pdf</p>
         <p class="text-xs text-[var(--muted)]">${s.resp.n} · ${s.date}</p>
         <div class="flex gap-2 mt-4">
           <button onclick="openContractModal(${s.id})" class="flex-1 h-9 rounded-lg border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)] transition">Abrir</button>
           <button onclick="toast('Download iniciado (demo)')" class="w-9 h-9 rounded-lg border border-[var(--border)] grid place-content-center hover:bg-[var(--hover)] transition" title="Baixar"><i data-lucide="download" class="w-4 h-4"></i></button>
-          <button onclick="toast('Contrato pronto para envio no WhatsApp!')" class="w-9 h-9 rounded-lg grid place-content-center text-white transition hover:brightness-105" style="background:#25D366" title="Enviar no WhatsApp">${WA('w-4 h-4')}</button>
+          <button onclick="toast('${waToast(s)}')" class="w-9 h-9 rounded-lg grid place-content-center text-white transition hover:brightness-105" style="background:#25D366" title="${waTitle(s)}">${WA('w-4 h-4')}</button>
         </div></div>`;
     }).join('');
   } else {
@@ -1727,11 +1772,12 @@ function renderContracts(){
           <p class="font-medium text-sm truncate">${s.kids.map(k=>k.n.split(' ')[0]).join(' e ')} <span class="text-[var(--muted)] font-normal">· Contrato_${s.kids[0].n.split(' ')[0]}.pdf</span></p>
           <p class="text-xs text-[var(--muted)] truncate">${s.resp.n} · ${s.date}${s.hora?' às '+s.hora:''}</p>
         </div>
+        ${staleBadge(s,'hidden sm:!inline-flex')}
         <span class="hidden sm:inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap" style="color:${st.c};background:${st.bg}"><span class="w-1.5 h-1.5 rounded-full" style="background:${st.c}"></span>${st.t}</span>
         <div class="flex items-center gap-1.5 shrink-0">
           <button onclick="openContractModal(${s.id})" class="w-8 h-8 rounded-lg border border-[var(--border)] grid place-content-center hover:bg-[var(--hover)] transition" title="Abrir"><i data-lucide="external-link" class="w-4 h-4"></i></button>
           <button onclick="toast('Download iniciado (demo)')" class="w-8 h-8 rounded-lg border border-[var(--border)] grid place-content-center hover:bg-[var(--hover)] transition" title="Baixar"><i data-lucide="download" class="w-4 h-4"></i></button>
-          <button onclick="toast('Contrato pronto para envio no WhatsApp!')" class="w-8 h-8 rounded-lg grid place-content-center text-white transition hover:brightness-105" style="background:#25D366" title="Enviar no WhatsApp">${WA('w-4 h-4')}</button>
+          <button onclick="toast('${waToast(s)}')" class="w-8 h-8 rounded-lg grid place-content-center text-white transition hover:brightness-105" style="background:#25D366" title="${waTitle(s)}">${WA('w-4 h-4')}</button>
         </div>
       </div>`;
     }).join('');
@@ -1755,6 +1801,68 @@ function renderEmails(){
 const USERS=[{id:1,n:'Priscylla Martins',e:'priscylla@englishpatio.com.br',r:'Administrador',c:'#1E3765'},{id:2,n:'Gabriel Teles',e:'gabriel@englishpatio.com.br',r:'Administrador',c:'#2F539A'},{id:3,n:'Stefany Oliveira',e:'stefany@englishpatio.com.br',r:'Secretaria',c:'#B5860B'},{id:4,n:'Beatriz Souza',e:'beatriz@englishpatio.com.br',r:'Secretaria',c:'#0d9488'}];
 function renderUsers(){
   document.getElementById('userList').innerHTML=USERS.map(x=>`<div class="flex items-center gap-3 p-4"><div class="w-10 h-10 rounded-full grid place-content-center text-white font-semibold" style="background:${x.c}">${initials(x.n)}</div><div class="flex-1 min-w-0"><p class="font-medium truncate">${x.n} ${x.pending?'<span class="text-[10px] font-semibold px-1.5 py-0.5 rounded-md align-middle" style="background:rgba(245,183,0,.16);color:#B5860B">convite pendente</span>':''}</p><p class="text-xs text-[var(--muted)] truncate">${x.e}</p></div><span class="text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap" style="background:var(--hover)">${x.r}</span><button onclick="openUserMenu(event,${x.id})" class="p-2 rounded-lg hover:bg-[var(--hover)]" title="Ações do usuário"><i data-lucide="more-vertical" class="w-4 h-4 text-[var(--muted)]"></i></button></div>`).join('');
+  lucide.createIcons();
+}
+
+/* ====================== REGISTRO DE ATIVIDADES (auditoria) ====================== */
+/* Cada ação no painel entra aqui — pessoas, o Sistema (rotinas automáticas) e o
+   Autentique (eventos de assinatura que chegam pelo webhook). Não se edita nem se apaga. */
+const ACT_ACTORS={
+  'Priscylla Martins':{ role:'Administrador', c:'#1E3765' },
+  'Gabriel Teles':    { role:'Administrador', c:'#2F539A' },
+  'Stefany Oliveira': { role:'Secretaria',    c:'#B5860B' },
+  'Beatriz Souza':    { role:'Secretaria',    c:'#0d9488' },
+  'Sistema':          { role:'Automático',    c:'#64748B', ic:'zap' },
+  'Autentique':       { role:'Assinatura digital', c:'#7C3AED', ic:'pen-line' },
+};
+const ACTIVITY=[
+  { who:'Sistema',           a:'Avisou: contrato de <b>Gabriel Fonseca Lopes</b> parado há 13 dias sem assinatura', t:'8h00',  day:'Hoje' },
+  { who:'Stefany Oliveira',  a:'Cobrou a assinatura de <b>Davi Cardoso Melo</b> pelo WhatsApp', t:'9h12', day:'Hoje' },
+  { who:'Priscylla Martins', a:'Entrou no painel', t:'8h47', day:'Hoje' },
+  { who:'Autentique',        a:'Registrou a assinatura de <b>Helena Duarte Lima</b> — contrato concluído e painel atualizado', t:'10h02', day:'Hoje' },
+  { who:'Autentique',        a:'Registrou que a família de <b>Sofia Mendes Castro</b> visualizou o contrato', t:'14h31', day:'Ontem' },
+  { who:'Sistema',           a:'Enviou o contrato de <b>Helena Duarte Lima</b> ao Autentique — link entregue por WhatsApp e e-mail', t:'20h14', day:'Ontem' },
+  { who:'Beatriz Souza',     a:'Exportou a planilha de alunos (130 matrículas)', t:'11h26', day:'Ontem' },
+  { who:'Priscylla Martins', a:'Editou os dados da matrícula de <b>Théo e Lara Andrade Rocha</b>', t:'10h05', day:'Ontem' },
+  { who:'Priscylla Martins', a:'Enviou o comunicado <b>"Boas-vindas — turma de junho"</b> para 21 famílias', t:'16h40', day:'01/06/2026' },
+  { who:'Stefany Oliveira',  a:'Marcou o contrato de <b>Bernardo Pires Alves</b> como assinado (carnê entregue na recepção)', t:'14h18', day:'01/06/2026' },
+  { who:'Priscylla Martins', a:'Importou a planilha de matrículas — 4 novas, 2 repetidas ignoradas', t:'9h33', day:'01/06/2026' },
+  { who:'Priscylla Martins', a:'Desligou <b>Arthur Moraes Pinto</b> — motivo: questões financeiras', t:'15h02', day:'30/05/2026' },
+  { who:'Autentique',        a:'Entregou o link de assinatura de <b>Sofia Mendes Castro</b> no WhatsApp', t:'21h47', day:'29/05/2026' },
+  { who:'Gabriel Teles',     a:'Definiu <b>"Contrato 2026.2 — Presencial"</b> como modelo em uso', t:'10h20', day:'12/05/2026' },
+  { who:'Priscylla Martins', a:'Convidou <b>Beatriz Souza</b> (Secretaria) para o painel', t:'9h05', day:'12/05/2026' },
+];
+function logAct(a){
+  ACTIVITY.unshift({ who:'Priscylla Martins', a, t:'agora', day:'Hoje' });
+  if(currentView()==='atividade') renderActivity();
+}
+function renderActivity(){
+  const el=document.getElementById('actList'); if(!el) return;
+  const q=(document.getElementById('actSearch')?.value||'').toLowerCase();
+  const fw=SEL.actWho?.value||'';
+  const rows=ACTIVITY.filter(x=>{
+    const hay=(x.who+' '+x.a.replace(/<[^>]+>/g,'')).toLowerCase();
+    return hay.includes(q) && (!fw||x.who===fw);
+  });
+  if(!rows.length){ el.innerHTML='<div class="px-5 py-12 text-center text-[var(--muted)] text-sm">Nenhuma atividade encontrada com esses filtros.</div>'; return; }
+  let lastDay=null, html='';
+  rows.forEach(x=>{
+    const actor=ACT_ACTORS[x.who]||{ role:'', c:'#64748B' };
+    if(x.day!==lastDay){ lastDay=x.day;
+      html+=`<p class="px-5 pt-4 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-[var(--muted)]">${x.day}</p>`; }
+    const avatar=actor.ic
+      ? `<div class="w-9 h-9 rounded-full grid place-content-center shrink-0" style="background:${actor.c}1f;color:${actor.c}"><i data-lucide="${actor.ic}" class="w-4 h-4"></i></div>`
+      : `<div class="w-9 h-9 rounded-full grid place-content-center text-white text-xs font-semibold shrink-0" style="background:${actor.c}">${initials(x.who)}</div>`;
+    html+=`<div class="flex items-start gap-3 px-5 py-3 border-b last:border-0" style="border-color:var(--border)">
+      ${avatar}
+      <div class="min-w-0 flex-1">
+        <p class="text-sm leading-snug">${x.a}</p>
+        <p class="text-[11px] text-[var(--muted)] mt-0.5">${x.who}${actor.role?' · '+actor.role:''}</p>
+      </div>
+      <span class="text-[11px] text-[var(--muted)] whitespace-nowrap shrink-0 mt-0.5">${x.t}</span>
+    </div>`;
+  });
+  el.innerHTML=html;
   lucide.createIcons();
 }
 
@@ -1797,11 +1905,14 @@ function renderPayLegend(){
 function renderHealth(){
   const act=STUDENTS.filter(inCohort);
   const by=k=>act.filter(s=>s.status===k).length;
-  const data=[{t:'Assinados',v:by('signed'),c:'#16a34a'},{t:'Enviados, aguardando',v:by('sent'),c:'#2F539A'},{t:'Pendentes de envio',v:by('pending'),c:'#B5860B'}];
-  const sub=document.getElementById('healthSub'); if(sub) sub.textContent=`Status das ${act.length} matrículas ativas`;
+  /* o funil do Autentique: assinado ← visualizado ← enviado ← pendente de envio */
+  const data=[{t:'Assinados',v:by('signed'),c:'#16a34a'},{t:'Visualizados, falta assinar',v:by('viewed'),c:'#7C3AED'},{t:'Enviados, sem abrir',v:by('sent'),c:'#2F539A'},{t:'Pendentes de envio',v:by('pending'),c:'#B5860B'}];
+  const sub=document.getElementById('healthSub'); if(sub) sub.textContent=`${act.length} matrículas ativas · o Autentique atualiza sozinho`;
+  const stale=act.filter(isStale).length;
   document.getElementById('contractHealth').innerHTML=data.map(x=>`<div>
     <div class="flex justify-between text-sm mb-1.5"><span class="font-medium">${x.t}</span><span class="font-semibold" style="color:${x.c}">${x.v}</span></div>
     <div class="h-2 rounded-full overflow-hidden" style="background:var(--hover)"><div class="h-full rounded-full" style="width:${Math.round(x.v/(act.length||1)*100)}%;background:${x.c}"></div></div></div>`).join('')
+  + (stale?`<p class="text-xs font-semibold flex items-center gap-1.5 mt-1" style="color:#DC2626"><i data-lucide="file-clock" class="w-3.5 h-3.5 shrink-0"></i>${stale} contrato${stale>1?'s':''} parado${stale>1?'s':''} há 7+ dias sem assinatura</p>`:'')
   + `<button onclick="goPendentes()" class="mt-1 w-full h-10 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 text-white transition hover:brightness-105" style="background:#25D366">${WA('w-4 h-4')} Cobrar pendentes no WhatsApp</button>`;
 }
 /* vagas por horário — ocupação real das turmas (capacidade fixa de 150 lugares) */
@@ -2313,22 +2424,23 @@ function init(){
   // selects customizados
   document.getElementById('periodSelWrap').innerHTML=cselect('period',[{v:'6m',l:'Últimos 6 meses'},{v:'ano',l:'Últimos 12 meses'},{v:'mes',l:'Este mês'}],{icon:'calendar',onChange:applyPeriod});
   document.getElementById('fScheduleWrap').innerHTML=cselect('fSchedule',[{v:'',l:'Todos os horários'},{v:'seg-qua',l:'Seg/Qua'},{v:'ter-qui',l:'Ter/Qui'}],{onChange:tableChanged});
-  document.getElementById('fStatusWrap').innerHTML=cselect('fStatus',[{v:'',l:'Contrato: todos'},{v:'signed',l:'Assinado'},{v:'sent',l:'Enviado'},{v:'pending',l:'Pendente'}],{onChange:tableChanged});
+  document.getElementById('fStatusWrap').innerHTML=cselect('fStatus',[{v:'',l:'Contrato: todos'},{v:'signed',l:'Assinado'},{v:'viewed',l:'Visualizado'},{v:'sent',l:'Enviado'},{v:'pending',l:'Pendente'}],{onChange:tableChanged});
   document.getElementById('fActiveWrap').innerHTML=cselect('fActive',[{v:'',l:'Situação: todas'},{v:'on',l:'Estudando agora'},{v:'next',l:'Começam em 2026.2'},{v:'off',l:'Inativas'}],{onChange:tableChanged});
   const hoods=[...new Set(STUDENTS.map(s=>s.addr.bairro))].sort();
   document.getElementById('fHoodWrap').innerHTML=cselect('fHood',[{v:'',l:'Bairro: todos'},...hoods.map(h=>({v:h,l:h}))],{onChange:tableChanged});
   document.getElementById('fAgeWrap').innerHTML=cselect('fAge',[{v:'',l:'Idade: todas'},{v:'4-6',l:'4 a 6 anos'},{v:'7-9',l:'7 a 9 anos'},{v:'10-12',l:'10 a 12 anos'},{v:'13+',l:'13 anos ou mais'}],{onChange:tableChanged});
   document.getElementById('fMediaWrap').innerHTML=cselect('fMedia',[{v:'',l:'Imagem: todos'},{v:'yes',l:'Autorizou imagem'},{v:'no',l:'Não autorizou'}],{onChange:tableChanged});
   document.getElementById('fSibWrap').innerHTML=cselect('fSib',[{v:'',l:'Irmãos: todos'},{v:'multi',l:'Com irmãos'},{v:'single',l:'Aluno único'}],{onChange:tableChanged});
-  document.getElementById('cStatusWrap').innerHTML=cselect('cStatus',[{v:'',l:'Status: todos'},{v:'pending',l:'Pendentes'},{v:'sent',l:'Aguardando assinatura'},{v:'signed',l:'Assinados'}],{onChange:contractsChanged});
+  document.getElementById('cStatusWrap').innerHTML=cselect('cStatus',[{v:'',l:'Status: todos'},{v:'pending',l:'Pendentes de envio'},{v:'sent',l:'Enviados, sem abrir'},{v:'viewed',l:'Visualizados, sem assinar'},{v:'signed',l:'Assinados'}],{onChange:contractsChanged});
   document.getElementById('cActiveWrap').innerHTML=cselect('cActive',[{v:'',l:'Situação: todas'},{v:'on',l:'Estudando agora'},{v:'next',l:'Começam em 2026.2'},{v:'off',l:'Inativas'}],{onChange:contractsChanged});
   renderTableHead();
   const actE=STUDENTS.filter(s=>s.active!==false);
   const kidsOf=sc=>actE.filter(s=>s.sch===sc).reduce((a,s)=>a+s.kids.length,0);
   document.getElementById('emailToWrap').innerHTML=cselect('emailTo',[{v:'all',l:`Todos os responsáveis (${actE.length})`},{v:'sq',l:`Apenas turma Seg/Qua (${kidsOf('seg-qua')})`},{v:'tq',l:`Apenas turma Ter/Qui (${kidsOf('ter-qui')})`},{v:'pend',l:`Contratos pendentes (${actE.filter(s=>s.status!=='signed').length})`}],{block:true});
+  document.getElementById('actWhoWrap').innerHTML=cselect('actWho',[{v:'',l:'Todos'},...Object.keys(ACT_ACTORS).map(w=>({v:w,l:w}))],{icon:'user-round',onChange:renderActivity});
   // conteúdo
   document.querySelectorAll('.wa-slot').forEach(s=>s.innerHTML=WA('w-4 h-4'));
-  renderTable(); renderContracts(); renderEmails(); renderUsers(); renderNotifs();
+  renderTable(); renderContracts(); renderEmails(); renderUsers(); renderNotifs(); renderActivity();
   renderEditorTabs(); setEditorPage('home');
   cmRender(); applySidebarTheme();
   buildCharts();
@@ -2413,6 +2525,7 @@ function submitNewEnrollment(){
     status:'pending', media:true, active:true, date:'03/06/2026', hora:'16h05' });
   NOTIFS.unshift({type:'enroll',sid:id,title:'Nova matrícula',desc:`${name} · ${hood}`,time:'agora',unread:true});
   renderTable(); renderContracts(); renderNotifs(); refreshOverviewData();
+  logAct(`Adicionou a matrícula de <b>${name}</b> manualmente`);
   closeModal(); go('alunos'); toast(`Matrícula de ${name.split(' ')[0]} adicionada!`);
 }
 
@@ -2549,6 +2662,7 @@ function saveEditEnrollment(id){
   s.t=SEL.edT?.value||s.t;
   closeModal();
   renderTable(); renderContracts(); refreshOverviewData();
+  logAct(`Editou os dados da matrícula de <b>${s.kids.map(k=>k.n).join(' e ')}</b>`);
   if(currentView()==='detalhe') openDetail(id);
   toast('Dados da matrícula atualizados!');
 }
@@ -2575,11 +2689,12 @@ function openDeleteModal(id){
 }
 function confirmDelete(id){
   const i=STUDENTS.findIndex(x=>x.id===id); if(i<0) return;
-  const nome=STUDENTS[i].kids[0].n.split(' ')[0];
+  const nomeFull=STUDENTS[i].kids[0].n, nome=nomeFull.split(' ')[0];
   STUDENTS.splice(i,1);
   closeModal();
   if(currentView()==='detalhe') go('alunos');
   renderTable(); renderContracts(); refreshOverviewData();
+  logAct(`Excluiu a matrícula de <b>${nomeFull}</b> (cadastro errado ou de teste)`);
   toast(`Matrícula de ${nome} excluída.`);
 }
 
@@ -2607,8 +2722,11 @@ function submitInvite(){
   const e=document.getElementById('invEmail').value.trim();
   if(!n){ document.getElementById('invName').focus(); return; }
   if(!e){ document.getElementById('invEmail').focus(); return; }
-  USERS.push({id:Math.max(...USERS.map(u=>u.id))+1, n, e, r:SEL.invRole?.value==='secretaria'?'Secretaria':'Administrador', c:'#0891b2', pending:true});
-  renderUsers(); closeModal(); toast(`Convite enviado para ${e}!`);
+  const papel=SEL.invRole?.value==='secretaria'?'Secretaria':'Administrador';
+  USERS.push({id:Math.max(...USERS.map(u=>u.id))+1, n, e, r:papel, c:'#0891b2', pending:true});
+  renderUsers(); closeModal();
+  logAct(`Convidou <b>${esc(n)}</b> (${papel}) para o painel`);
+  toast(`Convite enviado para ${e}!`);
 }
 
 /* --- CRUD de usuários do painel (menu ⋮ de cada linha) --- */
@@ -2819,6 +2937,8 @@ function sendComm(){
   const msg = commChannel==='email' ? 'Comunicado enviado por e-mail para 96 responsáveis!'
     : commChannel==='wa' ? 'Mensagens preparadas — 96 conversas de WhatsApp na fila!'
     : 'E-mails enviados e 96 conversas de WhatsApp preparadas!';
+  const subj=document.getElementById('emailSubject')?.value.trim();
+  logAct(`Enviou o comunicado <b>"${esc(subj||'(sem assunto)')}"</b>`);
   toast(msg);
 }
 function commTexts(){
@@ -2881,12 +3001,46 @@ function openCommPreview(){
   <div class="p-5 pt-0"><button onclick="closeModal()" class="w-full h-11 rounded-xl border border-[var(--border)] font-medium text-sm">Fechar</button></div>`,'max-w-lg');
 }
 
-/* --- visualizar contrato --- */
+/* --- visualizar contrato (com a linha do tempo do Autentique) --- */
+/* Tudo aqui é o que a API do Autentique realmente entrega: criação do documento via API,
+   entrega do link por WhatsApp+e-mail (delivery_method) e webhooks signature.viewed /
+   signature.accepted — visualização e assinatura chegam sozinhas, em tempo real. */
+function autentiqueTimeline(s){
+  const done=k=> k==='in' ? true
+    : k==='auto' ? s.status!=='pending'
+    : k==='view' ? (s.status==='viewed'||s.status==='signed')
+    : s.status==='signed';
+  const steps=[
+    { k:'in',   ic:'inbox',        l:'Matrícula recebida pelo site',            d:`${s.date}${s.hora?' às '+s.hora:''}` },
+    { k:'auto', ic:'zap',          l:'Contrato gerado e enviado ao Autentique', d: s.status==='pending'?'na fila de envio — ou envie agora pelo botão verde':'automático · link de assinatura entregue por WhatsApp e e-mail' },
+    { k:'view', ic:'eye',          l:'Visualizado pela família',                d: done('view')?'a família abriu o link de assinatura':'ainda não abriu o link' },
+    { k:'sign', ic:'file-check-2', l:'Assinado — validade jurídica',            d: done('sign')?'o painel foi atualizado sozinho, sem conferência manual':'aguardando assinatura' },
+  ];
+  const rows=steps.map((st,i)=>{ const on=done(st.k);
+    return `<div class="flex gap-3">
+      <div class="flex flex-col items-center">
+        <div class="w-7 h-7 rounded-full grid place-content-center shrink-0" style="background:${on?'rgba(22,163,74,.12)':'var(--hover)'};color:${on?'#16a34a':'var(--muted)'}"><i data-lucide="${on?'check':st.ic}" class="w-3.5 h-3.5"></i></div>
+        ${i<steps.length-1?`<div class="w-px flex-1 my-0.5" style="background:${on&&done(steps[i+1].k)?'#16a34a55':'var(--border)'}"></div>`:''}
+      </div>
+      <div class="pb-3 min-w-0"><p class="text-sm font-medium leading-tight ${on?'':'text-[var(--muted)]'}">${st.l}</p>
+        <p class="text-xs text-[var(--muted)] mt-0.5">${st.d}</p></div>
+    </div>`; }).join('');
+  const stale=isStale(s)?`<div class="flex items-center gap-2.5 rounded-xl p-3 mt-1" style="background:rgba(220,38,38,.07)">
+      <i data-lucide="file-clock" class="w-4 h-4 shrink-0" style="color:#DC2626"></i>
+      <p class="text-xs flex-1 min-w-0" style="color:#DC2626"><b>Parado há ${staleDays(s)} dias</b> — vale lembrar a família.</p>
+      <button onclick="toast('Cobrança preparada no WhatsApp — link de assinatura incluído!')" class="h-8 px-3 rounded-lg text-white text-xs font-semibold flex items-center gap-1.5 shrink-0 transition hover:brightness-105" style="background:#25D366">${WA('w-3.5 h-3.5')} Cobrar</button>
+    </div>`:'';
+  return `<div class="px-5 pt-4 pb-1">
+    <p class="text-[10px] font-bold uppercase tracking-wider text-[var(--muted)] mb-3 flex items-center gap-1.5"><i data-lucide="pen-line" class="w-3.5 h-3.5" style="color:#7C3AED"></i> Assinatura digital · Autentique</p>
+    ${rows}${stale}
+  </div>`;
+}
 function openContractModal(id){
   const s=STUDENTS.find(x=>x.id===id); if(!s) return;
   const names=s.kids.map(k=>k.n);
   const kids=names.length>1 ? names.slice(0,-1).join(', ')+' e '+names[names.length-1] : names[0];
   openModal(`${modalHeader('Contrato_'+s.kids[0].n.split(' ')[0]+'.pdf')}
+  ${autentiqueTimeline(s)}
   <div class="p-5" style="background:var(--hover)">
     <div class="bg-white text-slate-800 rounded-lg shadow-md p-6 sm:p-8 text-[13px] leading-relaxed">
       <p class="text-center font-bold text-sm mb-4">CONTRATO DE PRESTAÇÃO DE SERVIÇOS EDUCACIONAIS</p>
@@ -2938,6 +3092,7 @@ function exportCSV(useFilters){
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob); a.download='alunos-english-patio.csv'; a.click();
   URL.revokeObjectURL(a.href);
+  logAct(`Exportou a planilha de alunos (${rows.length} matrículas)`);
   toast(`Planilha exportada com ${rows.length} matrícula${rows.length>1?'s':''}!`);
 }
 
@@ -3148,6 +3303,7 @@ function applyImport(){
   pendingImport=null;
   closeModal();
   tableChanged(); renderContracts(); refreshOverviewData();
+  logAct(`Importou a planilha de matrículas — ${add.length} nova${add.length>1?'s':''}${skipped?`, ${skipped} deixada${skipped>1?'s':''} de fora`:''}`);
   toast(`${add.length} matrícula${add.length>1?'s importadas':' importada'} da planilha!${skipped?` ${skipped>1?skipped+' ficaram':'1 ficou'} de fora, como você pediu.`:''}`);
 }
 
@@ -3291,6 +3447,7 @@ function setActiveTpl(id){
 function confirmActiveTpl(id){
   TEMPLATES.forEach(t=>t.active=t.id===id);
   closeModal(); renderModelos();
+  logAct(`Definiu <b>"${esc(tplById(id)?.name||'')}"</b> como modelo de contrato em uso`);
   toast('Modelo em uso atualizado — vale para as próximas matrículas!');
 }
 function openTplRename(id){
@@ -3574,16 +3731,17 @@ function openRowMenu(e,id){
   const s=STUDENTS.find(x=>x.id===id); if(!s) return;
   const m=document.getElementById('rowMenu');
   const item=(ic,label,fn)=>`<button onclick="closeRowMenu();${fn}" class="w-full flex items-center gap-2.5 text-left text-sm px-3 py-2 rounded-lg hover:bg-[var(--hover)] transition"><i data-lucide="${ic}" class="w-4 h-4 text-[var(--muted)]"></i>${label}</button>`;
-  const waItem=label=>`<button onclick="closeRowMenu();toast('Contrato pronto para envio no WhatsApp!')" class="w-full flex items-center gap-2.5 text-left text-sm px-3 py-2 rounded-lg hover:bg-[var(--hover)] transition"><span style="color:#1faa53">${WA('w-4 h-4')}</span>${label}</button>`;
-  // ações dependem do status atual do contrato (sem transições redundantes)
+  const waItem=(label,msg='Contrato pronto para envio no WhatsApp!')=>`<button onclick="closeRowMenu();toast('${msg}')" class="w-full flex items-center gap-2.5 text-left text-sm px-3 py-2 rounded-lg hover:bg-[var(--hover)] transition"><span style="color:#1faa53">${WA('w-4 h-4')}</span>${label}</button>`;
+  // ações dependem do status atual do contrato (sem transições redundantes).
+  // Visualizado/assinado chegam sozinhos pelo Autentique — o "marcar" manual é só backup.
   let statusActions='';
   if(s.status==='pending'){
     statusActions = waItem('Enviar contrato no WhatsApp')
       + `<div class="h-px my-1" style="background:var(--border)"></div>`
       + item('send','Marcar como enviado',`markSent(${id})`)
       + item('check-circle-2','Marcar como assinado',`markSigned(${id})`);
-  } else if(s.status==='sent'){
-    statusActions = waItem('Reenviar contrato no WhatsApp')
+  } else if(s.status==='sent'||s.status==='viewed'){
+    statusActions = waItem('Cobrar assinatura no WhatsApp','Cobrança preparada no WhatsApp — link de assinatura incluído!')
       + `<div class="h-px my-1" style="background:var(--border)"></div>`
       + item('check-circle-2','Marcar como assinado',`markSigned(${id})`);
   }
@@ -3617,12 +3775,14 @@ function markSigned(id){
   const s=STUDENTS.find(x=>x.id===id); if(!s) return;
   s.status='signed';
   renderTable(); renderRecent(); renderContracts();
+  logAct(`Marcou o contrato de <b>${s.kids[0].n}</b> como assinado`);
   toast('Contrato marcado como assinado!');
 }
 function markSent(id){
   const s=STUDENTS.find(x=>x.id===id); if(!s) return;
   s.status='sent';
   renderTable(); renderRecent(); renderContracts();
+  logAct(`Marcou o contrato de <b>${s.kids[0].n}</b> como enviado`);
   toast('Contrato marcado como enviado!');
 }
 
@@ -3682,12 +3842,14 @@ function confirmExit(id){
   s.exit={ k:r.k, label:r.l, note:document.getElementById('exitNote')?.value.trim()||'', date:'03/06/2026' };
   closeModal();
   renderTable(); renderContracts(); refreshOverviewData();
+  logAct(`Desligou <b>${s.kids[0].n}</b> — motivo: ${r.l.toLowerCase()}`);
   toast(`${s.kids[0].n.split(' ')[0]} foi desligado da escola — motivo registrado.`);
 }
 function reactivateStudent(id){
   const s=STUDENTS.find(x=>x.id===id); if(!s) return;
   s.active=true; delete s.exit;
   renderTable(); renderContracts(); refreshOverviewData();
+  logAct(`Reativou <b>${s.kids[0].n}</b> — matrícula ativa de novo`);
   toast(`${s.kids[0].n.split(' ')[0]} voltou a ser aluno ativo!`);
 }
 
@@ -3715,7 +3877,7 @@ function elLabel(el){
     || '<'+el.tagName.toLowerCase()+'>';
 }
 function currentView(){ return document.querySelector('[data-view].view-active')?.dataset.view||'overview'; }
-const VIEW_LABEL={overview:'Visão geral',alunos:'Alunos',detalhe:'Detalhe do aluno',contratos:'Contratos',modelos:'Modelos de contrato',emails:'Comunicados',editor:'Editor do site',usuarios:'Usuários',config:'Configurações',notifs:'Notificações'};
+const VIEW_LABEL={overview:'Visão geral',alunos:'Alunos',detalhe:'Detalhe do aluno',contratos:'Contratos',modelos:'Modelos de contrato',emails:'Comunicados',editor:'Editor do site',usuarios:'Usuários',atividade:'Registro de atividades',config:'Configurações',notifs:'Notificações'};
 
 function toggleCommentMode(){
   commentMode=!commentMode;

@@ -34,7 +34,7 @@ const shot = async (page, name) => {
 /* ---------- desktop ---------- */
 const d = await boot({ width: 1440, height: 900 });
 
-for (const view of ['overview', 'alunos', 'contratos', 'emails', 'editor', 'usuarios', 'config', 'notifs']) {
+for (const view of ['overview', 'alunos', 'contratos', 'emails', 'editor', 'usuarios', 'atividade', 'config', 'notifs']) {
   await d.evaluate(v => go(v), view);
   await shot(d, `desktop-${view}`);
 }
@@ -64,6 +64,8 @@ const modais = [
   ['modal-importar-planilha', 'openImportModal()'],
   ['modal-importar-resultado', "openImportModal();runImport(IMPORT_SAMPLE,'planilha de exemplo')"],
   ['modal-contrato', 'openContractModal(STUDENTS[1].id)'],
+  ['modal-contrato-visualizado', "openContractModal(STUDENTS.find(s=>s.status==='viewed').id)"],
+  ['modal-contrato-parado', 'openContractModal(STUDENTS.find(s=>isStale(s)).id)'],
   ['modal-importar-pdf', 'openTplImport()'],
   ['modal-conta', 'openAccountModal()'],
 ];

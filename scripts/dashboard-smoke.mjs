@@ -472,6 +472,59 @@ section('Contratos');
   W.clearContractFilters();
 }
 
+/* ---------- Autentique: 4 status, contratos parados e linha do tempo ---------- */
+section('Autentique (assinatura digital)');
+{
+  const STATUS = W.eval('STATUS');
+  ['pending','sent','viewed','signed'].every(k => STATUS[k]) ? ok('4 status do funil (inclui Visualizado)') : fail('status do Autentique faltando');
+  STUDENTS.some(s => s.status === 'viewed') ? ok('base tem contratos visualizados') : fail('nenhum contrato "viewed" na base');
+  const isStale = W.eval('isStale');
+  const stale = STUDENTS.filter(s => isStale(s));
+  stale.length > 0 ? ok(`${stale.length} contratos parados há 7+ dias (badge tem o que mostrar)`) : fail('nenhum contrato parado na base');
+  stale.every(s => s.status === 'sent' || s.status === 'viewed') ? ok('"parado" só vale para enviado/visualizado') : fail('isStale pegou status errado');
+  W.go('contratos');
+  W.csSet('cStatus', 'viewed');
+  const vis = W.filteredContracts();
+  vis.length > 0 && vis.every(s => s.status === 'viewed') ? ok(`filtro "Visualizados" funciona (${vis.length})`) : fail('filtro viewed vazou');
+  W.clearContractFilters();
+  $('contractGrid').textContent.includes('parado há') ? ok('badge "parado há N dias" aparece na lista') : fail('badge de parado não renderizou');
+  // linha do tempo no modal do contrato
+  const sv = STUDENTS.find(s => s.status === 'viewed');
+  W.openContractModal(sv.id);
+  const box = $('modalBox').textContent;
+  box.includes('Autentique') && box.includes('Visualizado pela família') ? ok('modal mostra a linha do tempo do Autentique') : fail('modal sem timeline');
+  W.closeModal();
+  const sp = STUDENTS.find(s => s.status === 'pending' && s.active !== false);
+  W.openContractModal(sp.id);
+  $('modalBox').textContent.includes('na fila de envio') ? ok('pendente mostra "na fila de envio"') : fail('timeline de pendente errada');
+  W.closeModal();
+  // visão geral: funil com 4 barras + alerta de parados
+  W.go('overview');
+  const health = $('contractHealth').textContent;
+  health.includes('Visualizados') && health.includes('parado') ? ok('funil da visão geral tem Visualizados + alerta de parados') : fail('andamento dos contratos incompleto');
+}
+
+/* ---------- registro de atividades ---------- */
+section('Registro de atividades');
+{
+  const ACT = W.eval('ACTIVITY');
+  W.go('atividade');
+  $('actList').children.length > 0 ? ok('lista de atividades renderiza') : fail('atividade vazia');
+  $('actList').textContent.includes('Autentique') ? ok('eventos do Autentique aparecem no registro') : fail('sem eventos do Autentique');
+  // ações no painel entram no registro
+  const before = ACT.length;
+  const s = STUDENTS.find(x => x.active !== false && x.status !== 'signed');
+  W.markSigned(s.id);
+  ACT.length === before + 1 && ACT[0].t === 'agora' ? ok('marcar assinado entra no registro ("agora")') : fail('ação não registrou');
+  // busca + filtro por pessoa
+  W.go('atividade');
+  $('actSearch').value = 'zzz-nada'; W.renderActivity();
+  $('actList').textContent.includes('Nenhuma atividade') ? ok('busca sem resultado mostra vazio') : fail('vazio não renderiza');
+  $('actSearch').value = ''; W.csSet('actWho', 'Autentique'); W.renderActivity();
+  $('actList').textContent.includes('Autentique') && !$('actList').textContent.includes('Exportou') ? ok('filtro por pessoa funciona') : fail('filtro por pessoa vazou');
+  W.csSet('actWho', ''); W.renderActivity();
+}
+
 /* ---------- editor ---------- */
 section('Editor do site');
 for (const page of ['home','metodologia','vacation','matriculas']) {
