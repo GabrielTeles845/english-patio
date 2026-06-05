@@ -441,10 +441,13 @@
         <!-- vagas por horário + financeiro -->
         <div class="dash-row grid lg:grid-cols-3 gap-4 mt-4">
           <div class="surface rounded-2xl p-5 lg:col-span-2 flex flex-col" data-tour="vagas">
-            <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center justify-between gap-2 mb-4">
               <div><h3 class="font-heading font-semibold text-lg">Vagas por horário</h3>
-                <p class="text-xs text-[var(--muted)]">Turmas de até 6 alunos · capacidade total de 150 vagas</p></div>
-              <span class="text-xs px-2.5 py-1 rounded-full font-semibold" style="background:rgba(22,163,74,.10);color:#16a34a" id="vagasChip">—</span>
+                <p class="text-xs text-[var(--muted)]">Turmas de até 6 alunos · capacidade total de <span id="capTotal">150</span> vagas</p></div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs px-2.5 py-1 rounded-full font-semibold whitespace-nowrap" style="background:rgba(22,163,74,.10);color:#16a34a" id="vagasChip">—</span>
+                <button onclick="openTurmas()" class="flex items-center gap-1.5 h-8 px-2.5 rounded-lg border border-[var(--border)] text-xs font-medium hover:bg-[var(--hover)] transition" title="Criar horários, mudar capacidades e excluir turmas vazias"><i data-lucide="settings-2" class="w-3.5 h-3.5"></i><span class="hidden sm:inline">Gerenciar</span></button>
+              </div>
             </div>
             <div class="flex-1 content-center grid sm:grid-cols-2 gap-x-8 gap-y-3" id="vagasGrid"></div>
             <p class="text-xs text-[var(--muted)] mt-auto pt-4 flex items-center gap-1.5"><i data-lucide="lightbulb" class="w-3.5 h-3.5" style="color:#F5B700"></i> Ter/Qui 14h é o horário mais vazio — boa opção para sugerir a quem pedir matrícula.</p>
@@ -516,7 +519,7 @@
           <div><h1 class="font-heading text-2xl sm:text-3xl font-semibold">Alunos</h1>
             <p class="text-[var(--muted)] text-sm mt-0.5" id="alunosSub">—</p></div>
           <div class="flex items-center gap-2">
-            <button onclick="openImportModal()" data-tour="import-al" class="flex items-center gap-2 h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)]" title="Traz os alunos da planilha atual de matrículas (remove linhas duplicadas sozinho)"><i data-lucide="file-up" class="w-4 h-4"></i><span class="hidden sm:inline">Importar planilha</span></button>
+            <button onclick="openImportModal()" data-tour="import-al" class="flex items-center gap-2 h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)]" title="Traz os alunos da planilha atual de matrículas, removendo repetidos e separando nomes iguais e dados estranhos para você conferir"><i data-lucide="file-up" class="w-4 h-4"></i><span class="hidden sm:inline">Importar planilha</span></button>
             <button onclick="exportCSV(true)" data-tour="export-al" class="flex items-center gap-2 h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)]" title="Baixa um arquivo que abre no Excel ou Google Planilhas"><i data-lucide="sheet" class="w-4 h-4"></i><span class="hidden sm:inline">Exportar planilha</span></button>
             <button onclick="openNewEnrollment()" data-tour="nova" class="flex items-center gap-2 h-10 px-4 rounded-xl text-white text-sm font-semibold" style="background:linear-gradient(135deg,#1E3765,#2F539A)"><i data-lucide="plus" class="w-4 h-4"></i>Nova matrícula</button>
           </div>
@@ -553,7 +556,7 @@
 
         <!-- tabela com design próprio (cabeçalho ordenável renderizado via JS; cards no mobile) -->
         <div class="surface rounded-2xl overflow-hidden table-shell">
-          <div id="tableHead" class="hidden md:grid grid-cols-[1.6fr_1.3fr_.75fr_.85fr_.7fr_.85fr_52px] gap-3 px-5 py-3 text-[11px] uppercase tracking-wider text-[var(--muted)] font-semibold border-b" style="border-color:var(--border)"></div>
+          <div id="tableHead" class="hidden md:grid grid-cols-[1.5fr_1.2fr_.7fr_.8fr_.7fr_.85fr_.8fr_52px] gap-3 px-5 py-3 text-[11px] uppercase tracking-wider text-[var(--muted)] font-semibold border-b" style="border-color:var(--border)"></div>
           <div id="tableBody"></div>
           <div class="table-foot flex flex-wrap items-center justify-between gap-2 px-5 py-3 md:border-t text-sm text-[var(--muted)]" style="border-color:var(--border)">
             <span id="tableCount">—</span>
@@ -638,11 +641,7 @@
             <div class="p-5">
               <div class="mb-4" id="tplRow">
                 <span class="text-sm font-medium">Comece por um modelo <span class="font-normal text-xs text-[var(--muted)]">(opcional — já vem escrito)</span></span>
-                <div class="flex flex-wrap gap-2 mt-2">
-                  <button onclick="applyEmailTpl('recesso')" class="flex items-center gap-2 h-9 px-3 rounded-xl border border-[var(--border)] text-[13px] font-medium hover:bg-[var(--hover)] transition"><i data-lucide="sun" class="w-4 h-4" style="color:#F5B700"></i>Recesso / Vacation Classes</button>
-                  <button onclick="applyEmailTpl('contrato')" class="flex items-center gap-2 h-9 px-3 rounded-xl border border-[var(--border)] text-[13px] font-medium hover:bg-[var(--hover)] transition"><i data-lucide="file-clock" class="w-4 h-4" style="color:#B5860B"></i>Lembrete de contrato</button>
-                  <button onclick="applyEmailTpl('aviso')" class="flex items-center gap-2 h-9 px-3 rounded-xl border border-[var(--border)] text-[13px] font-medium hover:bg-[var(--hover)] transition"><i data-lucide="megaphone" class="w-4 h-4 text-brand-light"></i>Comunicado geral</button>
-                </div>
+                <div class="flex flex-wrap gap-2 mt-2" id="tplChips"></div>
               </div>
               <div class="h-px mb-4" style="background:var(--border)"></div>
               <div class="grid sm:grid-cols-2 gap-3 mb-3">
@@ -970,21 +969,21 @@ const EXIT_REASONS=[
   { k:'other',      ic:'pencil-line',     l:'Outro motivo',                   d:'Descreva abaixo o que aconteceu' },
 ];
 const STUDENTS = [
-  { id:1, kids:[{n:'Helena Duarte Lima', age:8, b:'14/02/2018'}], resp:{n:'Mariana Duarte Lima', cpf:'047.812.336-50', phone:'(62) 99214-8870', email:'mariana.duarte@gmail.com', rel:'Mãe', b:'09/05/1989'}, second:{n:'Rafael Lima', phone:'(62) 98112-4471', rel:'Pai'}, fin:'Mariana Duarte Lima', addr:{cep:'74230-110', street:'Rua T-55', num:'180', comp:'Apto 902', bairro:'Setor Bueno', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'15h00–16h30', pay:'PIX', status:'signed', media:true, date:'02/06/2026', hora:'20h14' },
-  { id:2, kids:[{n:'Théo Andrade Rocha', age:10, b:'22/08/2015'},{n:'Lara Andrade Rocha', age:7, b:'30/11/2018'}], resp:{n:'Patrícia Andrade', cpf:'118.553.701-22', phone:'(62) 99980-1245', email:'patricia.andrade@hotmail.com', rel:'Mãe', b:'17/03/1986'}, second:{n:'Bruno Rocha', phone:'(62) 99771-3380', rel:'Pai'}, fin:'Bruno Rocha', addr:{cep:'74115-030', street:'Av. T-9', num:'1240', comp:'', bairro:'Jardim Goiás', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'17h00–18h30', pay:'Boleto', status:'pending', media:true, date:'31/05/2026', hora:'19h32' },
-  { id:3, kids:[{n:'Miguel Ferreira Souza', age:12, b:'05/01/2014'}], resp:{n:'Camila Ferreira', cpf:'203.447.882-09', phone:'(62) 98341-6622', email:'camila.fsouza@gmail.com', rel:'Mãe', b:'25/07/1984'}, second:null, fin:'Camila Ferreira', addr:{cep:'74080-010', street:'Rua 90', num:'455', comp:'Casa 2', bairro:'Setor Sul', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'16h30–18h00', pay:'Cartão', status:'signed', media:false, date:'30/05/2026', hora:'10h05' },
+  { id:1, kids:[{n:'Helena Duarte Lima', age:8, b:'14/02/2018'}], resp:{n:'Mariana Duarte Lima', cpf:'047.812.336-50', phone:'(62) 99214-8870', email:'mariana.duarte@gmail.com', rel:'Mãe', b:'09/05/1989'}, second:{n:'Rafael Lima', phone:'(62) 98112-4471', rel:'Pai'}, fin:'Mariana Duarte Lima', addr:{cep:'74230-110', street:'Rua T-55', num:'180', comp:'Apto 902', bairro:'Setor Bueno', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'15h00–16h30', pay:'PIX', status:'signed', media:true, since:'03/02/2025', date:'02/06/2026', hora:'20h14' },
+  { id:2, kids:[{n:'Théo Andrade Rocha', age:10, b:'22/08/2015'},{n:'Lara Andrade Rocha', age:7, b:'30/11/2018'}], resp:{n:'Patrícia Andrade', cpf:'118.553.701-22', phone:'(62) 99980-1245', email:'patricia.andrade@hotmail.com', rel:'Mãe', b:'17/03/1986'}, second:{n:'Bruno Rocha', phone:'(62) 99771-3380', rel:'Pai'}, fin:'Bruno Rocha', addr:{cep:'74115-030', street:'Av. T-9', num:'1240', comp:'', bairro:'Jardim Goiás', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'17h00–18h30', pay:'Boleto', status:'pending', media:true, since:'05/08/2024', date:'31/05/2026', hora:'19h32' },
+  { id:3, kids:[{n:'Miguel Ferreira Souza', age:12, b:'05/01/2014'}], resp:{n:'Camila Ferreira', cpf:'203.447.882-09', phone:'(62) 98341-6622', email:'camila.fsouza@gmail.com', rel:'Mãe', b:'25/07/1984'}, second:null, fin:'Camila Ferreira', addr:{cep:'74080-010', street:'Rua 90', num:'455', comp:'Casa 2', bairro:'Setor Sul', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'16h30–18h00', pay:'Cartão', status:'signed', media:false, since:'03/02/2025', date:'30/05/2026', hora:'10h05' },
   { id:4, kids:[{n:'Sofia Mendes Castro', age:9, b:'19/09/2016'}], resp:{n:'Juliana Castro', cpf:'355.221.940-71', phone:'(62) 99657-2218', email:'ju.castro@outlook.com', rel:'Mãe', b:'12/12/1990'}, second:{n:'André Mendes', phone:'(62) 98220-9981', rel:'Pai'}, fin:'André Mendes', addr:{cep:'74810-100', street:'Rua C-140', num:'78', comp:'', bairro:'Jardim América', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'14h00–15h30', pay:'PIX', status:'sent', media:true, date:'29/05/2026', hora:'21h47' },
-  { id:5, kids:[{n:'Bernardo Pires Alves', age:6, b:'09/06/2020'}], resp:{n:'Fernanda Pires', cpf:'412.889.503-44', phone:'(62) 99102-7755', email:'fernanda.pires@gmail.com', rel:'Mãe', b:'28/02/1992'}, second:null, fin:'Fernanda Pires', addr:{cep:'74663-520', street:'Rua VP-7D', num:'320', comp:'Qd 12 Lt 4', bairro:'Vila São João', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'14h00–15h30', pay:'Dinheiro', status:'signed', media:true, date:'28/05/2026', hora:'14h22' },
-  { id:6, kids:[{n:'Alice Barbosa Nunes', age:11, b:'27/06/2015'}], resp:{n:'Renata Nunes', cpf:'509.334.118-60', phone:'(62) 98876-4400', email:'renata.nunes@yahoo.com', rel:'Mãe', b:'05/09/1983'}, second:{n:'Carlos Barbosa', phone:'(62) 99443-1102', rel:'Pai'}, fin:'Renata Nunes', addr:{cep:'74125-160', street:'Av. Mutirão', num:'2540', comp:'Apto 1503', bairro:'Setor Marista', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'16h30–18h00', pay:'PIX', status:'signed', media:true, date:'27/05/2026', hora:'18h39' },
-  { id:7, kids:[{n:'Davi Cardoso Melo', age:13, b:'11/06/2013'}], resp:{n:'Aline Melo', cpf:'620.778.245-31', phone:'(62) 99320-8845', email:'aline.melo@gmail.com', rel:'Mãe', b:'19/11/1981'}, second:null, fin:'Aline Melo', addr:{cep:'74305-040', street:'Rua 1136', num:'95', comp:'', bairro:'Setor Pedro Ludovico', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'18h00–19h30', pay:'Boleto', status:'pending', media:false, date:'26/05/2026', hora:'20h51' },
-  { id:8, kids:[{n:'Manuela Teixeira Gomes', age:7, b:'08/07/2018'},{n:'Pedro Teixeira Gomes', age:9, b:'16/05/2016'}], resp:{n:'Vanessa Teixeira', cpf:'731.005.667-88', phone:'(62) 98990-3321', email:'va.teixeira@hotmail.com', rel:'Mãe', b:'03/06/1988'}, second:{n:'Marcos Gomes', phone:'(62) 99558-7700', rel:'Pai'}, fin:'Marcos Gomes', addr:{cep:'74884-120', street:'Av. Rio Verde', num:'1180', comp:'Cond. Jardins', bairro:'Jardim Atlântico', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'15h00–16h30', pay:'Cartão', status:'sent', media:true, date:'25/05/2026', hora:'16h08' },
-  { id:9, kids:[{n:'Isabela Ribeiro Dias', age:14, b:'02/02/2012'}], resp:{n:'Cristina Dias', cpf:'845.119.302-15', phone:'(62) 99701-2266', email:'cristina.dias@gmail.com', rel:'Mãe', b:'21/08/1979'}, second:null, fin:'Cristina Dias', addr:{cep:'74215-908', street:'Av. 136', num:'960', comp:'Sala 408', bairro:'Setor Sul', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'18h00–19h30', pay:'PIX', status:'signed', media:false, active:false, exit:{ k:'moved', label:'Mudança de cidade ou bairro', note:'Família se mudou para Anápolis.', date:'28/05/2026' }, date:'24/05/2026', hora:'19h15' },
+  { id:5, kids:[{n:'Bernardo Pires Alves', age:6, b:'09/06/2020'}], resp:{n:'Fernanda Pires', cpf:'412.889.503-44', phone:'(62) 99102-7755', email:'fernanda.pires@gmail.com', rel:'Mãe', b:'28/02/1992'}, second:null, fin:'Fernanda Pires', addr:{cep:'74663-520', street:'Rua VP-7D', num:'320', comp:'Qd 12 Lt 4', bairro:'Vila São João', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'14h00–15h30', pay:'Dinheiro', status:'signed', media:true, date:'28/05/2026',hora:'14h22' },
+  { id:6, kids:[{n:'Alice Barbosa Nunes', age:11, b:'27/06/2015'}], resp:{n:'Renata Nunes', cpf:'509.334.118-60', phone:'(62) 98876-4400', email:'renata.nunes@yahoo.com', rel:'Mãe', b:'05/09/1983'}, second:{n:'Carlos Barbosa', phone:'(62) 99443-1102', rel:'Pai'}, fin:'Renata Nunes', addr:{cep:'74125-160', street:'Av. Mutirão', num:'2540', comp:'Apto 1503', bairro:'Setor Marista', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'16h30–18h00', pay:'PIX', status:'signed', media:true, since:'01/08/2022', date:'27/05/2026', hora:'18h39' },
+  { id:7, kids:[{n:'Davi Cardoso Melo', age:13, b:'11/06/2013'}], resp:{n:'Aline Melo', cpf:'620.778.245-31', phone:'(62) 99320-8845', email:'aline.melo@gmail.com', rel:'Mãe', b:'19/11/1981'}, second:null, fin:'Aline Melo', addr:{cep:'74305-040', street:'Rua 1136', num:'95', comp:'', bairro:'Setor Pedro Ludovico', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'18h00–19h30', pay:'Boleto', status:'pending', media:false, since:'05/02/2024', date:'26/05/2026', hora:'20h51' },
+  { id:8, kids:[{n:'Manuela Teixeira Gomes', age:7, b:'08/07/2018'},{n:'Pedro Teixeira Gomes', age:9, b:'16/05/2016'}], resp:{n:'Vanessa Teixeira', cpf:'731.005.667-88', phone:'(62) 98990-3321', email:'va.teixeira@hotmail.com', rel:'Mãe', b:'03/06/1988'}, second:{n:'Marcos Gomes', phone:'(62) 99558-7700', rel:'Pai'}, fin:'Marcos Gomes', addr:{cep:'74884-120', street:'Av. Rio Verde', num:'1180', comp:'Cond. Jardins', bairro:'Jardim Atlântico', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'15h00–16h30', pay:'Cartão', status:'sent', media:true, since:'05/02/2024', date:'25/05/2026', hora:'16h08' },
+  { id:9, kids:[{n:'Isabela Ribeiro Dias', age:14, b:'02/02/2012'}], resp:{n:'Cristina Dias', cpf:'845.119.302-15', phone:'(62) 99701-2266', email:'cristina.dias@gmail.com', rel:'Mãe', b:'21/08/1979'}, second:null, fin:'Cristina Dias', addr:{cep:'74215-908', street:'Av. 136', num:'960', comp:'Sala 408', bairro:'Setor Sul', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'18h00–19h30', pay:'PIX', status:'signed', media:false, active:false, exit:{ k:'moved', label:'Mudança de cidade ou bairro', note:'Família se mudou para Anápolis.', date:'28/05/2026' }, since:'06/02/2023', date:'24/05/2026', hora:'19h15' },
   { id:10, kids:[{n:'Arthur Moraes Pinto', age:8, b:'29/10/2017'}], resp:{n:'Letícia Moraes', cpf:'956.443.870-02', phone:'(62) 98112-9943', email:'leticia.moraes@outlook.com', rel:'Mãe', b:'14/04/1991'}, second:{n:'Felipe Pinto', phone:'(62) 99887-6610', rel:'Pai'}, fin:'Felipe Pinto', addr:{cep:'74070-060', street:'Rua 22', num:'310', comp:'', bairro:'Setor Aeroporto', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'17h00–18h30', pay:'Boleto', status:'pending', media:true, active:false, exit:{ k:'financial', label:'Questões financeiras', note:'', date:'30/05/2026' }, date:'23/05/2026', hora:'11h26' },
-  { id:11, kids:[{n:'Laura Cavalcante Reis', age:10, b:'12/12/2015'}], resp:{n:'Daniela Reis', cpf:'063.778.221-49', phone:'(62) 99334-1180', email:'dani.reis@gmail.com', rel:'Mãe', b:'30/01/1987'}, second:null, fin:'Daniela Reis', addr:{cep:'74343-230', street:'Rua RF-12', num:'140', comp:'Qd 8', bairro:'Residencial Forte', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'15h00–16h30', pay:'PIX', status:'signed', media:true, date:'22/05/2026', hora:'20h33' },
-  { id:12, kids:[{n:'Gabriel Fonseca Lopes', age:11, b:'07/08/2014'}], resp:{n:'Simone Fonseca', cpf:'174.882.605-77', phone:'(62) 98445-2290', email:'simone.fonseca@yahoo.com', rel:'Mãe', b:'08/10/1982'}, second:{n:'Thiago Lopes', phone:'(62) 99221-5544', rel:'Pai'}, fin:'Thiago Lopes', addr:{cep:'74150-020', street:'Av. T-63', num:'880', comp:'Apto 701', bairro:'Setor Bueno', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'16h30–18h00', pay:'Cartão', status:'sent', media:true, date:'21/05/2026', hora:'17h44' },
-  { id:13, kids:[{n:'Valentina Almeida Prado', age:9, b:'15/04/2017'},{n:'Henrique Almeida Prado', age:11, b:'20/09/2014'},{n:'Cecília Almeida Prado', age:6, b:'02/01/2020'}], resp:{n:'Roberta Almeida Prado', cpf:'288.443.190-66', phone:'(62) 99845-7733', email:'roberta.prado@gmail.com', rel:'Mãe', b:'11/07/1985'}, second:{n:'Eduardo Prado', phone:'(62) 99102-8844', rel:'Pai'}, fin:'Eduardo Prado', addr:{cep:'74110-100', street:'Rua 9', num:'520', comp:'Casa 1', bairro:'Setor Oeste', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'16h30–18h00', pay:'PIX', status:'signed', media:true, date:'20/05/2026', hora:'19h58' },
+  { id:11, kids:[{n:'Laura Cavalcante Reis', age:10, b:'12/12/2015'}], resp:{n:'Daniela Reis', cpf:'063.778.221-49', phone:'(62) 99334-1180', email:'dani.reis@gmail.com', rel:'Mãe', b:'30/01/1987'}, second:null, fin:'Daniela Reis', addr:{cep:'74343-230', street:'Rua RF-12', num:'140', comp:'Qd 8', bairro:'Residencial Forte', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'15h00–16h30', pay:'PIX', status:'signed', media:true, since:'07/08/2023', date:'22/05/2026', hora:'20h33' },
+  { id:12, kids:[{n:'Gabriel Fonseca Lopes', age:11, b:'07/08/2014'}], resp:{n:'Simone Fonseca', cpf:'174.882.605-77', phone:'(62) 98445-2290', email:'simone.fonseca@yahoo.com', rel:'Mãe', b:'08/10/1982'}, second:{n:'Thiago Lopes', phone:'(62) 99221-5544', rel:'Pai'}, fin:'Thiago Lopes', addr:{cep:'74150-020', street:'Av. T-63', num:'880', comp:'Apto 701', bairro:'Setor Bueno', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'16h30–18h00', pay:'Cartão', status:'sent', media:true, date:'21/05/2026',hora:'17h44' },
+  { id:13, kids:[{n:'Valentina Almeida Prado', age:9, b:'15/04/2017'},{n:'Henrique Almeida Prado', age:11, b:'20/09/2014'},{n:'Cecília Almeida Prado', age:6, b:'02/01/2020'}], resp:{n:'Roberta Almeida Prado', cpf:'288.443.190-66', phone:'(62) 99845-7733', email:'roberta.prado@gmail.com', rel:'Mãe', b:'11/07/1985'}, second:{n:'Eduardo Prado', phone:'(62) 99102-8844', rel:'Pai'}, fin:'Eduardo Prado', addr:{cep:'74110-100', street:'Rua 9', num:'520', comp:'Casa 1', bairro:'Setor Oeste', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'16h30–18h00', pay:'PIX', status:'signed', media:true, since:'06/02/2023', date:'20/05/2026', hora:'19h58' },
   // mesma mãe da Helena (id 1), em matrícula separada — agrupa ao ordenar por responsável
-  { id:14, kids:[{n:'Lorenzo Duarte Lima', age:5, b:'09/10/2021'}], resp:{n:'Mariana Duarte Lima', cpf:'047.812.336-50', phone:'(62) 99214-8870', email:'mariana.duarte@gmail.com', rel:'Mãe', b:'09/05/1989'}, second:{n:'Rafael Lima', phone:'(62) 98112-4471', rel:'Pai'}, fin:'Mariana Duarte Lima', addr:{cep:'74230-110', street:'Rua T-55', num:'180', comp:'Apto 902', bairro:'Setor Bueno', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'14h00–15h30', pay:'Boleto', status:'sent', media:true, date:'19/05/2026', hora:'20h41' },
+  { id:14, kids:[{n:'Lorenzo Duarte Lima', age:5, b:'09/10/2021'}], resp:{n:'Mariana Duarte Lima', cpf:'047.812.336-50', phone:'(62) 99214-8870', email:'mariana.duarte@gmail.com', rel:'Mãe', b:'09/05/1989'}, second:{n:'Rafael Lima', phone:'(62) 98112-4471', rel:'Pai'}, fin:'Mariana Duarte Lima', addr:{cep:'74230-110', street:'Rua T-55', num:'180', comp:'Apto 902', bairro:'Setor Bueno', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'14h00–15h30', pay:'Boleto', status:'sent', media:true, date:'19/05/2026',hora:'20h41' },
 ];
 
 /* +~116 matrículas geradas com seed fixa (mesmos dados em todo reload), calibradas para a
@@ -1092,6 +1091,23 @@ const STUDENTS = [
       sch:tu.sch, t:tu.t, pay:'Boleto', status:'signed', media:rnd()>=.2, active:false,
       exit:{ k:reason.k, label:reason.l, note:pick(EX_NOTES[reason.k]), date:`${pad(int(1,28))}/${pad(int(2,5))}/2026` },
       date:mkDate(dt), hora:genHora() }; });
+
+  /* "na escola desde": quando o aluno ENTROU na escola — diferente da data da matrícula,
+     que é só a última rematrícula. ~35% fica em branco de propósito: é assim que as
+     matrículas importadas da planilha chegam (a planilha não tem essa coluna). */
+  /* o semestre sempre começa em FEVEREIRO ou AGOSTO — o "desde" só cai nesses meses */
+  const SEM_STARTS={2019:['04/02/2019','05/08/2019'],2020:['03/02/2020','03/08/2020'],2021:['01/02/2021','02/08/2021'],2022:['07/02/2022','01/08/2022'],2023:['06/02/2023','07/08/2023'],2024:['05/02/2024','05/08/2024'],2025:['03/02/2025','04/08/2025'],2026:['02/02/2026','03/08/2026']};
+  [...actives, ...inactives].forEach(s=>{
+    const r=rnd();
+    if(r<.35) return;                                  // sem registro (fica "—" na lista)
+    const [,m,y]=s.date.split('/').map(Number);
+    if(r<.62){                                         // novato: entrou no semestre da matrícula
+      if(y===2026&&m>=5) return;                       // 2026.2 ainda nem começou → em branco
+      s.since=SEM_STARTS[y][m>=5?1:0]; return;
+    }
+    const y2=Math.max(2019,y-int(1,6));                // veterano: até 6 anos de casa
+    s.since=y2>=y?SEM_STARTS[y][0]:pick(SEM_STARTS[y2]);
+  });
 
   STUDENTS.push(...actives, ...inactives);
   const dv=s=>s.date.split('/').reverse().join('')+(s.hora||'');
@@ -1247,7 +1263,7 @@ const TOURS={
     { target:'[data-tour="strip"]', title:'Indicadores rápidos', body:'Média de idade, famílias com irmãos, ocupação das turmas, assinaturas e rematrículas — a régua da escola numa linha.', placement:'bottom' },
     { target:'[data-tour="enroll"]', title:'Novas × rematrículas', body:'A linha azul são as matrículas novas; a tracejada amarela, as rematrículas do semestre.', placement:'right' },
     { target:'[data-tour="health"]', title:'Cobrança sem dor de cabeça', body:'O "Andamento dos contratos" mostra quem ainda não assinou — e o botão verde leva direto para a lista já filtrada nos pendentes.', placement:'left' },
-    { target:'[data-tour="vagas"]', title:'Onde ainda cabe aluno', body:'Ocupação por horário, com a etiqueta CHEIA nas turmas lotadas e a dica do horário mais vazio para indicar a quem pedir matrícula.', placement:'right' },
+    { target:'[data-tour="vagas"]', title:'Onde ainda cabe aluno', body:'Ocupação por horário, com a etiqueta CHEIA nas turmas lotadas. No "Gerenciar" dá para criar horários novos, mudar capacidades e excluir turmas vazias.', placement:'right' },
     { target:'[data-tour="hours"]', title:'A hora do clique', body:'Mostra em que horário as famílias costumam matricular pelo site — útil para saber quando responder rápido e impulsionar posts.', placement:'right' },
     { target:'[data-tour="bday"]', title:'Mimos que fidelizam', body:'Os próximos aniversariantes, com botão que prepara as mensagens de parabéns no WhatsApp.', placement:'left' },
     { target:'[data-tour="export"]', title:'Leve para o Excel', body:'Exporta todos os alunos numa planilha que abre no Excel ou Google Planilhas.', placement:'bottom' },
@@ -1256,10 +1272,11 @@ const TOURS={
   alunos:[
     { target:'[data-tour="row-menu"]', title:'Tudo mora nos três pontinhos', body:'Cada linha tem um menu completo: ficha do aluno, editar os dados, ver e baixar contrato, enviar no WhatsApp, copiar telefone, marcar como enviado/assinado, desligar o aluno (com registro do motivo) e excluir cadastros errados.', placement:'left' },
     { target:'#tableHead', title:'Ordene por qualquer coluna', body:'Clique no título de uma coluna para ordenar (vem por nome). Clique de novo para inverter. Ordenando por Responsável, os irmãos de matrículas separadas ficam juntos.', placement:'bottom' },
+    { target:'[data-tour="col-since"]', title:'Desde quando estuda aqui', body:'A coluna "Na escola" mostra quando o aluno entrou de fato (sempre fevereiro ou agosto) — diferente da data de matrícula, que é só a última rematrícula. O traço (—) é quem ainda não tem o registro: preencha em ⋮ → Editar dados.', placement:'bottom' },
     { target:'[data-tour="filtros"]', title:'Busca e filtros', body:'Por horário, contrato, situação (estudando agora × começam no próximo período), bairro, idade, imagem, irmãos e período de matrícula (de/até) — o "Limpar" zera tudo de uma vez.', placement:'bottom' },
     { target:'[data-tip="Autorizou uso de imagem"]', title:'Câmera verde, câmera vermelha', body:'A camerazinha ao lado do nome mostra se a família autorizou fotos: verde = pode postar, vermelha = não pode.', placement:'right' },
     { target:'[data-tour="nova"]', title:'Matrícula manual', body:'A secretaria pode adicionar uma matrícula direto por aqui, sem passar pelo site.', placement:'bottom' },
-    { target:'[data-tour="import-al"]', title:'Traga a planilha de hoje', body:'Importa o arquivo da planilha atual de matrículas. Linhas repetidas (o mesmo cadastro enviado duas vezes) são removidas sozinhas, e quem já está na dashboard não duplica.', placement:'bottom' },
+    { target:'[data-tour="import-al"]', title:'Traga a planilha de hoje', body:'Importa o arquivo da planilha atual de matrículas. Linhas repetidas somem sozinhas, quem já está na dashboard não duplica, e nomes iguais ou dados estranhos entram numa lista para conferir antes de confirmar.', placement:'bottom' },
     { target:'[data-tour="export-al"]', title:'Planilha da lista filtrada', body:'Exporta exatamente o que está na tela — com os filtros aplicados.', placement:'bottom', last:true },
   ],
   editor:[
@@ -1281,13 +1298,13 @@ const TOURS={
   ],
   emails:[
     { target:'#chSeg', title:'E-mail, WhatsApp ou os dois', body:'Escreva o comunicado uma vez e escolha por onde cada família recebe.', placement:'bottom' },
-    { target:'#tplRow', title:'Modelos prontos', body:'Recesso, lembrete de contrato ou comunicado geral — um clique e o texto já vem escrito, é só ajustar.', placement:'bottom' },
+    { target:'#tplRow', title:'Modelos prontos', body:'Um clique e o texto já vem escrito, é só ajustar. Em "Gerenciar modelos" dá para criar os seus próprios, editar ou excluir os que existem.', placement:'bottom' },
     { target:'#emailBody', title:'Mensagens personalizadas', body:'Use os botões de variável — cada família recebe a mensagem com o próprio nome.', placement:'top' },
     { target:'[data-tour="prevbtn"]', title:'Veja antes de enviar', body:'Mostra exatamente como a família recebe: o e-mail montado e a bolha do WhatsApp.', placement:'top', last:true },
   ],
   usuarios:[
     { target:'[data-tour="convidar"]', title:'Chame o time', body:'Convide alguém por e-mail — a pessoa cria a própria senha no primeiro acesso.', placement:'bottom' },
-    { target:'[data-tour="papeis"]', title:'Dois papéis, sem confusão', body:'Administrador faz tudo; Secretaria só vê alunos e envia contratos. Cada pessoa enxerga apenas o que precisa.', placement:'top', last:true },
+    { target:'[data-tour="papeis"]', title:'Dois papéis, sem confusão', body:'Administrador faz tudo; Secretaria só vê alunos e envia contratos. No menu ⋮ de cada pessoa dá para editar o papel, reenviar o convite ou remover o acesso.', placement:'top', last:true },
   ],
   config:[
     { target:'#sbThemePicker', title:'6 combinações de visual', body:'Três cores de sidebar (azul, branca, amarela) vezes claro/escuro — e as bolinhas no rodapé da sidebar trocam de qualquer tela.', placement:'bottom' },
@@ -1437,9 +1454,13 @@ function rowHTML(s){
   const pillTip=fut?' title="Matrícula do período aberto — as aulas começam em Julho (2026.2)"':'';
   const actPill=`<span${exitTip}${pillTip} class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap" style="${pillStyle}"><span class="w-1.5 h-1.5 rounded-full" style="background:${pillDot}"></span>${inactive?'Inativa':fut?'Começa em Jul':'Estudando'}</span>`;
   const kebab=(extra='')=>`<button onclick="openRowMenu(event,${s.id})" ${extra} class="w-9 h-9 rounded-lg border border-[var(--border)] grid place-content-center hover:bg-[var(--card)] transition shrink-0" title="Todas as ações"><i data-lucide="more-vertical" class="w-4 h-4 text-[var(--muted)]"></i></button>`;
+  /* "na escola desde" ≠ data da matrícula: a matrícula é só a última rematrícula */
+  const sinceCell = s.since
+    ? `<span class="tip text-xs whitespace-nowrap" data-tip="Aluno da escola desde ${s.since}">Desde ${s.since}</span>`
+    : `<span class="tip text-xs text-[var(--muted)]" data-tip="Sem registro — use ⋮ → Editar dados para preencher">—</span>`;
   return `<div onclick="openDetail(${s.id})" class="cursor-pointer transition md:border-b md:last:border-0 hover:bg-[var(--hover)] ${inactive?'opacity-60':''}" style="border-color:var(--border)">
     <!-- desktop: linha da tabela -->
-    <div class="hidden md:grid md:grid-cols-[1.6fr_1.3fr_.75fr_.85fr_.7fr_.85fr_52px] gap-3 px-5 py-3.5 items-center">
+    <div class="hidden md:grid md:grid-cols-[1.5fr_1.2fr_.7fr_.8fr_.7fr_.85fr_.8fr_52px] gap-3 px-5 py-3.5 items-center">
       <div class="flex items-center gap-3 min-w-0">
         ${avatar}
         <div class="min-w-0"><p class="font-medium truncate flex items-center gap-2">${s.kids[0].n} ${more}${mediaIcon}</p>
@@ -1449,6 +1470,7 @@ function rowHTML(s){
       <div>${schChip}</div>
       <div>${stPill}</div>
       <div>${actPill}</div>
+      <div>${sinceCell}</div>
       <div><p class="text-xs whitespace-nowrap">${s.date}</p><p class="text-[10px] text-[var(--muted)]">às ${s.hora||'—'}</p></div>
       <div class="flex items-center justify-end">${kebab('data-tour="row-menu"')}</div>
     </div>
@@ -1462,7 +1484,7 @@ function rowHTML(s){
         </div>
         ${kebab()}
       </div>
-      <div class="flex flex-wrap gap-1.5 mt-3">${schChip}${stPill}${actPill}</div>
+      <div class="flex flex-wrap gap-1.5 mt-3">${schChip}${stPill}${actPill}${s.since?`<span class="text-xs font-medium px-2.5 py-1 rounded-lg whitespace-nowrap" style="color:var(--muted);background:var(--hover)">Desde ${s.since}</span>`:''}</div>
       <div class="flex items-center justify-between gap-3 mt-3 pt-3 border-t text-xs text-[var(--muted)]" style="border-color:var(--border)">
         <span class="truncate flex items-center gap-1.5 min-w-0">${s.resp.n}${famBadge}</span>
         <span class="whitespace-nowrap shrink-0">${s.date}${s.hora?' · '+s.hora:''}</span>
@@ -1502,7 +1524,7 @@ function clearFilters(){
 /* ordenação por coluna (nome como padrão) */
 const TABLE_COLS=[
   {k:'name', l:'Aluno'},{k:'resp', l:'Responsável'},{k:'sch', l:'Horário'},
-  {k:'status', l:'Contrato'},{k:'active', l:'Situação'},{k:'date', l:'Matrícula'},
+  {k:'status', l:'Contrato'},{k:'active', l:'Situação'},{k:'since', l:'Na escola'},{k:'date', l:'Matrícula'},
 ];
 const SORT_VAL={
   name:s=>s.kids[0].n.toLowerCase(),
@@ -1510,6 +1532,7 @@ const SORT_VAL={
   sch:s=>s.sch+s.t,
   status:s=>STATUS[s.status].t,
   active:s=>s.active===false?2:isFuture(s)?1:0,
+  since:s=>s.since?s.since.split('/').reverse().join(''):'99999999', // sem registro vai pro fim
   date:s=>s.date.split('/').reverse().join('')+(s.hora||''),
 };
 let sortKey='name', sortDir=1;
@@ -1522,7 +1545,7 @@ function renderTableHead(){
   const head=document.getElementById('tableHead'); if(!head) return;
   head.innerHTML=TABLE_COLS.map(c=>{
     const on=c.k===sortKey;
-    return `<button onclick="setSort('${c.k}')" class="flex items-center gap-1 text-left uppercase tracking-wider font-semibold transition hover:text-[var(--text)] ${on?'text-[var(--text)]':''}" title="Ordenar por ${c.l}">${c.l}<span class="text-[9px] leading-none">${on?(sortDir===1?'▲':'▼'):'↕'}</span></button>`;
+    return `<button onclick="setSort('${c.k}')" ${c.k==='since'?'data-tour="col-since" ':''}class="flex items-center gap-1 text-left uppercase tracking-wider font-semibold transition hover:text-[var(--text)] ${on?'text-[var(--text)]':''}" title="${c.k==='since'?'Desde quando o aluno está na escola (ordena por essa data)':'Ordenar por '+c.l}">${c.l}<span class="text-[9px] leading-none">${on?(sortDir===1?'▲':'▼'):'↕'}</span></button>`;
   }).join('')+'<span class="text-right">Ações</span>';
 }
 function updateClearBtn(){
@@ -1585,6 +1608,9 @@ function openDetail(id){
             <p class="text-[var(--muted)] text-sm">${s.kids.length>1?s.kids.length+' alunos (irmãos)':'1 aluno'} · matrícula em ${s.date}${s.hora?' às '+s.hora:''}</p>
             <div class="flex flex-wrap items-center gap-2 mt-2"><span class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full" style="color:${st.c};background:${st.bg}"><span class="w-1.5 h-1.5 rounded-full" style="background:${st.c}"></span>Contrato ${st.t.toLowerCase()}</span>
               <span class="text-xs font-medium px-2.5 py-1 rounded-lg" style="color:#2F539A;background:rgba(47,83,154,.10)">${schLabel(s.sch)} · ${s.t}</span>
+              ${s.since
+                ?`<span class="tip text-xs font-medium px-2.5 py-1 rounded-lg" data-tip="Quando o aluno entrou na escola — a data da matrícula é só a última rematrícula" style="color:var(--muted);background:var(--hover)"><i data-lucide="school" class="w-3 h-3 inline -mt-0.5"></i> Na escola desde ${s.since}</span>`
+                :`<button onclick="event.stopPropagation();openEditEnrollment(${s.id})" class="tip text-xs font-medium px-2.5 py-1 rounded-lg border border-dashed transition hover:bg-[var(--hover)]" data-tip="Ainda não sabemos desde quando este aluno está na escola — clique para registrar" style="color:var(--muted);border-color:var(--border)"><i data-lucide="calendar-plus" class="w-3 h-3 inline -mt-0.5"></i> Registrar desde quando estuda aqui</button>`}
               ${s.active!==false&&isFuture(s)?'<span class="text-xs font-semibold px-2.5 py-1 rounded-full" style="color:#fff;background:#2F539A">🎒 Começa em Jul/2026</span>':''}</div></div>
         </div>
         <div class="flex flex-wrap gap-2">
@@ -1723,11 +1749,12 @@ function renderEmails(){
     : ch==='both' ? `<span class="flex items-center gap-0.5"><i data-lucide="mail" class="w-3.5 h-3.5 text-brand-light"></i><span style="color:#1faa53">${WA('w-3.5 h-3.5')}</span></span>`
     : `<i data-lucide="mail" class="w-4 h-4 text-brand-light"></i>`;
   document.getElementById('emailHistory').innerHTML=data.map(e=>`<div class="flex items-center gap-3 p-3 rounded-xl" style="background:var(--hover)"><div class="w-9 h-9 rounded-lg grid place-content-center bg-[var(--card)]">${chIcon(e.ch)}</div><div class="flex-1 min-w-0"><p class="text-sm font-medium truncate">${e.s}</p><p class="text-xs text-[var(--muted)]">${e.n} famílias · ${e.d}</p></div><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500"></i></div>`).join('');
+  renderTplChips();
   lucide.createIcons();
 }
-const USERS=[{n:'Priscylla Martins',e:'priscylla@englishpatio.com.br',r:'Administrador',c:'#1E3765'},{n:'Gabriel Teles',e:'gabriel@englishpatio.com.br',r:'Administrador',c:'#2F539A'},{n:'Stefany Oliveira',e:'stefany@englishpatio.com.br',r:'Secretaria',c:'#B5860B'},{n:'Beatriz Souza',e:'beatriz@englishpatio.com.br',r:'Secretaria',c:'#0d9488'}];
+const USERS=[{id:1,n:'Priscylla Martins',e:'priscylla@englishpatio.com.br',r:'Administrador',c:'#1E3765'},{id:2,n:'Gabriel Teles',e:'gabriel@englishpatio.com.br',r:'Administrador',c:'#2F539A'},{id:3,n:'Stefany Oliveira',e:'stefany@englishpatio.com.br',r:'Secretaria',c:'#B5860B'},{id:4,n:'Beatriz Souza',e:'beatriz@englishpatio.com.br',r:'Secretaria',c:'#0d9488'}];
 function renderUsers(){
-  document.getElementById('userList').innerHTML=USERS.map(x=>`<div class="flex items-center gap-3 p-4"><div class="w-10 h-10 rounded-full grid place-content-center text-white font-semibold" style="background:${x.c}">${initials(x.n)}</div><div class="flex-1 min-w-0"><p class="font-medium truncate">${x.n} ${x.pending?'<span class="text-[10px] font-semibold px-1.5 py-0.5 rounded-md align-middle" style="background:rgba(245,183,0,.16);color:#B5860B">convite pendente</span>':''}</p><p class="text-xs text-[var(--muted)] truncate">${x.e}</p></div><span class="text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap" style="background:var(--hover)">${x.r}</span><button class="p-2 rounded-lg hover:bg-[var(--hover)]"><i data-lucide="more-vertical" class="w-4 h-4 text-[var(--muted)]"></i></button></div>`).join('');
+  document.getElementById('userList').innerHTML=USERS.map(x=>`<div class="flex items-center gap-3 p-4"><div class="w-10 h-10 rounded-full grid place-content-center text-white font-semibold" style="background:${x.c}">${initials(x.n)}</div><div class="flex-1 min-w-0"><p class="font-medium truncate">${x.n} ${x.pending?'<span class="text-[10px] font-semibold px-1.5 py-0.5 rounded-md align-middle" style="background:rgba(245,183,0,.16);color:#B5860B">convite pendente</span>':''}</p><p class="text-xs text-[var(--muted)] truncate">${x.e}</p></div><span class="text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap" style="background:var(--hover)">${x.r}</span><button onclick="openUserMenu(event,${x.id})" class="p-2 rounded-lg hover:bg-[var(--hover)]" title="Ações do usuário"><i data-lucide="more-vertical" class="w-4 h-4 text-[var(--muted)]"></i></button></div>`).join('');
   lucide.createIcons();
 }
 
@@ -1788,7 +1815,110 @@ function renderVagas(){
       return `<div><div class="flex justify-between text-[13px] mb-1"><span class="font-medium">${t}${full?' <span class="text-[9px] font-bold px-1.5 py-0.5 rounded align-middle" style="background:rgba(245,183,0,.22);color:#B5860B">CHEIA</span>':''}</span><span class="text-[var(--muted)]">${v}/${cap}</span></div>
       <div class="h-2 rounded-full overflow-hidden" style="background:var(--hover)"><div class="h-full rounded-full" style="width:${pct}%;background:${full?'#F5B700':'#2F539A'}"></div></div></div>`; }).join('')+`</div>`;
   const grid=document.getElementById('vagasGrid'); if(grid) grid.innerHTML=col('seg-qua','Segunda / Quarta')+col('ter-qui','Terça / Quinta');
-  const chip=document.getElementById('vagasChip'); if(chip) chip.textContent=`${Math.max(0,150-tot)} vagas livres`;
+  const totCap=Object.values(TURMA_CAP).reduce((a,ts)=>a+Object.values(ts).reduce((x,y)=>x+y,0),0);
+  const capEl=document.getElementById('capTotal'); if(capEl) capEl.textContent=totCap;
+  const chip=document.getElementById('vagasChip'); if(chip) chip.textContent=`${Math.max(0,totCap-tot)} vagas livres`;
+}
+
+/* --- CRUD de turmas/horários: capacidade, novo horário e exclusão de turma vazia --- */
+function turmaOcc(){
+  const occ={};
+  STUDENTS.forEach(s=>{ if(s.active===false) return; occ[s.sch+'|'+s.t]=(occ[s.sch+'|'+s.t]||0)+s.kids.length; });
+  return occ;
+}
+function openTurmas(){
+  openModal(`${modalHeader('Gerenciar turmas')}
+  <div class="p-5 space-y-4">
+    <div id="tmList"></div>
+    <div class="rounded-xl p-3 space-y-2.5" style="background:var(--hover)">
+      <p class="text-sm font-medium flex items-center gap-1.5"><i data-lucide="plus-circle" class="w-4 h-4 text-brand-light"></i> Novo horário</p>
+      <div class="grid grid-cols-2 gap-2">
+        <div id="ntSchWrap"></div>
+        <label class="block relative"><input id="ntCap" placeholder="Vagas (ex.: 18)" inputmode="numeric" oninput="this.value=this.value.replace(/\\D/g,'').slice(0,2)" class="${inputCls}" style="margin-top:0"></label>
+      </div>
+      <div class="grid grid-cols-2 gap-2">
+        <input id="ntIni" placeholder="Começa (ex.: 14h00)" oninput="maskHour(this)" class="${inputCls}" style="margin-top:0">
+        <input id="ntFim" placeholder="Termina (ex.: 15h30)" oninput="maskHour(this)" class="${inputCls}" style="margin-top:0">
+      </div>
+      <div id="ntErr"></div>
+      <button onclick="addTurma()" class="w-full h-10 rounded-xl text-white text-sm font-semibold" style="background:linear-gradient(135deg,#1E3765,#2F539A)">Adicionar horário</button>
+    </div>
+    <p class="text-xs text-[var(--muted)] flex items-start gap-1.5"><i data-lucide="info" class="w-3.5 h-3.5 shrink-0 mt-0.5"></i><span>A capacidade não desce abaixo dos alunos que já estão na turma, e só turmas <b>vazias</b> podem ser excluídas.</span></p>
+  </div>
+  <div class="p-5 pt-0"><button onclick="closeModal()" class="w-full h-11 rounded-xl border border-[var(--border)] font-medium text-sm">Fechar</button></div>`,'max-w-lg');
+  document.getElementById('ntSchWrap').innerHTML=cselect('ntSch',[{v:'seg-qua',l:'Seg/Qua'},{v:'ter-qui',l:'Ter/Qui'}],{block:true});
+  renderTurmasList();
+}
+function renderTurmasList(){
+  const el=document.getElementById('tmList'); if(!el) return;
+  const occ=turmaOcc();
+  el.innerHTML=Object.entries(TURMA_CAP).map(([sch,ts])=>`
+    <p class="text-[10px] font-bold uppercase tracking-wider text-[var(--muted)] mt-3 first:mt-0 mb-1.5">${schLabel(sch)}</p>
+    ${Object.entries(ts).map(([t,cap])=>{ const v=occ[sch+'|'+t]||0; const empty=v===0;
+      return `<div class="flex items-center gap-2.5 py-2 border-b last:border-0" style="border-color:var(--border)">
+        <span class="text-sm font-medium flex-1">${t}</span>
+        <span class="text-xs text-[var(--muted)] whitespace-nowrap">${v}/${cap} aluno${cap===1?'':'s'}</span>
+        <div class="flex items-center gap-1">
+          <button onclick="tCapStep('${sch}','${t}',-1)" class="w-7 h-7 rounded-lg border border-[var(--border)] grid place-content-center hover:bg-[var(--hover)] transition disabled:opacity-35" ${cap<=Math.max(v,1)?'disabled':''} title="Diminuir capacidade"><i data-lucide="minus" class="w-3.5 h-3.5"></i></button>
+          <span class="w-7 text-center text-sm font-semibold">${cap}</span>
+          <button onclick="tCapStep('${sch}','${t}',1)" class="w-7 h-7 rounded-lg border border-[var(--border)] grid place-content-center hover:bg-[var(--hover)] transition disabled:opacity-35" ${cap>=30?'disabled':''} title="Aumentar capacidade"><i data-lucide="plus" class="w-3.5 h-3.5"></i></button>
+        </div>
+        <button onclick="deleteTurma('${sch}','${t}')" class="w-7 h-7 rounded-lg border border-[var(--border)] grid place-content-center transition ${empty?'hover:bg-[var(--hover)]':'opacity-35 cursor-not-allowed'}" title="${empty?'Excluir esta turma':'Só turmas vazias podem ser excluídas — mova os alunos antes'}"><i data-lucide="trash-2" class="w-3.5 h-3.5" style="color:#DC2626"></i></button>
+      </div>`; }).join('')}`).join('');
+  lucide.createIcons();
+}
+function tCapStep(sch,t,d){
+  const occ=turmaOcc()[sch+'|'+t]||0;
+  const cap=TURMA_CAP[sch][t]+d;
+  if(cap<Math.max(occ,1)||cap>30) return;
+  TURMA_CAP[sch][t]=cap;
+  renderTurmasList(); renderVagas();
+}
+function maskHour(el){
+  const v=el.value.replace(/\D/g,'').slice(0,4);
+  el.value=v.length>2?v.slice(0,2)+'h'+v.slice(2):v;
+}
+function ntError(msg){
+  const el=document.getElementById('ntErr');
+  if(el){ el.innerHTML=`<div class="rounded-xl p-2.5 text-xs flex items-start gap-2 bg-[var(--card)]" style="color:#DC2626"><i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i><span>${msg}</span></div>`; lucide.createIcons(); }
+}
+function addTurma(){
+  const sch=SEL.ntSch?.value||'seg-qua';
+  const ini=document.getElementById('ntIni').value.trim();
+  const fim=document.getElementById('ntFim').value.trim();
+  const cap=parseInt(document.getElementById('ntCap').value,10);
+  if(!/^\d{2}h\d{2}$/.test(ini)||!/^\d{2}h\d{2}$/.test(fim)) return ntError('Preencha começo e fim no formato <b>14h00</b>.');
+  if(fim<=ini) return ntError('O fim precisa ser depois do começo.');
+  if(!(cap>=1&&cap<=30)) return ntError('Capacidade entre 1 e 30 vagas.');
+  const t=`${ini}–${fim}`;
+  if(TURMA_CAP[sch][t]!=null) return ntError(`${schLabel(sch)} ${t} já existe.`);
+  TURMA_CAP[sch][t]=cap;
+  ['ntIni','ntFim','ntCap'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('ntErr').innerHTML='';
+  renderTurmasList(); renderVagas();
+  toast(`Turma ${schLabel(sch)} ${t} criada com ${cap} vagas!`);
+}
+function deleteTurma(sch,t){
+  if((turmaOcc()[sch+'|'+t]||0)>0) return; // só turma vazia
+  if(Object.keys(TURMA_CAP[sch]).length===1){ ntError(`${schLabel(sch)} ficaria sem nenhum horário — crie outro antes de excluir este.`); return; }
+  openModal(`${modalHeader('Excluir turma')}
+  <div class="p-5 space-y-4">
+    <div class="flex items-start gap-3 p-3 rounded-xl" style="background:rgba(220,38,38,.06)">
+      <div class="w-10 h-10 rounded-xl grid place-content-center shrink-0" style="background:rgba(220,38,38,.12)"><i data-lucide="trash-2" class="w-5 h-5" style="color:#DC2626"></i></div>
+      <div class="min-w-0"><p class="font-medium text-sm">Excluir a turma ${schLabel(sch)} · ${t}?</p>
+      <p class="text-xs text-[var(--muted)] mt-0.5">Ela está vazia — o horário some das opções de matrícula e do painel de vagas.</p></div>
+    </div>
+    <div class="flex gap-2">
+      <button onclick="openTurmas()" class="flex-1 h-11 rounded-xl border border-[var(--border)] text-sm font-semibold hover:bg-[var(--hover)] transition">Cancelar</button>
+      <button onclick="confirmDeleteTurma('${sch}','${t}')" class="flex-1 h-11 rounded-xl text-white text-sm font-semibold transition hover:brightness-110" style="background:#DC2626">Excluir turma</button>
+    </div>
+  </div>`);
+}
+function confirmDeleteTurma(sch,t){
+  delete TURMA_CAP[sch][t];
+  renderVagas();
+  openTurmas();
+  toast(`Turma ${schLabel(sch)} ${t} excluída.`);
 }
 /* recalcula tudo que deriva da base (chamado no init e após desligar/reativar/nova matrícula).
    ovCohort: ''=todos · 'on'=estudando agora · 'next'=matrículas do período aberto (2026.2) */
@@ -2297,28 +2427,84 @@ function openEditEnrollment(id){
         <input id="edKidB${i}" value="${k.b}" placeholder="dd/mm/aaaa" oninput="maskDate(this)" inputmode="numeric" class="${inputCls} pr-10">
         <button type="button" onclick="openDatePicker(event,'edKidB${i}',2018)" class="dp-btn absolute right-2 bottom-[9px] p-1 rounded-md text-[var(--muted)] hover:text-brand-light hover:bg-[var(--hover)] transition" title="Abrir calendário"><i data-lucide="calendar" class="w-4 h-4"></i></button></label>
     </div>`).join('');
+  const sec=t=>`<p class="text-[10px] font-bold uppercase tracking-wider text-[var(--muted)] pt-2">${t}</p>`;
+  const ckSvg='<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3"><polyline points="20 6 9 17 4 12"/></svg>';
   openModal(`${modalHeader('Editar matrícula')}
   <div class="p-5 space-y-3">
+    ${sec('Alunos')}
     ${kidFields}
-    <label class="block"><span class="text-sm font-medium">Responsável legal</span>
-      <input id="edResp" value="${s.resp.n.replace(/"/g,'&quot;')}" class="${inputCls}"></label>
+    ${sec('Responsável legal')}
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <label class="block"><span class="text-sm font-medium">Nome</span>
+        <input id="edResp" value="${s.resp.n.replace(/"/g,'&quot;')}" class="${inputCls}"></label>
+      <label class="block"><span class="text-sm font-medium">Parentesco</span>
+        <input id="edRespRel" value="${(s.resp.rel||'').replace(/"/g,'&quot;')}" placeholder="Mãe, Pai, Avó…" class="${inputCls}"></label>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <label class="block"><span class="text-sm font-medium">CPF</span>
+        <input id="edCpf" value="${s.resp.cpf==='—'?'':s.resp.cpf}" placeholder="000.000.000-00" oninput="maskCpf(this)" inputmode="numeric" class="${inputCls}"></label>
+      <label class="block relative"><span class="text-sm font-medium">Nascimento</span>
+        <input id="edRespB" value="${s.resp.b==='—'?'':s.resp.b}" placeholder="dd/mm/aaaa" oninput="maskDate(this)" inputmode="numeric" class="${inputCls} pr-10">
+        <button type="button" onclick="openDatePicker(event,'edRespB',1988)" class="dp-btn absolute right-2 bottom-[9px] p-1 rounded-md text-[var(--muted)] hover:text-brand-light hover:bg-[var(--hover)] transition" title="Abrir calendário"><i data-lucide="calendar" class="w-4 h-4"></i></button></label>
+    </div>
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
       <label class="block"><span class="text-sm font-medium">Telefone</span>
         <input id="edPhone" value="${s.resp.phone}" oninput="maskPhone(this)" inputmode="numeric" class="${inputCls}"></label>
       <label class="block"><span class="text-sm font-medium">E-mail</span>
         <input id="edEmail" type="email" value="${s.resp.email}" class="${inputCls}"></label>
     </div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    ${sec('Segundo responsável')}
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <label class="block"><span class="text-sm font-medium">Nome</span>
+        <input id="edSecN" value="${(s.second?.n||'').replace(/"/g,'&quot;')}" placeholder="Deixe vazio se não tiver" class="${inputCls}"></label>
+      <label class="block"><span class="text-sm font-medium">Telefone</span>
+        <input id="edSecP" value="${s.second?.phone||''}" oninput="maskPhone(this)" inputmode="numeric" class="${inputCls}"></label>
+      <label class="block"><span class="text-sm font-medium">Parentesco</span>
+        <input id="edSecR" value="${(s.second?.rel||'').replace(/"/g,'&quot;')}" placeholder="Pai, Mãe…" class="${inputCls}"></label>
+    </div>
+    <p class="text-xs text-[var(--muted)] -mt-1">Para remover o segundo responsável, apague o nome e salve.</p>
+    ${sec('Financeiro e autorizações')}
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 items-end">
+      <label class="block"><span class="text-sm font-medium">Responsável financeiro</span>
+        <input id="edFin" value="${(s.fin||'').replace(/"/g,'&quot;')}" class="${inputCls}"></label>
+      <button type="button" onclick="document.getElementById('edMedia').classList.toggle('on')" class="flex items-center gap-2.5 h-11 px-3 rounded-xl border border-[var(--border)] hover:bg-[var(--hover)] transition text-left">
+        <span id="edMedia" class="ck ${s.media!==false?'on':''} shrink-0">${ckSvg}</span>
+        <span class="text-sm">Autoriza uso de imagem (fotos)</span>
+      </button>
+    </div>
+    ${sec('Endereço')}
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <label class="block"><span class="text-sm font-medium">CEP</span>
+        <input id="edCep" value="${s.addr.cep==='—'?'':s.addr.cep}" placeholder="00000-000" oninput="maskCep(this)" inputmode="numeric" class="${inputCls}"></label>
+      <label class="block sm:col-span-2"><span class="text-sm font-medium">Rua / avenida</span>
+        <input id="edStreet" value="${(s.addr.street==='—'?'':s.addr.street).replace(/"/g,'&quot;')}" class="${inputCls}"></label>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <label class="block"><span class="text-sm font-medium">Número</span>
+        <input id="edNum" value="${s.addr.num||''}" class="${inputCls}"></label>
+      <label class="block"><span class="text-sm font-medium">Complemento</span>
+        <input id="edComp" value="${(s.addr.comp||'').replace(/"/g,'&quot;')}" class="${inputCls}"></label>
       <label class="block"><span class="text-sm font-medium">Bairro</span>
         <input id="edHood" value="${s.addr.bairro.replace(/"/g,'&quot;')}" class="${inputCls}"></label>
-      <div><span class="text-sm font-medium">Dias</span><div class="mt-1.5" id="edSchWrap"></div></div>
+      <label class="block"><span class="text-sm font-medium">Cidade</span>
+        <input id="edCity" value="${(s.addr.city||'').replace(/"/g,'&quot;')}" class="${inputCls}"></label>
     </div>
-    <div><span class="text-sm font-medium">Turma (horário)</span><div class="mt-1.5" id="edTWrap"></div></div>
+    ${sec('Turma')}
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div><span class="text-sm font-medium">Dias</span><div class="mt-1.5" id="edSchWrap"></div></div>
+      <div><span class="text-sm font-medium">Turma (horário)</span><div class="mt-1.5" id="edTWrap"></div></div>
+    </div>
+    <div class="rounded-xl p-3 space-y-2" style="background:var(--hover)">
+      <label class="block relative"><span class="text-sm font-medium">Na escola desde</span>
+        <input id="edSince" value="${s.since||''}" placeholder="dd/mm/aaaa" oninput="maskDate(this)" inputmode="numeric" class="${inputCls} pr-10" style="background:var(--card)">
+        <button type="button" onclick="openDatePicker(event,'edSince',2023)" class="dp-btn absolute right-2 bottom-[9px] p-1 rounded-md text-[var(--muted)] hover:text-brand-light hover:bg-[var(--hover)] transition" title="Abrir calendário"><i data-lucide="calendar" class="w-4 h-4"></i></button></label>
+      <p class="text-xs text-[var(--muted)]">Quando o aluno <b>entrou na escola</b> (sempre fevereiro ou agosto) — diferente da data da matrícula, que mostra só a última rematrícula. Pode deixar em branco se ainda não souber.</p>
+    </div>
   </div>
   <div class="p-5 pt-0 flex gap-2">
     <button onclick="closeModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] font-medium text-sm">Cancelar</button>
     <button onclick="saveEditEnrollment(${id})" class="flex-1 h-11 rounded-xl text-white font-semibold text-sm" style="background:linear-gradient(135deg,#1E3765,#2F539A)">Salvar alterações</button>
-  </div>`,'max-w-lg');
+  </div>`,'max-w-xl');
   const tOpts=sch=>Object.keys(TURMA_CAP[sch]).map(t=>({v:t,l:t}));
   document.getElementById('edSchWrap').innerHTML=cselect('edSch',[{v:'seg-qua',l:'Seg/Qua'},{v:'ter-qui',l:'Ter/Qui'}],{block:true,value:s.sch,onChange:v=>{
     document.getElementById('edTWrap').innerHTML=cselect('edT',tOpts(v),{block:true});
@@ -2337,10 +2523,28 @@ function saveEditEnrollment(id){
     const b=document.getElementById('edKidB'+i)?.value.trim()||k.b;
     return { ...k, n, b, age: ageFrom(b)??k.age };
   });
-  s.resp.n=document.getElementById('edResp').value.trim()||s.resp.n;
-  s.resp.phone=document.getElementById('edPhone').value.trim()||s.resp.phone;
-  s.resp.email=document.getElementById('edEmail').value.trim()||s.resp.email;
-  s.addr.bairro=document.getElementById('edHood').value.trim()||s.addr.bairro;
+  const gv=id=>document.getElementById(id)?.value.trim()||'';
+  s.resp.n=gv('edResp')||s.resp.n;
+  s.resp.rel=gv('edRespRel')||s.resp.rel;
+  s.resp.phone=gv('edPhone')||s.resp.phone;
+  s.resp.email=gv('edEmail')||s.resp.email;
+  const cpf=gv('edCpf'); if(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(cpf)) s.resp.cpf=cpf;
+  const rb=gv('edRespB'); if(/^\d{2}\/\d{2}\/\d{4}$/.test(rb)) s.resp.b=rb;
+  /* segundo responsável: nome vazio remove; preenchido cria ou atualiza */
+  const secN=gv('edSecN');
+  s.second = secN ? { n:secN, phone:gv('edSecP')||s.second?.phone||'—', rel:gv('edSecR')||s.second?.rel||'Responsável' } : null;
+  s.fin=gv('edFin')||s.fin;
+  s.media=document.getElementById('edMedia')?.classList.contains('on')??s.media;
+  const cep=gv('edCep'); if(/^\d{5}-\d{3}$/.test(cep)) s.addr.cep=cep;
+  s.addr.street=gv('edStreet')||s.addr.street;
+  s.addr.num=gv('edNum')||s.addr.num;
+  s.addr.comp=gv('edComp'); // complemento pode ficar vazio
+  s.addr.bairro=gv('edHood')||s.addr.bairro;
+  s.addr.city=gv('edCity')||s.addr.city;
+  /* "na escola desde": vazio limpa o registro; data inválida não corrompe o que já existia */
+  const sv=gv('edSince');
+  if(!sv) delete s.since;
+  else if(/^\d{2}\/\d{2}\/\d{4}$/.test(sv)) s.since=sv;
   s.sch=SEL.edSch?.value||s.sch;
   s.t=SEL.edT?.value||s.t;
   closeModal();
@@ -2403,21 +2607,188 @@ function submitInvite(){
   const e=document.getElementById('invEmail').value.trim();
   if(!n){ document.getElementById('invName').focus(); return; }
   if(!e){ document.getElementById('invEmail').focus(); return; }
-  USERS.push({n, e, r:SEL.invRole?.value==='secretaria'?'Secretaria':'Administrador', c:'#0891b2', pending:true});
+  USERS.push({id:Math.max(...USERS.map(u=>u.id))+1, n, e, r:SEL.invRole?.value==='secretaria'?'Secretaria':'Administrador', c:'#0891b2', pending:true});
   renderUsers(); closeModal(); toast(`Convite enviado para ${e}!`);
 }
 
-/* --- modelos prontos + variáveis clicáveis --- */
-const EMAIL_TPLS={
-  recesso:{ s:'Recesso de julho — Vacation Classes 📅', b:'Olá, {{nome_responsavel}}!\n\nPassando para lembrar que em julho acontecem as Vacation Classes: as mensalidades do mês são convertidas integralmente em vivências divertidas e imersivas.\n\nEm breve mandamos a programação completa. Qualquer dúvida, é só responder este e-mail!\n\nAbraços,\nEquipe English Patio' },
-  contrato:{ s:'Falta pouco: contrato de {{nome_aluno}}', b:'Olá, {{nome_responsavel}}!\n\nNotamos que o contrato de {{nome_aluno}} ainda está aguardando assinatura. É rapidinho — qualquer dificuldade, respondemos por aqui ou pelo WhatsApp da escola.\n\nAbraços,\nEquipe English Patio' },
-  aviso:{ s:'Comunicado — English Patio', b:'Olá, {{nome_responsavel}}!\n\n[Escreva aqui o seu recado]\n\nAbraços,\nEquipe English Patio' },
-};
+/* --- CRUD de usuários do painel (menu ⋮ de cada linha) --- */
+function userById(id){ return USERS.find(u=>u.id===id); }
+function openUserMenu(e,id){
+  e.stopPropagation();
+  const u=userById(id); if(!u) return;
+  const m=document.getElementById('rowMenu');
+  const item=(ic,label,fn,style='')=>`<button onclick="closeRowMenu();${fn}" class="w-full flex items-center gap-2.5 text-left text-sm px-3 py-2 rounded-lg hover:bg-[var(--hover)] transition" ${style?`style="${style}"`:''}><i data-lucide="${ic}" class="w-4 h-4 ${style?'':'text-[var(--muted)]'}"></i>${label}</button>`;
+  m.innerHTML=
+    item('pencil','Editar usuário',`openEditUser(${id})`)+
+    (u.pending?item('send','Reenviar convite',`resendInvite(${id})`):'')+
+    `<div class="h-px my-1" style="background:var(--border)"></div>`+
+    item('user-round-x','Remover acesso',`openRemoveUser(${id})`,'color:#DC2626');
+  m.classList.remove('hidden');
+  const r=e.currentTarget.getBoundingClientRect();
+  const mh=m.offsetHeight||140;
+  m.style.left=Math.max(10, Math.min(r.left-220, innerWidth-270))+'px';
+  m.style.top=(r.bottom+mh+12>innerHeight ? r.top-mh-6 : r.bottom+6)+'px';
+  lucide.createIcons();
+}
+function openEditUser(id){
+  const u=userById(id); if(!u) return;
+  openModal(`${modalHeader('Editar usuário')}
+  <div class="p-5 space-y-3">
+    <label class="block"><span class="text-sm font-medium">Nome</span>
+      <input id="euName" value="${esc(u.n).replace(/"/g,'&quot;')}" class="${inputCls}"></label>
+    <label class="block"><span class="text-sm font-medium">E-mail</span>
+      <input id="euEmail" type="email" value="${esc(u.e)}" class="${inputCls}"></label>
+    <div><span class="text-sm font-medium">Papel</span><div class="mt-1.5" id="euRoleWrap"></div></div>
+    <p class="text-xs text-[var(--muted)] flex items-center gap-1.5"><i data-lucide="shield-check" class="w-3.5 h-3.5 shrink-0"></i> Secretaria só vê alunos e envia contratos; Administrador tem acesso total.</p>
+    <div id="euErr"></div>
+  </div>
+  <div class="p-5 pt-0 flex gap-2">
+    <button onclick="closeModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] font-medium text-sm">Cancelar</button>
+    <button onclick="saveUser(${id})" class="flex-1 h-11 rounded-xl text-white font-semibold text-sm" style="background:linear-gradient(135deg,#1E3765,#2F539A)">Salvar alterações</button>
+  </div>`);
+  document.getElementById('euRoleWrap').innerHTML=cselect('euRole',[{v:'admin',l:'Administrador'},{v:'secretaria',l:'Secretaria'}],{block:true,value:u.r==='Secretaria'?'secretaria':'admin'});
+  lucide.createIcons();
+}
+function saveUser(id){
+  const u=userById(id); if(!u) return;
+  const novoPapel=SEL.euRole?.value==='secretaria'?'Secretaria':'Administrador';
+  /* não deixa o painel sem nenhum administrador */
+  if(u.r==='Administrador'&&novoPapel==='Secretaria'&&USERS.filter(x=>x.r==='Administrador').length===1){
+    document.getElementById('euErr').innerHTML=`<div class="rounded-xl p-3 text-sm flex items-start gap-2" style="background:rgba(220,38,38,.08);color:#DC2626"><i data-lucide="alert-circle" class="w-4 h-4 shrink-0 mt-0.5"></i><span>${esc(u.n.split(' ')[0])} é a única pessoa administradora — promova outra antes de mudar o papel.</span></div>`;
+    lucide.createIcons(); return;
+  }
+  u.n=document.getElementById('euName').value.trim()||u.n;
+  u.e=document.getElementById('euEmail').value.trim()||u.e;
+  u.r=novoPapel;
+  closeModal(); renderUsers();
+  toast('Usuário atualizado!');
+}
+function resendInvite(id){
+  const u=userById(id); if(!u) return;
+  toast(`Convite reenviado para ${u.e}!`);
+}
+function openRemoveUser(id){
+  const u=userById(id); if(!u) return;
+  if(u.r==='Administrador'&&USERS.filter(x=>x.r==='Administrador').length===1){
+    openModal(`${modalHeader('Não dá para remover')}
+    <div class="p-5 space-y-4">
+      <p class="text-sm"><b>${esc(u.n)}</b> é a única pessoa administradora do painel — promova outra pessoa a Administrador antes de remover este acesso.</p>
+      <button onclick="closeModal()" class="w-full h-11 rounded-xl border border-[var(--border)] font-medium text-sm">Entendi</button>
+    </div>`); return;
+  }
+  openModal(`${modalHeader('Remover acesso')}
+  <div class="p-5 space-y-4">
+    <div class="flex items-start gap-3 p-3 rounded-xl" style="background:rgba(220,38,38,.06)">
+      <div class="w-10 h-10 rounded-full grid place-content-center text-white font-semibold shrink-0" style="background:${u.c}">${initials(u.n)}</div>
+      <div class="min-w-0"><p class="font-medium text-sm">Remover o acesso de ${esc(u.n)}?</p>
+      <p class="text-xs text-[var(--muted)] mt-0.5">A pessoa não consegue mais entrar no painel. Dá para convidar de novo depois, se precisar.</p></div>
+    </div>
+    <div class="flex gap-2">
+      <button onclick="closeModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] text-sm font-semibold hover:bg-[var(--hover)] transition">Cancelar</button>
+      <button onclick="confirmRemoveUser(${id})" class="flex-1 h-11 rounded-xl text-white text-sm font-semibold transition hover:brightness-110" style="background:#DC2626">Remover acesso</button>
+    </div>
+  </div>`);
+}
+function confirmRemoveUser(id){
+  const i=USERS.findIndex(u=>u.id===id); if(i<0) return;
+  const nome=USERS[i].n.split(' ')[0];
+  USERS.splice(i,1);
+  closeModal(); renderUsers();
+  toast(`Acesso de ${nome} removido.`);
+}
+
+/* --- modelos prontos (com CRUD) + variáveis clicáveis --- */
+const EMAIL_TPLS=[
+  { k:'recesso',  l:'Recesso / Vacation Classes', ic:'sun',        col:'#F5B700', s:'Recesso de julho — Vacation Classes 📅', b:'Olá, {{nome_responsavel}}!\n\nPassando para lembrar que em julho acontecem as Vacation Classes: as mensalidades do mês são convertidas integralmente em vivências divertidas e imersivas.\n\nEm breve mandamos a programação completa. Qualquer dúvida, é só responder este e-mail!\n\nAbraços,\nEquipe English Patio' },
+  { k:'contrato', l:'Lembrete de contrato',       ic:'file-clock', col:'#B5860B', s:'Falta pouco: contrato de {{nome_aluno}}', b:'Olá, {{nome_responsavel}}!\n\nNotamos que o contrato de {{nome_aluno}} ainda está aguardando assinatura. É rapidinho — qualquer dificuldade, respondemos por aqui ou pelo WhatsApp da escola.\n\nAbraços,\nEquipe English Patio' },
+  { k:'aviso',    l:'Comunicado geral',           ic:'megaphone',  col:'#2F539A', s:'Comunicado — English Patio', b:'Olá, {{nome_responsavel}}!\n\n[Escreva aqui o seu recado]\n\nAbraços,\nEquipe English Patio' },
+];
+function emailTplBy(k){ return EMAIL_TPLS.find(t=>t.k===k); }
+function renderTplChips(){
+  const el=document.getElementById('tplChips'); if(!el) return;
+  el.innerHTML=EMAIL_TPLS.map(t=>`<button onclick="applyEmailTpl('${t.k}')" class="flex items-center gap-2 h-9 px-3 rounded-xl border border-[var(--border)] text-[13px] font-medium hover:bg-[var(--hover)] transition"><i data-lucide="${t.ic}" class="w-4 h-4" style="color:${t.col}"></i>${esc(t.l)}</button>`).join('')
+    +`<button onclick="openTplManage()" class="flex items-center gap-1.5 h-9 px-3 rounded-xl border border-dashed border-[var(--border)] text-[13px] font-medium text-[var(--muted)] hover:bg-[var(--hover)] transition" title="Criar, editar ou excluir modelos de comunicado"><i data-lucide="settings-2" class="w-4 h-4"></i>Gerenciar modelos</button>`;
+  lucide.createIcons();
+}
 function applyEmailTpl(k){
-  const t=EMAIL_TPLS[k]; if(!t) return;
+  const t=emailTplBy(k); if(!t) return;
   document.getElementById('emailSubject').value=t.s;
   document.getElementById('emailBody').value=t.b;
   toast('Modelo aplicado — ajuste o texto e envie.');
+}
+/* gerenciar modelos: lista com editar/excluir + criar novo (aproveitando o texto já escrito) */
+function openTplManage(){
+  const rows=EMAIL_TPLS.map(t=>`<div class="flex items-center gap-3 p-3 rounded-xl" style="background:var(--hover)">
+    <div class="w-9 h-9 rounded-lg grid place-content-center shrink-0 bg-[var(--card)]"><i data-lucide="${t.ic}" class="w-4 h-4" style="color:${t.col}"></i></div>
+    <div class="min-w-0 flex-1"><p class="text-sm font-medium truncate">${esc(t.l)}</p><p class="text-xs text-[var(--muted)] truncate">${esc(t.s)}</p></div>
+    <button onclick="openTplEdit('${t.k}')" class="w-8 h-8 rounded-lg border border-[var(--border)] grid place-content-center hover:bg-[var(--card)] transition" title="Editar este modelo"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
+    <button onclick="deleteEmailTpl('${t.k}')" class="w-8 h-8 rounded-lg border border-[var(--border)] grid place-content-center hover:bg-[var(--card)] transition" title="Excluir este modelo"><i data-lucide="trash-2" class="w-3.5 h-3.5" style="color:#DC2626"></i></button>
+  </div>`).join('');
+  openModal(`${modalHeader('Modelos de comunicado')}
+  <div class="p-5 space-y-3">
+    ${EMAIL_TPLS.length?rows:'<p class="text-sm text-[var(--muted)] text-center py-4">Nenhum modelo salvo — crie o primeiro.</p>'}
+    <button onclick="openTplEdit(null)" class="w-full h-10 rounded-xl border border-dashed border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)] transition flex items-center justify-center gap-2"><i data-lucide="plus" class="w-4 h-4"></i> Novo modelo</button>
+    <p class="text-xs text-[var(--muted)] flex items-start gap-1.5"><i data-lucide="lightbulb" class="w-3.5 h-3.5 shrink-0 mt-0.5" style="color:#F5B700"></i><span>Ao criar um modelo novo, o assunto e o texto que já estiverem escritos no comunicado vêm preenchidos — é só dar um nome e salvar.</span></p>
+  </div>
+  <div class="p-5 pt-0"><button onclick="closeModal()" class="w-full h-11 rounded-xl border border-[var(--border)] font-medium text-sm">Fechar</button></div>`,'max-w-lg');
+}
+function openTplEdit(k){
+  const t=k?emailTplBy(k):null;
+  /* novo modelo herda o que já está escrito no comunicado */
+  const subj=t?t.s:(document.getElementById('emailSubject')?.value.trim()||'');
+  const body=t?t.b:(document.getElementById('emailBody')?.value.trim()||'');
+  openModal(`${modalHeader(t?'Editar modelo':'Novo modelo')}
+  <div class="p-5 space-y-3">
+    <label class="block"><span class="text-sm font-medium">Nome do modelo <span class="text-[var(--muted)] font-normal text-xs">(aparece no botão)</span></span>
+      <input id="tplEL" value="${t?esc(t.l).replace(/"/g,'&quot;'):''}" placeholder="Ex.: Reunião de pais" class="${inputCls}"></label>
+    <label class="block"><span class="text-sm font-medium">Assunto</span>
+      <input id="tplES" value="${esc(subj).replace(/"/g,'&quot;')}" placeholder="Assunto do e-mail" class="${inputCls}"></label>
+    <label class="block"><span class="text-sm font-medium">Texto</span>
+      <textarea id="tplEB" rows="7" placeholder="Olá, {{nome_responsavel}}!…" class="${inputCls} h-auto py-2.5 resize-none">${esc(body)}</textarea></label>
+    <p class="text-xs text-[var(--muted)]">Use {{nome_responsavel}} e {{nome_aluno}} — cada família recebe com os próprios nomes.</p>
+    <div id="tplEErr"></div>
+  </div>
+  <div class="p-5 pt-0 flex gap-2">
+    <button onclick="openTplManage()" class="flex-1 h-11 rounded-xl border border-[var(--border)] font-medium text-sm">Voltar</button>
+    <button onclick="saveTplEdit(${t?`'${t.k}'`:'null'})" class="flex-1 h-11 rounded-xl text-white font-semibold text-sm" style="background:linear-gradient(135deg,#1E3765,#2F539A)">${t?'Salvar alterações':'Criar modelo'}</button>
+  </div>`,'max-w-lg');
+  document.getElementById('tplEL').focus();
+}
+function saveTplEdit(k){
+  const l=document.getElementById('tplEL').value.trim();
+  const s=document.getElementById('tplES').value.trim();
+  const b=document.getElementById('tplEB').value.trim();
+  const err=m=>{ document.getElementById('tplEErr').innerHTML=`<div class="rounded-xl p-3 text-sm flex items-start gap-2" style="background:rgba(220,38,38,.08);color:#DC2626"><i data-lucide="alert-circle" class="w-4 h-4 shrink-0 mt-0.5"></i><span>${m}</span></div>`; lucide.createIcons(); };
+  if(!l) return err('Dê um nome ao modelo — é ele que aparece no botão.');
+  if(!s||!b) return err('Preencha o assunto e o texto do modelo.');
+  if(EMAIL_TPLS.some(t=>t.l.toLowerCase()===l.toLowerCase()&&t.k!==k)) return err(`Já existe um modelo chamado <b>${esc(l)}</b> — escolha outro nome.`);
+  if(k){ const t=emailTplBy(k); t.l=l; t.s=s; t.b=b; }
+  else EMAIL_TPLS.push({ k:'tpl'+Date.now(), l, s, b, ic:'file-text', col:'#2F539A' });
+  renderTplChips(); openTplManage();
+  toast(k?'Modelo atualizado!':'Modelo criado — já aparece nos botões.');
+}
+let tplDeleteArmed=null;
+function deleteEmailTpl(k){
+  const t=emailTplBy(k); if(!t) return;
+  openModal(`${modalHeader('Excluir modelo')}
+  <div class="p-5 space-y-4">
+    <div class="flex items-start gap-3 p-3 rounded-xl" style="background:rgba(220,38,38,.06)">
+      <div class="w-10 h-10 rounded-xl grid place-content-center shrink-0" style="background:rgba(220,38,38,.12)"><i data-lucide="trash-2" class="w-5 h-5" style="color:#DC2626"></i></div>
+      <div class="min-w-0"><p class="font-medium text-sm">Excluir o modelo “${esc(t.l)}”?</p>
+      <p class="text-xs text-[var(--muted)] mt-0.5">Os comunicados já enviados não mudam — só o botão de modelo some.</p></div>
+    </div>
+    <div class="flex gap-2">
+      <button onclick="openTplManage()" class="flex-1 h-11 rounded-xl border border-[var(--border)] text-sm font-semibold hover:bg-[var(--hover)] transition">Cancelar</button>
+      <button onclick="confirmDeleteEmailTpl('${t.k}')" class="flex-1 h-11 rounded-xl text-white text-sm font-semibold transition hover:brightness-110" style="background:#DC2626">Excluir modelo</button>
+    </div>
+  </div>`);
+}
+function confirmDeleteEmailTpl(k){
+  const i=EMAIL_TPLS.findIndex(t=>t.k===k); if(i<0) return;
+  const nome=EMAIL_TPLS[i].l;
+  EMAIL_TPLS.splice(i,1);
+  renderTplChips(); openTplManage();
+  toast(`Modelo “${nome}” excluído.`);
 }
 function insertVar(token){
   const ta=document.getElementById('emailBody'); if(!ta) return;
@@ -2559,9 +2930,9 @@ function openChangePass(){
 /* --- exportar CSV (de verdade) --- */
 function exportCSV(useFilters){
   const rows=useFilters?filteredStudents():STUDENTS;
-  const head=['Aluno','Idade','Nascimento','Responsável','Telefone','Horário','Status contrato','Situação','Bairro','Cidade','Matrícula em','Hora'];
+  const head=['Aluno','Idade','Nascimento','Responsável','Telefone','Horário','Status contrato','Situação','Na escola desde','Bairro','Cidade','Matrícula em','Hora','Desligado em','Motivo do desligamento','Observações do desligamento'];
   const csv=[head.join(';')].concat(rows.flatMap(s=>s.kids.map(k=>
-    [k.n,k.age,k.b,s.resp.n,s.resp.phone,schLabel(s.sch)+' '+s.t,STATUS[s.status].t,s.active===false?'Inativa':isFuture(s)?'Começa em 2026.2':'Estudando',s.addr.bairro,s.addr.city,s.date,s.hora||''].join(';')
+    [k.n,k.age,k.b,s.resp.n,s.resp.phone,schLabel(s.sch)+' '+s.t,STATUS[s.status].t,s.active===false?'Inativa':isFuture(s)?'Começa em 2026.2':'Estudando',s.since||'',s.addr.bairro,s.addr.city,s.date,s.hora||'',s.exit?.date||'',s.exit?.label||'',(s.exit?.note||'').replace(/;/g,',')].join(';')
   ))).join('\n');
   const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'});
   const a=document.createElement('a');
@@ -2592,9 +2963,12 @@ const IMPORT_SAMPLE=[
   '15/05/2026 19:42:10,Maria Fernanda Sousa Cardoso,12/03/2017,9,-,-,-,Juliana Sousa,389.214.557-30,(62) 99318-2244,juliana.sousa@gmail.com,Mãe,04/08/1988,Carlos Cardoso,(62) 98551-7733,Pai,521.336.904-88,Juliana Sousa,389.214.557-30,74333-120,"Rua C-205, 142 - Apto 301",Jardim América,Goiânia,GO,Presencial na Sede,Boleto,Sim,Sim,Sim,https://drive.google.com/file/d/abc123',
   '16/05/2026 10:08:55,Otto Faria Neves,22/09/2018,7,Igor Faria Neves,14/01/2016,10,Camila Faria,654.880.123-09,(62) 99662-8800,camila.faria@hotmail.com,Mãe,19/02/1990,-, -,-,-,Camila Faria,654.880.123-09,74455-200,"Av. T-7, 988",Setor Oeste,Goiânia,GO,Presencial na Sede,Boleto,Não,Sim,Sim,https://drive.google.com/file/d/def456',
   '16/05/2026 21:30:02,Maria Fernanda Sousa Cardoso,12/03/2017,9,-,-,-,Juliana Sousa,389.214.557-30,(62) 99318-2244,juliana.sousa@gmail.com,Mãe,04/08/1988,Carlos Cardoso,(62) 98551-7733,Pai,521.336.904-88,Juliana Sousa,389.214.557-30,74333-120,"Rua C-205, 142 - Apto 301",Jardim América,Goiânia,GO,Presencial na Sede,Boleto,Sim,Sim,Sim,https://drive.google.com/file/d/zzz999',
+  '17/05/2026 08:21:14,Otto Faria Neves,22/09/2018,7,Igor Faria Neves,14/01/2016,10,Camila Faria,654.880.123-09,(62) 99662-8801,camila.faria@hotmail.com,Mãe,19/02/1990,-, -,-,-,Camila Faria,654.880.123-09,74455-200,"Av. T-7, 988",Setor Oeste,Goiânia,GO,Presencial na Sede,Boleto,Não,Sim,Sim,https://drive.google.com/file/d/def457',
   '18/05/2026 14:12:40,Larissa Prado Gonçalves,30/06/2015,10,-,-,-,Renato Gonçalves,112.774.469-01,(62) 98123-9050,renato.goncalves@outlook.com,Pai,11/11/1984,-,-,-,-,Renato Gonçalves,112.774.469-01,74140-070,"Rua 56, 75",Setor Marista,Goiânia,GO,Presencial na Sede,Boleto,Sim,Sim,Sim,https://drive.google.com/file/d/ghi789',
+  '19/05/2026 16:02:09,Alice Barbosa Nunes,03/05/2017,9,-,-,-,Fernanda Almeida,512.667.039-20,(62) 99812-7745,fernanda.almeida@gmail.com,Mãe,22/09/1991,-,-,-,-,Fernanda Almeida,512.667.039-20,74230-200,"Rua T-36, 410",Setor Bueno,Goiânia,GO,Presencial na Sede,Boleto,Sim,Sim,Sim,https://drive.google.com/file/d/pqr678',
   '02/06/2026 20:14:33,Helena Duarte Lima,14/02/2018,8,-,-,-,Mariana Duarte Lima,047.812.336-50,(62) 99214-8870,mariana.duarte@gmail.com,Mãe,09/05/1989,Rafael Lima,(62) 98112-4471,Pai,-,Mariana Duarte Lima,047.812.336-50,74230-110,"Rua T-55, 180 - Apto 902",Setor Bueno,Goiânia,GO,Presencial na Sede,Boleto,Sim,Sim,Sim,https://drive.google.com/file/d/jkl012',
   '20/05/2026 09:45:21,Benjamin Castro Moura,08/12/2019,6,-,-,-,Paula Castro,778.290.541-66,(62) 99770-1188,paula.castro@gmail.com,Mãe,25/06/1993,-,-,-,-,Paula Castro,778.290.541-66,74810-330,"Av. 136, 1020",Setor Sul,Goiânia,GO,Presencial na Sede,Boleto,Não,Sim,Sim,https://drive.google.com/file/d/mno345',
+  '21/05/2026 11:34:55,Vicente Sales Ramos,17/03/2016,10,-,-,-,Tatiane Sales,12345678900,62 9812,tatiane.sales@gmail.com,Mãe,02/05/1989,-,-,-,-,Tatiane Sales,12345678900,74140-010,"Rua 56, 120",Setor Marista,Goiânia,GO,Presencial na Sede,Boleto,Sim,Sim,Sim,https://drive.google.com/file/d/stu901',
 ].join('\n');
 let pendingImport=null;
 function openImportModal(){
@@ -2611,9 +2985,12 @@ function openImportModal(){
       <p class="text-xs text-[var(--muted)] mt-1">Somente .csv — a planilha de matrículas exportada</p>
       <input id="importFile" type="file" accept=".csv,text/csv" class="hidden" onchange="importPicked(this)">
     </div>
-    <div class="rounded-xl p-3 text-xs flex items-start gap-2" style="background:rgba(245,183,0,.10);color:#B5860B">
-      <i data-lucide="copy-x" class="w-4 h-4 shrink-0 mt-0.5"></i>
-      <span><b>Linhas repetidas são removidas sozinhas:</b> quando a mesma matrícula aparece mais de uma vez (mesmos dados, só a data/hora e o link do PDF diferentes), só a primeira conta.</span>
+    <div class="rounded-xl p-3 text-xs space-y-1.5" style="background:rgba(245,183,0,.10);color:#B5860B">
+      <p class="font-semibold flex items-center gap-1.5"><i data-lucide="shield-check" class="w-4 h-4 shrink-0"></i> O que é conferido sozinho antes de entrar:</p>
+      <p>• <b>Linhas repetidas</b> (a mesma matrícula enviada duas vezes) são removidas — só a primeira conta.</p>
+      <p>• <b>Quem já está na dashboard</b> não duplica.</p>
+      <p>• <b>Nomes iguais</b>, versões diferentes da mesma matrícula e <b>dados estranhos</b> (CPF, telefone, datas) entram numa lista para você conferir antes de confirmar.</p>
+      <p>• O campo <b>“Na escola desde”</b> não existe na planilha — as matrículas importadas chegam com ele em branco, para preencher depois.</p>
     </div>
     <div id="importError"></div>
     <button onclick="runImport(IMPORT_SAMPLE,'planilha de exemplo')" class="w-full h-10 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)] transition flex items-center justify-center gap-2"><i data-lucide="sparkle" class="w-4 h-4 text-brand-light"></i> Testar com uma planilha de exemplo</button>
@@ -2653,13 +3030,22 @@ function runImport(text, sourceName){
     rel:head.findIndex(h=>h==='parentesco'), rb:col('nasc. responsável'),
     sr:col('segundo responsável'), srt:col('tel. segundo'), srr:col('parentesco 2'),
     fin:col('responsável financeiro'), cep:col('cep'), end:col('endereço'), hood:col('bairro'),
-    city:col('cidade'), uf:col('estado'), media:col('mídia'), pdf:col('link') };
+    city:col('cidade'), uf:col('estado'), media:col('mídia'), pdf:col('link'), since:col('na escola desde') };
   if(C.a1<0||C.resp<0){ importError('Esse arquivo não parece ser a planilha de matrículas — faltam as colunas <b>Nome Aluno 1</b> e <b>Responsável Legal</b>.'); return; }
-  /* dedup: compara a linha inteira IGNORANDO Data/Hora e Link do PDF */
+  /* validação em camadas:
+     1. linhas idênticas (fora Data/Hora e Link do PDF) somem sozinhas — é o bug de re-gerar o contrato;
+     2. aluno+responsável que já estão na dashboard não duplicam;
+     3. mesmo aluno+responsável DUAS vezes na planilha com dados diferentes → vale a linha mais
+        recente, marcada para conferir;
+     4. nome de aluno que já existe na dashboard com OUTRO responsável → possível homônimo (ou a
+        mesma criança digitada de novo), marcado para conferir;
+     5. CPF / telefone / data de nascimento fora do formato → marcado para conferir. */
   const norm=v=>String(v??'').trim().toLowerCase().replace(/\s+/g,' ');
   const keyOf=r=>r.filter((_,i)=>i!==C.ts&&i!==C.pdf).map(norm).join('|');
   const existing=new Set(STUDENTS.flatMap(s=>s.kids.map(k=>norm(k.n)+'|'+norm(s.resp.n))));
-  const seen=new Set(); const novos=[]; let dups=0, jaExiste=0, incompletas=0;
+  const ownerOf=new Map(); STUDENTS.forEach(s=>s.kids.forEach(k=>{ const n=norm(k.n); if(!ownerOf.has(n)) ownerOf.set(n,s.resp.n); }));
+  const seen=new Set(), byKid=new Map(), nameWarns={}, dataWarns={};
+  let dups=0, jaExiste=0, incompletas=0;
   const val=(r,i)=>{ const v=i>=0?String(r[i]??'').trim():''; return v==='-'?'':v; };
   for(const r of rows.slice(1)){
     const a1=val(r,C.a1), resp=val(r,C.resp);
@@ -2667,9 +3053,23 @@ function runImport(text, sourceName){
     const k=keyOf(r);
     if(seen.has(k)){ dups++; continue; }
     seen.add(k);
-    if(existing.has(norm(a1)+'|'+norm(resp))){ jaExiste++; continue; }
-    novos.push(r);
+    const kid=norm(a1)+'|'+norm(resp);
+    if(existing.has(kid)){ jaExiste++; continue; }
+    if(byKid.has(kid)){
+      const w=(nameWarns[kid]=nameWarns[kid]||[]);
+      if(!w.some(x=>x.includes('mais de uma versão'))) w.push('A planilha tem mais de uma versão desta matrícula com dados diferentes — ficou valendo a linha mais recente.');
+    } else {
+      const owner=ownerOf.get(norm(a1));
+      if(owner) (nameWarns[kid]=nameWarns[kid]||[]).push(`Já existe um aluno com esse nome na dashboard (responsável: ${owner}) — confira se não é a mesma criança cadastrada duas vezes.`);
+    }
+    const issues=[], cpf=val(r,C.cpf), tel=val(r,C.tel), b1=val(r,C.b1);
+    if(cpf&&!/^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(cpf)) issues.push(`CPF do responsável fora do padrão: “${cpf}”.`);
+    if(tel&&!/^\(\d{2}\)\s?9?\d{4}-\d{4}$/.test(tel)) issues.push(`Telefone fora do padrão: “${tel}”.`);
+    if(b1&&!/^\d{2}\/\d{2}\/\d{4}$/.test(b1)) issues.push(`Data de nascimento fora do padrão: “${b1}”.`);
+    if(issues.length) dataWarns[kid]=issues; else delete dataWarns[kid];
+    byKid.set(kid,r); // a última linha do mesmo aluno+responsável vence
   }
+  const novos=[...byKid.entries()];
   /* monta as matrículas (horário entra na turma com mais vagas — ajusta depois se precisar) */
   const ageFrom=(b,fb)=>{ const p=b.split('/').map(Number); return p[2]>1900 ? 2026-p[2]-((p[1]*100+p[0])>603?1:0) : (parseInt(fb,10)||8); };
   const occ={}; STUDENTS.forEach(s=>{ if(s.active!==false) occ[s.sch+'|'+s.t]=(occ[s.sch+'|'+s.t]||0)+s.kids.length; });
@@ -2677,7 +3077,7 @@ function runImport(text, sourceName){
     Object.entries(TURMA_CAP).forEach(([sch,ts])=>Object.entries(ts).forEach(([t,cap])=>{ const f=cap-(occ[sch+'|'+t]||0); if(f>=n&&f>free){ free=f; best={sch,t}; } }));
     best=best||{sch:'seg-qua',t:'15h00–16h30'}; occ[best.sch+'|'+best.t]=(occ[best.sch+'|'+best.t]||0)+n; return best; };
   let nid=Math.max(...STUDENTS.map(s=>s.id))+1;
-  pendingImport=novos.map(r=>{
+  pendingImport=novos.map(([kid,r])=>{
     const kids=[{n:val(r,C.a1), b:val(r,C.b1)||'—', age:ageFrom(val(r,C.b1),val(r,C.i1))}];
     if(val(r,C.a2)) kids.push({n:val(r,C.a2), b:val(r,C.b2)||'—', age:ageFrom(val(r,C.b2),val(r,C.i2))});
     const ts=val(r,C.ts), dParts=ts.split(' ');
@@ -2685,41 +3085,70 @@ function runImport(text, sourceName){
     const hora=/^\d{1,2}:\d{2}/.test(dParts[1]||'')?dParts[1].split(':').slice(0,2).join('h'):'';
     const endRaw=val(r,C.end), ci=endRaw.indexOf(',');
     const tu=freest(kids.length);
-    return { id:nid++, kids,
+    const o={ id:nid++, kids,
       resp:{ n:val(r,C.resp), cpf:val(r,C.cpf)||'—', phone:val(r,C.tel)||'—', email:val(r,C.mail)||'—', rel:val(r,C.rel)||'Responsável', b:val(r,C.rb)||'—' },
       second: val(r,C.sr)?{ n:val(r,C.sr), phone:val(r,C.srt)||'—', rel:val(r,C.srr)||'Responsável' }:null,
       fin: val(r,C.fin)||val(r,C.resp),
       addr:{ cep:val(r,C.cep)||'—', street:ci>0?endRaw.slice(0,ci):endRaw||'—', num:ci>0?endRaw.slice(ci+1).trim():'', comp:'', bairro:val(r,C.hood)||'—', city:val(r,C.city)||'Goiânia', uf:val(r,C.uf)||'GO' },
-      sch:tu.sch, t:tu.t, pay:'Boleto', status:'signed', media:norm(val(r,C.media))!=='não', date, hora };
+      sch:tu.sch, t:tu.t, pay:'Boleto', status:'signed', media:norm(val(r,C.media))!=='não', date, hora,
+      _warn:[...(nameWarns[kid]||[]), ...(dataWarns[kid]||[])] };
+    /* "na escola desde" só vem se a planilha tiver a coluna — senão fica em branco p/ preencher depois */
+    const sv=val(r,C.since);
+    if(/^\d{2}\/\d{2}\/\d{4}$/.test(sv)) o.since=sv;
+    return o;
   });
-  /* resultado */
+  /* resultado: números + lista de conferência (desmarcar = não importar) + novos sem pendência */
   const stat=(n,label,c)=>`<div class="rounded-xl p-3 text-center" style="background:var(--hover)"><p class="font-heading text-2xl font-semibold" style="color:${c}">${n}</p><p class="text-[11px] text-[var(--muted)] leading-tight">${label}</p></div>`;
-  const names=pendingImport.slice(0,6).map(s=>`<li class="flex items-center gap-2"><i data-lucide="user-round-plus" class="w-3.5 h-3.5 text-emerald-500 shrink-0"></i>${esc(s.kids.map(k=>k.n).join(' e '))}</li>`).join('');
+  const ckSvg='<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3"><polyline points="20 6 9 17 4 12"/></svg>';
+  const flagged=pendingImport.map((p,i)=>({p,i})).filter(x=>x.p._warn.length);
+  const clean=pendingImport.filter(p=>!p._warn.length);
+  const names=clean.slice(0,6).map(s=>`<li class="flex items-center gap-2"><i data-lucide="user-round-plus" class="w-3.5 h-3.5 text-emerald-500 shrink-0"></i>${esc(s.kids.map(k=>k.n).join(' e '))}</li>`).join('');
   document.getElementById('importBody').innerHTML=`
     <p class="text-sm"><b>${esc(sourceName)}</b> lida — confira antes de confirmar:</p>
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
       ${stat(rows.length-1,'linhas lidas','var(--text)')}
-      ${stat(dups,'duplicadas removidas','#B5860B')}
+      ${stat(dups,'repetidas removidas','#B5860B')}
       ${stat(jaExiste,'já estavam aqui','#2F539A')}
       ${stat(pendingImport.length,'novas matrículas','#16a34a')}
     </div>
     ${incompletas?`<p class="text-xs text-[var(--muted)]"><i data-lucide="info" class="w-3.5 h-3.5 inline"></i> ${incompletas} linha${incompletas>1?'s':''} sem aluno ou responsável ${incompletas>1?'foram ignoradas':'foi ignorada'}.</p>`:''}
-    ${pendingImport.length?`<ul class="text-sm space-y-1.5 rounded-xl p-3" style="background:var(--hover)">${names}${pendingImport.length>6?`<li class="text-xs text-[var(--muted)]">… e mais ${pendingImport.length-6}</li>`:''}</ul>`:'<p class="text-sm text-[var(--muted)]">Nada novo para importar — todas as linhas já estão na dashboard ou eram repetidas.</p>'}
+    ${flagged.length?`<div class="rounded-xl p-3 space-y-1" style="background:rgba(245,183,0,.10)">
+      <p class="text-xs font-semibold flex items-center gap-1.5 mb-1.5" style="color:#B5860B"><i data-lucide="search-check" class="w-4 h-4 shrink-0"></i>${flagged.length===1?'1 matrícula':flagged.length+' matrículas'} para conferir — desmarque o que não deve entrar:</p>
+      ${flagged.map(({p,i})=>`<button type="button" onclick="impToggle(${i})" class="w-full flex items-start gap-2.5 text-left p-2 rounded-lg hover:bg-[var(--hover)] transition">
+        <span id="impCk-${i}" class="ck on mt-0.5 shrink-0">${ckSvg}</span>
+        <span class="min-w-0"><span class="text-sm font-medium block">${esc(p.kids.map(k=>k.n).join(' e '))} <span class="text-xs text-[var(--muted)] font-normal">· resp. ${esc(p.resp.n)}</span></span>
+        ${p._warn.map(w=>`<span class="text-xs text-[var(--muted)] block mt-0.5">• ${esc(w)}</span>`).join('')}</span>
+      </button>`).join('')}
+    </div>`:''}
+    ${clean.length?`<ul class="text-sm space-y-1.5 rounded-xl p-3" style="background:var(--hover)">${names}${clean.length>6?`<li class="text-xs text-[var(--muted)]">… e mais ${clean.length-6}</li>`:''}</ul>`:''}
+    ${pendingImport.length?(C.since<0?`<p class="text-xs text-[var(--muted)] flex items-start gap-1.5"><i data-lucide="calendar-off" class="w-3.5 h-3.5 shrink-0 mt-0.5"></i><span>A planilha não tem a coluna <b>“Na escola desde”</b> — as matrículas chegam com esse campo em branco. Preencha depois em ⋮ → Editar dados.</span></p>`:''):'<p class="text-sm text-[var(--muted)]">Nada novo para importar — todas as linhas já estão na dashboard ou eram repetidas.</p>'}
     <div class="flex gap-2">
       <button onclick="openImportModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] text-sm font-semibold hover:bg-[var(--hover)] transition">Voltar</button>
-      ${pendingImport.length?`<button onclick="applyImport()" class="flex-1 h-11 rounded-xl text-white text-sm font-semibold" style="background:linear-gradient(135deg,#1E3765,#2F539A)">Importar ${pendingImport.length} matrícula${pendingImport.length>1?'s':''}</button>`:''}
+      ${pendingImport.length?`<button id="impGo" onclick="applyImport()" class="flex-1 h-11 rounded-xl text-white text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed" style="background:linear-gradient(135deg,#1E3765,#2F539A)">Importar ${pendingImport.length} matrícula${pendingImport.length>1?'s':''}</button>`:''}
     </div>`;
   lucide.createIcons();
 }
+function impToggle(i){
+  const p=pendingImport?.[i]; if(!p) return;
+  p._skip=!p._skip;
+  document.getElementById('impCk-'+i)?.classList.toggle('on',!p._skip);
+  const btn=document.getElementById('impGo');
+  if(btn){ const n=pendingImport.filter(x=>!x._skip).length;
+    btn.textContent=n?`Importar ${n} matrícula${n>1?'s':''}`:'Nada selecionado';
+    btn.disabled=!n; }
+}
 function applyImport(){
-  if(!pendingImport||!pendingImport.length) return;
-  STUDENTS.push(...pendingImport);
+  if(!pendingImport) return;
+  const add=pendingImport.filter(p=>!p._skip).map(({_warn,_skip,...s})=>s);
+  if(!add.length) return;
+  STUDENTS.push(...add);
   const dv=s=>s.date.split('/').reverse().join('')+(s.hora||'');
   STUDENTS.sort((a,b)=> dv(a)<dv(b)?1:dv(a)>dv(b)?-1:0);
-  const n=pendingImport.length; pendingImport=null;
+  const skipped=pendingImport.length-add.length;
+  pendingImport=null;
   closeModal();
   tableChanged(); renderContracts(); refreshOverviewData();
-  toast(`${n} matrícula${n>1?'s importadas':' importada'} da planilha!`);
+  toast(`${add.length} matrícula${add.length>1?'s importadas':' importada'} da planilha!${skipped?` ${skipped>1?skipped+' ficaram':'1 ficou'} de fora, como você pediu.`:''}`);
 }
 
 /* ====================== MODELOS DE CONTRATO ====================== */
@@ -2763,6 +3192,7 @@ function renderModelos(){
       <div class="flex flex-wrap gap-2 mt-4">
         <button onclick="openTplMap(${t.id})" class="h-9 px-3.5 rounded-lg border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)] transition flex items-center gap-1.5"><i data-lucide="locate-fixed" class="w-4 h-4 text-brand-light"></i> Ver mapeamento</button>
         ${t.active?'':`<button onclick="setActiveTpl(${t.id})" class="h-9 px-3.5 rounded-lg text-sm font-semibold transition flex items-center gap-1.5 ${um?'opacity-50 cursor-not-allowed border border-[var(--border)]':'text-white'}" ${um?`title="Posicione os ${um} campos pendentes antes de usar este modelo"`:'style="background:#1E3765"'}><i data-lucide="check-circle-2" class="w-4 h-4"></i> Usar nas matrículas</button>`}
+        <button onclick="openTplRename(${t.id})" class="h-9 w-9 rounded-lg border border-[var(--border)] grid place-content-center hover:bg-[var(--hover)] transition" title="Renomear modelo"><i data-lucide="pencil" class="w-4 h-4"></i></button>
         <button onclick="toast('Download do PDF iniciado (demo)')" class="h-9 w-9 rounded-lg border border-[var(--border)] grid place-content-center hover:bg-[var(--hover)] transition" title="Baixar o PDF"><i data-lucide="download" class="w-4 h-4"></i></button>
         <button onclick="deleteTpl(${t.id})" class="h-9 w-9 rounded-lg border border-[var(--border)] grid place-content-center hover:bg-[var(--hover)] transition" title="Excluir modelo"><i data-lucide="trash-2" class="w-4 h-4" style="color:#DC2626"></i></button>
       </div>
@@ -2862,6 +3292,30 @@ function confirmActiveTpl(id){
   TEMPLATES.forEach(t=>t.active=t.id===id);
   closeModal(); renderModelos();
   toast('Modelo em uso atualizado — vale para as próximas matrículas!');
+}
+function openTplRename(id){
+  const t=tplById(id); if(!t) return;
+  openModal(`${modalHeader('Renomear modelo')}
+  <div class="p-5 space-y-3">
+    <label class="block"><span class="text-sm font-medium">Nome do modelo</span>
+      <input id="tplRN" value="${esc(t.name).replace(/"/g,'&quot;')}" class="${inputCls}"></label>
+    <div id="tplRNErr"></div>
+  </div>
+  <div class="p-5 pt-0 flex gap-2">
+    <button onclick="closeModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] font-medium text-sm">Cancelar</button>
+    <button onclick="saveTplRename(${id})" class="flex-1 h-11 rounded-xl text-white font-semibold text-sm" style="background:linear-gradient(135deg,#1E3765,#2F539A)">Salvar nome</button>
+  </div>`);
+  document.getElementById('tplRN').focus();
+}
+function saveTplRename(id){
+  const t=tplById(id); if(!t) return;
+  const n=document.getElementById('tplRN').value.trim();
+  const err=m=>{ document.getElementById('tplRNErr').innerHTML=`<div class="rounded-xl p-3 text-sm flex items-start gap-2" style="background:rgba(220,38,38,.08);color:#DC2626"><i data-lucide="alert-circle" class="w-4 h-4 shrink-0 mt-0.5"></i><span>${m}</span></div>`; lucide.createIcons(); };
+  if(!n) return err('O modelo precisa de um nome.');
+  if(TEMPLATES.some(x=>x.id!==id&&x.name.toLowerCase()===n.toLowerCase())) return err(`Já existe um modelo chamado <b>${esc(n)}</b>.`);
+  t.name=n;
+  closeModal(); renderModelos();
+  toast('Modelo renomeado!');
 }
 function deleteTpl(id){
   const t=tplById(id); if(!t) return;
@@ -3045,6 +3499,18 @@ function maskPhone(el){
   else if(v.length>2) out='('+v.slice(0,2)+') '+v.slice(2);
   else if(v.length>0) out='('+v;
   el.value=out;
+}
+function maskCpf(el){
+  const v=el.value.replace(/\D/g,'').slice(0,11);
+  let out=v;
+  if(v.length>9) out=v.slice(0,3)+'.'+v.slice(3,6)+'.'+v.slice(6,9)+'-'+v.slice(9);
+  else if(v.length>6) out=v.slice(0,3)+'.'+v.slice(3,6)+'.'+v.slice(6);
+  else if(v.length>3) out=v.slice(0,3)+'.'+v.slice(3);
+  el.value=out;
+}
+function maskCep(el){
+  const v=el.value.replace(/\D/g,'').slice(0,8);
+  el.value=v.length>5?v.slice(0,5)+'-'+v.slice(5):v;
 }
 
 /* ====================== DATEPICKER (calendário componentizado) ====================== */
