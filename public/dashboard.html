@@ -2184,7 +2184,7 @@ function renderMovimento(){
    A tese da tela: a agenda não se "edita" — edita-se o dado (aluno ↔ turma) e
    todas as visões se redesenham. Substitui o quadro feito à mão no Canva. */
 let agView='grade', agPar='seg-qua', agVagasOnly=false, agSala=null;
-function setAgView(v){ agView=v; if(v!=='salas') agSala=null; renderAgenda(); }
+function setAgView(v){ agView=v; agSala=null; renderAgenda(); } // clicar na pill sempre volta ao nível de cima
 function setAgPar(p){ agPar=p; renderAgenda(); }
 function toggleAgVagas(){ agVagasOnly=!agVagasOnly; renderAgenda(); }
 function openSalaView(id){ agView='salas'; agSala=id; renderAgenda(); }
