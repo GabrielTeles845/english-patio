@@ -678,15 +678,14 @@
         <!-- fila: alunos sem turma -->
         <div id="agSemTurma" class="mb-4"></div>
 
-        <!-- alternador de visões: em destaque, acima dos filtros -->
-        <div class="surface rounded-2xl p-1.5 mb-3 inline-flex items-center gap-1" data-tour="ag-views">
-          <button id="agvGrade" onclick="setAgView('grade')" class="flex items-center gap-2 px-4 h-10 rounded-xl text-sm"><i data-lucide="table-2" class="w-4 h-4"></i>Grade</button>
-          <button id="agvSalas" onclick="setAgView('salas')" class="flex items-center gap-2 px-4 h-10 rounded-xl text-sm"><i data-lucide="door-open" class="w-4 h-4"></i>Salas</button>
-          <button id="agvNiveis" onclick="setAgView('niveis')" class="flex items-center gap-2 px-4 h-10 rounded-xl text-sm"><i data-lucide="layers" class="w-4 h-4"></i>Níveis</button>
-        </div>
-
-        <!-- filtros transversais -->
+        <!-- visões + filtros transversais (visões em destaque: ícone + ativo em navy) -->
         <div class="surface rounded-2xl p-3 mb-4 flex flex-wrap items-center gap-2" data-tour="ag-filtros">
+          <div class="flex items-center bg-[var(--hover)] rounded-xl p-1 text-sm" data-tour="ag-views">
+            <button id="agvGrade" onclick="setAgView('grade')" class="flex items-center gap-1.5 px-3.5 h-9 rounded-lg"><i data-lucide="table-2" class="w-4 h-4"></i>Grade</button>
+            <button id="agvSalas" onclick="setAgView('salas')" class="flex items-center gap-1.5 px-3.5 h-9 rounded-lg"><i data-lucide="door-open" class="w-4 h-4"></i>Salas</button>
+            <button id="agvNiveis" onclick="setAgView('niveis')" class="flex items-center gap-1.5 px-3.5 h-9 rounded-lg"><i data-lucide="layers" class="w-4 h-4"></i>Níveis</button>
+          </div>
+          <div class="h-6 w-px mx-1 hidden sm:block" style="background:var(--border)"></div>
           <div class="flex items-center bg-[var(--hover)] rounded-xl p-1 text-sm" id="agParSeg" data-tour="ag-par">
             <button id="agpSq" onclick="setAgPar('seg-qua')" class="px-3 py-1.5 rounded-lg bg-[var(--card)] shadow-sm font-medium">Seg/Qua</button>
             <button id="agpTq" onclick="setAgPar('ter-qui')" class="px-3 py-1.5 rounded-lg text-[var(--muted)]">Ter/Qui</button>
@@ -1102,7 +1101,7 @@
 </div>
 
 <!-- toast -->
-<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[90] translate-y-24 transition-transform duration-300 w-max max-w-[92vw]">
+<div id="toast" class="fixed bottom-6 right-6 z-[90] translate-y-24 transition-transform duration-300 w-max max-w-[92vw]">
   <div class="surface flex items-center gap-3 pl-2.5 pr-5 py-2.5 rounded-2xl text-sm font-semibold shadow-2xl">
     <span class="w-8 h-8 rounded-full grid place-content-center shrink-0" style="background:#F5B700">
       <i data-lucide="check" class="w-4 h-4" style="color:#15294d"></i></span>
@@ -1408,12 +1407,15 @@ function cselect(id, items, opts={}){
 }
 function csToggle(id,e){ e&&e.stopPropagation(); const wrap=document.getElementById('cs-'+id), menu=document.getElementById('csm-'+id);
   const willOpen=menu.classList.contains('hidden'); csCloseAll(); if(willOpen){ menu.classList.remove('hidden'); wrap.classList.add('open');
-    /* dentro de um modal o menu vira "fixed" para escapar do overflow do modalBox
-       (senão fica preso/cortado dentro do modal) */
+    /* dentro de um modal o menu vai de "portal" para o <body> com position:fixed —
+       fixed DENTRO do modal não funciona (o fade-in cria um transform e o menu
+       abre longe, estourando a largura do modal) */
     const box=document.getElementById('modalBox');
     if(box&&box.contains(wrap)){
       const r=wrap.getBoundingClientRect();
-      menu.style.position='fixed'; menu.style.zIndex='90';
+      menu._home=menu.parentElement; menu._next=menu.nextSibling;
+      document.body.appendChild(menu);
+      menu.style.position='fixed'; menu.style.zIndex='95';
       menu.style.left=Math.max(8,Math.min(r.left,innerWidth-288))+'px'; menu.style.minWidth=r.width+'px';
       menu.style.maxHeight='300px'; menu.style.overflowY='auto';
       const mh=Math.min(menu.scrollHeight,300);
@@ -1421,7 +1423,11 @@ function csToggle(id,e){ e&&e.stopPropagation(); const wrap=document.getElementB
       else{ menu.style.bottom='auto'; menu.style.top=(r.bottom+6)+'px'; }
     }
   } }
-function csCloseAll(){ document.querySelectorAll('.cs-menu').forEach(m=>{ m.classList.add('hidden'); ['position','zIndex','left','minWidth','maxHeight','overflowY','top','bottom'].forEach(p=>m.style[p]=''); }); document.querySelectorAll('.cs').forEach(c=>c.classList.remove('open')); }
+function csCloseAll(){ document.querySelectorAll('.cs-menu').forEach(m=>{
+  m.classList.add('hidden');
+  if(m._home){ m._home.insertBefore(m,m._next||null); m._home=null; m._next=null; } // volta do portal
+  ['position','zIndex','left','minWidth','maxHeight','overflowY','top','bottom'].forEach(p=>m.style[p]=''); });
+  document.querySelectorAll('.cs').forEach(c=>c.classList.remove('open')); }
 function csSet(id,value){ const s=SEL[id]; if(!s) return; const i=s.items.findIndex(x=>x.v===value); if(i>=0) csPick(id,i); }
 function csPick(id,i){ const s=SEL[id]; s.value=s.items[i].v;
   document.getElementById('csl-'+id).textContent=s.items[i].l;
@@ -2390,7 +2396,7 @@ function renderAgenda(){
   const body=document.getElementById('agBody'); if(!body) return;
   const pill=(id,on)=>{ const b=document.getElementById(id); if(b) b.className='px-3 py-1.5 rounded-lg '+(on?'bg-[var(--card)] shadow-sm font-medium':'text-[var(--muted)]'); };
   const vpill=(id,on)=>{ const b=document.getElementById(id); if(!b) return;
-    b.className='flex items-center gap-2 px-4 h-10 rounded-xl text-sm transition '+(on?'text-white font-semibold shadow-md':'text-[var(--muted)] font-medium hover:bg-[var(--hover)] hover:text-[var(--text)]');
+    b.className='flex items-center gap-1.5 px-3.5 h-9 rounded-lg text-sm transition '+(on?'text-white font-semibold shadow-md':'text-[var(--muted)] font-medium hover:text-[var(--text)]');
     b.style.background=on?'linear-gradient(135deg,#1E3765,#2F539A)':''; };
   vpill('agvGrade',agView==='grade'); vpill('agvSalas',agView==='salas'); vpill('agvNiveis',agView==='niveis');
   pill('agpSq',agPar==='seg-qua'); pill('agpTq',agPar==='ter-qui');
@@ -2408,9 +2414,12 @@ function renderAgFila(){
   const el=document.getElementById('agSemTurma'); if(!el) return;
   const fila=semTurmaKids();
   if(!fila.length){ el.innerHTML=''; return; }
-  el.innerHTML=`<div class="rounded-2xl p-4 border" style="border-color:rgba(245,183,0,.55);background:rgba(245,183,0,.07)" data-tour="ag-fila">
-    <p class="text-sm font-semibold flex items-center gap-2 mb-2.5" style="color:#B5860B"><i data-lucide="hourglass" class="w-4 h-4"></i>${fila.length} aluno${fila.length>1?'s':''} aguardando turma <span class="font-normal text-xs text-[var(--muted)]">— clique no nome para alocar, ou arraste para uma turma</span></p>
-    <div class="flex flex-wrap gap-2">${fila.map(({s,k,ki})=>`<button onclick="openMoverKid(${s.id},${ki})" draggable="true" ondragstart="agDragKid(event,${s.id},${ki})" ondragend="agDragEnd()" class="flex items-center gap-2 h-9 pl-1.5 pr-3 rounded-xl border text-sm font-medium transition hover:shadow-md" style="border-color:var(--border);background:var(--card)"><span class="w-6 h-6 rounded-lg grid place-content-center text-white text-[10px] font-bold" style="background:linear-gradient(135deg,${palette[s.id%palette.length]},#2F539A)">${initials(k.n)}</span>${esc(k.n.split(' ').slice(0,2).join(' '))} <span class="text-xs text-[var(--muted)]">(${k.age})</span></button>`).join('')}</div>
+  el.innerHTML=`<div class="surface rounded-2xl p-4" data-tour="ag-fila">
+    <div class="flex flex-wrap items-baseline justify-between gap-2 mb-2.5">
+      <p class="text-sm font-semibold">Aguardando turma <span class="font-normal text-[var(--muted)]">· ${fila.length} aluno${fila.length>1?'s':''}</span></p>
+      <p class="text-xs text-[var(--muted)]">clique no nome para alocar, ou arraste para uma turma</p>
+    </div>
+    <div class="flex flex-wrap gap-2">${fila.map(({s,k,ki})=>`<button onclick="openMoverKid(${s.id},${ki})" draggable="true" ondragstart="agDragKid(event,${s.id},${ki})" ondragend="agDragEnd()" class="flex items-center gap-1.5 h-9 px-3 rounded-xl border text-sm font-medium transition hover:shadow-sm hover:border-brand-light" style="border-color:var(--border);background:var(--card)">${esc(k.n.split(' ').slice(0,2).join(' '))} <span class="text-xs text-[var(--muted)]">(${k.age})</span></button>`).join('')}</div>
   </div>`;
 }
 /* ---- visão 1: grade geral (raio-X — colunas = salas, linhas = horários) ---- */
@@ -2825,8 +2834,13 @@ function smRender(){
         <div class="min-w-0 flex-1"><p class="text-sm font-medium truncate">${esc(s.n)}</p>
           <p class="text-[11px] text-[var(--muted)] truncate">${ts.length} turma${ts.length===1?'':'s'} · ${nA} aluno${nA===1?'':'s'}${s.prof?' · Teacher '+esc(s.prof):''}</p></div>
         <button onclick="openSalaEdit('${s.id}')" class="h-8 px-2.5 rounded-lg border border-[var(--border)] text-xs font-semibold hover:bg-[var(--hover)] transition">Editar</button>
+        ${ts.length?'':`<button onclick="smRemoveSala('${s.id}')" class="p-1.5 rounded-lg hover:bg-[var(--hover)] transition" title="Excluir sala (está vazia)"><i data-lucide="trash-2" class="w-3.5 h-3.5" style="color:#DC2626"></i></button>`}
       </div>`; }).join('')}</div>
-    <p class="text-xs text-[var(--muted)] mt-3 flex items-start gap-1.5"><i data-lucide="info" class="w-3.5 h-3.5 shrink-0 mt-0.5"></i><span>Aqui é só o cadastro da sala: <b>nome e cor</b>. Quem dá aula em cada sala fica na aba <b>Teachers</b>.</span></p>`;
+    <div class="flex items-center gap-2 mt-3">
+      <input id="smNewSala" placeholder="Nome da sala nova (ex.: Coral Room)" class="flex-1 h-10 rounded-xl border border-[var(--border)] bg-[var(--card)] px-3 text-sm outline-none focus:ring-2 ring-brand-light">
+      <button onclick="smAddSala()" class="h-10 px-3.5 rounded-xl text-white text-sm font-semibold shrink-0" style="background:linear-gradient(135deg,#1E3765,#2F539A)">Adicionar</button>
+    </div>
+    <p class="text-xs text-[var(--muted)] mt-3 flex items-start gap-1.5"><i data-lucide="info" class="w-3.5 h-3.5 shrink-0 mt-0.5"></i><span>Aqui é só o cadastro da sala: <b>nome e cor</b> (a sala nova ganha uma cor livre — ajuste no Editar). Quem dá aula em cada sala fica na aba <b>Teachers</b>. Excluir, só sala sem turma.</span></p>`;
   } else {
     const rows=TEACHERS.map((p,i)=>{ const sala=SALAS.find(s=>s.prof===p); const nA=teacherAlunos(p);
       return `<div class="flex items-center gap-3 py-2.5 border-b last:border-0" style="border-color:var(--border)">
@@ -2864,6 +2878,45 @@ function smAssignTeacher(i,salaId){
   smRender();
   toast(salaId?`${p.split(' ')[0]} agora é teacher da ${salaById(salaId).n}.`:`${p.split(' ')[0]} ficou sem sala por enquanto.`);
 }
+function smAddSala(){
+  const inp=document.getElementById('smNewSala'); const n=(inp?.value||'').trim();
+  if(!n){ inp?.focus(); return; }
+  if(SALAS.some(s=>s.n.toLowerCase()===n.toLowerCase())){ toast('Já existe uma sala com esse nome.'); return; }
+  let id=slugify(n); while(SALAS.some(s=>s.id===id)) id+='-2';
+  const usadas=new Set(SALAS.map(s=>s.c));
+  const cor=SALA_COLORS.find(c=>!usadas.has(c))||SALA_COLORS[SALAS.length%SALA_COLORS.length];
+  SALAS.push({ id, n, c:cor, prof:null });
+  logAct(`Criou a sala <b>${esc(n)}</b>`);
+  refreshAll(); if(currentView()==='agenda') renderAgenda();
+  smRender();
+  toast(`${n} criada! Ajuste a cor no Editar, se quiser.`);
+}
+function smRemoveSala(id){
+  const s=salaById(id); if(!s) return;
+  if(TURMAS.some(t=>t.sala===id)){ toast('Essa sala tem turmas — mova ou exclua as turmas antes.'); return; }
+  openModal(`${modalHeader('Excluir sala')}
+  <div class="p-5 space-y-4">
+    <div class="flex items-start gap-3 p-3 rounded-xl" style="background:rgba(220,38,38,.06)">
+      <span class="w-9 h-9 rounded-full grid place-content-center shrink-0" style="background:${s.c}"><i data-lucide="door-open" class="w-4 h-4 text-white"></i></span>
+      <div class="min-w-0"><p class="font-medium text-sm">Excluir a ${esc(s.n)}?</p>
+      <p class="text-xs text-[var(--muted)] mt-0.5">Ela está vazia — some do cadastro e das opções da agenda. Dá para criar de novo depois, se precisar.</p></div>
+    </div>
+    <div class="flex gap-2">
+      <button onclick="openSalasManage('salas')" class="flex-1 h-11 rounded-xl border border-[var(--border)] text-sm font-semibold hover:bg-[var(--hover)] transition">Cancelar</button>
+      <button onclick="confirmSmRemoveSala('${id}')" class="flex-1 h-11 rounded-xl text-white text-sm font-semibold transition hover:brightness-110" style="background:#DC2626">Excluir sala</button>
+    </div>
+  </div>`);
+  lucide.createIcons();
+}
+function confirmSmRemoveSala(id){
+  const s=salaById(id); if(!s) return;
+  if(s.prof&&!TEACHERS.includes(s.prof)) TEACHERS.push(s.prof);
+  SALAS.splice(SALAS.findIndex(x=>x.id===id),1);
+  logAct(`Excluiu a sala <b>${esc(s.n)}</b> (estava vazia)`);
+  refreshAll(); if(currentView()==='agenda') renderAgenda();
+  openSalasManage('salas');
+  toast('Sala excluída.');
+}
 function smAddTeacher(){
   const inp=document.getElementById('smNewProf'); const n=(inp?.value||'').trim();
   if(!n){ inp?.focus(); return; }
@@ -2875,11 +2928,28 @@ function smAddTeacher(){
 }
 function smRemoveTeacher(i){
   const p=TEACHERS[i]; if(!p) return;
+  const sala=SALAS.find(s=>s.prof===p);
+  openModal(`${modalHeader('Remover teacher')}
+  <div class="p-5 space-y-4">
+    <div class="flex items-start gap-3 p-3 rounded-xl" style="background:rgba(220,38,38,.06)">
+      <div class="w-9 h-9 rounded-full grid place-content-center text-white text-xs font-bold shrink-0" style="background:${sala?sala.c:'#94a3b8'}">${initials(p)}</div>
+      <div class="min-w-0"><p class="font-medium text-sm">Remover ${esc(p)} do cadastro?</p>
+      <p class="text-xs text-[var(--muted)] mt-0.5">${sala?`A ${esc(sala.n)} fica sem teacher (as turmas continuam intactas).`:'O nome sai do cadastro de teachers.'} Dá para cadastrar de novo depois.</p></div>
+    </div>
+    <div class="flex gap-2">
+      <button onclick="openSalasManage('profs')" class="flex-1 h-11 rounded-xl border border-[var(--border)] text-sm font-semibold hover:bg-[var(--hover)] transition">Cancelar</button>
+      <button onclick="confirmSmRemoveTeacher(${i})" class="flex-1 h-11 rounded-xl text-white text-sm font-semibold transition hover:brightness-110" style="background:#DC2626">Remover teacher</button>
+    </div>
+  </div>`);
+  lucide.createIcons();
+}
+function confirmSmRemoveTeacher(i){
+  const p=TEACHERS[i]; if(!p) return;
   const sala=SALAS.find(s=>s.prof===p); if(sala) sala.prof=null;
   TEACHERS.splice(i,1);
   refreshAll(); if(currentView()==='agenda') renderAgenda();
   logAct(`Removeu o teacher <b>${esc(p)}</b> do cadastro${sala?` (a ${esc(sala.n)} ficou sem teacher)`:''}`);
-  smRender();
+  openSalasManage('profs');
   toast(`${p.split(' ')[0]} removido do cadastro.`);
 }
 function seCorPaint(){ document.querySelectorAll('#seCores button').forEach(b=>{ const on=b.dataset.c===seCor; b.style.outline=on?'3px solid var(--ring)':'none'; b.style.outlineOffset=on?'2px':'0'; }); }
@@ -3079,7 +3149,7 @@ function renderOpsStats(){
       <span class="text-sm font-bold px-2 py-0.5 rounded-full" style="background:${tone}1a;color:${tone}">${n}</span>
     </div>`;
   set('opsAlerts',
-    alert('hourglass','Alunos aguardando turma',fila,"go('agenda')",'#B5860B')
+    alert('users-round','Alunos aguardando turma',fila,"go('agenda')",'#B5860B')
     +alert('door-closed','Turmas lotadas',cheias,"go('agenda');setAgView('grade')",'#16a34a')
     +alert('expand','Turmas com vaga extra aberta (limite acima de 7)',extras.length,"go('agenda');setAgView('grade')",'#7C3AED')
     +alert('user-round-x','Salas com turma e sem teacher',semProfSalas.length,"openSalasManage('profs')",'#DC2626'));
@@ -3470,9 +3540,9 @@ let toastTimer=null;
 function toast(msg){
   document.getElementById('toastMsg').textContent=msg;
   const t=document.getElementById('toast');
-  t.style.transform='translate(-50%,0)';
+  t.style.transform='translateY(0)';
   clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>{ t.style.transform='translate(-50%,6rem)'; }, 2600);
+  toastTimer=setTimeout(()=>{ t.style.transform='translateY(6rem)'; }, 2600);
 }
 
 /* ====================== INIT ====================== */

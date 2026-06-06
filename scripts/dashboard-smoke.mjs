@@ -356,8 +356,22 @@ section('Agenda: salas, turmas, mover aluno e fila');
   salaById('rose').prof === 'Fernanda Brito' ? ok('teacher atribuído à sala') : fail('atribuição de teacher falhou');
   W.smAssignTeacher(TEACHERS.indexOf('Fernanda Brito'), '');
   salaById('rose').prof === null ? ok('"sem sala por enquanto" tira o teacher da sala') : fail('teacher não saiu da sala');
+  // excluir teacher: pede confirmação antes
   W.smRemoveTeacher(W.eval('TEACHERS').indexOf('Fernanda Brito'));
-  !W.eval('TEACHERS').includes('Fernanda Brito') ? ok('teacher removido do cadastro') : fail('teacher não removeu');
+  W.eval('TEACHERS').includes('Fernanda Brito') ? ok('remover teacher abre confirmação (não exclui direto)') : fail('TEACHER EXCLUÍDO SEM CONFIRMAÇÃO!');
+  W.confirmSmRemoveTeacher(W.eval('TEACHERS').indexOf('Fernanda Brito'));
+  !W.eval('TEACHERS').includes('Fernanda Brito') ? ok('confirmar remove o teacher') : fail('teacher não removeu');
+  // criar sala nova + excluir (vazia, com confirmação)
+  W.openSalasManage('salas');
+  $('smNewSala').value = 'Coral Room';
+  W.smAddSala();
+  W.eval('salaById')('coral-room') ? ok('sala nova criada com cor livre') : fail('sala nova não criou');
+  W.smRemoveSala('coral-room');
+  W.eval('salaById')('coral-room') ? ok('excluir sala abre confirmação (não exclui direto)') : fail('SALA EXCLUÍDA SEM CONFIRMAÇÃO!');
+  W.confirmSmRemoveSala('coral-room');
+  !W.eval('salaById')('coral-room') ? ok('confirmar exclui a sala vazia') : fail('sala não excluiu');
+  W.smRemoveSala('green');
+  W.eval('salaById')('green') ? ok('sala com turmas não pode ser excluída') : fail('EXCLUIU SALA COM TURMAS!');
   W.closeModal();
   // drag-and-drop: turma → slot vazio · aluno → turma com vaga
   const evStub = { preventDefault(){}, dataTransfer:{} };
