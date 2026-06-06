@@ -162,7 +162,9 @@
   .cs-chev{ transition:transform .15s ease; }
   .cs-menu{ animation:pop .14s ease both; max-height:320px; overflow-y:auto; }
   /* agenda: grade geral com coluna de horários fixa */
-  #agGridScroll{ overflow-x:auto; }
+  #agGridScroll{ overflow-x:auto; cursor:grab; }
+  #agGridScroll.panning{ cursor:grabbing; }
+  #agGridScroll.panning *{ cursor:grabbing!important; }
   #agGridScroll .ag-sticky{ position:sticky; left:0; z-index:2; background:var(--card); }
   /* checkbox componentizada */
   .ck{ width:18px; height:18px; border-radius:6px; border:2px solid var(--border); display:inline-grid;
@@ -2325,6 +2327,28 @@ function agPass(t){
   const fp=SEL.agProf?.value||''; if(fp){ const p=salaById(t.sala).prof; if(fp==='none'?!!p:p!==fp) return false; }
   return true;
 }
+/* ---- pan da grade: segurar e arrastar rola para os lados (a coluna de horários
+   fica grudada). O arrasto de turma (DnD) tem prioridade; cliques continuam valendo
+   porque só viram pan depois de 4px de movimento. ---- */
+let agPan=null, agPanClickGuard=false;
+document.addEventListener('mousedown',e=>{
+  const sc=e.target.closest?.('#agGridScroll'); if(!sc||e.button!==0) return;
+  if(e.target.closest('[draggable="true"]')) return; // turma usa o drag-and-drop
+  agPan={ sc, x:e.clientX, y:e.clientY, sl:sc.scrollLeft, st:sc.scrollTop, moved:false };
+});
+document.addEventListener('mousemove',e=>{
+  if(!agPan) return;
+  const dx=e.clientX-agPan.x, dy=e.clientY-agPan.y;
+  if(!agPan.moved&&Math.hypot(dx,dy)>4){ agPan.moved=true; agPan.sc.classList.add('panning'); }
+  if(agPan.moved){ agPan.sc.scrollLeft=agPan.sl-dx; agPan.sc.scrollTop=agPan.st-dy; e.preventDefault(); }
+});
+document.addEventListener('mouseup',()=>{
+  if(!agPan) return;
+  if(agPan.moved) agPanClickGuard=true; // engole o clique que viria depois do arrasto
+  agPan.sc.classList.remove('panning'); agPan=null;
+});
+document.addEventListener('click',e=>{ if(agPanClickGuard){ agPanClickGuard=false; e.preventDefault(); e.stopPropagation(); } },true);
+
 /* ---- drag-and-drop: turma → slot vazio · aluno → turma com vaga ---- */
 let agDrag=null; // {type:'turma',tid} | {type:'kid',sid,ki}
 function agDragTurma(ev,tid){ agDrag={type:'turma',tid}; ev.dataTransfer.effectAllowed='move'; try{ev.dataTransfer.setData('text/plain','t')}catch(_){ } document.body.classList.add('ag-dragging'); }
@@ -2412,7 +2436,7 @@ function agGradeHTML(){
     }).join('');
   });
   html+=`</div></div>
-  <p class="text-xs text-[var(--muted)] mt-3 flex items-center gap-1.5"><i data-lucide="mouse-pointer-click" class="w-3.5 h-3.5"></i> Toque numa turma para abrir (alunos, editar, mover) — ou no <b>+</b> de um horário vazio para criar uma turma ali. Dá para <b>arrastar</b>: uma turma para um horário vazio, ou um aluno da fila para uma turma com vaga.</p>`;
+  <p class="text-xs text-[var(--muted)] mt-3 flex items-center gap-1.5"><i data-lucide="mouse-pointer-click" class="w-3.5 h-3.5"></i> Toque numa turma para abrir (alunos, editar, mover) — ou no <b>+</b> de um horário vazio para criar uma turma ali. Dá para <b>arrastar</b>: uma turma para um horário vazio, um aluno da fila para uma turma com vaga — e <b>segurar num espaço vazio</b> para rolar a grade para os lados.</p>`;
   return html;
 }
 /* ---- visão 2: salas (cards → página da sala no formato do Canva) ---- */

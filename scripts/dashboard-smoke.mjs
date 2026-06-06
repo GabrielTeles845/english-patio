@@ -375,6 +375,19 @@ section('Agenda: salas, turmas, mover aluno e fila');
   tMove.sala === tSnap.sala && tMove.hora === tSnap.hora ? ok('soltar em slot ocupado é recusado') : fail('drop sobrescreveu slot ocupado!');
   const fila2 = W.semTurmaKids();
   const aluno = fila2[0];
+  // pan da grade: segurar e arrastar rola lateralmente (sem matar o clique simples)
+  W.setAgView('grade');
+  {
+    const sc = $('agGridScroll');
+    const fire = (type, x, y) => document.dispatchEvent(new W.MouseEvent(type, { bubbles: true, clientX: x, clientY: y }));
+    const down = new W.MouseEvent('mousedown', { bubbles: true, clientX: 200, clientY: 200, button: 0 });
+    Object.defineProperty(down, 'target', { value: sc });
+    document.dispatchEvent(down);
+    fire('mousemove', 120, 200); // arrasta 80px pra esquerda
+    sc.classList.contains('panning') && sc.scrollLeft === 80 ? ok('segurar e arrastar rola a grade para o lado') : fail(`pan não rolou (scrollLeft=${sc.scrollLeft})`);
+    fire('mouseup', 120, 200);
+    !sc.classList.contains('panning') ? ok('soltar encerra o pan') : fail('pan não encerrou');
+  }
   const tFull = id => W.eval(`turmaFull(turmaById(${id}))`);
   const destDrop = TURMAS.find(t => !tFull(t.id) && (() => { const nv = nivelByK(t.nivel); return aluno.k.age >= nv.ages[0] - 1 && aluno.k.age <= nv.ages[1] + 1; })());
   W.dropMoveKid(aluno.s.id, aluno.ki, destDrop.id);
