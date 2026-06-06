@@ -417,6 +417,40 @@ section('Agenda: salas, turmas, mover aluno e fila');
   W.openMoverKid(aluno.s.id, aluno.ki); W.mvPick(0); W.confirmMoverKid(aluno.s.id, aluno.ki); // devolve pra fila
 }
 
+/* ---------- famílias juntas, irmãos e navegação contextual ---------- */
+section('Famílias, irmãos e navegação');
+{
+  // célula Turma de irmãos: uma linha por aluno, com nome — sem "+1" escondido
+  const sib = STUDENTS.find(s => s.kids.length > 1 && s.active !== false);
+  const cell = W.turmaCellHTML(sib);
+  sib.kids.every(k => cell.includes(k.n.split(' ')[0])) ? ok('célula Turma mostra cada irmão pelo nome') : fail('célula de irmãos sem os nomes');
+  !cell.includes('+1') ? ok('o "+1" escondido em tooltip morreu') : fail('ainda tem +1 na célula');
+  // famílias juntas: matrículas do mesmo responsável ficam adjacentes
+  const rows = STUDENTS.filter(s => s.active !== false).slice().sort((a, b) => a.kids[0].n < b.kids[0].n ? -1 : 1);
+  const grouped = W.famGroupRows(rows);
+  const idx = {};
+  grouped.forEach((r, i) => { (idx[r.resp.cpf] ||= []).push(i); });
+  const adj = Object.values(idx).every(list => list.every((v, i) => i === 0 || v === list[i - 1] + 1));
+  adj && grouped.length === rows.length ? ok('famGroupRows deixa matrículas da mesma família adjacentes') : fail('agrupamento por família quebrou');
+  W.toggleFamGroup(); W.toggleFamGroup();
+  ok('toggle "Famílias juntas" liga/desliga sem erro');
+  // ficha do aluno lembra de onde a pessoa veio
+  W.go('agenda'); W.openDetail(1);
+  W.eval('detailBack') === 'agenda' && $('detailBackLabel').textContent.toLowerCase().includes('agenda')
+    ? ok('ficha lembra de onde veio (voltar para agenda)') : fail('voltar contextual falhou');
+  // soltar aluno num card de sala abre a alocação filtrada
+  W.go('agenda'); W.setAgView('salas');
+  const fila3 = W.semTurmaKids();
+  W.eval(`agDrag={type:'kid',sid:${fila3[0].s.id},ki:${fila3[0].ki}}`);
+  W.agDropSala({ preventDefault(){} }, 'green');
+  $('modalBox').textContent.includes('aluno') ? ok('soltar aluno num card de sala abre a alocação') : fail('drop na sala não abriu modal');
+  W.closeModal();
+  // visão por nível: drop nas turmas + criar turma em qualquer nível
+  W.setAgView('niveis');
+  $('agBody').innerHTML.includes("agDropTurma") ? ok('turmas da visão por nível aceitam aluno arrastado') : fail('visão por nível sem drop');
+  ($('agBody').innerHTML.match(/nova turma deste nível/g) || []).length >= 10 ? ok('criar turma disponível em todos os níveis') : fail('+ nova turma só nos níveis vazios');
+}
+
 /* ---------- modais: rodapé sempre visível + select escapa do modal ---------- */
 section('Modais: rodapé fixo e cselect');
 {

@@ -628,6 +628,7 @@
               <input id="alunoSearch" oninput="tableChanged()" placeholder="Buscar por nome, responsável ou bairro…" class="flex-1 bg-transparent outline-none text-sm">
             </div>
             <button id="fClear" onclick="clearFilters()" class="hidden h-10 px-3 rounded-xl text-sm font-semibold transition items-center gap-1.5 shrink-0" style="background:rgba(245,183,0,.14);color:#B5860B"><i data-lucide="filter-x" class="w-4 h-4"></i>Limpar <span id="fClearN"></span></button>
+            <button id="fFamBtn" onclick="toggleFamGroup()" class="tip h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium flex items-center gap-1.5 shrink-0 transition" data-tip="Matrículas da mesma família (mesmo responsável) aparecem uma embaixo da outra, mesmo na ordem alfabética"><i data-lucide="users" class="w-4 h-4"></i><span class="hidden sm:inline">Famílias juntas</span></button>
             <button onclick="toggleFilters('fRow','fChev')" class="md:hidden h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium flex items-center gap-1.5 shrink-0"><i data-lucide="sliders-horizontal" class="w-4 h-4"></i>Filtros<i id="fChev" data-lucide="chevron-down" class="w-4 h-4 transition-transform"></i></button>
           </div>
           <div id="fRow" class="collapsed md:!flex flex flex-wrap items-center gap-2 pt-2.5 border-t" style="border-color:var(--border)">
@@ -707,7 +708,7 @@
 
       <!-- ====================== DETALHE DO ALUNO ====================== -->
       <section data-view="detalhe" class="fade-in">
-        <button onclick="go('alunos')" class="flex items-center gap-2 text-sm font-medium text-[var(--muted)] hover:text-[var(--text)] mb-4"><i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar para alunos</button>
+        <button onclick="go(detailBack||'alunos')" class="flex items-center gap-2 text-sm font-medium text-[var(--muted)] hover:text-[var(--text)] mb-4"><i data-lucide="arrow-left" class="w-4 h-4"></i> <span id="detailBackLabel">Voltar para alunos</span></button>
         <div id="detailContent"></div>
       </section>
 
@@ -1755,15 +1756,22 @@ function kidTurmaChip(k){
 }
 function turmaCellHTML(s){
   const infos=s.kids.map(k=>({k,t:kidTurma(k)}));
-  const first=infos[0];
-  const extra=infos.slice(1).filter(x=>(x.t?.id||0)!==(first.t?.id||0));
-  const more=extra.length?`<span class="tip text-[10px] font-bold px-1.5 py-0.5 rounded-md whitespace-nowrap" data-tip="${extra.map(x=>`${x.k.n.split(' ')[0]}: ${x.t?turmaShort(x.t)+' · '+nivelLabel(x.t.nivel):'sem turma'}`).join('  ·  ')}" style="background:var(--hover);color:var(--muted)">+${extra.length}</span>`:'';
-  if(!first.t) return `<div class="flex items-center gap-1.5">${semTurmaChip()}${more}</div>`;
-  const sala=salaById(first.t.sala);
-  return `<div class="min-w-0">
-    <p class="text-xs font-medium flex items-center gap-1.5 whitespace-nowrap"><span class="w-2 h-2 rounded-full shrink-0" style="background:${sala.c}"></span><span class="truncate">${sala.n.replace(' Room','')} · ${first.t.hora}</span>${more}</p>
-    <p class="text-[10px] mt-0.5 font-semibold whitespace-nowrap" style="color:${famC(first.t.nivel)}">${nivelLabel(first.t.nivel)} · ${schLabel(first.t.par)}</p>
-  </div>`;
+  /* um aluno só: formato completo em 2 linhas */
+  if(infos.length===1){
+    const {t}=infos[0];
+    if(!t) return semTurmaChip();
+    const sala=salaById(t.sala);
+    return `<div class="min-w-0">
+      <p class="text-xs font-medium flex items-center gap-1.5 whitespace-nowrap"><span class="w-2 h-2 rounded-full shrink-0" style="background:${sala.c}"></span><span class="truncate">${sala.n.replace(' Room','')} · ${t.hora}</span></p>
+      <p class="text-[10px] mt-0.5 font-semibold whitespace-nowrap" style="color:${famC(t.nivel)}">${nivelLabel(t.nivel)} · ${schLabel(t.par)}</p>
+    </div>`;
+  }
+  /* irmãos na mesma matrícula: uma linha por aluno, com o nome — sem "+1" escondido */
+  return `<div class="min-w-0 space-y-1">${infos.map(({k,t})=>{
+    if(!t) return `<p class="text-[11px] flex items-center gap-1.5 whitespace-nowrap"><span class="font-semibold shrink-0">${esc(k.n.split(' ')[0])}</span>${semTurmaChip()}</p>`;
+    const sala=salaById(t.sala);
+    return `<p class="text-[11px] flex items-center gap-1.5 whitespace-nowrap min-w-0"><span class="w-2 h-2 rounded-full shrink-0" style="background:${sala.c}"></span><span class="font-semibold shrink-0">${esc(k.n.split(' ')[0])}</span><span class="text-[var(--muted)] truncate">${sala.n.replace(' Room','')} ${t.hora} ·</span><span class="font-semibold shrink-0" style="color:${famC(t.nivel)}">${nivelLabel(t.nivel)}</span></p>`;
+  }).join('')}</div>`;
 }
 function rowHTML(s){
   const nSib=s.kids.length-1;
@@ -1789,7 +1797,7 @@ function rowHTML(s){
   const sinceCell = s.since
     ? `<span class="tip text-xs whitespace-nowrap" data-tip="Aluno da escola desde ${s.since}">Desde ${s.since}</span>`
     : `<span class="tip text-xs text-[var(--muted)]" data-tip="Sem registro — use ⋮ → Editar dados para preencher">—</span>`;
-  return `<div onclick="openDetail(${s.id})" class="cursor-pointer transition md:border-b md:last:border-0 hover:bg-[var(--hover)] ${inactive?'opacity-60':''}" style="border-color:var(--border)">
+  return `<div onclick="openDetail(${s.id})" class="cursor-pointer transition md:border-b md:last:border-0 hover:bg-[var(--hover)] ${inactive?'opacity-60':''}" style="border-color:var(--border)${famGroup&&fam>1?';box-shadow:inset 3px 0 0 #2F539A':''}">
     <!-- desktop: linha da tabela -->
     <div class="hidden md:grid md:grid-cols-[1.45fr_1.1fr_1fr_.8fr_.7fr_.85fr_.8fr_52px] gap-3 px-5 py-3.5 items-center">
       <div class="flex items-center gap-3 min-w-0">
@@ -1927,12 +1935,29 @@ function pagerHTML(page,pages,fn){
     + (end<pages?(end<pages-1?'<span class="px-0.5">…</span>':'')+btn(pages,pages,false,false):'')
     + btn('<i data-lucide="chevron-right" class="w-4 h-4"></i>',page+1,false,page===pages);
 }
+/* "Famílias juntas": matrículas do mesmo responsável aparecem adjacentes,
+   na posição da primeira que apareceria na ordenação atual */
+let famGroup=false;
+function famGroupRows(rows){
+  const seen=new Set(), out=[];
+  rows.forEach(r=>{ if(seen.has(r.resp.cpf)) return; seen.add(r.resp.cpf);
+    out.push(...rows.filter(x=>x.resp.cpf===r.resp.cpf)); });
+  return out;
+}
+function toggleFamGroup(){
+  famGroup=!famGroup;
+  const b=document.getElementById('fFamBtn');
+  if(b){ b.style.background=famGroup?'rgba(47,83,154,.10)':''; b.style.color=famGroup?'#2F539A':''; b.style.borderColor=famGroup?'rgba(47,83,154,.45)':''; }
+  tableChanged();
+  toast(famGroup?'Matrículas da mesma família agora aparecem juntas.':'Agrupamento por família desligado.');
+}
 function renderTable(){
   updateClearBtn();
-  const rows=filteredStudents().slice().sort((a,b)=>{
+  let rows=filteredStudents().slice().sort((a,b)=>{
     const va=SORT_VAL[sortKey](a), vb=SORT_VAL[sortKey](b);
     return (va<vb?-1:va>vb?1:0)*sortDir;
   });
+  if(famGroup) rows=famGroupRows(rows);
   const pages=Math.max(1,Math.ceil(rows.length/PAGE_SIZE));
   tablePage=Math.min(tablePage,pages);
   const pageRows=rows.slice((tablePage-1)*PAGE_SIZE, tablePage*PAGE_SIZE);
@@ -1947,7 +1972,13 @@ function renderTable(){
 function infoRow(label,val){ return `<div class="flex justify-between gap-4 py-2 border-b last:border-0" style="border-color:var(--border)"><span class="text-sm text-[var(--muted)]">${label}</span><span class="text-sm font-medium text-right flex items-center justify-end gap-1.5">${val}</span></div>`; }
 function card(title,icon,body){ return `<div class="surface rounded-2xl p-5"><h3 class="font-heading font-semibold flex items-center gap-2 mb-3"><i data-lucide="${icon}" class="w-[18px] h-[18px] text-brand-light"></i>${title}</h3>${body}</div>`; }
 const phoneVal = (phone,name) => `${phone} <button onclick="event.stopPropagation();toast('Abrindo WhatsApp de ${name}…')" class="inline-grid place-content-center w-6 h-6 rounded-md transition hover:scale-110" style="background:rgba(37,211,102,.14);color:#1faa53" title="WhatsApp">${WA('w-3.5 h-3.5')}</button>`;
+let detailBack='alunos';
 function openDetail(id){
+  /* lembra de onde a pessoa veio — a ficha devolve pra lá (agenda, notificações…), sem perder o contexto */
+  const cv=currentView();
+  if(cv&&cv!=='detalhe') detailBack=cv;
+  const lbl=document.getElementById('detailBackLabel');
+  if(lbl) lbl.textContent='Voltar para '+(VIEW_LABEL[detailBack]||'Alunos').toLowerCase();
   const s=STUDENTS.find(x=>x.id===id); const st=STATUS[s.status];
   const kidsCards = s.kids.map((k,ki)=>{
     const t=kidTurma(k);
@@ -2364,7 +2395,7 @@ let agDrag=null; // {type:'turma',tid} | {type:'kid',sid,ki}
 function agDragTurma(ev,tid){ agDrag={type:'turma',tid}; ev.dataTransfer.effectAllowed='move'; try{ev.dataTransfer.setData('text/plain','t')}catch(_){ } document.body.classList.add('ag-dragging'); }
 function agDragKid(ev,sid,ki){ ev.stopPropagation(); agDrag={type:'kid',sid,ki}; ev.dataTransfer.effectAllowed='move'; try{ev.dataTransfer.setData('text/plain','k')}catch(_){ } document.body.classList.add('ag-dragging'); }
 function agDragEnd(){ agDrag=null; document.body.classList.remove('ag-dragging'); document.querySelectorAll('.ag-drop').forEach(el=>el.classList.remove('ag-drop')); }
-function agOver(ev,el,kind){ if(!agDrag) return; if(kind==='empty'&&agDrag.type!=='turma') return; if(kind==='turma'&&agDrag.type!=='kid') return; ev.preventDefault(); ev.dataTransfer.dropEffect='move'; el.classList.add('ag-drop'); }
+function agOver(ev,el,kind){ if(!agDrag) return; if(kind==='empty'&&agDrag.type!=='turma') return; if((kind==='turma'||kind==='sala')&&agDrag.type!=='kid') return; ev.preventDefault(); ev.dataTransfer.dropEffect='move'; el.classList.add('ag-drop'); }
 function agLeave(el){ el.classList.remove('ag-drop'); }
 function agDropEmpty(ev,sala,par,hora){
   ev.preventDefault(); const d=agDrag; agDragEnd();
@@ -2379,6 +2410,15 @@ function agDropEmpty(ev,sala,par,hora){
   toast('Turma movida!');
 }
 function agDropTurma(ev,tid){ ev.preventDefault(); const d=agDrag; agDragEnd(); if(!d||d.type!=='kid') return; dropMoveKid(d.sid,d.ki,tid); }
+/* soltar aluno num CARD de sala (visão Salas): a sala tem várias turmas — abre o
+   modal de alocação já filtrado por ela, pra escolher o horário */
+function agDropSala(ev,salaId){
+  ev.preventDefault(); const d=agDrag; agDragEnd();
+  if(!d||d.type!=='kid') return;
+  const sala=salaById(salaId); if(!sala) return;
+  openMoverKid(d.sid,d.ki);
+  setTimeout(()=>{ const inp=document.getElementById('mvSearch'); if(inp){ inp.value=sala.n; mvFilter(sala.n); } },60);
+}
 function dropMoveKid(sid,ki,tid){
   const s=STUDENTS.find(x=>x.id===sid); if(!s) return;
   const k=s.kids[ki]; if(!k) return;
@@ -2458,7 +2498,7 @@ function agSalasHTML(){
     const ts=TURMAS.filter(t=>t.sala===s.id);
     const tsP=ts.filter(t=>t.par===agPar&&agPass(t)).sort((a,b)=>HORAS.indexOf(a.hora)-HORAS.indexOf(b.hora));
     const alunos=ts.reduce((a,t)=>a+activeKidsIn(t.id),0);
-    return `<div onclick="openSalaView('${s.id}')" class="surface rounded-2xl overflow-hidden cursor-pointer transition hover:shadow-lg">
+    return `<div onclick="openSalaView('${s.id}')" ondragover="agOver(event,this,'sala')" ondragleave="agLeave(this)" ondrop="agDropSala(event,'${s.id}')" class="surface rounded-2xl overflow-hidden cursor-pointer transition hover:shadow-lg">
       <div class="px-5 py-3.5 flex items-center justify-between gap-3" style="background:${s.c}22;border-bottom:3px solid ${s.c}">
         <div class="min-w-0"><p class="font-heading font-semibold truncate">${esc(s.n)}</p><p class="text-xs text-[var(--muted)] truncate">${s.prof?'Teacher '+esc(s.prof):'sem teacher definido'}</p></div>
         <span class="w-4 h-4 rounded-full shrink-0" style="background:${s.c}"></span>
@@ -2574,12 +2614,13 @@ function agNiveisHTML(){
         return `<div class="surface rounded-2xl p-4">
           <div class="flex items-center justify-between mb-2"><p class="font-heading font-semibold text-sm">${nv.n}</p><span class="text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap" style="background:${f.c}1a;color:${f.c}">${tot} aluno${tot===1?'':'s'}</span></div>
           ${ts.length?`<div class="space-y-1">${ts.map(t=>{ const v=turmaVagas(t); const sala=salaById(t.sala);
-            return `<button onclick="openTurmaModal(${t.id})" class="w-full flex items-center gap-2 text-left text-xs p-2 rounded-lg hover:bg-[var(--hover)] transition">
+            return `<button onclick="openTurmaModal(${t.id})" ondragover="agOver(event,this,'turma')" ondragleave="agLeave(this)" ondrop="agDropTurma(event,${t.id})" class="w-full flex items-center gap-2 text-left text-xs p-2 rounded-lg hover:bg-[var(--hover)] transition" title="Abrir a turma (alunos, editar) — também aceita aluno arrastado">
               <span class="w-2 h-2 rounded-full shrink-0" style="background:${sala.c}"></span>
               <span class="font-medium truncate">${esc(sala.n.replace(' Room',''))}</span>
               <span class="text-[var(--muted)] whitespace-nowrap">${schLabel(t.par)} ${t.hora}</span>
               <span class="ml-auto whitespace-nowrap font-bold" style="color:${v?'#16a34a':'#B5860B'}">${v?v+' vaga'+(v>1?'s':''):'CHEIA'}</span></button>`; }).join('')}</div>`
           :'<p class="text-xs text-[var(--muted)]">todas as turmas ficaram fora dos filtros atuais</p>'}
+          <button onclick="openNewTurma(null,null,null,'${nv.k}')" class="mt-2 text-xs font-semibold text-brand-light hover:underline">+ nova turma deste nível</button>
         </div>`;
       }).join('')}
       </div></div>`;
@@ -2790,7 +2831,7 @@ function openTurmaModal(tid){
       ${list.length?`<div class="space-y-1">${list.map(({s,k,ki})=>`<div class="flex items-center gap-2.5 p-2 rounded-lg" style="background:var(--hover)">
         <span class="w-7 h-7 rounded-lg grid place-content-center text-white text-[10px] font-bold shrink-0" style="background:linear-gradient(135deg,${palette[s.id%palette.length]},#2F539A)">${initials(k.n)}</span>
         <button onclick="closeModal();openDetail(${s.id})" class="text-sm font-medium hover:underline truncate text-left flex-1 min-w-0">${esc(k.n)} <span class="text-xs text-[var(--muted)] font-normal">(${k.age})</span>${isNovo(s)?` <span class="text-[9px] font-bold" style="color:#E0457B">${novoTag(k)}</span>`:''}</button>
-        <button onclick="openMoverKid(${s.id},${ki})" class="h-7 px-2 rounded-md border border-[var(--border)] text-[11px] font-semibold hover:bg-[var(--card)] transition flex items-center gap-1 shrink-0" title="Mover de turma"><i data-lucide="arrow-right-left" class="w-3 h-3"></i>Mover</button>
+        <button onclick="openMoverKid(${s.id},${ki})" class="h-7 px-2 rounded-md text-[11px] font-semibold transition flex items-center gap-1 shrink-0 hover:ring-1 ring-brand-light" style="background:var(--card);border:1px solid var(--border)" title="Mover de turma"><i data-lucide="arrow-right-left" class="w-3 h-3"></i>Mover</button>
       </div>`).join('')}</div>`:'<p class="text-sm text-[var(--muted)]">Nenhum aluno ainda — aloque pela fila "aguardando turma" ou pela ficha do aluno.</p>'}
     </div>
     <div class="rounded-xl p-3 space-y-2.5" style="background:var(--hover)">
