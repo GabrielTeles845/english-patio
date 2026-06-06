@@ -175,6 +175,16 @@
   @keyframes fade{ from{ opacity:0; transform:translateY(6px);} to{ opacity:1; transform:none;} }
   [data-view]{ display:none; }
   [data-view].view-active{ display:block; }
+  /* scrollbars discretas em todo o painel (modais, grade, listas) */
+  *{ scrollbar-width:thin; scrollbar-color:var(--border) transparent; }
+  ::-webkit-scrollbar{ width:10px; height:10px; }
+  ::-webkit-scrollbar-thumb{ background:var(--border); border-radius:8px; border:3px solid transparent; background-clip:padding-box; }
+  ::-webkit-scrollbar-track{ background:transparent; }
+  /* drag-and-drop da agenda */
+  [draggable="true"]{ cursor:grab; }
+  [draggable="true"]:active{ cursor:grabbing; }
+  .ag-drop{ outline:2px dashed #F5B700; outline-offset:-3px; border-radius:12px; background:rgba(245,183,0,.12)!important; opacity:1!important; }
+  body.ag-dragging .ag-empty{ opacity:.9!important; border-color:var(--border)!important; }
 </style>
 </head>
 
@@ -270,22 +280,22 @@
       <div>
         <p class="px-3 text-[10px] uppercase tracking-wider font-semibold mb-2" style="color:var(--sb-muted)">Principal</p>
         <div class="space-y-1">
-          <a class="nav-item sb-item active group relative flex items-center gap-3 px-3 h-10 rounded-xl transition cursor-pointer" onclick="go('overview', this)">
+          <a class="nav-item sb-item active group relative flex items-center gap-3 px-3 h-10 rounded-xl transition cursor-pointer" data-nav="overview" onclick="go('overview', this)">
             <span class="bar absolute left-0 top-2 bottom-2 w-1 rounded-full opacity-0 transition" style="background:var(--sb-accent)"></span>
             <i data-lucide="layout-dashboard" class="w-[18px] h-[18px]"></i><span class="text-sm font-medium">Visão geral</span></a>
-          <a class="nav-item sb-item group relative flex items-center gap-3 px-3 h-10 rounded-xl transition cursor-pointer" data-tour="nav-alunos" onclick="go('alunos', this)">
+          <a class="nav-item sb-item group relative flex items-center gap-3 px-3 h-10 rounded-xl transition cursor-pointer" data-nav="alunos" data-tour="nav-alunos" onclick="go('alunos', this)">
             <span class="bar absolute left-0 top-2 bottom-2 w-1 rounded-full opacity-0 transition" style="background:var(--sb-accent)"></span>
             <i data-lucide="graduation-cap" class="w-[18px] h-[18px]"></i><span class="text-sm font-medium">Alunos</span>
             <span id="navNewBadge" class="ml-auto text-[11px] px-2 py-0.5 rounded-full font-bold" style="background:var(--sb-accent);color:var(--sb-accent-text)">3 novas</span></a>
-          <a class="nav-item sb-item group relative flex items-center gap-3 px-3 h-10 rounded-xl transition cursor-pointer" data-tour="nav-agenda" onclick="go('agenda', this)">
+          <a class="nav-item sb-item group relative flex items-center gap-3 px-3 h-10 rounded-xl transition cursor-pointer" data-nav="agenda" data-tour="nav-agenda" onclick="go('agenda', this)">
             <span class="bar absolute left-0 top-2 bottom-2 w-1 rounded-full opacity-0 transition" style="background:var(--sb-accent)"></span>
             <i data-lucide="calendar-days" class="w-[18px] h-[18px]"></i><span class="text-sm font-medium">Agenda</span>
             <span id="navAgBadge" class="ml-auto text-[11px] px-2 py-0.5 rounded-full" style="background:var(--sb-badge-bg);color:var(--sb-badge-text)"></span></a>
-          <a class="nav-item sb-item group relative flex items-center gap-3 px-3 h-10 rounded-xl transition cursor-pointer" onclick="go('contratos', this)">
+          <a class="nav-item sb-item group relative flex items-center gap-3 px-3 h-10 rounded-xl transition cursor-pointer" data-nav="contratos" onclick="go('contratos', this)">
             <span class="bar absolute left-0 top-2 bottom-2 w-1 rounded-full opacity-0 transition" style="background:var(--sb-accent)"></span>
             <i data-lucide="file-text" class="w-[18px] h-[18px]"></i><span class="text-sm font-medium">Contratos</span>
             <span class="ml-auto text-[11px] px-2 py-0.5 rounded-full" style="background:var(--sb-badge-bg);color:var(--sb-badge-text)">7 pend.</span></a>
-          <a class="nav-item sb-item group relative flex items-center gap-3 px-3 h-10 rounded-xl transition cursor-pointer" onclick="go('emails', this)">
+          <a class="nav-item sb-item group relative flex items-center gap-3 px-3 h-10 rounded-xl transition cursor-pointer" data-nav="emails" onclick="go('emails', this)">
             <span class="bar absolute left-0 top-2 bottom-2 w-1 rounded-full opacity-0 transition" style="background:var(--sb-accent)"></span>
             <i data-lucide="megaphone" class="w-[18px] h-[18px]"></i><span class="text-sm font-medium">Comunicados</span></a>
         </div>
@@ -293,7 +303,7 @@
       <div>
         <p class="px-3 text-[10px] uppercase tracking-wider font-semibold mb-2" style="color:var(--sb-muted)">Conteúdo</p>
         <div class="space-y-1">
-          <a class="nav-item sb-item group relative flex items-center gap-3 px-3 h-10 rounded-xl transition cursor-pointer" data-tour="nav-editor" onclick="go('editor', this)">
+          <a class="nav-item sb-item group relative flex items-center gap-3 px-3 h-10 rounded-xl transition cursor-pointer" data-nav="editor" data-tour="nav-editor" onclick="go('editor', this)">
             <span class="bar absolute left-0 top-2 bottom-2 w-1 rounded-full opacity-0 transition" style="background:var(--sb-accent)"></span>
             <i data-lucide="pencil-ruler" class="w-[18px] h-[18px]"></i><span class="text-sm font-medium">Editor do site</span></a>
         </div>
@@ -301,13 +311,13 @@
       <div>
         <p class="px-3 text-[10px] uppercase tracking-wider font-semibold mb-2" style="color:var(--sb-muted)">Administração</p>
         <div class="space-y-1">
-          <a class="nav-item sb-item group relative flex items-center gap-3 px-3 h-10 rounded-xl transition cursor-pointer" onclick="go('usuarios', this)">
+          <a class="nav-item sb-item group relative flex items-center gap-3 px-3 h-10 rounded-xl transition cursor-pointer" data-nav="usuarios" onclick="go('usuarios', this)">
             <span class="bar absolute left-0 top-2 bottom-2 w-1 rounded-full opacity-0 transition" style="background:var(--sb-accent)"></span>
             <i data-lucide="users-round" class="w-[18px] h-[18px]"></i><span class="text-sm font-medium">Usuários</span></a>
-          <a class="nav-item sb-item group relative flex items-center gap-3 px-3 h-10 rounded-xl transition cursor-pointer" onclick="go('atividade', this)">
+          <a class="nav-item sb-item group relative flex items-center gap-3 px-3 h-10 rounded-xl transition cursor-pointer" data-nav="atividade" onclick="go('atividade', this)">
             <span class="bar absolute left-0 top-2 bottom-2 w-1 rounded-full opacity-0 transition" style="background:var(--sb-accent)"></span>
             <i data-lucide="history" class="w-[18px] h-[18px]"></i><span class="text-sm font-medium">Atividade</span></a>
-          <a class="nav-item sb-item group relative flex items-center gap-3 px-3 h-10 rounded-xl transition cursor-pointer" onclick="go('config', this)">
+          <a class="nav-item sb-item group relative flex items-center gap-3 px-3 h-10 rounded-xl transition cursor-pointer" data-nav="config" onclick="go('config', this)">
             <span class="bar absolute left-0 top-2 bottom-2 w-1 rounded-full opacity-0 transition" style="background:var(--sb-accent)"></span>
             <i data-lucide="settings" class="w-[18px] h-[18px]"></i><span class="text-sm font-medium">Configurações</span></a>
         </div>
@@ -323,10 +333,10 @@
     </div>
     <div class="p-3 border-t" style="border-color:var(--sb-border)">
       <div class="sb-item flex items-center gap-3 px-2 py-2 rounded-xl cursor-pointer" onclick="openAccountModal()">
-        <div class="w-9 h-9 rounded-full grid place-content-center font-semibold" style="background:var(--sb-accent);color:var(--sb-accent-text)">PM</div>
+        <div id="sbUserAvatar" class="w-9 h-9 rounded-full grid place-content-center font-semibold" style="background:var(--sb-accent);color:var(--sb-accent-text)">PM</div>
         <div class="leading-tight min-w-0">
-          <p class="text-sm font-medium truncate" style="color:var(--sb-strong)">Priscylla Martins</p>
-          <p class="text-[11px]" style="color:var(--sb-muted)">Administrador</p>
+          <p id="sbUserName" class="text-sm font-medium truncate" style="color:var(--sb-strong)">Priscylla Martins</p>
+          <p id="sbUserRole" class="text-[11px]" style="color:var(--sb-muted)">Diretor</p>
         </div>
         <i data-lucide="log-out" class="w-4 h-4 ml-auto hover:opacity-100 opacity-60" style="color:var(--sb-muted)" onclick="event.stopPropagation();logout()"></i>
       </div>
@@ -368,6 +378,15 @@
       </div>
       </div>
     </header>
+
+    <!-- faixa do "ver painel como…" (simulação de papel) -->
+    <div id="viewAsBar" class="hidden sticky top-16 z-20 border-b" style="background:rgba(245,183,0,.15);border-color:var(--border)">
+      <div class="max-w-[1400px] mx-auto w-full px-4 sm:px-6 lg:px-8 py-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm" style="color:#B5860B">
+        <i data-lucide="eye" class="w-4 h-4 shrink-0"></i>
+        <p class="min-w-0">Você está vendo o painel como <b id="viewAsRole"></b> — o menu e as ações mudam junto com o papel.</p>
+        <button onclick="setViewAs('Diretor')" class="ml-auto shrink-0 h-7 px-3 rounded-lg text-xs font-semibold text-white hover:brightness-110 transition" style="background:#1E3765">Voltar a ver como Diretor</button>
+      </div>
+    </div>
 
     <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1400px] w-full mx-auto">
 
@@ -547,9 +566,9 @@
           <div><h1 class="font-heading text-2xl sm:text-3xl font-semibold">Alunos</h1>
             <p class="text-[var(--muted)] text-sm mt-0.5" id="alunosSub">—</p></div>
           <div class="flex items-center gap-2">
-            <button onclick="openImportModal()" data-tour="import-al" class="flex items-center gap-2 h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)]" title="Traz os alunos da planilha atual de matrículas, removendo repetidos e separando nomes iguais e dados estranhos para você conferir"><i data-lucide="file-up" class="w-4 h-4"></i><span class="hidden sm:inline">Importar planilha</span></button>
+            <button onclick="openImportModal()" data-tour="import-al" data-perm="alunos-write" class="flex items-center gap-2 h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)]" title="Traz os alunos da planilha atual de matrículas, removendo repetidos e separando nomes iguais e dados estranhos para você conferir"><i data-lucide="file-up" class="w-4 h-4"></i><span class="hidden sm:inline">Importar planilha</span></button>
             <button onclick="exportCSV(true)" data-tour="export-al" class="flex items-center gap-2 h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)]" title="Baixa um arquivo que abre no Excel ou Google Planilhas"><i data-lucide="sheet" class="w-4 h-4"></i><span class="hidden sm:inline">Exportar planilha</span></button>
-            <button onclick="openNewEnrollment()" data-tour="nova" class="flex items-center gap-2 h-10 px-4 rounded-xl text-white text-sm font-semibold" style="background:linear-gradient(135deg,#1E3765,#2F539A)"><i data-lucide="plus" class="w-4 h-4"></i>Nova matrícula</button>
+            <button onclick="openNewEnrollment()" data-tour="nova" data-perm="alunos-write" class="flex items-center gap-2 h-10 px-4 rounded-xl text-white text-sm font-semibold" style="background:linear-gradient(135deg,#1E3765,#2F539A)"><i data-lucide="plus" class="w-4 h-4"></i>Nova matrícula</button>
           </div>
         </div>
 
@@ -606,7 +625,7 @@
             <p class="text-[var(--muted)] text-sm">Todas as turmas, salas e níveis num lugar só — mover um aluno aqui atualiza a agenda inteira na hora</p>
           </div>
           <div class="flex flex-wrap items-center gap-2">
-            <button onclick="openSalasManage()" class="flex items-center gap-2 h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)]" title="Renomear salas, trocar cores e definir o teacher de cada uma"><i data-lucide="door-open" class="w-4 h-4"></i><span class="hidden sm:inline">Salas</span></button>
+            <button onclick="openSalasManage()" class="flex items-center gap-2 h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)]" title="Cadastro das salas (nome e cor) e dos teachers (cada um com a sua sala — ou sem sala por enquanto)"><i data-lucide="door-open" class="w-4 h-4"></i><span class="hidden sm:inline">Salas & teachers</span></button>
             <button onclick="openAgExport()" data-tour="ag-export" class="flex items-center gap-2 h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)]" title="Gera as imagens da agenda — como as páginas do Canva, mas sempre atualizadas"><i data-lucide="image-down" class="w-4 h-4"></i><span class="hidden sm:inline">Exportar imagens</span></button>
             <button onclick="openNewTurma()" data-tour="ag-nova" class="flex items-center gap-2 h-10 px-4 rounded-xl text-white text-sm font-semibold" style="background:linear-gradient(135deg,#1E3765,#2F539A)"><i data-lucide="plus" class="w-4 h-4"></i>Nova turma</button>
           </div>
@@ -615,13 +634,15 @@
         <!-- fila: alunos sem turma -->
         <div id="agSemTurma" class="mb-4"></div>
 
-        <!-- visões + filtros transversais -->
+        <!-- alternador de visões: em destaque, acima dos filtros -->
+        <div class="surface rounded-2xl p-1.5 mb-3 inline-flex items-center gap-1" data-tour="ag-views">
+          <button id="agvGrade" onclick="setAgView('grade')" class="flex items-center gap-2 px-4 h-10 rounded-xl text-sm"><i data-lucide="table-2" class="w-4 h-4"></i>Grade</button>
+          <button id="agvSalas" onclick="setAgView('salas')" class="flex items-center gap-2 px-4 h-10 rounded-xl text-sm"><i data-lucide="door-open" class="w-4 h-4"></i>Salas</button>
+          <button id="agvNiveis" onclick="setAgView('niveis')" class="flex items-center gap-2 px-4 h-10 rounded-xl text-sm"><i data-lucide="layers" class="w-4 h-4"></i>Níveis</button>
+        </div>
+
+        <!-- filtros transversais -->
         <div class="surface rounded-2xl p-3 mb-4 flex flex-wrap items-center gap-2" data-tour="ag-filtros">
-          <div class="flex items-center bg-[var(--hover)] rounded-xl p-1 text-sm" data-tour="ag-views">
-            <button id="agvGrade" onclick="setAgView('grade')" class="px-3 py-1.5 rounded-lg bg-[var(--card)] shadow-sm font-medium">Grade</button>
-            <button id="agvSalas" onclick="setAgView('salas')" class="px-3 py-1.5 rounded-lg text-[var(--muted)]">Salas</button>
-            <button id="agvNiveis" onclick="setAgView('niveis')" class="px-3 py-1.5 rounded-lg text-[var(--muted)]">Níveis</button>
-          </div>
           <div class="flex items-center bg-[var(--hover)] rounded-xl p-1 text-sm" id="agParSeg" data-tour="ag-par">
             <button id="agpSq" onclick="setAgPar('seg-qua')" class="px-3 py-1.5 rounded-lg bg-[var(--card)] shadow-sm font-medium">Seg/Qua</button>
             <button id="agpTq" onclick="setAgPar('ter-qui')" class="px-3 py-1.5 rounded-lg text-[var(--muted)]">Ter/Qui</button>
@@ -845,11 +866,16 @@
           <button onclick="openInvite()" data-tour="convidar" class="h-10 px-4 rounded-xl text-white text-sm font-semibold flex items-center gap-2" style="background:linear-gradient(135deg,#1E3765,#2F539A)"><i data-lucide="user-plus" class="w-4 h-4"></i> Convidar</button>
         </div>
         <div class="surface rounded-2xl divide-y" style="border-color:var(--border)" id="userList"></div>
-        <div class="grid sm:grid-cols-2 gap-4 mt-4" data-tour="papeis">
-          <div class="surface rounded-2xl p-5"><div class="flex items-center gap-2 mb-2"><i data-lucide="shield-check" class="w-5 h-5 text-brand-light"></i><h3 class="font-heading font-semibold">Administrador</h3></div>
-            <p class="text-sm text-[var(--muted)]">Acesso total: alunos, contratos, comunicados, editor do site, usuários, registro de atividades e configurações.</p></div>
-          <div class="surface rounded-2xl p-5"><div class="flex items-center gap-2 mb-2"><i data-lucide="clipboard-list" class="w-5 h-5 text-brand-light"></i><h3 class="font-heading font-semibold">Secretaria</h3></div>
-            <p class="text-sm text-[var(--muted)]">Vê os alunos e envia/cobra contratos (WhatsApp/download). Não acessa comunicados, editor do site, usuários nem o registro de atividades.</p></div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4" data-tour="papeis">
+          <div class="surface rounded-2xl p-5 flex flex-col"><div class="flex items-center gap-2 mb-2"><i data-lucide="shield-check" class="w-5 h-5 text-brand-light"></i><h3 class="font-heading font-semibold">Diretor</h3></div>
+            <p class="text-sm text-[var(--muted)] flex-1">Acesso total: visão geral, alunos, agenda, contratos, modelos, comunicados, editor do site, usuários, registro de atividades e configurações.</p>
+            <p class="mt-3 text-xs text-[var(--muted)] flex items-center gap-1.5"><i data-lucide="eye" class="w-3.5 h-3.5 shrink-0"></i> É a visão atual do painel.</p></div>
+          <div class="surface rounded-2xl p-5 flex flex-col"><div class="flex items-center gap-2 mb-2"><i data-lucide="calendar-check" class="w-5 h-5 text-brand-light"></i><h3 class="font-heading font-semibold">Supervisor</h3></div>
+            <p class="text-sm text-[var(--muted)] flex-1">Cuida da agenda: monta turmas, move alunos entre salas e exporta as imagens. Vê os alunos só para consulta — sem editar dados nem mexer em contratos.</p>
+            <button onclick="setViewAs('Supervisor')" class="mt-3 h-9 rounded-xl border border-[var(--border)] text-xs font-semibold hover:bg-[var(--hover)] transition flex items-center justify-center gap-1.5"><i data-lucide="eye" class="w-3.5 h-3.5"></i> Ver o painel como Supervisor</button></div>
+          <div class="surface rounded-2xl p-5 flex flex-col"><div class="flex items-center gap-2 mb-2"><i data-lucide="clipboard-list" class="w-5 h-5 text-brand-light"></i><h3 class="font-heading font-semibold">Secretaria</h3></div>
+            <p class="text-sm text-[var(--muted)] flex-1">Cadastra tudo no dia a dia: alunos, turmas, salas e agenda — e envia/cobra contratos (WhatsApp/download). Não acessa comunicados, modelos, editor do site, usuários nem o registro de atividades.</p>
+            <button onclick="setViewAs('Secretaria')" class="mt-3 h-9 rounded-xl border border-[var(--border)] text-xs font-semibold hover:bg-[var(--hover)] transition flex items-center justify-center gap-1.5"><i data-lucide="eye" class="w-3.5 h-3.5"></i> Ver o painel como Secretaria</button></div>
         </div>
       </section>
 
@@ -901,8 +927,8 @@
             </div>
             <div class="p-5">
               <div class="flex items-center gap-3">
-                <div class="w-12 h-12 rounded-full grid place-content-center font-semibold text-[#15294d]" style="background:#FFE17A">PM</div>
-                <div class="min-w-0"><p class="font-medium truncate">Priscylla Martins</p><p class="text-xs text-[var(--muted)] truncate">priscylla@englishpatio.com.br · Administrador</p></div>
+                <div id="accAvatar" class="w-12 h-12 rounded-full grid place-content-center font-semibold text-[#15294d]" style="background:#FFE17A">PM</div>
+                <div class="min-w-0"><p id="accName" class="font-medium truncate">Priscylla Martins</p><p id="accMail" class="text-xs text-[var(--muted)] truncate">priscylla@englishpatio.com.br · Diretor</p></div>
               </div>
               <button onclick="openAccountModal()" class="mt-4 w-full h-10 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)] transition flex items-center justify-center gap-2"><i data-lucide="pencil" class="w-4 h-4"></i> Editar e-mail e senha</button>
             </div>
@@ -1337,8 +1363,21 @@ function cselect(id, items, opts={}){
   </div>`;
 }
 function csToggle(id,e){ e&&e.stopPropagation(); const wrap=document.getElementById('cs-'+id), menu=document.getElementById('csm-'+id);
-  const willOpen=menu.classList.contains('hidden'); csCloseAll(); if(willOpen){ menu.classList.remove('hidden'); wrap.classList.add('open'); } }
-function csCloseAll(){ document.querySelectorAll('.cs-menu').forEach(m=>m.classList.add('hidden')); document.querySelectorAll('.cs').forEach(c=>c.classList.remove('open')); }
+  const willOpen=menu.classList.contains('hidden'); csCloseAll(); if(willOpen){ menu.classList.remove('hidden'); wrap.classList.add('open');
+    /* dentro de um modal o menu vira "fixed" para escapar do overflow do modalBox
+       (senão fica preso/cortado dentro do modal) */
+    const box=document.getElementById('modalBox');
+    if(box&&box.contains(wrap)){
+      const r=wrap.getBoundingClientRect();
+      menu.style.position='fixed'; menu.style.zIndex='90';
+      menu.style.left=Math.max(8,Math.min(r.left,innerWidth-288))+'px'; menu.style.minWidth=r.width+'px';
+      menu.style.maxHeight='300px'; menu.style.overflowY='auto';
+      const mh=Math.min(menu.scrollHeight,300);
+      if(innerHeight-r.bottom<mh+14 && r.top>mh+14){ menu.style.top='auto'; menu.style.bottom=(innerHeight-r.top+6)+'px'; }
+      else{ menu.style.bottom='auto'; menu.style.top=(r.bottom+6)+'px'; }
+    }
+  } }
+function csCloseAll(){ document.querySelectorAll('.cs-menu').forEach(m=>{ m.classList.add('hidden'); ['position','zIndex','left','minWidth','maxHeight','overflowY','top','bottom'].forEach(p=>m.style[p]=''); }); document.querySelectorAll('.cs').forEach(c=>c.classList.remove('open')); }
 function csSet(id,value){ const s=SEL[id]; if(!s) return; const i=s.items.findIndex(x=>x.v===value); if(i>=0) csPick(id,i); }
 function csPick(id,i){ const s=SEL[id]; s.value=s.items[i].v;
   document.getElementById('csl-'+id).textContent=s.items[i].l;
@@ -1348,6 +1387,7 @@ function csPick(id,i){ const s=SEL[id]; s.value=s.items[i].v;
 
 /* ====================== NAVEGAÇÃO ====================== */
 function go(view, el){
+  if(typeof roleAllows==='function' && !roleAllows(view)){ toast(`O papel ${VIEW_AS} não acessa essa tela.`); return; }
   document.querySelectorAll('[data-view]').forEach(s=>s.classList.toggle('view-active', s.dataset.view===view));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   if(el){ el.classList.add('active'); }
@@ -1358,7 +1398,7 @@ function go(view, el){
   const ht=document.getElementById('headerTitle'); if(ht) ht.textContent=VIEW_LABEL[view]||'Visão geral';
   window.scrollTo(0,0);
   lucide.createIcons();
-  if(typeof maybeTourFor==='function' && inited) maybeTourFor(view);
+  if(typeof maybeTourFor==='function' && inited && VIEW_AS==='Diretor') maybeTourFor(view);
 }
 function toggleSidebar(open){
   const sb=document.getElementById('sidebar'), ov=document.getElementById('overlay');
@@ -1521,7 +1561,7 @@ const TOURS={
   ],
   usuarios:[
     { target:'[data-tour="convidar"]', title:'Chame o time', body:'Convide alguém por e-mail — a pessoa cria a própria senha no primeiro acesso.', placement:'bottom' },
-    { target:'[data-tour="papeis"]', title:'Dois papéis, sem confusão', body:'Administrador faz tudo; Secretaria só vê alunos e envia contratos. No menu ⋮ de cada pessoa dá para editar o papel, reenviar o convite ou remover o acesso.', placement:'top', last:true },
+    { target:'[data-tour="papeis"]', title:'Três papéis, sem confusão', body:'Diretor faz tudo; Supervisor cuida da agenda e consulta alunos; Secretaria cadastra alunos e turmas e envia contratos. Use "Ver o painel como…" para conferir o que cada papel enxerga.', placement:'top', last:true },
   ],
   config:[
     { target:'#sbThemePicker', title:'6 combinações de visual', body:'Três cores de sidebar (azul, branca, amarela) vezes claro/escuro — e as bolinhas no rodapé da sidebar trocam de qualquer tela.', placement:'bottom' },
@@ -2019,18 +2059,61 @@ function renderEmails(){
   renderTplChips();
   lucide.createIcons();
 }
-const USERS=[{id:1,n:'Priscylla Martins',e:'priscylla@englishpatio.com.br',r:'Administrador',c:'#1E3765'},{id:2,n:'Gabriel Teles',e:'gabriel@englishpatio.com.br',r:'Administrador',c:'#2F539A'},{id:3,n:'Stefany Oliveira',e:'stefany@englishpatio.com.br',r:'Secretaria',c:'#B5860B'},{id:4,n:'Beatriz Souza',e:'beatriz@englishpatio.com.br',r:'Secretaria',c:'#0d9488'}];
+const USERS=[{id:1,n:'Priscylla Martins',e:'priscylla@englishpatio.com.br',r:'Diretor',c:'#1E3765'},{id:2,n:'Gabriel Teles',e:'gabriel@englishpatio.com.br',r:'Diretor',c:'#2F539A'},{id:3,n:'Camila Nogueira',e:'camila@englishpatio.com.br',r:'Supervisor',c:'#C2410C'},{id:4,n:'Stefany Oliveira',e:'stefany@englishpatio.com.br',r:'Secretaria',c:'#B5860B'},{id:5,n:'Beatriz Souza',e:'beatriz@englishpatio.com.br',r:'Secretaria',c:'#0d9488'}];
 function renderUsers(){
   document.getElementById('userList').innerHTML=USERS.map(x=>`<div class="flex items-center gap-3 p-4"><div class="w-10 h-10 rounded-full grid place-content-center text-white font-semibold" style="background:${x.c}">${initials(x.n)}</div><div class="flex-1 min-w-0"><p class="font-medium truncate">${x.n} ${x.pending?'<span class="text-[10px] font-semibold px-1.5 py-0.5 rounded-md align-middle" style="background:rgba(245,183,0,.16);color:#B5860B">convite pendente</span>':''}</p><p class="text-xs text-[var(--muted)] truncate">${x.e}</p></div><span class="text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap" style="background:var(--hover)">${x.r}</span><button onclick="openUserMenu(event,${x.id})" class="p-2 rounded-lg hover:bg-[var(--hover)]" title="Ações do usuário"><i data-lucide="more-vertical" class="w-4 h-4 text-[var(--muted)]"></i></button></div>`).join('');
   lucide.createIcons();
+}
+
+/* ====================== PAPÉIS — "ver painel como…" (simulação) ====================== */
+/* Matriz definida em 06/Jun/2026 (DASHBOARD_PLAN.md §4). No produto real o papel vem da
+   sessão e o RBAC é validado no servidor; aqui é só demonstração visual do gating. */
+const ROLE_VIEWS={
+  'Supervisor':['alunos','agenda','detalhe','config'],
+  'Secretaria':['alunos','agenda','detalhe','contratos','config','notifs'],
+};
+const ROLE_HOME={ 'Diretor':'overview', 'Supervisor':'agenda', 'Secretaria':'alunos' };
+const ROLE_DEMO={ 'Diretor':1, 'Supervisor':3, 'Secretaria':4 }; // pessoa de exemplo (id em USERS)
+let VIEW_AS='Diretor';
+function roleAllows(view){ return VIEW_AS==='Diretor' || (ROLE_VIEWS[VIEW_AS]||[]).includes(view); }
+function applyRoleView(){
+  const u=userById(ROLE_DEMO[VIEW_AS])||USERS[0];
+  // sidebar: esconde itens fora do papel e grupos que ficaram vazios
+  document.querySelectorAll('#sidebar [data-nav]').forEach(a=>a.classList.toggle('hidden', !roleAllows(a.dataset.nav)));
+  document.querySelectorAll('#sidebar nav > div').forEach(g=>{
+    const items=[...g.querySelectorAll('[data-nav]')];
+    g.classList.toggle('hidden', items.length>0 && items.every(a=>a.classList.contains('hidden')));
+  });
+  // quem está "logado" (rodapé da sidebar + card Minha conta)
+  const ini=initials(u.n);
+  const set=(id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
+  set('sbUserAvatar',ini); set('sbUserName',u.n); set('sbUserRole',u.r);
+  set('accAvatar',ini); set('accName',u.n); set('accMail',u.e+' · '+u.r);
+  // sino de notificações (Supervisor não recebe eventos de contrato/matrícula)
+  document.querySelector('[data-tour="bell"]')?.classList.toggle('hidden', VIEW_AS==='Supervisor');
+  // ações de escrita na tela Alunos (Supervisor vê só para consulta)
+  document.querySelectorAll('[data-perm="alunos-write"]').forEach(b=>b.classList.toggle('hidden', VIEW_AS==='Supervisor'));
+  // faixa de simulação
+  const bar=document.getElementById('viewAsBar');
+  if(bar){ bar.classList.toggle('hidden', VIEW_AS==='Diretor');
+    const r=document.getElementById('viewAsRole'); if(r) r.textContent=`${VIEW_AS} (${u.n})`; }
+  lucide.createIcons();
+}
+function setViewAs(role){
+  if(role===VIEW_AS) return;
+  VIEW_AS=role;
+  applyRoleView();
+  go(ROLE_HOME[role]);
+  toast(role==='Diretor'?'De volta à visão de Diretor.':`Vendo o painel como ${role} — demonstração dos acessos.`);
 }
 
 /* ====================== REGISTRO DE ATIVIDADES (auditoria) ====================== */
 /* Cada ação no painel entra aqui — pessoas, o Sistema (rotinas automáticas) e o
    Autentique (eventos de assinatura que chegam pelo webhook). Não se edita nem se apaga. */
 const ACT_ACTORS={
-  'Priscylla Martins':{ role:'Administrador', c:'#1E3765' },
-  'Gabriel Teles':    { role:'Administrador', c:'#2F539A' },
+  'Priscylla Martins':{ role:'Diretor',       c:'#1E3765' },
+  'Gabriel Teles':    { role:'Diretor',       c:'#2F539A' },
+  'Camila Nogueira':  { role:'Supervisor',    c:'#C2410C' },
   'Stefany Oliveira': { role:'Secretaria',    c:'#B5860B' },
   'Beatriz Souza':    { role:'Secretaria',    c:'#0d9488' },
   'Sistema':          { role:'Automático',    c:'#64748B', ic:'zap' },
@@ -2046,6 +2129,7 @@ const ACTIVITY=[
   { who:'Autentique',        a:'Registrou que a família de <b>Sofia Mendes Castro</b> visualizou o contrato', t:'14h31', day:'Ontem' },
   { who:'Sistema',           a:'Enviou o contrato de <b>Helena Duarte Lima</b> ao Autentique — link entregue por WhatsApp e e-mail', t:'20h14', day:'Ontem' },
   { who:'Beatriz Souza',     a:'Exportou a planilha de alunos (130 matrículas)', t:'11h26', day:'Ontem' },
+  { who:'Camila Nogueira',   a:'Criou a turma <b>Power 4 · Mint Room · Seg/Qua 16:45</b>', t:'10h48', day:'Ontem' },
   { who:'Priscylla Martins', a:'Editou os dados da matrícula de <b>Théo e Lara Andrade Rocha</b>', t:'10h05', day:'Ontem' },
   { who:'Priscylla Martins', a:'Enviou o comunicado <b>"Boas-vindas — turma de junho"</b> para 21 famílias', t:'16h40', day:'01/06/2026' },
   { who:'Stefany Oliveira',  a:'Marcou o contrato de <b>Bernardo Pires Alves</b> como assinado (carnê entregue na recepção)', t:'14h18', day:'01/06/2026' },
@@ -2056,7 +2140,8 @@ const ACTIVITY=[
   { who:'Priscylla Martins', a:'Convidou <b>Beatriz Souza</b> (Secretaria) para o painel', t:'9h05', day:'12/05/2026' },
 ];
 function logAct(a){
-  ACTIVITY.unshift({ who:'Priscylla Martins', a, t:'agora', day:'Hoje' });
+  const who=(userById(ROLE_DEMO[VIEW_AS])||USERS[0]).n; // a pessoa simulada pelo "ver painel como…"
+  ACTIVITY.unshift({ who, a, t:'agora', day:'Hoje' });
   if(currentView()==='atividade') renderActivity();
 }
 function renderActivity(){
@@ -2196,10 +2281,50 @@ function agPass(t){
   const fp=SEL.agProf?.value||''; if(fp){ const p=salaById(t.sala).prof; if(fp==='none'?!!p:p!==fp) return false; }
   return true;
 }
+/* ---- drag-and-drop: turma → slot vazio · aluno → turma com vaga ---- */
+let agDrag=null; // {type:'turma',tid} | {type:'kid',sid,ki}
+function agDragTurma(ev,tid){ agDrag={type:'turma',tid}; ev.dataTransfer.effectAllowed='move'; try{ev.dataTransfer.setData('text/plain','t')}catch(_){ } document.body.classList.add('ag-dragging'); }
+function agDragKid(ev,sid,ki){ ev.stopPropagation(); agDrag={type:'kid',sid,ki}; ev.dataTransfer.effectAllowed='move'; try{ev.dataTransfer.setData('text/plain','k')}catch(_){ } document.body.classList.add('ag-dragging'); }
+function agDragEnd(){ agDrag=null; document.body.classList.remove('ag-dragging'); document.querySelectorAll('.ag-drop').forEach(el=>el.classList.remove('ag-drop')); }
+function agOver(ev,el,kind){ if(!agDrag) return; if(kind==='empty'&&agDrag.type!=='turma') return; if(kind==='turma'&&agDrag.type!=='kid') return; ev.preventDefault(); ev.dataTransfer.dropEffect='move'; el.classList.add('ag-drop'); }
+function agLeave(el){ el.classList.remove('ag-drop'); }
+function agDropEmpty(ev,sala,par,hora){
+  ev.preventDefault(); const d=agDrag; agDragEnd();
+  if(!d||d.type!=='turma') return;
+  const t=turmaById(d.tid); if(!t) return;
+  if(t.sala===sala&&t.par===par&&t.hora===hora) return;
+  if(turmaAt(sala,par,hora)){ toast('Esse horário já tem turma nessa sala.'); return; }
+  const from=`${salaById(t.sala).n} · ${schLabel(t.par)} ${t.hora}`;
+  t.sala=sala; t.par=par; t.hora=hora;
+  renderAgenda(); refreshAll();
+  logAct(`Moveu a turma <b>${nivelLabel(t.nivel)}</b> de ${esc(from)} para <b>${esc(salaById(sala).n)} · ${schLabel(par)} ${hora}</b> (arrastando na grade)`);
+  toast('Turma movida!');
+}
+function agDropTurma(ev,tid){ ev.preventDefault(); const d=agDrag; agDragEnd(); if(!d||d.type!=='kid') return; dropMoveKid(d.sid,d.ki,tid); }
+function dropMoveKid(sid,ki,tid){
+  const s=STUDENTS.find(x=>x.id===sid); if(!s) return;
+  const k=s.kids[ki]; if(!k) return;
+  const cur=kidTurma(k), t=turmaById(tid); if(!t) return;
+  if(cur&&cur.id===t.id) return;
+  if(turmaFull(t)){ openMoverKid._ctx={sid,ki}; mvAskFull(t.id); return; } // explica a vaga extra antes
+  // mudança de nível (ou nível fora da idade, pra quem está na fila) pede confirmação:
+  // abre o modal de mover já com o destino selecionado e o aviso visível
+  const nv=nivelByK(t.nivel);
+  const needsConfirm = cur ? t.nivel!==cur.nivel : (k.age<nv.ages[0]-1||k.age>nv.ages[1]+1);
+  if(needsConfirm){ openMoverKid(sid,ki); setTimeout(()=>mvPick(t.id),60); return; }
+  k.tid=t.id;
+  logAct(cur?`Moveu <b>${esc(k.n)}</b> de ${turmaShort(cur)} para <b>${turmaShort(t)}</b> (${nivelLabel(t.nivel)}) arrastando na agenda`
+            :`Alocou <b>${esc(k.n)}</b> na turma <b>${turmaShort(t)}</b> (${nivelLabel(t.nivel)}) arrastando na agenda`);
+  refreshAll(); renderAgenda();
+  toast(`${k.n.split(' ')[0]} agora está em ${turmaShort(t)}!`);
+}
 function renderAgenda(){
   const body=document.getElementById('agBody'); if(!body) return;
   const pill=(id,on)=>{ const b=document.getElementById(id); if(b) b.className='px-3 py-1.5 rounded-lg '+(on?'bg-[var(--card)] shadow-sm font-medium':'text-[var(--muted)]'); };
-  pill('agvGrade',agView==='grade'); pill('agvSalas',agView==='salas'); pill('agvNiveis',agView==='niveis');
+  const vpill=(id,on)=>{ const b=document.getElementById(id); if(!b) return;
+    b.className='flex items-center gap-2 px-4 h-10 rounded-xl text-sm transition '+(on?'text-white font-semibold shadow-md':'text-[var(--muted)] font-medium hover:bg-[var(--hover)] hover:text-[var(--text)]');
+    b.style.background=on?'linear-gradient(135deg,#1E3765,#2F539A)':''; };
+  vpill('agvGrade',agView==='grade'); vpill('agvSalas',agView==='salas'); vpill('agvNiveis',agView==='niveis');
   pill('agpSq',agPar==='seg-qua'); pill('agpTq',agPar==='ter-qui');
   const parSeg=document.getElementById('agParSeg'); if(parSeg) parSeg.style.display=agView==='niveis'?'none':'flex'; // a visão por nível mostra os dois pares
   const vb=document.getElementById('agVagasBtn');
@@ -2216,13 +2341,13 @@ function renderAgFila(){
   const fila=semTurmaKids();
   if(!fila.length){ el.innerHTML=''; return; }
   el.innerHTML=`<div class="rounded-2xl p-4 border" style="border-color:rgba(245,183,0,.55);background:rgba(245,183,0,.07)" data-tour="ag-fila">
-    <p class="text-sm font-semibold flex items-center gap-2 mb-2.5" style="color:#B5860B"><i data-lucide="hourglass" class="w-4 h-4"></i>${fila.length} aluno${fila.length>1?'s':''} aguardando turma <span class="font-normal text-xs text-[var(--muted)]">— clique no nome para alocar</span></p>
-    <div class="flex flex-wrap gap-2">${fila.map(({s,k,ki})=>`<button onclick="openMoverKid(${s.id},${ki})" class="flex items-center gap-2 h-9 pl-1.5 pr-3 rounded-xl border text-sm font-medium transition hover:shadow-md" style="border-color:var(--border);background:var(--card)"><span class="w-6 h-6 rounded-lg grid place-content-center text-white text-[10px] font-bold" style="background:linear-gradient(135deg,${palette[s.id%palette.length]},#2F539A)">${initials(k.n)}</span>${esc(k.n.split(' ').slice(0,2).join(' '))} <span class="text-xs text-[var(--muted)]">(${k.age})</span></button>`).join('')}</div>
+    <p class="text-sm font-semibold flex items-center gap-2 mb-2.5" style="color:#B5860B"><i data-lucide="hourglass" class="w-4 h-4"></i>${fila.length} aluno${fila.length>1?'s':''} aguardando turma <span class="font-normal text-xs text-[var(--muted)]">— clique no nome para alocar, ou arraste para uma turma</span></p>
+    <div class="flex flex-wrap gap-2">${fila.map(({s,k,ki})=>`<button onclick="openMoverKid(${s.id},${ki})" draggable="true" ondragstart="agDragKid(event,${s.id},${ki})" ondragend="agDragEnd()" class="flex items-center gap-2 h-9 pl-1.5 pr-3 rounded-xl border text-sm font-medium transition hover:shadow-md" style="border-color:var(--border);background:var(--card)"><span class="w-6 h-6 rounded-lg grid place-content-center text-white text-[10px] font-bold" style="background:linear-gradient(135deg,${palette[s.id%palette.length]},#2F539A)">${initials(k.n)}</span>${esc(k.n.split(' ').slice(0,2).join(' '))} <span class="text-xs text-[var(--muted)]">(${k.age})</span></button>`).join('')}</div>
   </div>`;
 }
 /* ---- visão 1: grade geral (raio-X — colunas = salas, linhas = horários) ---- */
 function agGradeHTML(){
-  const cols=`grid-template-columns:84px repeat(${SALAS.length},132px)`;
+  const cols=`grid-template-columns:70px repeat(${SALAS.length},108px)`;
   let html=`<div id="agGridScroll" class="surface rounded-2xl"><div class="grid" style="${cols};min-width:max-content">`;
   html+=`<div class="ag-sticky border-b border-r px-2 py-2.5 grid place-content-center text-[9px] font-bold uppercase tracking-wider text-[var(--muted)]" style="border-color:var(--border)">Horário</div>`;
   html+=SALAS.map(s=>`<div class="border-b px-2 py-2 text-center cursor-pointer hover:bg-[var(--hover)] transition" style="border-color:var(--border)" onclick="openSalaView('${s.id}')" title="Abrir a página da ${esc(s.n)}">
@@ -2234,21 +2359,21 @@ function agGradeHTML(){
     html+=`<div class="ag-sticky border-b border-r px-2 py-2 grid place-content-center text-xs font-semibold" style="border-color:var(--border)">${h}</div>`;
     html+=SALAS.map(s=>{
       const t=turmaAt(s.id,agPar,h);
-      if(!t) return `<div class="border-b p-1" style="border-color:var(--border)"><button onclick="openNewTurma('${s.id}','${agPar}','${h}')" class="w-full h-full min-h-[46px] rounded-xl border border-dashed border-transparent grid place-content-center text-[var(--muted)] opacity-30 hover:opacity-100 hover:border-[var(--border)] hover:bg-[var(--hover)] transition" title="Criar turma na ${esc(s.n)} · ${schLabel(agPar)} ${h}"><i data-lucide="plus" class="w-3.5 h-3.5"></i></button></div>`;
+      if(!t) return `<div class="border-b p-1" style="border-color:var(--border)"><button onclick="openNewTurma('${s.id}','${agPar}','${h}')" ondragover="agOver(event,this,'empty')" ondragleave="agLeave(this)" ondrop="agDropEmpty(event,'${s.id}','${agPar}','${h}')" class="ag-empty w-full h-full min-h-[46px] rounded-xl border border-dashed border-transparent grid place-content-center text-[var(--muted)] opacity-30 hover:opacity-100 hover:border-[var(--border)] hover:bg-[var(--hover)] transition" title="Criar turma na ${esc(s.n)} · ${schLabel(agPar)} ${h} — ou solte uma turma arrastada aqui"><i data-lucide="plus" class="w-3.5 h-3.5"></i></button></div>`;
       const v=activeKidsIn(t.id), full=v>=t.cap, dim=!agPass(t);
-      return `<div class="border-b p-1" style="border-color:var(--border)"><button onclick="openTurmaModal(${t.id})" class="w-full text-left rounded-xl px-2 py-1.5 transition hover:shadow-md ${dim?'opacity-25':''}" style="background:${famC(t.nivel)}14;border:1px solid ${famC(t.nivel)}45" title="${nivelLabel(t.nivel)} · ${v}/${t.cap} alunos — toque para abrir">
+      return `<div class="border-b p-1" style="border-color:var(--border)"><button onclick="openTurmaModal(${t.id})" draggable="true" ondragstart="agDragTurma(event,${t.id})" ondragend="agDragEnd()" ondragover="agOver(event,this,'turma')" ondragleave="agLeave(this)" ondrop="agDropTurma(event,${t.id})" class="w-full text-left rounded-xl px-2 py-1.5 transition hover:shadow-md ${dim?'opacity-25':''}" style="background:${famC(t.nivel)}14;border:1px solid ${famC(t.nivel)}45" title="${nivelLabel(t.nivel)} · ${v}/${t.cap} alunos — toque para abrir, arraste para mover de horário">
         <p class="text-[10px] font-bold truncate" style="color:${famC(t.nivel)}">${nivelLabel(t.nivel)}</p>
         <p class="text-[10px] text-[var(--muted)] mt-0.5">${v}/${t.cap}${full?' <span class="font-bold" style="color:#16a34a">· CHEIA</span>':` · ${t.cap-v} vaga${t.cap-v>1?'s':''}`}</p>
       </button></div>`;
     }).join('');
   });
   html+=`</div></div>
-  <p class="text-xs text-[var(--muted)] mt-3 flex items-center gap-1.5"><i data-lucide="mouse-pointer-click" class="w-3.5 h-3.5"></i> Toque numa turma para abrir (alunos, editar, mover) — ou no <b>+</b> de um horário vazio para criar uma turma ali.</p>`;
+  <p class="text-xs text-[var(--muted)] mt-3 flex items-center gap-1.5"><i data-lucide="mouse-pointer-click" class="w-3.5 h-3.5"></i> Toque numa turma para abrir (alunos, editar, mover) — ou no <b>+</b> de um horário vazio para criar uma turma ali. Dá para <b>arrastar</b>: uma turma para um horário vazio, ou um aluno da fila para uma turma com vaga.</p>`;
   return html;
 }
 /* ---- visão 2: salas (cards → página da sala no formato do Canva) ---- */
 function agSalasHTML(){
-  return `<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">${SALAS.map(s=>{
+  return `<div class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">${SALAS.map(s=>{
     const ts=TURMAS.filter(t=>t.sala===s.id);
     const tsP=ts.filter(t=>t.par===agPar&&agPass(t)).sort((a,b)=>HORAS.indexOf(a.hora)-HORAS.indexOf(b.hora));
     const alunos=ts.reduce((a,t)=>a+activeKidsIn(t.id),0);
@@ -2269,8 +2394,8 @@ function salaPageHTML(salaId,par,forExport){
   const ts=TURMAS.filter(t=>t.sala===salaId&&t.par===par).sort((a,b)=>HORAS.indexOf(a.hora)-HORAS.indexOf(b.hora));
   const slot=t=>{
     const list=kidsOfTurma(t.id);
-    const items=list.map(({s,k,ki},i)=>`<li class="leading-snug${forExport?'':' cursor-pointer hover:underline'}" ${forExport?'':`onclick="openMoverKid(${s.id},${ki})" title="Mover ${esc(k.n.split(' ')[0])} de turma"`} style="color:#243250"><span style="color:${sala.c}">${i+1}.</span> <b>${esc(k.n.toUpperCase())}</b> <span style="color:#64748B">(${k.age})</span>${isNovo(s)?` <span style="color:#E0457B;font-weight:700">- ${novoTag(k)}</span>`:''}</li>`).join('');
-    return `<div class="mb-5" style="break-inside:avoid">
+    const items=list.map(({s,k,ki},i)=>`<li class="leading-snug${forExport?'':' cursor-pointer hover:underline'}" ${forExport?'':`onclick="openMoverKid(${s.id},${ki})" draggable="true" ondragstart="agDragKid(event,${s.id},${ki})" ondragend="agDragEnd()" title="Mover ${esc(k.n.split(' ')[0])} de turma — clique ou arraste para outro horário"`} style="color:#243250"><span style="color:${sala.c}">${i+1}.</span> <b>${esc(k.n.toUpperCase())}</b> <span style="color:#64748B">(${k.age})</span>${isNovo(s)?` <span style="color:#E0457B;font-weight:700">- ${novoTag(k)}</span>`:''}</li>`).join('');
+    return `<div class="mb-5" style="break-inside:avoid"${forExport?'':` ondragover="agOver(event,this,'turma')" ondragleave="agLeave(this)" ondrop="agDropTurma(event,${t.id})"`}>
       <p class="font-bold text-[13px]" style="color:#16233f">${t.hora} - <span style="color:${famC(t.nivel)}">${nivelLabel(t.nivel).toUpperCase()}</span></p>
       <ol class="mt-1 space-y-0.5 text-[12px]">${items||`<li class="text-[11px]" style="color:#94a3b8">— sem alunos ainda${forExport?'':' (aloque pela fila)'}</li>`}</ol>
       ${turmaFull(t)?'<p class="text-[11px] font-bold mt-1" style="color:#16a34a">NÃO TEM VAGA</p>':''}
@@ -2307,7 +2432,7 @@ function agNiveisHTML(){
     const lvls=NIVEIS.filter(n=>n.fam===fk);
     return `<div class="mb-6">
       <p class="text-[11px] font-bold uppercase tracking-wider mb-2 flex items-center gap-2" style="color:${f.c}"><span class="w-2.5 h-2.5 rounded-full" style="background:${f.c}"></span>${f.n}</p>
-      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
       ${lvls.map(nv=>{
         const all=TURMAS.filter(t=>t.nivel===nv.k);
         const ts=all.filter(agPass).sort((a,b)=>(a.par+a.hora)<(b.par+b.hora)?-1:1);
@@ -2338,11 +2463,22 @@ function openMoverKid(sid,ki){
   const cur=kidTurma(k);
   mvSel=null;
   const dest=TURMAS.filter(t=>t.id!==(cur?.id||0)&&!turmaFull(t));
+  const cheias=TURMAS.filter(t=>t.id!==(cur?.id||0)&&turmaFull(t));
   const ageFit=t=>{ const nv=nivelByK(t.nivel); return k.age>=nv.ages[0]-1&&k.age<=nv.ages[1]+1; };
   const sameLvl=dest.filter(t=>cur?t.nivel===cur.nivel:ageFit(t));
   const others=dest.filter(t=>!sameLvl.includes(t));
+  const fullRow=t=>{ const sala=salaById(t.sala);
+    return `<button type="button" onclick="mvAskFull(${t.id})" data-mvsearch="${esc(mvSearchStr(t))} cheia" class="w-full flex items-center gap-2.5 text-left p-2.5 rounded-xl border transition hover:bg-[var(--hover)]" style="border-color:var(--border)">
+      <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${sala.c}"></span>
+      <span class="min-w-0 flex-1"><span class="text-sm font-medium block truncate">${esc(sala.n.replace(' Room',''))} · ${schLabel(t.par)} ${t.hora}</span>
+      <span class="text-[11px] block truncate" style="color:${famC(t.nivel)}">${nivelLabel(t.nivel)}${sala.prof?' · Teacher '+esc(sala.prof):''}</span></span>
+      <span class="text-[11px] font-bold whitespace-nowrap" style="color:#16a34a">${activeKidsIn(t.id)}/${t.cap}</span>
+      <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full whitespace-nowrap" style="background:rgba(245,183,0,.16);color:#B5860B">abrir +1 vaga</span>
+    </button>`; };
+  const mvSearchStr=t=>{ const sala=salaById(t.sala); const nv=nivelByK(t.nivel);
+    return `${sala.n} ${schLabel(t.par)} ${t.par} ${t.hora} ${nivelLabel(t.nivel)} ${FAMS[nv.fam].n} ${sala.prof||'sem teacher'} ${horaPeriodo(t.hora)==='m'?'manhã matutino':'tarde vespertino'}`.toLowerCase(); };
   const row=t=>{ const sala=salaById(t.sala); const v=turmaVagas(t);
-    return `<button type="button" id="mv-${t.id}" onclick="mvPick(${t.id})" class="w-full flex items-center gap-2.5 text-left p-2.5 rounded-xl border transition hover:bg-[var(--hover)]" style="border-color:var(--border)">
+    return `<button type="button" id="mv-${t.id}" onclick="mvPick(${t.id})" data-mvsearch="${esc(mvSearchStr(t))}" class="w-full flex items-center gap-2.5 text-left p-2.5 rounded-xl border transition hover:bg-[var(--hover)]" style="border-color:var(--border)">
       <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${sala.c}"></span>
       <span class="min-w-0 flex-1"><span class="text-sm font-medium block truncate">${esc(sala.n.replace(' Room',''))} · ${schLabel(t.par)} ${t.hora}</span>
       <span class="text-[11px] block truncate" style="color:${famC(t.nivel)}">${nivelLabel(t.nivel)}${sala.prof?' · Teacher '+esc(sala.prof):''}</span></span>
@@ -2356,14 +2492,24 @@ function openMoverKid(sid,ki){
       <div class="min-w-0"><p class="font-medium text-sm truncate">${esc(k.n)} <span class="text-xs text-[var(--muted)] font-normal">(${k.age} anos)</span></p>
       <p class="text-xs ${cur?'text-[var(--muted)]':'font-semibold'}" ${cur?'':'style="color:#B5860B"'}>${cur?`hoje em ${turmaShort(cur)} · ${nivelLabel(cur.nivel)}`:'aguardando turma'}</p></div>
     </div>
-    ${sameLvl.length?`<div><p class="text-[10px] font-bold uppercase tracking-wider text-[var(--muted)] mb-1.5">${cur?'Mesmo nível ('+nivelLabel(cur.nivel)+')':'Compatível com a idade'}</p><div class="space-y-1.5">${sameLvl.map(row).join('')}</div></div>`:''}
-    ${others.length?`<div><p class="text-[10px] font-bold uppercase tracking-wider text-[var(--muted)] mb-1.5">Outros níveis <span class="normal-case font-normal">(muda o nível do aluno — confirme com cuidado)</span></p><div class="space-y-1.5 max-h-[200px] overflow-y-auto pr-1">${others.map(row).join('')}</div></div>`:''}
+    <div class="flex items-center gap-2 rounded-xl px-3 h-10" style="background:var(--hover)">
+      <i data-lucide="search" class="w-4 h-4 text-[var(--muted)]"></i>
+      <input id="mvSearch" oninput="mvFilter(this.value)" placeholder="Buscar por sala, nível, horário, dia, teacher…" class="flex-1 bg-transparent outline-none text-sm">
+    </div>
+    ${sameLvl.length?`<div class="mv-sec"><p class="text-[10px] font-bold uppercase tracking-wider text-[var(--muted)] mb-1.5">${cur?'Mesmo nível ('+nivelLabel(cur.nivel)+')':'Compatível com a idade'}</p><div class="space-y-1.5">${sameLvl.map(row).join('')}</div></div>`:''}
+    ${others.length?`<div class="mv-sec"><p class="text-[10px] font-bold uppercase tracking-wider text-[var(--muted)] mb-1.5">Outros níveis <span class="normal-case font-normal">(muda o nível do aluno — confirme com cuidado)</span></p><div class="space-y-1.5 max-h-[200px] overflow-y-auto pr-1">${others.map(row).join('')}</div></div>`:''}
     ${!sameLvl.length&&!others.length?'<p class="text-sm text-[var(--muted)]">Nenhuma turma com vaga no momento — crie uma turma nova pela Agenda.</p>':''}
     ${cur?`<button type="button" id="mv-0" onclick="mvPick(0)" class="w-full flex items-center gap-2.5 text-left p-2.5 rounded-xl border transition hover:bg-[var(--hover)]" style="border-color:var(--border)">
       <i data-lucide="hourglass" class="w-4 h-4 shrink-0" style="color:#B5860B"></i>
       <span class="text-sm font-medium flex-1">Deixar sem turma <span class="text-xs text-[var(--muted)] font-normal">(volta para a fila de alocação)</span></span>
       <span class="mv-check w-5 h-5 rounded-full border grid place-content-center shrink-0 transition" style="border-color:var(--border)"></span>
     </button>`:''}
+    ${cheias.length?`<div class="mv-sec pt-1 border-t" style="border-color:var(--border)">
+      <button type="button" onclick="mvToggleFull()" class="w-full flex items-center justify-between text-left py-1.5 text-xs font-semibold text-[var(--muted)] hover:text-[var(--text)] transition">
+        <span class="flex items-center gap-1.5"><i data-lucide="alert-triangle" class="w-3.5 h-3.5" style="color:#B5860B"></i>Turmas cheias (${cheias.length}) — dá para abrir 1 vaga extra</span>
+        <i id="mvFullChev" data-lucide="chevron-down" class="w-4 h-4 transition-transform"></i></button>
+      <div id="mvFullList" class="hidden space-y-1.5 mt-1 max-h-[180px] overflow-y-auto pr-1">${cheias.map(fullRow).join('')}</div>
+    </div>`:''}
     <div id="mvWarn"></div>
     <div class="flex gap-2">
       <button onclick="closeModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] text-sm font-semibold hover:bg-[var(--hover)] transition">Cancelar</button>
@@ -2389,6 +2535,52 @@ function mvPick(tid){
       : '';
     lucide.createIcons();
   }
+}
+/* busca do modal de alocar: filtra por tudo (sala, nível, família, horário, dia, teacher, período) */
+function mvFilter(q){
+  q=(q||'').trim().toLowerCase();
+  document.querySelectorAll('#modalBox [data-mvsearch]').forEach(b=>{ b.style.display=b.dataset.mvsearch.includes(q)?'':'none'; });
+  document.querySelectorAll('#modalBox .mv-sec').forEach(sec=>{
+    const any=[...sec.querySelectorAll('[data-mvsearch]')].some(b=>b.style.display!=='none');
+    sec.style.display=any?'':'none';
+  });
+  const fl=document.getElementById('mvFullList'); // a busca abre a lista de cheias se achar algo nela
+  if(fl&&q&&[...fl.querySelectorAll('[data-mvsearch]')].some(b=>b.style.display!=='none')){ fl.classList.remove('hidden'); const ch=document.getElementById('mvFullChev'); if(ch) ch.style.transform='rotate(180deg)'; }
+}
+function mvToggleFull(){
+  const el=document.getElementById('mvFullList'); if(!el) return;
+  el.classList.toggle('hidden');
+  const ch=document.getElementById('mvFullChev'); if(ch) ch.style.transform=el.classList.contains('hidden')?'':'rotate(180deg)';
+}
+/* turma cheia: alocar abrindo 1 vaga extra — sempre com explicação + confirmação */
+function mvAskFull(tid){
+  const ctx=openMoverKid._ctx; if(!ctx) return;
+  const s=STUDENTS.find(x=>x.id===ctx.sid); const k=s?.kids[ctx.ki]; const t=turmaById(tid); if(!k||!t) return;
+  openModal(`${modalHeader('Abrir uma vaga extra?')}
+  <div class="p-5 space-y-3">
+    <div class="flex items-center gap-3 p-3 rounded-xl" style="background:var(--hover)">
+      <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${salaById(t.sala).c}"></span>
+      <div class="min-w-0"><p class="font-medium text-sm truncate">${turmaShort(t)} · ${nivelLabel(t.nivel)}</p>
+      <p class="text-xs font-semibold" style="color:#16a34a">turma cheia — ${activeKidsIn(t.id)}/${t.cap} alunos</p></div>
+    </div>
+    <p class="text-sm">Para colocar <b>${esc(k.n.split(' ')[0])}</b> nessa turma, o limite dela aumenta em 1: de <b>${t.cap}</b> para <b>${t.cap+1}</b> alunos.</p>
+    <div class="rounded-xl p-3 text-xs flex items-start gap-2" style="background:rgba(245,183,0,.12);color:#B5860B"><i data-lucide="alert-triangle" class="w-4 h-4 shrink-0"></i><span>Use só quando realmente couber mais uma criança na sala. A turma deixa de mostrar "NÃO TEM VAGA" até lotar de novo — e dá para voltar o limite depois, editando a turma.</span></div>
+  </div>
+  <div class="p-5 pt-0 flex gap-2">
+    <button onclick="openMoverKid(${ctx.sid},${ctx.ki})" class="flex-1 h-11 rounded-xl border border-[var(--border)] text-sm font-semibold hover:bg-[var(--hover)] transition">Voltar</button>
+    <button onclick="confirmFullAlloc(${tid})" class="flex-1 h-11 rounded-xl text-white text-sm font-semibold" style="background:linear-gradient(135deg,#1E3765,#2F539A)">Abrir vaga e alocar</button>
+  </div>`,'max-w-md');
+  lucide.createIcons();
+}
+function confirmFullAlloc(tid){
+  const ctx=openMoverKid._ctx; if(!ctx) return;
+  const s=STUDENTS.find(x=>x.id===ctx.sid); const k=s?.kids[ctx.ki]; const t=turmaById(tid); if(!k||!t) return;
+  const cur=kidTurma(k);
+  t.cap+=1; k.tid=t.id;
+  closeModal();
+  logAct(`Abriu 1 vaga extra na turma <b>${turmaShort(t)}</b> (limite ${t.cap-1} → ${t.cap}) e ${cur?'moveu':'alocou'} <b>${esc(k.n)}</b> nela`);
+  refreshAll(); if(currentView()==='agenda') renderAgenda(); if(currentView()==='detalhe') openDetail(ctx.sid);
+  toast(`${k.n.split(' ')[0]} entrou na ${turmaShort(t)} — o limite agora é ${t.cap}.`);
 }
 function confirmMoverKid(sid,ki){
   const s=STUDENTS.find(x=>x.id===sid); if(!s||mvSel===null) return;
@@ -2531,23 +2723,96 @@ function confirmAgDeleteTurma(tid){
   logAct(`Excluiu a turma vazia <b>${turmaShort(t)}</b>`);
   toast('Turma excluída.');
 }
-/* ---- salas: renomear, cor e teacher (opcional) ---- */
+/* ---- salas & teachers: dois CRUDs separados no mesmo modal (abas) ----
+   Aba "Salas" cuida só de nome + cor; aba "Teachers" cuida só de quem dá aula
+   em qual sala (ou fica sem sala por enquanto). */
 const SALA_COLORS=['#7CB342','#D9B777','#F2997A','#8E5AC8','#4A7FD4','#F08A3C','#4DB89E','#E8B931','#E0606E','#B9A189','#E26D9F','#31B5C4','#A78BDB'];
 let seCor=null;
-function openSalasManage(){
-  const rows=SALAS.map(s=>{ const ts=TURMAS.filter(t=>t.sala===s.id); const nA=ts.reduce((a,t)=>a+activeKidsIn(t.id),0);
-    return `<div class="flex items-center gap-3 py-2 border-b last:border-0" style="border-color:var(--border)">
-      <span class="w-3.5 h-3.5 rounded-full shrink-0" style="background:${s.c}"></span>
-      <div class="min-w-0 flex-1"><p class="text-sm font-medium truncate">${esc(s.n)}</p>
-        <p class="text-[11px] text-[var(--muted)] truncate">${s.prof?'Teacher '+esc(s.prof):'sem teacher'} · ${ts.length} turma${ts.length===1?'':'s'} · ${nA} aluno${nA===1?'':'s'}</p></div>
-      <button onclick="openSalaEdit('${s.id}')" class="h-8 px-2.5 rounded-lg border border-[var(--border)] text-xs font-semibold hover:bg-[var(--hover)] transition">Editar</button>
-    </div>`; }).join('');
-  openModal(`${modalHeader('Salas da escola')}
-  <div class="p-5">
-    <div>${rows}</div>
-    <p class="text-xs text-[var(--muted)] mt-3 flex items-start gap-1.5"><i data-lucide="info" class="w-3.5 h-3.5 shrink-0 mt-0.5"></i><span>O teacher é <b>opcional</b> — quando preenchido, aparece no topo da página da sala e nas imagens exportadas. Teacher, sala e níveis ficam definidos no semestre.</span></p>
+let TEACHERS=null; // registro de teachers (inclui quem está sem sala)
+function ensureTeachers(){ if(!TEACHERS) TEACHERS=[...new Set(SALAS.filter(s=>s.prof).map(s=>s.prof))].sort(); }
+function teacherAlunos(name){ let n=0; SALAS.filter(s=>s.prof===name).forEach(s=>TURMAS.filter(t=>t.sala===s.id).forEach(t=>n+=activeKidsIn(t.id))); return n; }
+let smTab='salas';
+function openSalasManage(tab){
+  ensureTeachers();
+  smTab=tab||smTab||'salas';
+  openModal(`${modalHeader('Salas & teachers')}
+  <div class="px-5 pt-4">
+    <div class="flex items-center bg-[var(--hover)] rounded-xl p-1 text-sm w-fit">
+      <button id="smTabSalas" onclick="smSetTab('salas')" class="px-4 py-1.5 rounded-lg">Salas</button>
+      <button id="smTabProfs" onclick="smSetTab('profs')" class="px-4 py-1.5 rounded-lg">Teachers</button>
+    </div>
   </div>
+  <div class="p-5 pt-3" id="smBody"></div>
   <div class="p-5 pt-0"><button onclick="closeModal()" class="w-full h-11 rounded-xl border border-[var(--border)] font-medium text-sm">Fechar</button></div>`,'max-w-lg');
+  smRender();
+}
+function smSetTab(t){ smTab=t; smRender(); }
+function smRender(){
+  const el=document.getElementById('smBody'); if(!el) return;
+  [['smTabSalas','salas'],['smTabProfs','profs']].forEach(([id,k])=>{ const b=document.getElementById(id); if(b) b.className='px-4 py-1.5 rounded-lg '+(smTab===k?'bg-[var(--card)] shadow-sm font-semibold':'text-[var(--muted)] font-medium'); });
+  if(smTab==='salas'){
+    el.innerHTML=`<div>${SALAS.map(s=>{ const ts=TURMAS.filter(t=>t.sala===s.id); const nA=ts.reduce((a,t)=>a+activeKidsIn(t.id),0);
+      return `<div class="flex items-center gap-3 py-2.5 border-b last:border-0" style="border-color:var(--border)">
+        <span class="w-3.5 h-3.5 rounded-full shrink-0" style="background:${s.c}"></span>
+        <div class="min-w-0 flex-1"><p class="text-sm font-medium truncate">${esc(s.n)}</p>
+          <p class="text-[11px] text-[var(--muted)] truncate">${ts.length} turma${ts.length===1?'':'s'} · ${nA} aluno${nA===1?'':'s'}${s.prof?' · Teacher '+esc(s.prof):''}</p></div>
+        <button onclick="openSalaEdit('${s.id}')" class="h-8 px-2.5 rounded-lg border border-[var(--border)] text-xs font-semibold hover:bg-[var(--hover)] transition">Editar</button>
+      </div>`; }).join('')}</div>
+    <p class="text-xs text-[var(--muted)] mt-3 flex items-start gap-1.5"><i data-lucide="info" class="w-3.5 h-3.5 shrink-0 mt-0.5"></i><span>Aqui é só o cadastro da sala: <b>nome e cor</b>. Quem dá aula em cada sala fica na aba <b>Teachers</b>.</span></p>`;
+  } else {
+    const rows=TEACHERS.map((p,i)=>{ const sala=SALAS.find(s=>s.prof===p); const nA=teacherAlunos(p);
+      return `<div class="flex items-center gap-3 py-2.5 border-b last:border-0" style="border-color:var(--border)">
+        <div class="w-8 h-8 rounded-full grid place-content-center text-white text-[11px] font-bold shrink-0" style="background:${sala?sala.c:'#94a3b8'}">${initials(p)}</div>
+        <div class="min-w-0 flex-1"><p class="text-sm font-medium truncate">${esc(p)}</p>
+          <p class="text-[11px] text-[var(--muted)] truncate">${sala?`${nA} aluno${nA===1?'':'s'} na ${esc(sala.n)}`:'sem sala por enquanto'}</p></div>
+        <div class="w-[150px] shrink-0" id="smProfSel${i}"></div>
+        <button onclick="smRemoveTeacher(${i})" class="p-1.5 rounded-lg hover:bg-[var(--hover)] transition" title="Remover teacher do cadastro"><i data-lucide="trash-2" class="w-3.5 h-3.5" style="color:#DC2626"></i></button>
+      </div>`; }).join('');
+    el.innerHTML=`${TEACHERS.length?`<div>${rows}</div>`:'<p class="text-sm text-[var(--muted)] py-2">Nenhum teacher cadastrado ainda.</p>'}
+    <div class="flex items-center gap-2 mt-3">
+      <input id="smNewProf" placeholder="Nome do teacher novo" class="flex-1 h-10 rounded-xl border border-[var(--border)] bg-[var(--card)] px-3 text-sm outline-none focus:ring-2 ring-brand-light">
+      <button onclick="smAddTeacher()" class="h-10 px-3.5 rounded-xl text-white text-sm font-semibold shrink-0" style="background:linear-gradient(135deg,#1E3765,#2F539A)">Adicionar</button>
+    </div>
+    <p class="text-xs text-[var(--muted)] mt-3 flex items-start gap-1.5"><i data-lucide="info" class="w-3.5 h-3.5 shrink-0 mt-0.5"></i><span>Cada teacher pode ter <b>uma sala</b> no semestre — ou ficar <b>sem sala</b> por enquanto. O nome só aparece na agenda e nas imagens quando a sala está atribuída.</span></p>`;
+    TEACHERS.forEach((p,i)=>{
+      const sala=SALAS.find(s=>s.prof===p);
+      const wrap=document.getElementById('smProfSel'+i); if(!wrap) return;
+      wrap.innerHTML=cselect('smProf'+i,[{v:'',l:'Sem sala'},...SALAS.map(s=>({v:s.id,l:s.n.replace(' Room',''),dot:s.c}))],{block:true,value:sala?sala.id:''});
+      SEL['smProf'+i].onChange=v=>smAssignTeacher(i,v);
+    });
+  }
+  lucide.createIcons();
+}
+function smAssignTeacher(i,salaId){
+  const p=TEACHERS[i]; if(!p) return;
+  const old=SALAS.find(s=>s.prof===p);
+  if(old) old.prof=null;
+  if(salaId){ const sala=salaById(salaId); if(!sala) return;
+    if(sala.prof&&sala.prof!==p&&!TEACHERS.includes(sala.prof)) TEACHERS.push(sala.prof); // quem sai vira "sem sala"
+    sala.prof=p;
+    logAct(`Definiu <b>${esc(p)}</b> como teacher da <b>${esc(sala.n)}</b>`);
+  } else if(old){ logAct(`Tirou <b>${esc(p)}</b> da <b>${esc(old.n)}</b> — ficou sem sala por enquanto`); }
+  refreshAll(); if(currentView()==='agenda') renderAgenda();
+  smRender();
+  toast(salaId?`${p.split(' ')[0]} agora é teacher da ${salaById(salaId).n}.`:`${p.split(' ')[0]} ficou sem sala por enquanto.`);
+}
+function smAddTeacher(){
+  const inp=document.getElementById('smNewProf'); const n=(inp?.value||'').trim();
+  if(!n){ inp?.focus(); return; }
+  if(TEACHERS.some(t=>t.toLowerCase()===n.toLowerCase())){ toast('Esse teacher já está cadastrado.'); return; }
+  TEACHERS.push(n); TEACHERS.sort();
+  logAct(`Cadastrou o teacher <b>${esc(n)}</b> (sem sala por enquanto)`);
+  smRender();
+  toast(`${n.split(' ')[0]} cadastrado — atribua uma sala quando quiser.`);
+}
+function smRemoveTeacher(i){
+  const p=TEACHERS[i]; if(!p) return;
+  const sala=SALAS.find(s=>s.prof===p); if(sala) sala.prof=null;
+  TEACHERS.splice(i,1);
+  refreshAll(); if(currentView()==='agenda') renderAgenda();
+  logAct(`Removeu o teacher <b>${esc(p)}</b> do cadastro${sala?` (a ${esc(sala.n)} ficou sem teacher)`:''}`);
+  smRender();
+  toast(`${p.split(' ')[0]} removido do cadastro.`);
 }
 function seCorPaint(){ document.querySelectorAll('#seCores button').forEach(b=>{ const on=b.dataset.c===seCor; b.style.outline=on?'3px solid var(--ring)':'none'; b.style.outlineOffset=on?'2px':'0'; }); }
 function seCorSet(c){ seCor=c; seCorPaint(); }
@@ -2557,10 +2822,9 @@ function openSalaEdit(id){
   <div class="p-5 space-y-3">
     <label class="block"><span class="text-sm font-medium">Nome da sala</span>
       <input id="seNome" value="${esc(s.n).replace(/"/g,'&quot;')}" class="${inputCls}"></label>
-    <label class="block"><span class="text-sm font-medium">Teacher <span class="text-xs font-normal text-[var(--muted)]">(opcional — deixe vazio se ainda não tiver)</span></span>
-      <input id="seProf" value="${esc(s.prof||'')}" placeholder="Ex.: Mariana Rios" class="${inputCls}"></label>
     <div><span class="text-sm font-medium">Cor da sala</span>
       <div class="flex flex-wrap gap-2 mt-1.5" id="seCores">${SALA_COLORS.map(c=>`<button type="button" onclick="seCorSet('${c}')" data-c="${c}" class="w-8 h-8 rounded-full transition hover:scale-110" style="background:${c}" title="Usar esta cor"></button>`).join('')}</div></div>
+    <p class="text-xs text-[var(--muted)] flex items-start gap-1.5"><i data-lucide="info" class="w-3.5 h-3.5 shrink-0 mt-0.5"></i><span>${s.prof?`Teacher atual: <b>${esc(s.prof)}</b>. `:''}Quem dá aula aqui se define na aba <b>Teachers</b> (botão "Salas & teachers" da Agenda).</span></p>
     <div id="seErr"></div>
   </div>
   <div class="p-5 pt-0 flex gap-2">
@@ -2574,11 +2838,9 @@ function saveSala(id){
   const n=document.getElementById('seNome')?.value.trim();
   if(!n) return ntErrBox('seErr','A sala precisa de um nome.');
   if(SALAS.some(x=>x.id!==id&&x.n.toLowerCase()===n.toLowerCase())) return ntErrBox('seErr',`Já existe uma sala chamada <b>${esc(n)}</b>.`);
-  const prof=document.getElementById('seProf')?.value.trim();
-  const profMudou=(s.prof||'')!==(prof||'');
-  s.n=n; s.prof=prof||null; if(seCor) s.c=seCor;
-  closeModal(); refreshAll();
-  logAct(`Editou a sala <b>${esc(s.n)}</b>${profMudou?` — teacher: ${s.prof?esc(s.prof):'removido'}`:''}`);
+  s.n=n; if(seCor) s.c=seCor;
+  closeModal(); refreshAll(); if(currentView()==='agenda') renderAgenda();
+  logAct(`Editou a sala <b>${esc(s.n)}</b>`);
   toast('Sala atualizada!');
 }
 /* ---- exportação de imagens (as "páginas do Canva", sempre atualizadas) ---- */
@@ -3115,7 +3377,25 @@ function openModal(html, size){
   const box=document.getElementById('modalBox');
   box.className=`surface rounded-2xl w-full ${size||'max-w-md'} max-h-[90vh] overflow-y-auto fade-in`;
   box.innerHTML=html;
+  /* rodapé sempre visível: o bloco final de botões gruda embaixo do modal, igual o
+     header já gruda em cima — sem precisar scrollar para achar as ações */
+  let foot=box.children.length>=3?box.lastElementChild:null;
+  if(foot&&!foot.querySelector('button')) foot=null;
+  if(!foot&&box.children.length===2){
+    // modais com a fileira de botões dentro do corpo: destaca a fileira para virar rodapé
+    const body=box.lastElementChild, row=body&&body.lastElementChild;
+    if(row&&/\bflex\b/.test(row.className)&&/\bgap-2\b/.test(row.className)&&row.querySelector('button')){
+      box.appendChild(row); row.style.padding='12px 20px 20px'; body.style.paddingBottom='6px'; foot=row;
+    }
+  }
+  if(foot){
+    foot.style.position='sticky'; foot.style.bottom='0'; foot.style.zIndex='10';
+    foot.style.background='var(--card)';
+    if(/\bpt-0\b/.test(foot.className)) foot.style.paddingTop='12px';
+    requestAnimationFrame(()=>{ if(box.scrollHeight>box.clientHeight+2) foot.style.boxShadow='0 -10px 14px -14px rgba(0,0,0,.4)'; });
+  }
   document.getElementById('modal').classList.replace('hidden','flex');
+  box.scrollTop=0;
   lucide.createIcons();
 }
 function closeModal(){ document.getElementById('modal').classList.replace('flex','hidden'); }
@@ -3369,13 +3649,13 @@ function openInvite(){
     <label class="block"><span class="text-sm font-medium">E-mail</span>
       <input id="invEmail" type="email" placeholder="email@exemplo.com" class="${inputCls}"></label>
     <div><span class="text-sm font-medium">Papel</span><div class="mt-1.5" id="invRoleWrap"></div></div>
-    <p class="text-xs text-[var(--muted)] flex items-center gap-1.5"><i data-lucide="shield-check" class="w-3.5 h-3.5 shrink-0"></i> A pessoa recebe um e-mail para criar a própria senha. Secretaria só vê alunos e envia contratos.</p>
+    <p class="text-xs text-[var(--muted)] flex items-center gap-1.5"><i data-lucide="shield-check" class="w-3.5 h-3.5 shrink-0"></i> A pessoa recebe um e-mail para criar a própria senha. Diretor faz tudo; Supervisor cuida da agenda e consulta alunos; Secretaria cadastra alunos e turmas e envia contratos.</p>
   </div>
   <div class="p-5 pt-0 flex gap-2">
     <button onclick="closeModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] font-medium text-sm">Cancelar</button>
     <button onclick="submitInvite()" class="flex-1 h-11 rounded-xl text-white font-semibold text-sm flex items-center justify-center gap-2" style="background:linear-gradient(135deg,#1E3765,#2F539A)"><i data-lucide="send" class="w-4 h-4"></i> Enviar convite</button>
   </div>`);
-  document.getElementById('invRoleWrap').innerHTML=cselect('invRole',[{v:'admin',l:'Administrador'},{v:'secretaria',l:'Secretaria'}],{block:true});
+  document.getElementById('invRoleWrap').innerHTML=cselect('invRole',[{v:'diretor',l:'Diretor'},{v:'supervisor',l:'Supervisor'},{v:'secretaria',l:'Secretaria'}],{block:true});
   lucide.createIcons();
   document.getElementById('invName').focus();
 }
@@ -3384,7 +3664,7 @@ function submitInvite(){
   const e=document.getElementById('invEmail').value.trim();
   if(!n){ document.getElementById('invName').focus(); return; }
   if(!e){ document.getElementById('invEmail').focus(); return; }
-  const papel=SEL.invRole?.value==='secretaria'?'Secretaria':'Administrador';
+  const papel={diretor:'Diretor',supervisor:'Supervisor',secretaria:'Secretaria'}[SEL.invRole?.value]||'Diretor';
   USERS.push({id:Math.max(...USERS.map(u=>u.id))+1, n, e, r:papel, c:'#0891b2', pending:true});
   renderUsers(); closeModal();
   logAct(`Convidou <b>${esc(n)}</b> (${papel}) para o painel`);
@@ -3419,22 +3699,22 @@ function openEditUser(id){
     <label class="block"><span class="text-sm font-medium">E-mail</span>
       <input id="euEmail" type="email" value="${esc(u.e)}" class="${inputCls}"></label>
     <div><span class="text-sm font-medium">Papel</span><div class="mt-1.5" id="euRoleWrap"></div></div>
-    <p class="text-xs text-[var(--muted)] flex items-center gap-1.5"><i data-lucide="shield-check" class="w-3.5 h-3.5 shrink-0"></i> Secretaria só vê alunos e envia contratos; Administrador tem acesso total.</p>
+    <p class="text-xs text-[var(--muted)] flex items-center gap-1.5"><i data-lucide="shield-check" class="w-3.5 h-3.5 shrink-0"></i> Diretor tem acesso total; Supervisor cuida da agenda e consulta alunos; Secretaria cadastra alunos e turmas e envia contratos.</p>
     <div id="euErr"></div>
   </div>
   <div class="p-5 pt-0 flex gap-2">
     <button onclick="closeModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] font-medium text-sm">Cancelar</button>
     <button onclick="saveUser(${id})" class="flex-1 h-11 rounded-xl text-white font-semibold text-sm" style="background:linear-gradient(135deg,#1E3765,#2F539A)">Salvar alterações</button>
   </div>`);
-  document.getElementById('euRoleWrap').innerHTML=cselect('euRole',[{v:'admin',l:'Administrador'},{v:'secretaria',l:'Secretaria'}],{block:true,value:u.r==='Secretaria'?'secretaria':'admin'});
+  document.getElementById('euRoleWrap').innerHTML=cselect('euRole',[{v:'diretor',l:'Diretor'},{v:'supervisor',l:'Supervisor'},{v:'secretaria',l:'Secretaria'}],{block:true,value:{'Diretor':'diretor','Supervisor':'supervisor','Secretaria':'secretaria'}[u.r]||'diretor'});
   lucide.createIcons();
 }
 function saveUser(id){
   const u=userById(id); if(!u) return;
-  const novoPapel=SEL.euRole?.value==='secretaria'?'Secretaria':'Administrador';
-  /* não deixa o painel sem nenhum administrador */
-  if(u.r==='Administrador'&&novoPapel==='Secretaria'&&USERS.filter(x=>x.r==='Administrador').length===1){
-    document.getElementById('euErr').innerHTML=`<div class="rounded-xl p-3 text-sm flex items-start gap-2" style="background:rgba(220,38,38,.08);color:#DC2626"><i data-lucide="alert-circle" class="w-4 h-4 shrink-0 mt-0.5"></i><span>${esc(u.n.split(' ')[0])} é a única pessoa administradora — promova outra antes de mudar o papel.</span></div>`;
+  const novoPapel={diretor:'Diretor',supervisor:'Supervisor',secretaria:'Secretaria'}[SEL.euRole?.value]||'Diretor';
+  /* não deixa o painel sem nenhuma pessoa com papel Diretor */
+  if(u.r==='Diretor'&&novoPapel!=='Diretor'&&USERS.filter(x=>x.r==='Diretor').length===1){
+    document.getElementById('euErr').innerHTML=`<div class="rounded-xl p-3 text-sm flex items-start gap-2" style="background:rgba(220,38,38,.08);color:#DC2626"><i data-lucide="alert-circle" class="w-4 h-4 shrink-0 mt-0.5"></i><span>${esc(u.n.split(' ')[0])} é a única pessoa com papel Diretor — promova outra antes de mudar o papel.</span></div>`;
     lucide.createIcons(); return;
   }
   u.n=document.getElementById('euName').value.trim()||u.n;
@@ -3449,10 +3729,10 @@ function resendInvite(id){
 }
 function openRemoveUser(id){
   const u=userById(id); if(!u) return;
-  if(u.r==='Administrador'&&USERS.filter(x=>x.r==='Administrador').length===1){
+  if(u.r==='Diretor'&&USERS.filter(x=>x.r==='Diretor').length===1){
     openModal(`${modalHeader('Não dá para remover')}
     <div class="p-5 space-y-4">
-      <p class="text-sm"><b>${esc(u.n)}</b> é a única pessoa administradora do painel — promova outra pessoa a Administrador antes de remover este acesso.</p>
+      <p class="text-sm"><b>${esc(u.n)}</b> é a única pessoa com papel Diretor no painel — promova outra pessoa a Diretor antes de remover este acesso.</p>
       <button onclick="closeModal()" class="w-full h-11 rounded-xl border border-[var(--border)] font-medium text-sm">Entendi</button>
     </div>`); return;
   }
@@ -4287,14 +4567,15 @@ function renderSbPicker(){
 
 /* ====================== MINHA CONTA (e-mail + senha) ====================== */
 function openAccountModal(){
+  const u=userById(ROLE_DEMO[VIEW_AS])||USERS[0];
   openModal(`${modalHeader('Minha conta')}
   <div class="p-5 space-y-3">
     <div class="flex items-center gap-3 mb-1">
-      <div class="w-12 h-12 rounded-full grid place-content-center font-semibold text-[#15294d]" style="background:#FFE17A">PM</div>
-      <div><p class="font-medium">Priscylla Martins</p><p class="text-xs text-[var(--muted)]">Administrador</p></div>
+      <div class="w-12 h-12 rounded-full grid place-content-center font-semibold text-[#15294d]" style="background:#FFE17A">${initials(u.n)}</div>
+      <div><p class="font-medium">${esc(u.n)}</p><p class="text-xs text-[var(--muted)]">${u.r}</p></div>
     </div>
     <label class="block"><span class="text-sm font-medium">E-mail de acesso</span>
-      <input id="accEmail" type="email" value="priscylla@englishpatio.com.br" class="${inputCls}"></label>
+      <input id="accEmail" type="email" value="${esc(u.e)}" class="${inputCls}"></label>
     <div class="pt-3 border-t" style="border-color:var(--border)">
       <p class="text-sm font-semibold mb-2">Trocar senha <span class="font-normal text-xs text-[var(--muted)]">(deixe em branco para manter)</span></p>
       ${passInput('Senha atual','mb-2')}
@@ -4399,6 +4680,18 @@ function openRowMenu(e,id){
   const m=document.getElementById('rowMenu');
   const item=(ic,label,fn)=>`<button onclick="closeRowMenu();${fn}" class="w-full flex items-center gap-2.5 text-left text-sm px-3 py-2 rounded-lg hover:bg-[var(--hover)] transition"><i data-lucide="${ic}" class="w-4 h-4 text-[var(--muted)]"></i>${label}</button>`;
   const waItem=(label,msg='Contrato pronto para envio no WhatsApp!')=>`<button onclick="closeRowMenu();toast('${msg}')" class="w-full flex items-center gap-2.5 text-left text-sm px-3 py-2 rounded-lg hover:bg-[var(--hover)] transition"><span style="color:#1faa53">${WA('w-4 h-4')}</span>${label}</button>`;
+  // Supervisor vê os alunos só para consulta — menu reduzido (sem editar/contrato/desligar)
+  if(VIEW_AS==='Supervisor'){
+    m.innerHTML=
+      item('user-round','Ver ficha completa',`openDetail(${id})`)+
+      item('copy','Copiar telefone do responsável',`copyPhone(${id})`);
+    m.classList.remove('hidden');
+    const rr=e.currentTarget.getBoundingClientRect();
+    const mhh=m.offsetHeight||100;
+    m.style.left=Math.max(10, Math.min(rr.left-220, innerWidth-270))+'px';
+    m.style.top=(rr.bottom+mhh+12>innerHeight ? rr.top-mhh-6 : rr.bottom+6)+'px';
+    lucide.createIcons(); return;
+  }
   // ações dependem do status atual do contrato (sem transições redundantes).
   // Visualizado/assinado chegam sozinhos pelo Autentique — o "marcar" manual é só backup.
   let statusActions='';
@@ -4412,7 +4705,8 @@ function openRowMenu(e,id){
       + `<div class="h-px my-1" style="background:var(--border)"></div>`
       + item('check-circle-2','Marcar como assinado',`markSigned(${id})`);
   }
-  // desligar / reativar / excluir — só administradores fazem isso, direto pela dashboard
+  // desligar / reativar / excluir — Diretor e Secretaria fazem isso direto pela dashboard
+  // (Supervisor não chega aqui: o menu dele é o reduzido lá de cima)
   const exitAction = `<div class="h-px my-1" style="background:var(--border)"></div>` + (s.active===false
     ? `<button onclick="closeRowMenu();reactivateStudent(${id})" class="w-full flex items-center gap-2.5 text-left text-sm px-3 py-2 rounded-lg hover:bg-[var(--hover)] transition" style="color:#16a34a"><i data-lucide="rotate-ccw" class="w-4 h-4"></i>Reativar aluno</button>`
     : `<button onclick="closeRowMenu();openExitModal(${id})" class="w-full flex items-center gap-2.5 text-left text-sm px-3 py-2 rounded-lg hover:bg-[var(--hover)] transition" style="color:#DC2626"><i data-lucide="user-round-x" class="w-4 h-4"></i>Desligar aluno</button>`)

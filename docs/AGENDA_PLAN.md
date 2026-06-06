@@ -28,7 +28,7 @@ tempo todo (aluno troca de horário, aluno novo entra, turma lota). A tese da te
 | Turma cheia | Mostrar **"NÃO TEM VAGA"** igual ao Canva (texto verde sob a lista). |
 | Aluno sem turma | Existe — cadastra primeiro, atrela depois; também muda de turma. |
 | "Saída" nos analytics | Desligamento da **escola** (troca interna de sala não conta). |
-| Papéis (quem pode o quê) | **Adiado** — fora deste plano. |
+| Papéis (quem pode o quê) | **Definido 06/Jun** — Diretor, Supervisor e Secretaria têm CRUD completo na Agenda; Supervisor vê alunos só em leitura. Matriz completa no `DASHBOARD_PLAN.md` §4. |
 
 ## 3. Modelo de dados (mock do preview)
 
@@ -162,4 +162,5 @@ Cada etapa deixa o preview funcional — dá pra mostrar pra dona no meio do cam
 - Arrastar-e-soltar aluno entre células da grade (fase 2 da Agenda).
 - Assistente de **virada de semestre** (redefinir teacher/níveis das salas em lote).
 - Professor substituto (falta pontual) — hoje resolvem informalmente.
-- Papéis Secretaria/Supervisor/Diretor + "ver painel como…" (espera definição da dona).
+- ~~Papéis Secretaria/Supervisor/Diretor + "ver painel como…"~~ — definidos em 06/Jun
+  (matriz no `DASHBOARD_PLAN.md` §4; "ver painel como…" entrou no preview).

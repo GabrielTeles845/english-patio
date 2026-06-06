@@ -213,18 +213,39 @@ section('CRUD de usuários');
 {
   const USERS = W.eval('USERS');
   const before = USERS.length;
-  W.openEditUser(3); // Stefany (Secretaria)
+  new Set(USERS.map(u => u.r)).size === 3 ? ok('3 papéis na base (Diretor, Supervisor, Secretaria)') : fail('papéis: ' + [...new Set(USERS.map(u => u.r))].join(','));
+  W.openEditUser(4); // Stefany (Secretaria)
   $('euName').value = 'Stefany Editada';
-  W.saveUser(3);
-  USERS.find(u => u.id === 3)?.n === 'Stefany Editada' ? ok('editar usuário salva') : fail('edição de usuário não salvou');
-  // proteção: não deixar o painel sem administrador
-  W.openRemoveUser(2); W.confirmRemoveUser(2); // remove Gabriel (admin, mas sobra Priscylla)
+  W.saveUser(4);
+  USERS.find(u => u.id === 4)?.n === 'Stefany Editada' ? ok('editar usuário salva') : fail('edição de usuário não salvou');
+  // proteção: não deixar o painel sem ninguém com papel Diretor
+  W.openRemoveUser(2); W.confirmRemoveUser(2); // remove Gabriel (Diretor, mas sobra Priscylla)
   USERS.length === before - 1 ? ok('remover acesso funciona') : fail('remoção não funcionou');
   W.openEditUser(1); W.csSet('euRole', 'secretaria'); W.saveUser(1);
-  USERS.find(u => u.id === 1)?.r === 'Administrador' ? ok('última pessoa admin não vira Secretaria') : fail('PAINEL FICOU SEM ADMIN!');
+  USERS.find(u => u.id === 1)?.r === 'Diretor' ? ok('última pessoa Diretor não vira Secretaria') : fail('PAINEL FICOU SEM DIRETOR!');
   W.openRemoveUser(1);
-  USERS.find(u => u.id === 1) ? ok('última pessoa admin não pode ser removida') : fail('REMOVEU O ÚLTIMO ADMIN!');
+  USERS.find(u => u.id === 1) ? ok('última pessoa Diretor não pode ser removida') : fail('REMOVEU O ÚLTIMO DIRETOR!');
   W.closeModal();
+}
+
+/* ---------- papéis: "ver painel como…" (gating simulado) ---------- */
+section('Papéis e "ver painel como…"');
+{
+  W.eval('go("usuarios")');
+  W.setViewAs('Supervisor');
+  W.eval('VIEW_AS') === 'Supervisor' ? ok('setViewAs muda o papel simulado') : fail('VIEW_AS não mudou');
+  !W.roleAllows('contratos') && !W.roleAllows('emails') && !W.roleAllows('usuarios')
+    ? ok('Supervisor não acessa contratos/comunicados/usuários') : fail('gating do Supervisor furou');
+  W.roleAllows('agenda') && W.roleAllows('alunos') ? ok('Supervisor acessa agenda e alunos') : fail('Supervisor sem agenda/alunos');
+  W.eval('go("contratos")');
+  W.eval('currentView()') !== 'contratos' ? ok('go() bloqueia tela fora do papel') : fail('go() deixou Supervisor entrar em contratos');
+  !$('viewAsBar').classList.contains('hidden') ? ok('faixa "vendo como" aparece') : fail('faixa de simulação não apareceu');
+  document.querySelector('[data-nav="emails"]').classList.contains('hidden') ? ok('sidebar esconde itens fora do papel') : fail('sidebar não escondeu Comunicados');
+  document.querySelector('[data-perm="alunos-write"]').classList.contains('hidden') ? ok('Supervisor não vê "Nova matrícula"/importar') : fail('botões de escrita visíveis p/ Supervisor');
+  W.setViewAs('Secretaria');
+  W.roleAllows('contratos') && !W.roleAllows('editor') ? ok('Secretaria acessa contratos, não o editor') : fail('gating da Secretaria furou');
+  W.setViewAs('Diretor');
+  W.roleAllows('editor') && $('viewAsBar').classList.contains('hidden') ? ok('voltar a Diretor restaura tudo') : fail('volta a Diretor não restaurou');
 }
 
 /* ---------- agenda: salas, turmas, visões, mover aluno e fila ---------- */
@@ -303,15 +324,62 @@ section('Agenda: salas, turmas, mover aluno e fila');
   alvo.k.tid === null ? ok('"deixar sem turma" devolve para a fila') : fail('não voltou para a fila');
   W.agDeleteTurma(nova.id); W.confirmAgDeleteTurma(nova.id);
   !turmaById(nova.id) ? ok('turma vazia excluída') : fail('não excluiu turma vazia');
-  // CRUD de sala: teacher é opcional (preenche e remove)
+  // CRUD de sala (nome/cor) — teacher agora vive na aba Teachers
   W.openSalaEdit('rose');
-  $('seProf').value = 'Fernanda Brito';
+  $('seNome').value = 'Rose Room';
   W.saveSala('rose');
-  salaById('rose').prof === 'Fernanda Brito' ? ok('teacher da sala salvo') : fail('teacher não salvou');
-  W.openSalaEdit('rose');
-  $('seProf').value = '';
-  W.saveSala('rose');
-  salaById('rose').prof === null ? ok('teacher vazio remove (campo opcional)') : fail('teacher não removeu');
+  salaById('rose').n === 'Rose Room' ? ok('editar sala salva (nome/cor)') : fail('edição de sala não salvou');
+  // CRUD de teachers: cadastrar sem sala, atribuir, tirar e remover
+  W.openSalasManage('profs');
+  $('smNewProf').value = 'Fernanda Brito';
+  W.smAddTeacher();
+  const TEACHERS = W.eval('TEACHERS');
+  TEACHERS.includes('Fernanda Brito') ? ok('teacher novo cadastrado sem sala') : fail('teacher não cadastrou');
+  const fiIdx = TEACHERS.indexOf('Fernanda Brito');
+  W.smAssignTeacher(fiIdx, 'rose');
+  salaById('rose').prof === 'Fernanda Brito' ? ok('teacher atribuído à sala') : fail('atribuição de teacher falhou');
+  W.smAssignTeacher(TEACHERS.indexOf('Fernanda Brito'), '');
+  salaById('rose').prof === null ? ok('"sem sala por enquanto" tira o teacher da sala') : fail('teacher não saiu da sala');
+  W.smRemoveTeacher(W.eval('TEACHERS').indexOf('Fernanda Brito'));
+  !W.eval('TEACHERS').includes('Fernanda Brito') ? ok('teacher removido do cadastro') : fail('teacher não removeu');
+  W.closeModal();
+  // drag-and-drop: turma → slot vazio · aluno → turma com vaga
+  const evStub = { preventDefault(){}, dataTransfer:{} };
+  const HORAS = W.eval('HORAS');
+  const tMove = TURMAS.find(t => W.activeKidsIn(t.id) > 0);
+  let freeSlot = null;
+  for (const s of SALAS) { for (const h of HORAS) if (!W.turmaAt(s.id, 'ter-qui', h)) { freeSlot = { sala: s.id, hora: h }; break; } if (freeSlot) break; }
+  W.eval(`agDrag={type:'turma',tid:${tMove.id}}`);
+  W.agDropEmpty(evStub, freeSlot.sala, 'ter-qui', freeSlot.hora);
+  tMove.sala === freeSlot.sala && tMove.par === 'ter-qui' && tMove.hora === freeSlot.hora ? ok('arrastar turma para slot vazio move') : fail('drop de turma não moveu');
+  const ocupado = TURMAS.find(t => t.id !== tMove.id);
+  const tSnap = { sala: tMove.sala, par: tMove.par, hora: tMove.hora };
+  W.eval(`agDrag={type:'turma',tid:${tMove.id}}`);
+  W.agDropEmpty(evStub, ocupado.sala, ocupado.par, ocupado.hora);
+  tMove.sala === tSnap.sala && tMove.hora === tSnap.hora ? ok('soltar em slot ocupado é recusado') : fail('drop sobrescreveu slot ocupado!');
+  const fila2 = W.semTurmaKids();
+  const aluno = fila2[0];
+  const tFull = id => W.eval(`turmaFull(turmaById(${id}))`);
+  const destDrop = TURMAS.find(t => !tFull(t.id) && (() => { const nv = nivelByK(t.nivel); return aluno.k.age >= nv.ages[0] - 1 && aluno.k.age <= nv.ages[1] + 1; })());
+  W.dropMoveKid(aluno.s.id, aluno.ki, destDrop.id);
+  aluno.k.tid === destDrop.id ? ok('arrastar aluno da fila para turma com vaga aloca') : fail('drop de aluno não alocou');
+  W.openMoverKid(aluno.s.id, aluno.ki); W.mvPick(0); W.confirmMoverKid(aluno.s.id, aluno.ki); // devolve pra fila
+}
+
+/* ---------- modais: rodapé sempre visível + select escapa do modal ---------- */
+section('Modais: rodapé fixo e cselect');
+{
+  W.openInvite();
+  const box = $('modalBox');
+  box.lastElementChild.style.position === 'sticky' ? ok('rodapé do modal é sticky (botões sempre visíveis)') : fail('rodapé do modal não é sticky');
+  W.csToggle('invRole');
+  $('csm-invRole').style.position === 'fixed' ? ok('cselect dentro de modal abre em "fixed" (escapa do overflow)') : fail('cselect preso dentro do modal');
+  W.csCloseAll(); W.closeModal();
+  // modal com botões no corpo (mover aluno) ganha rodapé destacado
+  const alvo2 = W.semTurmaKids()[0];
+  W.openMoverKid(alvo2.s.id, alvo2.ki);
+  box.lastElementChild.style.position === 'sticky' && box.lastElementChild.querySelector('#mvGo') ? ok('fileira de botões do corpo vira rodapé sticky') : fail('botões do mover não viraram rodapé');
+  W.closeModal();
 }
 
 /* ---------- filtros de alunos por turma (nível, sala, teacher, período) ---------- */
