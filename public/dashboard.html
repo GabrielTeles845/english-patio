@@ -177,6 +177,10 @@
   @keyframes fade{ from{ opacity:0; transform:translateY(6px);} to{ opacity:1; transform:none;} }
   [data-view]{ display:none; }
   [data-view].view-active{ display:block; }
+  /* pontinhos de ajuda "?" — tooltip no hover, no lugar de tour gigante */
+  .qm{ display:inline-grid; place-content:center; width:16px; height:16px; border-radius:50%;
+       background:var(--hover); color:var(--muted); font-size:10px; font-weight:700; cursor:help; transition:.15s; }
+  .qm:hover{ background:#F5B700; color:#15294d; }
   /* scrollbars discretas em todo o painel (modais, grade, listas) */
   *{ scrollbar-width:thin; scrollbar-color:var(--border) transparent; }
   ::-webkit-scrollbar{ width:10px; height:10px; }
@@ -686,11 +690,13 @@
             <button id="agvNiveis" onclick="setAgView('niveis')" class="flex items-center gap-1.5 px-3.5 h-9 rounded-lg"><i data-lucide="layers" class="w-4 h-4"></i>Níveis</button>
             <button id="agvMural" onclick="setAgView('mural')" class="flex items-center gap-1.5 px-3.5 h-9 rounded-lg"><i data-lucide="layout-grid" class="w-4 h-4"></i>Mural</button>
           </div>
+          <span class="qm tip" data-tour="ag-help" data-tip="Grade = raio-X salas × horários · Salas = a página de cada sala · Níveis = onde tem vaga por nível · Mural = todas as páginas do par lado a lado">?</span>
           <div class="h-6 w-px mx-1 hidden sm:block" style="background:var(--border)"></div>
           <div class="flex items-center bg-[var(--hover)] rounded-xl p-1 text-sm" id="agParSeg" data-tour="ag-par">
             <button id="agpSq" onclick="setAgPar('seg-qua')" class="px-3 py-1.5 rounded-lg bg-[var(--card)] shadow-sm font-medium">Seg/Qua</button>
             <button id="agpTq" onclick="setAgPar('ter-qui')" class="px-3 py-1.5 rounded-lg text-[var(--muted)]">Ter/Qui</button>
           </div>
+          <span class="qm tip" data-tip="As turmas vivem em pares de dias: Seg/Qua ou Ter/Qui. Trocar aqui vale em todas as visões (a de Níveis mostra os dois pares juntos)">?</span>
           <button id="agVagasBtn" onclick="toggleAgVagas()" data-tour="ag-vagas" class="h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium flex items-center gap-1.5 transition" title="Mostra só as turmas que ainda têm vaga — o modo 'onde cabe aluno?'"><i data-lucide="armchair" class="w-4 h-4"></i>Só com vagas</button>
           <span id="agPeriodoWrap"></span>
           <span id="agProfWrap"></span>
@@ -1591,11 +1597,8 @@ const TOURS={
   agenda:[
     { target:null, title:'A agenda que se atualiza sozinha', body:'Chega de refazer o quadro no Canva: aqui a agenda é um reflexo vivo dos dados. Mudou um aluno de turma? Todas as visões — e as imagens exportadas — já mudaram juntas.', placement:'center', logo:true },
     { target:'[data-tour="ag-views"]', title:'Quatro jeitos de ver', body:'Grade = o raio-X da escola (salas × horários). Salas = a página de cada sala, igual ao quadro do Canva. Níveis = responde "que dia tem Power 2 e onde tem vaga?". Mural = todas as páginas do par, lado a lado.', placement:'bottom' },
-    { target:'[data-tour="ag-par"]', title:'Seg/Qua ⇄ Ter/Qui', body:'As turmas vivem em pares de dias. Este botão troca o par em todas as visões (na visão por nível, os dois aparecem juntos).', placement:'bottom' },
-    { target:'[data-tour="ag-vagas"]', title:'O modo "onde cabe aluno?"', body:'Liga o "Só com vagas" e as turmas cheias somem — sobra exatamente onde dá para encaixar alguém. Perfeito para responder uma família no telefone.', placement:'bottom' },
-    { target:'[data-tour="ag-fila"]', title:'Ninguém fica esquecido', body:'Aluno matriculado sem turma entra nesta fila. Clique no nome e o painel mostra só os destinos válidos — turmas com vaga, do nível certo primeiro.', placement:'bottom' },
-    { target:'[data-tour="ag-nova"]', title:'Criar turma', body:'Sala, dias, horário, nível e vagas (padrão 7, que é o máximo). Também dá para criar direto pelo + de qualquer horário vazio na grade.', placement:'bottom' },
-    { target:'[data-tour="ag-export"]', title:'As imagens do Canva, sem o Canva', body:'Exporta a página de uma sala, o pacote de todas as salas ou um nível inteiro — no mesmo formato do quadro de hoje, mas sempre com os dados de agora. Turma cheia sai com o "NÃO TEM VAGA" de sempre.', placement:'bottom', last:true },
+    { target:'[data-tour="ag-export"]', title:'As imagens do Canva, sem o Canva', body:'Exporta a página de uma sala, o pacote de todas as salas ou um nível inteiro — no mesmo formato do quadro de hoje, mas sempre com os dados de agora.', placement:'bottom' },
+    { target:'[data-tour="ag-help"]', title:'O resto, os "?" explicam', body:'Esta tela tem muita coisa — em vez de um tour gigante, os pontinhos "?" espalhados explicam cada detalhe no hover: pares de dias, fila de alocação, modo "só com vagas" e o que mais aparecer.', placement:'bottom', last:true },
   ],
   atividade:[
     { target:'[data-tour="act-list"]', title:'A memória do painel', body:'Toda ação fica registrada: o que cada pessoa fez, o que o sistema fez sozinho e o que o Autentique avisou (visualizações e assinaturas). Nada aqui pode ser editado ou apagado.', placement:'top' },
@@ -2417,7 +2420,7 @@ function renderAgFila(){
   if(!fila.length){ el.innerHTML=''; return; }
   el.innerHTML=`<div class="surface rounded-2xl p-4" data-tour="ag-fila">
     <div class="flex flex-wrap items-baseline justify-between gap-2 mb-2.5">
-      <p class="text-sm font-semibold">Aguardando turma <span class="font-normal text-[var(--muted)]">· ${fila.length} aluno${fila.length>1?'s':''}</span></p>
+      <p class="text-sm font-semibold flex items-center gap-1.5">Aguardando turma <span class="font-normal text-[var(--muted)]">· ${fila.length} aluno${fila.length>1?'s':''}</span> <span class="qm tip" data-tip="Aluno matriculado sem turma cai nesta fila — clique no nome para ver só os destinos válidos (turmas com vaga, do nível certo primeiro) ou arraste direto para uma turma">?</span></p>
       <p class="text-xs text-[var(--muted)]">clique no nome para alocar, ou arraste para uma turma</p>
     </div>
     <div class="flex flex-wrap gap-2">${fila.map(({s,k,ki})=>`<button onclick="openMoverKid(${s.id},${ki})" draggable="true" ondragstart="agDragKid(event,${s.id},${ki})" ondragend="agDragEnd()" class="flex items-center gap-1.5 h-9 px-3 rounded-xl border text-sm font-medium transition hover:shadow-sm hover:border-brand-light" style="border-color:var(--border);background:var(--card)">${esc(k.n.split(' ').slice(0,2).join(' '))} <span class="text-xs text-[var(--muted)]">(${k.age})</span></button>`).join('')}</div>
@@ -2467,7 +2470,7 @@ function agSalasHTML(){
     </div>`; }).join('')}</div>`;
 }
 /* a página da sala — réplica do quadro do Canva, gerada dos dados (e usada na exportação) */
-function salaPageHTML(salaId,par,forExport){
+function salaPageHTML(salaId,par,forExport,noPar){
   const sala=salaById(salaId);
   const ts=TURMAS.filter(t=>t.sala===salaId&&t.par===par).sort((a,b)=>HORAS.indexOf(a.hora)-HORAS.indexOf(b.hora));
   const slot=t=>{
@@ -2479,13 +2482,13 @@ function salaPageHTML(salaId,par,forExport){
       ${turmaFull(t)?'<p class="text-[11px] font-bold mt-1" style="color:#16a34a">NÃO TEM VAGA</p>':''}
     </div>`;
   };
-  return `<div class="bg-white rounded-2xl p-7 sm:p-8" style="min-height:380px;color:#16233f;font-family:Inter,system-ui,sans-serif">
+  return `<div class="bg-white rounded-2xl p-7 sm:p-8" style="${noPar?'':'min-height:380px;'}color:#16233f;font-family:Inter,system-ui,sans-serif">
     <div class="flex items-start justify-between gap-4 mb-6">
       <div class="rounded-2xl px-6 py-3 text-center" style="background:${sala.c}">
         <p class="font-heading text-2xl font-bold tracking-wide text-white" style="text-shadow:0 1px 2px rgba(0,0,0,.18)">${esc(sala.n.toUpperCase())}</p>
         ${sala.prof?`<p class="text-[15px] font-medium" style="color:rgba(255,255,255,.94)">Teacher ${esc(sala.prof)}</p>`:''}
       </div>
-      <p class="font-bold text-lg pt-1" style="color:#16233f">${par==='seg-qua'?'Mon/Wed':'Tue/Thu'}</p>
+      ${noPar?'':`<p class="font-bold text-lg pt-1" style="color:#16233f">${par==='seg-qua'?'Mon/Wed':'Tue/Thu'}</p>`}
     </div>
     ${ts.length?`<div class="sm:columns-2" style="column-gap:48px">${ts.map(slot).join('')}</div>`
       :'<p class="text-sm" style="color:#94a3b8">Nenhuma turma neste par de dias — crie pelo botão "Nova turma" ou pelo + na grade.</p>'}
@@ -2504,19 +2507,54 @@ function agSalaPageWrap(){
     <div id="salaPage" class="shadow-xl rounded-2xl">${salaPageHTML(agSala,agPar,false)}</div>
   </div>`;
 }
-/* ---- visão 4: mural — todas as páginas das salas (estilo Canva) lado a lado ---- */
+/* ---- visão 4: mural — a agenda do par inteira em cards ricos (masonry).
+   O card é a versão "de tela" da página da sala: ocupação, chips de aluno
+   clicáveis/arrastáveis. A exportação continua fiel ao Canva. ---- */
+function muralCardHTML(s){
+  const ts=TURMAS.filter(t=>t.sala===s.id&&t.par===agPar).sort((a,b)=>HORAS.indexOf(a.hora)-HORAS.indexOf(b.hora));
+  const tot=ts.reduce((a,t)=>a+activeKidsIn(t.id),0);
+  const vagas=ts.reduce((a,t)=>a+Math.max(0,t.cap-activeKidsIn(t.id)),0);
+  const slot=t=>{ const list=kidsOfTurma(t.id); const v=activeKidsIn(t.id); const full=v>=t.cap;
+    return `<div class="px-5 py-3 border-t" style="border-color:var(--border)" ondragover="agOver(event,this,'turma')" ondragleave="agLeave(this)" ondrop="agDropTurma(event,${t.id})">
+      <div class="flex items-center gap-2">
+        <span class="font-heading text-sm font-semibold w-11 shrink-0">${t.hora}</span>
+        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap" style="background:${famC(t.nivel)}1a;color:${famC(t.nivel)}">${nivelLabel(t.nivel)}</span>
+        <div class="flex-1"></div>
+        <div class="w-14 h-1.5 rounded-full overflow-hidden shrink-0" style="background:var(--hover)"><div class="h-full rounded-full" style="width:${Math.round(v/(t.cap||1)*100)}%;background:${full?'#16a34a':famC(t.nivel)}"></div></div>
+        <span class="text-[11px] font-bold whitespace-nowrap w-9 text-right" style="color:${full?'#16a34a':'var(--muted)'}">${full?'cheia':v+'/'+t.cap}</span>
+      </div>
+      <div class="mt-2 flex flex-wrap gap-1.5">
+        ${list.length?list.map(({s:st,k,ki})=>`<button onclick="event.stopPropagation();openMoverKid(${st.id},${ki})" draggable="true" ondragstart="agDragKid(event,${st.id},${ki})" ondragend="agDragEnd()" title="Mover ${esc(k.n.split(' ')[0])} de turma" class="text-[11px] font-medium px-2 py-1 rounded-lg transition hover:ring-1 ring-brand-light" style="background:var(--hover)">${esc(k.n.split(' ').slice(0,2).join(' '))} <span class="text-[var(--muted)] font-normal">(${k.age})</span>${isNovo(st)?` <span class="font-bold" style="color:#E0457B">${novoTag(k)}</span>`:''}</button>`).join('')
+          :'<span class="text-[11px] text-[var(--muted)]">— sem alunos ainda (aloque pela fila)</span>'}
+        ${full?'<span class="text-[10px] font-bold px-2 py-1 rounded-lg" style="background:rgba(22,163,74,.10);color:#16a34a">NÃO TEM VAGA</span>':''}
+      </div>
+    </div>`; };
+  return `<div class="mural-card surface rounded-2xl overflow-hidden mb-4 transition hover:shadow-xl" style="break-inside:avoid">
+    <div class="relative px-5 py-4 overflow-hidden cursor-pointer" onclick="openSalaView('${s.id}')" style="background:linear-gradient(135deg,${s.c},color-mix(in srgb,${s.c} 70%,#16233f))">
+      <div class="absolute -top-10 -right-6 w-32 h-32 rounded-full pointer-events-none" style="background:rgba(255,255,255,.13)"></div>
+      <div class="relative flex items-center justify-between gap-3">
+        <div class="min-w-0">
+          <p class="font-heading text-lg font-semibold text-white truncate" style="text-shadow:0 1px 2px rgba(0,0,0,.18)">${esc(s.n)}</p>
+          ${s.prof?`<p class="text-xs text-white/85 truncate">Teacher ${esc(s.prof)}</p>`:'<p class="text-xs text-white/60">sem teacher definido</p>'}
+        </div>
+        <span class="shrink-0 text-[11px] font-bold px-2.5 py-1 rounded-full" style="background:rgba(255,255,255,.2);color:#fff">${tot} aluno${tot===1?'':'s'}${vagas?` · ${vagas} vaga${vagas>1?'s':''}`:' · lotada'}</span>
+      </div>
+    </div>
+    ${ts.map(slot).join('')}
+    <div class="px-5 py-2.5 border-t flex items-center justify-between gap-2" style="border-color:var(--border);background:var(--hover)">
+      <span class="text-[11px] text-[var(--muted)]">${ts.length} turma${ts.length===1?'':'s'} · ${schLabel(agPar)}</span>
+      <div class="flex items-center gap-1.5">
+        <button onclick="openSalaView('${s.id}')" class="h-7 px-2.5 rounded-lg text-[11px] font-semibold border border-[var(--border)] hover:bg-[var(--card)] transition flex items-center gap-1"><i data-lucide="maximize-2" class="w-3 h-3"></i> Abrir</button>
+        <button onclick="exportSala('${s.id}','${agPar}')" class="h-7 px-2.5 rounded-lg text-[11px] font-semibold text-white transition hover:brightness-110 flex items-center gap-1" style="background:#1E3765"><i data-lucide="image-down" class="w-3 h-3"></i> Exportar</button>
+      </div>
+    </div>
+  </div>`;
+}
 function agMuralHTML(){
   const list=SALAS.filter(s=>TURMAS.some(t=>t.sala===s.id&&t.par===agPar));
   if(!list.length) return `<div class="surface rounded-2xl p-10 text-center text-sm text-[var(--muted)]">Nenhuma sala com turmas neste par de dias — troque o par ali em cima.</div>`;
-  return `<div class="grid lg:grid-cols-2 gap-4">${list.map(s=>`
-    <div class="relative group">
-      <div class="absolute right-3 top-3 z-10 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition">
-        <button onclick="openSalaView('${s.id}')" class="h-8 px-2.5 rounded-lg text-xs font-semibold surface border border-[var(--border)] hover:bg-[var(--hover)] transition flex items-center gap-1"><i data-lucide="maximize-2" class="w-3 h-3"></i> Abrir</button>
-        <button onclick="exportSala('${s.id}','${agPar}')" class="h-8 px-2.5 rounded-lg text-xs font-semibold text-white transition hover:brightness-110 flex items-center gap-1" style="background:#1E3765"><i data-lucide="image-down" class="w-3 h-3"></i> Exportar</button>
-      </div>
-      <div onclick="openSalaView('${s.id}')" class="shadow-lg rounded-2xl cursor-pointer transition hover:shadow-xl">${salaPageHTML(s.id,agPar,true)}</div>
-    </div>`).join('')}</div>
-  <p class="text-xs text-[var(--muted)] mt-3 flex items-center gap-1.5"><i data-lucide="info" class="w-3.5 h-3.5"></i> O mural é a agenda do par inteira, no formato das páginas do Canva — toque numa página para abrir (mover alunos, editar) ou passe o mouse para exportar só ela. "Exportar imagens" gera o pacote completo.</p>`;
+  return `<div class="lg:columns-2 xl:columns-3" style="column-gap:1rem">${list.map(muralCardHTML).join('')}</div>
+  <p class="text-xs text-[var(--muted)] mt-3 flex items-center gap-1.5"><i data-lucide="info" class="w-3.5 h-3.5"></i> O mural é a agenda do par inteira — toque no nome de um aluno para movê-lo (ou arraste para outro horário), no cabeçalho para abrir a sala, e "Exportar" gera a imagem no formato do Canva.</p>`;
 }
 /* ---- visão 3: por nível — "que dia tem Power 2 e onde tem vaga?" ---- */
 function agNiveisHTML(){
