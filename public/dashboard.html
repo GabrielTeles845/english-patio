@@ -544,6 +544,48 @@
           </div>
         </div>
 
+        <!-- teachers + vagas por nível + radar da agenda -->
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+          <div class="surface rounded-2xl p-5 flex flex-col" data-tour="ov-teachers">
+            <div class="flex items-center justify-between mb-1">
+              <h3 class="font-heading font-semibold text-lg">Alunos por teacher</h3>
+              <button onclick="openSalasManage('profs')" class="text-sm font-medium text-brand-light hover:underline whitespace-nowrap">Gerenciar</button>
+            </div>
+            <p class="text-xs text-[var(--muted)] mb-4">Pela sala de cada teacher no semestre</p>
+            <div id="teacherList" class="flex-1 flex flex-col justify-evenly gap-2"></div>
+          </div>
+          <div class="surface rounded-2xl p-5 flex flex-col" data-tour="ov-vagas-nivel">
+            <div class="flex items-center justify-between mb-1">
+              <h3 class="font-heading font-semibold text-lg">Vagas por nível</h3>
+              <button onclick="go('agenda');setAgView('niveis')" class="text-sm font-medium text-brand-light hover:underline flex items-center gap-1 whitespace-nowrap">Ver na agenda <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
+            </div>
+            <p class="text-xs text-[var(--muted)] mb-4">"Onde tem vaga?" — os quase lotados primeiro</p>
+            <div id="vagasNivelList" class="flex-1 flex flex-col justify-evenly gap-1.5"></div>
+          </div>
+          <div class="surface rounded-2xl p-5 flex flex-col" data-tour="ov-radar">
+            <h3 class="font-heading font-semibold text-lg mb-1">Radar da agenda</h3>
+            <p class="text-xs text-[var(--muted)] mb-4">O que merece um olho hoje — toque para resolver</p>
+            <div id="opsAlerts" class="flex-1 flex flex-col justify-evenly gap-1.5"></div>
+          </div>
+        </div>
+
+        <!-- períodos + raio-X das saídas -->
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+          <div class="surface rounded-2xl p-5 flex flex-col" data-tour="ov-periodos">
+            <h3 class="font-heading font-semibold text-lg mb-1">Manhã × tarde</h3>
+            <p class="text-xs text-[var(--muted)] mb-4">Ocupação das turmas por período</p>
+            <div id="periodSplit" class="flex-1 flex flex-col justify-center gap-5"></div>
+          </div>
+          <div class="surface rounded-2xl p-5 flex flex-col lg:col-span-2" data-tour="ov-saidas">
+            <h3 class="font-heading font-semibold text-lg mb-1">Raio-X das saídas</h3>
+            <p class="text-xs text-[var(--muted)] mb-4">Por que as famílias saem, quando saem e de onde — desligamentos da escola no período</p>
+            <div class="grid sm:grid-cols-2 gap-x-8 gap-y-3">
+              <div id="exitReasons" class="space-y-2"></div>
+              <div id="exitFacts" class="space-y-2.5"></div>
+            </div>
+          </div>
+        </div>
+
         <!-- bairros + pagamento + saúde dos contratos -->
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
           <div class="surface rounded-2xl p-5 lg:col-span-2 flex flex-col">
@@ -1506,6 +1548,8 @@ const TOURS={
     { target:'[data-tour="health"]', title:'Cobrança sem dor de cabeça', body:'O funil do Autentique em tempo real: assinados, visualizados, enviados e pendentes — com aviso de contrato parado há 7+ dias. O botão verde leva direto para a lista filtrada nos pendentes.', placement:'left' },
     { target:'[data-tour="vagas"]', title:'Onde ainda cabe aluno', body:'Ocupação de cada sala, com a etiqueta CHEIA nas lotadas. Toque numa sala para abrir a página dela na Agenda — turmas, horários e alunos.', placement:'right' },
     { target:'[data-tour="niveis"]', title:'Quantos alunos por nível', body:'Do Fun Plus ao Sprint, cada nível com a sua cor. Ao lado, as entradas e saídas por sala — de onde mais saiu gente e onde mais entrou.', placement:'top' },
+    { target:'[data-tour="ov-vagas-nivel"]', title:'"Onde tem vaga?"', body:'A pergunta de todo dia, respondida sem abrir a Agenda: cada nível com a ocupação e as vagas restantes — os quase lotados aparecem primeiro. Ao lado, os alunos por teacher e o radar do que precisa de atenção.', placement:'top' },
+    { target:'[data-tour="ov-saidas"]', title:'Por que as famílias saem', body:'Os motivos dos desligamentos, o mês com mais saídas e a sala que mais perdeu alunos — com as entradas do período para comparar.', placement:'top' },
     { target:'[data-tour="hours"]', title:'A hora do clique', body:'Mostra em que horário as famílias costumam matricular pelo site — útil para saber quando responder rápido e impulsionar posts.', placement:'right' },
     { target:'[data-tour="bday"]', title:'Mimos que fidelizam', body:'Os próximos aniversariantes, com botão que prepara as mensagens de parabéns no WhatsApp.', placement:'left' },
     { target:'[data-tour="export"]', title:'Leve para o Excel', body:'Exporta todos os alunos numa planilha que abre no Excel ou Google Planilhas.', placement:'bottom' },
@@ -2966,7 +3010,7 @@ function refreshOverviewData(){
   set('stSemTurma',String(semTurmaKids().length));
   set('stSigned',Math.round(act.filter(s=>s.status==='signed').length/(act.length||1)*100)+'%');
   set('alunosSub',`${allKids} alunos em ${allAct.length} matrículas ativas`);
-  renderHealth(); renderPayLegend(); renderVagas(); renderNiveis(); renderMovimento(); renderHoods(); renderBirthdays(); renderRecent(); renderAgenda();
+  renderHealth(); renderPayLegend(); renderVagas(); renderNiveis(); renderMovimento(); renderHoods(); renderBirthdays(); renderRecent(); renderOpsStats(); renderAgenda();
   /* gráficos que derivam da base */
   const kidsByPar=p=>act.reduce((a,s)=>a+s.kids.filter(k=>kidTurma(k)?.par===p).length,0);
   const nSq=kidsByPar('seg-qua'), nTq=kidsByPar('ter-qui');
@@ -2974,6 +3018,86 @@ function refreshOverviewData(){
   if(charts.sch){ charts.sch.data.datasets[0].data=[nSq,nTq]; charts.sch.update(); }
   if(charts.age){ const b=[0,0,0,0,0]; actKids.forEach(k=>{ b[k.age<=6?0:k.age<=9?1:k.age<=12?2:k.age<=15?3:4]++; }); charts.age.data.datasets[0].data=b; charts.age.update(); }
   if(charts.pay){ charts.pay.data.datasets[0].data=payData().map(p=>p[1]); charts.pay.update(); }
+}
+/* estatísticas operacionais da agenda: teachers, vagas por nível, radar, períodos e saídas */
+function renderOpsStats(){
+  const set=(id,html)=>{ const e=document.getElementById(id); if(e) e.innerHTML=html; };
+  const bar=(pct,color)=>`<div class="flex-1 h-2 rounded-full overflow-hidden" style="background:var(--hover)"><div class="h-full rounded-full" style="width:${Math.min(100,Math.round(pct))}%;background:${color}"></div></div>`;
+  /* --- alunos por teacher --- */
+  ensureTeachers();
+  const tRows=TEACHERS.map(p=>({ p, sala:SALAS.find(s=>s.prof===p), n:teacherAlunos(p) })).sort((a,b)=>b.n-a.n);
+  const semProfSalas=SALAS.filter(s=>!s.prof&&TURMAS.some(t=>t.sala===s.id));
+  const semProfAlunos=semProfSalas.reduce((a,s)=>a+TURMAS.filter(t=>t.sala===s.id).reduce((x,t)=>x+activeKidsIn(t.id),0),0);
+  const maxT=Math.max(1,...tRows.map(r=>r.n));
+  set('teacherList', tRows.map(r=>`<div class="flex items-center gap-2.5">
+      <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${r.sala?r.sala.c:'#94a3b8'}"></span>
+      <span class="text-sm font-medium w-[110px] truncate" title="${r.sala?esc(r.sala.n):'sem sala por enquanto'}">${esc(r.p)}</span>
+      ${bar(r.n/maxT*100, r.sala?r.sala.c:'#94a3b8')}
+      <span class="text-sm font-semibold w-7 text-right">${r.n}</span>
+    </div>`).join('')
+    +(semProfSalas.length?`<p class="text-[11px] text-[var(--muted)] pt-1.5 border-t mt-1" style="border-color:var(--border)">+ ${semProfSalas.length} sala${semProfSalas.length>1?'s':''} sem teacher (${semProfAlunos} aluno${semProfAlunos===1?'':'s'})</p>`:''));
+  /* --- vagas por nível (quase lotados primeiro) --- */
+  const nivRows=NIVEIS.map(nv=>{ const ts=TURMAS.filter(t=>t.nivel===nv.k); if(!ts.length) return null;
+    const cap=ts.reduce((a,t)=>a+t.cap,0), occ=ts.reduce((a,t)=>a+activeKidsIn(t.id),0);
+    return { nv, cap, occ, vagas:cap-occ }; }).filter(Boolean).sort((a,b)=>a.vagas-b.vagas);
+  set('vagasNivelList', nivRows.map(r=>`<div class="flex items-center gap-2.5 cursor-pointer hover:bg-[var(--hover)] -mx-1.5 px-1.5 py-0.5 rounded-lg transition" onclick="go('agenda');setAgView('niveis')">
+      <span class="text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap w-[96px] text-center truncate shrink-0" style="background:${famC(r.nv.k)}1a;color:${famC(r.nv.k)}">${r.nv.n}</span>
+      ${bar(r.occ/(r.cap||1)*100, famC(r.nv.k))}
+      <span class="text-[11px] font-bold whitespace-nowrap w-14 text-right" style="color:${r.vagas===0?'#16a34a':'var(--muted)'}">${r.vagas===0?'lotado':r.vagas+' vaga'+(r.vagas>1?'s':'')}</span>
+    </div>`).join(''));
+  /* --- radar (alertas operacionais) --- */
+  const cheias=TURMAS.filter(t=>activeKidsIn(t.id)>=t.cap).length;
+  const extras=TURMAS.filter(t=>t.cap>7);
+  const fila=semTurmaKids().length;
+  const alert=(ic,label,n,fn,tone)=>`<div onclick="${fn}" class="flex items-center gap-2.5 cursor-pointer hover:bg-[var(--hover)] -mx-1.5 px-1.5 py-1.5 rounded-lg transition">
+      <div class="w-8 h-8 rounded-lg grid place-content-center shrink-0" style="background:${tone}1a"><i data-lucide="${ic}" class="w-4 h-4" style="color:${tone}"></i></div>
+      <span class="text-sm flex-1 leading-snug">${label}</span>
+      <span class="text-sm font-bold px-2 py-0.5 rounded-full" style="background:${tone}1a;color:${tone}">${n}</span>
+    </div>`;
+  set('opsAlerts',
+    alert('hourglass','Alunos aguardando turma',fila,"go('agenda')",'#B5860B')
+    +alert('door-closed','Turmas lotadas',cheias,"go('agenda');setAgView('grade')",'#16a34a')
+    +alert('expand','Turmas com vaga extra aberta (limite acima de 7)',extras.length,"go('agenda');setAgView('grade')",'#7C3AED')
+    +alert('user-round-x','Salas com turma e sem teacher',semProfSalas.length,"openSalasManage('profs')",'#DC2626'));
+  /* --- manhã × tarde --- */
+  const part=p=>{ const ts=TURMAS.filter(t=>horaPeriodo(t.hora)===p);
+    return { n:ts.length, cap:ts.reduce((a,t)=>a+t.cap,0), occ:ts.reduce((a,t)=>a+activeKidsIn(t.id),0) }; };
+  const man=part('m'), tar=part('t');
+  const half=(label,ic,d,color)=>`<div>
+      <div class="flex items-center justify-between mb-1.5">
+        <span class="text-sm font-medium flex items-center gap-1.5"><i data-lucide="${ic}" class="w-4 h-4" style="color:${color}"></i>${label}</span>
+        <span class="text-xs text-[var(--muted)]">${d.occ} aluno${d.occ===1?'':'s'} · ${d.n} turma${d.n===1?'':'s'} · ${Math.round(d.occ/(d.cap||1)*100)}%</span>
+      </div>
+      <div class="h-2.5 rounded-full overflow-hidden" style="background:var(--hover)"><div class="h-full rounded-full" style="width:${Math.round(d.occ/(d.cap||1)*100)}%;background:${color}"></div></div>
+    </div>`;
+  set('periodSplit', half('Manhã','sun',man,'#F5B700')+half('Tarde','sunset',tar,'#2F539A')
+    +`<p class="text-[11px] text-[var(--muted)]">A manhã existe, mas é menor — vagas livres de manhã são oportunidade de turma nova.</p>`);
+  /* --- raio-X das saídas --- */
+  const exits=STUDENTS.filter(s=>s.active===false&&s.exit);
+  const exitKids=exits.reduce((a,s)=>a+s.kids.length,0);
+  const byReason={}; exits.forEach(s=>{ byReason[s.exit.label]=(byReason[s.exit.label]||0)+s.kids.length; });
+  const reasons=Object.entries(byReason).sort((a,b)=>b[1]-a[1]);
+  const maxR=Math.max(1,...reasons.map(r=>r[1]));
+  set('exitReasons', reasons.length?reasons.map(([l,n])=>`<div class="flex items-center gap-2.5">
+      <span class="text-xs w-[150px] truncate" title="${esc(l)}">${esc(l)}</span>
+      ${bar(n/maxR*100,'#DC2626')}
+      <span class="text-xs font-semibold w-5 text-right">${n}</span>
+    </div>`).join(''):'<p class="text-sm text-[var(--muted)]">Nenhum desligamento no período. 🎉</p>');
+  const MES={ '01':'Jan','02':'Fev','03':'Mar','04':'Abr','05':'Mai','06':'Jun','07':'Jul','08':'Ago','09':'Set','10':'Out','11':'Nov','12':'Dez' };
+  const byMonth={}; exits.forEach(s=>{ const [,m2,y]=s.exit.date.split('/'); const k=`${MES[m2]}/${y.slice(2)}`; byMonth[k]=(byMonth[k]||0)+s.kids.length; });
+  const topMonth=Object.entries(byMonth).sort((a,b)=>b[1]-a[1])[0];
+  const bySala={}; exits.forEach(s=>s.kids.forEach(k=>{ const t=kidTurma(k); if(t) bySala[t.sala]=(bySala[t.sala]||0)+1; }));
+  const topSala=Object.entries(bySala).sort((a,b)=>b[1]-a[1])[0];
+  const tsTop=topSala?salaById(topSala[0]):null;
+  const fact=(ic,label,value)=>`<div class="flex items-center gap-2.5">
+      <div class="w-8 h-8 rounded-lg grid place-content-center shrink-0" style="background:var(--hover)"><i data-lucide="${ic}" class="w-4 h-4 text-[var(--muted)]"></i></div>
+      <div class="min-w-0"><p class="text-[11px] text-[var(--muted)] leading-tight">${label}</p><p class="text-sm font-semibold truncate">${value}</p></div>
+    </div>`;
+  set('exitFacts',
+    fact('users-round','Saídas no período',`${exitKids} aluno${exitKids===1?'':'s'} (${exits.length} famíli${exits.length===1?'a':'as'})`)
+    +fact('calendar-x','Mês com mais saídas',topMonth?`${topMonth[0]} (${topMonth[1]})`:'—')
+    +fact('door-open','Sala que mais perdeu alunos',tsTop?`${tsTop.n}${tsTop.prof?' · Teacher '+esc(tsTop.prof):''} (${topSala[1]})`:'—')
+    +fact('trending-up','Entradas no mesmo período',`${STUDENTS.filter(s=>s.active!==false&&isNovo(s)).reduce((a,s)=>a+s.kids.length,0)} alunos novos`));
 }
 function goPendentes(){
   go('alunos');

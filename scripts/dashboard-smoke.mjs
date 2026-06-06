@@ -248,6 +248,22 @@ section('Papéis e "ver painel como…"');
   W.roleAllows('editor') && $('viewAsBar').classList.contains('hidden') ? ok('voltar a Diretor restaura tudo') : fail('volta a Diretor não restaurou');
 }
 
+/* ---------- visão geral: estatísticas operacionais ---------- */
+section('Visão geral: teachers, vagas, radar, períodos e saídas');
+{
+  W.eval('renderOpsStats()');
+  $('teacherList').children.length >= 3 ? ok('alunos por teacher renderiza') : fail('teacherList vazio');
+  $('teacherList').textContent.includes('Mariana') ? ok('teacher com sala aparece na lista') : fail('teachers sem nomes');
+  $('vagasNivelList').children.length >= 5 ? ok('vagas por nível renderiza') : fail('vagasNivelList vazio');
+  $('vagasNivelList').textContent.includes('lotado') ? ok('nível lotado destacado ("lotado")') : fail('nenhum nível lotado na lista');
+  $('vagasNivelList').textContent.includes('vaga') ? ok('níveis com vaga mostram a contagem') : fail('vagas não aparecem');
+  $('opsAlerts').children.length === 4 ? ok('radar com 4 alertas operacionais') : fail(`radar com ${$('opsAlerts').children.length} alertas`);
+  $('opsAlerts').textContent.includes('aguardando turma') && $('opsAlerts').textContent.includes('lotadas') ? ok('radar cobre fila + turmas lotadas') : fail('alertas do radar incompletos');
+  $('periodSplit').textContent.includes('Manhã') && $('periodSplit').textContent.includes('Tarde') ? ok('manhã × tarde renderiza') : fail('periodSplit incompleto');
+  $('exitReasons').children.length >= 1 ? ok('saídas por motivo renderiza') : fail('exitReasons vazio');
+  $('exitFacts').textContent.includes('Mês com mais saídas') && $('exitFacts').textContent.includes('Sala que mais perdeu') ? ok('fatos das saídas (mês pico, sala que mais perdeu)') : fail('exitFacts incompleto');
+}
+
 /* ---------- agenda: salas, turmas, visões, mover aluno e fila ---------- */
 section('Agenda: salas, turmas, mover aluno e fila');
 {
