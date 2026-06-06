@@ -227,40 +227,129 @@ section('CRUD de usuários');
   W.closeModal();
 }
 
-/* ---------- turmas: capacidade, criar e excluir ---------- */
-section('CRUD de turmas');
+/* ---------- agenda: salas, turmas, visões, mover aluno e fila ---------- */
+section('Agenda: salas, turmas, mover aluno e fila');
 {
-  const CAP = W.eval('TURMA_CAP');
-  W.openTurmas();
-  const capAntes = CAP['seg-qua']['14h00–15h30'];
-  W.tCapStep('seg-qua', '14h00–15h30', 1);
-  CAP['seg-qua']['14h00–15h30'] === capAntes + 1 ? ok('aumentar capacidade') : fail('capacidade não subiu');
-  W.tCapStep('seg-qua', '14h00–15h30', -1);
-  CAP['seg-qua']['14h00–15h30'] === capAntes ? ok('diminuir capacidade') : fail('capacidade não desceu');
-  // não desce abaixo da ocupação
-  const occ = W.turmaOcc()['seg-qua|14h00–15h30'] || 0;
-  CAP['seg-qua']['14h00–15h30'] = occ;
-  W.tCapStep('seg-qua', '14h00–15h30', -1);
-  CAP['seg-qua']['14h00–15h30'] === occ ? ok('capacidade não desce abaixo da ocupação') : fail('capacidade ficou menor que a turma!');
-  CAP['seg-qua']['14h00–15h30'] = capAntes; // restaura
-  // criar horário novo
-  W.csSet('ntSch', 'ter-qui');
-  $('ntIni').value = '19h00'; $('ntFim').value = '20h30'; $('ntCap').value = '12';
-  W.addTurma();
-  CAP['ter-qui']['19h00–20h30'] === 12 ? ok('horário novo criado') : fail('não criou horário');
-  // duplicado é recusado
-  $('ntIni').value = '19h00'; $('ntFim').value = '20h30'; $('ntCap').value = '10';
-  W.addTurma();
-  $('ntErr').innerHTML.includes('já existe') ? ok('horário duplicado recusado') : fail('aceitou duplicado');
-  // turma vazia pode ser excluída; ocupada não
-  W.deleteTurma('ter-qui', '19h00–20h30');
-  W.confirmDeleteTurma('ter-qui', '19h00–20h30');
-  !('19h00–20h30' in CAP['ter-qui']) ? ok('turma vazia excluída') : fail('não excluiu turma vazia');
-  const cheia = Object.keys(CAP['seg-qua'])[0];
-  W.openTurmas();
-  W.deleteTurma('seg-qua', cheia); // tem alunos → não abre confirmação
-  CAP['seg-qua'][cheia] != null ? ok('turma com alunos não é excluída') : fail('EXCLUIU TURMA OCUPADA!');
+  const TURMAS = W.eval('TURMAS'), SALAS = W.eval('SALAS');
+  const kidTurma = W.eval('kidTurma'), turmaById = W.eval('turmaById'), salaById = W.eval('salaById'), nivelByK = W.eval('nivelByK');
+  SALAS.length === 13 ? ok('13 salas com nome de cor') : fail(`${SALAS.length} salas`);
+  TURMAS.every(t => t.cap >= 1 && t.cap <= 7) ? ok('toda turma tem capacidade ≤ 7 (padrão da escola)') : fail('turma com cap > 7');
+  const tids = new Set(TURMAS.map(t => t.id));
+  STUDENTS.every(s => s.kids.every(k => !k.tid || tids.has(k.tid))) ? ok('todo aluno aponta para turma existente') : fail('tid órfão na base');
+  TURMAS.every(t => W.activeKidsIn(t.id) <= t.cap) ? ok('nenhuma turma acima da capacidade') : fail('turma estourada!');
+  TURMAS.some(t => W.activeKidsIn(t.id) >= t.cap) ? ok('existem turmas CHEIAS na história') : fail('nenhuma turma cheia');
+  // níveis coerentes com a idade (tolerância de ±1 ano usada na alocação)
+  const incoerente = [];
+  STUDENTS.forEach(s => s.kids.forEach(k => { const t = kidTurma(k); if (!t) return;
+    const nv = nivelByK(t.nivel); if (k.age < nv.ages[0] - 1 || k.age > nv.ages[1] + 1) incoerente.push(k.n); }));
+  incoerente.length === 0 ? ok('idades coerentes com o nível da turma') : fail('idade × nível incoerente: ' + incoerente.slice(0, 3).join(', '));
+  // fila de sem turma
+  const fila = W.semTurmaKids();
+  fila.length >= 3 ? ok(`${fila.length} alunos aguardando turma (fila tem o que mostrar)`) : fail('fila de sem turma vazia');
+  // as 3 visões renderizam
+  W.go('agenda');
+  W.setAgView('grade');
+  $('agBody').innerHTML.includes('Horário') && $('agBody').textContent.includes('CHEIA') ? ok('grade geral renderiza (com CHEIA)') : fail('grade vazia');
+  W.setAgView('salas');
+  $('agBody').textContent.includes('Green') ? ok('cards de salas renderizam') : fail('cards de salas vazios');
+  W.openSalaView('green');
+  $('salaPage') && $('agBody').textContent.includes('GREEN ROOM') ? ok('página da sala no formato do Canva') : fail('página da sala não renderizou');
+  $('agBody').textContent.includes('NÃO TEM VAGA') ? ok('turma cheia mostra "NÃO TEM VAGA" como no Canva') : fail('sem "NÃO TEM VAGA" na página da sala');
+  $('agBody').textContent.includes('Teacher Mariana Rios') ? ok('teacher aparece quando preenchido') : fail('teacher sumiu da página da sala');
+  W.setAgView('niveis');
+  $('agBody').textContent.includes('Power 2') && $('agBody').textContent.includes('sem turma neste semestre') ? ok('visão por nível + níveis sem oferta esmaecidos') : fail('visão por nível incompleta');
+  $('agBody').textContent.includes('vaga') ? ok('visão por nível mostra vagas ("que dia tem Power 2?")') : fail('visão por nível sem vagas');
+  // "só com vagas" esmaece as cheias na grade
+  W.setAgView('grade'); W.toggleAgVagas();
+  $('agBody').innerHTML.includes('opacity-25') ? ok('"só com vagas" esmaece as turmas cheias') : fail('toggle de vagas sem efeito');
+  W.toggleAgVagas();
+  // criar turma + slot ocupado recusado
+  const before = TURMAS.length;
+  W.openNewTurma('lavender', 'seg-qua', '08:30', 'power-2');
+  W.agSaveTurma();
+  TURMAS.length === before + 1 ? ok('turma nova criada') : fail('não criou turma');
+  const nova = TURMAS[TURMAS.length - 1];
+  W.openNewTurma('lavender', 'seg-qua', '08:30', 'power-3');
+  W.agSaveTurma();
+  TURMAS.length === before + 1 && $('ntErr').innerHTML.includes('já tem turma') ? ok('slot ocupado recusado (sala não duplica horário)') : fail('aceitou duas turmas no mesmo slot');
   W.closeModal();
+  // mover/alocar aluno da fila — habilita ao escolher, aplica, loga e tira da fila
+  const ACT = W.eval('ACTIVITY'); const actBefore = ACT.length;
+  const alvo = fila[0];
+  W.openMoverKid(alvo.s.id, alvo.ki);
+  $('mvGo').disabled ? ok('mover começa desabilitado') : fail('mover habilitado sem destino');
+  W.mvPick(nova.id);
+  !$('mvGo').disabled ? ok('escolher destino habilita') : fail('não habilitou ao escolher');
+  W.confirmMoverKid(alvo.s.id, alvo.ki);
+  alvo.k.tid === nova.id ? ok('aluno da fila alocado na turma') : fail('alocação não aplicou');
+  ACT.length === actBefore + 1 ? ok('movimentação entra no registro de atividades') : fail('mover não logou');
+  W.semTurmaKids().length === fila.length - 1 ? ok('fila diminui após alocar') : fail('fila não diminuiu');
+  // capacidade: 0 é recusada; menor que a ocupação também
+  W.openTurmaModal(nova.id);
+  $('etCap').value = '0';
+  W.agUpdateTurma(nova.id);
+  turmaById(nova.id).cap === 7 ? ok('capacidade 0 recusada') : fail('aceitou capacidade 0');
+  W.closeModal();
+  const cheia = TURMAS.find(t => W.activeKidsIn(t.id) >= 2);
+  W.openTurmaModal(cheia.id);
+  $('etCap').value = '1';
+  W.agUpdateTurma(cheia.id);
+  turmaById(cheia.id).cap >= W.activeKidsIn(cheia.id) ? ok('capacidade não desce abaixo da ocupação') : fail('capacidade ficou menor que a turma!');
+  W.closeModal();
+  // excluir: com aluno não; vazia sim
+  W.agDeleteTurma(nova.id);
+  turmaById(nova.id) ? ok('turma com aluno não é excluída') : fail('EXCLUIU TURMA OCUPADA!');
+  W.openMoverKid(alvo.s.id, alvo.ki); W.mvPick(0); W.confirmMoverKid(alvo.s.id, alvo.ki); // devolve pra fila
+  alvo.k.tid === null ? ok('"deixar sem turma" devolve para a fila') : fail('não voltou para a fila');
+  W.agDeleteTurma(nova.id); W.confirmAgDeleteTurma(nova.id);
+  !turmaById(nova.id) ? ok('turma vazia excluída') : fail('não excluiu turma vazia');
+  // CRUD de sala: teacher é opcional (preenche e remove)
+  W.openSalaEdit('rose');
+  $('seProf').value = 'Fernanda Brito';
+  W.saveSala('rose');
+  salaById('rose').prof === 'Fernanda Brito' ? ok('teacher da sala salvo') : fail('teacher não salvou');
+  W.openSalaEdit('rose');
+  $('seProf').value = '';
+  W.saveSala('rose');
+  salaById('rose').prof === null ? ok('teacher vazio remove (campo opcional)') : fail('teacher não removeu');
+}
+
+/* ---------- filtros de alunos por turma (nível, sala, teacher, período) ---------- */
+section('Filtros de alunos por turma');
+{
+  const kidTurma = W.eval('kidTurma'), nivelByK = W.eval('nivelByK'), salaById = W.eval('salaById');
+  W.go('alunos'); W.clearFilters();
+  W.csSet('fNivel', 'fam:power');
+  const fam = W.filteredStudents();
+  fam.length > 0 && fam.every(s => s.kids.some(k => { const t = kidTurma(k); return t && nivelByK(t.nivel).fam === 'power'; }))
+    ? ok(`família inteira filtra — Todos os Power (${fam.length})`) : fail('filtro de família vazou');
+  W.csSet('fNivel', 'power-2');
+  const p2 = W.filteredStudents();
+  p2.length > 0 && p2.every(s => s.kids.some(k => kidTurma(k)?.nivel === 'power-2'))
+    ? ok(`nível específico filtra — Power 2 (${p2.length})`) : fail('filtro de nível vazou');
+  W.clearFilters();
+  W.csSet('fSala', 'green');
+  const gr = W.filteredStudents();
+  gr.length > 0 && gr.every(s => s.kids.some(k => kidTurma(k)?.sala === 'green'))
+    ? ok(`sala filtra — Green Room (${gr.length})`) : fail('filtro de sala vazou');
+  W.csSet('fSala', 'none');
+  const semT = W.filteredStudents();
+  semT.every(s => s.kids.some(k => !k.tid)) ? ok(`"Sem turma" filtra (${semT.length})`) : fail('filtro sem turma vazou');
+  W.clearFilters();
+  W.csSet('fProf', 'Mariana Rios');
+  const pr = W.filteredStudents();
+  pr.length > 0 && pr.every(s => s.kids.some(k => { const t = kidTurma(k); return t && salaById(t.sala).prof === 'Mariana Rios'; }))
+    ? ok(`teacher filtra (${pr.length})`) : fail('filtro de teacher vazou');
+  W.clearFilters();
+  W.csSet('fPeriodo', 'm');
+  const man = W.filteredStudents();
+  man.length > 0 && man.every(s => s.kids.some(k => { const t = kidTurma(k); return t && +t.hora.slice(0, 2) < 12; }))
+    ? ok(`período matutino filtra (${man.length})`) : fail('filtro matutino vazou');
+  W.csSet('fPeriodo', 't'); W.csSet('fDia', 'ter-qui'); W.csSet('fHora', '15:30');
+  const combo = W.filteredStudents();
+  combo.every(s => s.kids.some(k => { const t = kidTurma(k); return t && t.par === 'ter-qui' && t.hora === '15:30'; }))
+    ? ok(`dia + horário combinados (${combo.length})`) : fail('combinação de filtros vazou');
+  W.clearFilters();
 }
 
 /* ---------- modelos de e-mail: criar, editar, excluir ---------- */

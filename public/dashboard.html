@@ -160,7 +160,10 @@
   .cs.open .cs-btn{ border-color:#2F539A; box-shadow:0 0 0 3px rgba(47,83,154,.15); }
   .cs.open .cs-chev{ transform:rotate(180deg); }
   .cs-chev{ transition:transform .15s ease; }
-  .cs-menu{ animation:pop .14s ease both; }
+  .cs-menu{ animation:pop .14s ease both; max-height:320px; overflow-y:auto; }
+  /* agenda: grade geral com coluna de horários fixa */
+  #agGridScroll{ overflow-x:auto; }
+  #agGridScroll .ag-sticky{ position:sticky; left:0; z-index:2; background:var(--card); }
   /* checkbox componentizada */
   .ck{ width:18px; height:18px; border-radius:6px; border:2px solid var(--border); display:inline-grid;
     place-content:center; transition:all .15s ease; cursor:pointer; background:var(--card); }
@@ -274,6 +277,10 @@
             <span class="bar absolute left-0 top-2 bottom-2 w-1 rounded-full opacity-0 transition" style="background:var(--sb-accent)"></span>
             <i data-lucide="graduation-cap" class="w-[18px] h-[18px]"></i><span class="text-sm font-medium">Alunos</span>
             <span id="navNewBadge" class="ml-auto text-[11px] px-2 py-0.5 rounded-full font-bold" style="background:var(--sb-accent);color:var(--sb-accent-text)">3 novas</span></a>
+          <a class="nav-item sb-item group relative flex items-center gap-3 px-3 h-10 rounded-xl transition cursor-pointer" data-tour="nav-agenda" onclick="go('agenda', this)">
+            <span class="bar absolute left-0 top-2 bottom-2 w-1 rounded-full opacity-0 transition" style="background:var(--sb-accent)"></span>
+            <i data-lucide="calendar-days" class="w-[18px] h-[18px]"></i><span class="text-sm font-medium">Agenda</span>
+            <span id="navAgBadge" class="ml-auto text-[11px] px-2 py-0.5 rounded-full" style="background:var(--sb-badge-bg);color:var(--sb-badge-text)"></span></a>
           <a class="nav-item sb-item group relative flex items-center gap-3 px-3 h-10 rounded-xl transition cursor-pointer" onclick="go('contratos', this)">
             <span class="bar absolute left-0 top-2 bottom-2 w-1 rounded-full opacity-0 transition" style="background:var(--sb-accent)"></span>
             <i data-lucide="file-text" class="w-[18px] h-[18px]"></i><span class="text-sm font-medium">Contratos</span>
@@ -416,6 +423,7 @@
           <span class="flex items-center gap-2"><i data-lucide="cake" class="w-4 h-4 text-brand-light"></i>Média de idade <strong id="stAge">—</strong></span>
           <span class="flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-brand-light"></i><strong id="stFam">—</strong> com irmãos matriculados</span>
           <span class="flex items-center gap-2"><i data-lucide="armchair" class="w-4 h-4 text-brand-light"></i>Ocupação das turmas <strong id="stOcc">—</strong></span>
+          <span onclick="go('agenda')" class="flex items-center gap-2 cursor-pointer hover:underline" title="Alunos matriculados que ainda não foram colocados numa turma — toque para alocar na Agenda"><i data-lucide="hourglass" class="w-4 h-4" style="color:#B5860B"></i><strong id="stSemTurma" style="color:#B5860B">—</strong> aguardando turma</span>
           <span class="flex items-center gap-2"><i data-lucide="file-check-2" class="w-4 h-4 text-brand-light"></i>Contratos assinados <strong id="stSigned">—</strong></span>
           <span class="flex items-center gap-2"><i data-lucide="backpack" class="w-4 h-4" style="color:#2F539A"></i><strong id="stNext" style="color:#2F539A">—</strong> começam em Jul (2026.2)</span>
           <span class="flex items-center gap-2"><i data-lucide="refresh-ccw" class="w-4 h-4 text-brand-light"></i>Rematrículas do semestre <strong>91%</strong></span>
@@ -445,15 +453,15 @@
         <div class="dash-row grid lg:grid-cols-3 gap-4 mt-4">
           <div class="surface rounded-2xl p-5 lg:col-span-2 flex flex-col" data-tour="vagas">
             <div class="flex items-center justify-between gap-2 mb-4">
-              <div><h3 class="font-heading font-semibold text-lg">Vagas por horário</h3>
-                <p class="text-xs text-[var(--muted)]">Turmas de até 6 alunos · capacidade total de <span id="capTotal">150</span> vagas</p></div>
+              <div><h3 class="font-heading font-semibold text-lg">Ocupação por sala</h3>
+                <p class="text-xs text-[var(--muted)]">Turmas de até 7 alunos · capacidade total de <span id="capTotal">—</span> lugares</p></div>
               <div class="flex items-center gap-2">
                 <span class="text-xs px-2.5 py-1 rounded-full font-semibold whitespace-nowrap" style="background:rgba(22,163,74,.10);color:#16a34a" id="vagasChip">—</span>
-                <button onclick="openTurmas()" class="flex items-center gap-1.5 h-8 px-2.5 rounded-lg border border-[var(--border)] text-xs font-medium hover:bg-[var(--hover)] transition" title="Criar horários, mudar capacidades e excluir turmas vazias"><i data-lucide="settings-2" class="w-3.5 h-3.5"></i><span class="hidden sm:inline">Gerenciar</span></button>
+                <button onclick="go('agenda')" class="flex items-center gap-1.5 h-8 px-2.5 rounded-lg border border-[var(--border)] text-xs font-medium hover:bg-[var(--hover)] transition" title="Abrir a Agenda — criar turmas, mover alunos e ver as salas"><i data-lucide="calendar-days" class="w-3.5 h-3.5"></i><span class="hidden sm:inline">Abrir agenda</span></button>
               </div>
             </div>
             <div class="flex-1 content-center grid sm:grid-cols-2 gap-x-8 gap-y-3" id="vagasGrid"></div>
-            <p class="text-xs text-[var(--muted)] mt-auto pt-4 flex items-center gap-1.5"><i data-lucide="lightbulb" class="w-3.5 h-3.5" style="color:#F5B700"></i> Ter/Qui 14h é o horário mais vazio — boa opção para sugerir a quem pedir matrícula.</p>
+            <p class="text-xs text-[var(--muted)] mt-auto pt-4 flex items-center gap-1.5" id="vagasHint"><i data-lucide="lightbulb" class="w-3.5 h-3.5" style="color:#F5B700"></i> <span>Na <b>Agenda</b> dá para ver cada sala como no quadro do Canva — e mover alunos em 2 cliques.</span></p>
           </div>
           <div class="surface rounded-2xl p-5 flex flex-col">
             <h3 class="font-heading font-semibold text-lg mb-1">Faixa etária</h3>
@@ -494,9 +502,26 @@
             <p class="text-xs text-[var(--muted)] mb-4">Dias das aulas</p>
             <div class="relative h-44"><canvas id="chartSchedule"></canvas></div>
             <div class="mt-auto pt-4 space-y-2 text-sm">
-              <div class="flex items-center justify-between"><span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full" style="background:#2F539A"></span>Seg/Qua</span><span class="font-semibold">71</span></div>
-              <div class="flex items-center justify-between"><span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full" style="background:#F5B700"></span>Ter/Qui</span><span class="font-semibold">57</span></div>
+              <div class="flex items-center justify-between"><span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full" style="background:#2F539A"></span>Seg/Qua</span><span class="font-semibold" id="legSq">—</span></div>
+              <div class="flex items-center justify-between"><span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full" style="background:#F5B700"></span>Ter/Qui</span><span class="font-semibold" id="legTq">—</span></div>
             </div>
+          </div>
+        </div>
+
+        <!-- alunos por nível + entradas × saídas por sala -->
+        <div class="dash-row grid lg:grid-cols-3 gap-4 mt-4">
+          <div class="surface rounded-2xl p-5 lg:col-span-2 flex flex-col" data-tour="niveis">
+            <div class="flex items-center justify-between mb-4">
+              <div><h3 class="font-heading font-semibold text-lg">Alunos por nível</h3>
+                <p class="text-xs text-[var(--muted)]">Quantos alunos estudam em cada nível — só os níveis com turma neste semestre</p></div>
+              <button onclick="go('agenda');setAgView('niveis')" class="text-sm font-medium text-brand-light hover:underline flex items-center gap-1 whitespace-nowrap">Ver na agenda <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
+            </div>
+            <div id="nivelChart" class="flex-1 grid sm:grid-cols-2 gap-x-10 gap-y-3 content-center"></div>
+          </div>
+          <div class="surface rounded-2xl p-5 flex flex-col" data-tour="movimento">
+            <h3 class="font-heading font-semibold text-lg mb-1">Entradas × saídas</h3>
+            <p class="text-xs text-[var(--muted)] mb-4">Por sala, no semestre — entradas são matrículas novas; saídas, desligamentos da escola</p>
+            <div id="movList" class="flex-1 flex flex-col justify-evenly gap-1.5"></div>
           </div>
         </div>
 
@@ -540,7 +565,12 @@
           </div>
           <div id="fRow" class="collapsed md:!flex flex flex-wrap items-center gap-2 pt-2.5 border-t" style="border-color:var(--border)">
             <span class="hidden md:flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-[var(--muted)] mr-1"><i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>Filtros</span>
-            <span id="fScheduleWrap"></span>
+            <span id="fNivelWrap" data-tour="f-nivel"></span>
+            <span id="fSalaWrap"></span>
+            <span id="fProfWrap"></span>
+            <span id="fHoraWrap"></span>
+            <span id="fDiaWrap"></span>
+            <span id="fPeriodoWrap"></span>
             <span id="fStatusWrap"></span>
             <span id="fActiveWrap"></span>
             <span id="fHoodWrap"></span>
@@ -559,13 +589,49 @@
 
         <!-- tabela com design próprio (cabeçalho ordenável renderizado via JS; cards no mobile) -->
         <div class="surface rounded-2xl overflow-hidden table-shell">
-          <div id="tableHead" class="hidden md:grid grid-cols-[1.5fr_1.2fr_.7fr_.8fr_.7fr_.85fr_.8fr_52px] gap-3 px-5 py-3 text-[11px] uppercase tracking-wider text-[var(--muted)] font-semibold border-b" style="border-color:var(--border)"></div>
+          <div id="tableHead" class="hidden md:grid grid-cols-[1.45fr_1.1fr_1fr_.8fr_.7fr_.85fr_.8fr_52px] gap-3 px-5 py-3 text-[11px] uppercase tracking-wider text-[var(--muted)] font-semibold border-b" style="border-color:var(--border)"></div>
           <div id="tableBody"></div>
           <div class="table-foot flex flex-wrap items-center justify-between gap-2 px-5 py-3 md:border-t text-sm text-[var(--muted)]" style="border-color:var(--border)">
             <span id="tableCount">—</span>
             <div id="tablePager" class="flex items-center gap-1"></div>
           </div>
         </div>
+      </section>
+
+      <!-- ====================== AGENDA (salas × turmas × níveis) ====================== -->
+      <section data-view="agenda" class="fade-in">
+        <div class="flex flex-wrap items-end justify-between gap-3 mb-4">
+          <div>
+            <h1 class="font-heading text-2xl sm:text-3xl font-semibold mb-1">Agenda</h1>
+            <p class="text-[var(--muted)] text-sm">Todas as turmas, salas e níveis num lugar só — mover um aluno aqui atualiza a agenda inteira na hora</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button onclick="openSalasManage()" class="flex items-center gap-2 h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)]" title="Renomear salas, trocar cores e definir o teacher de cada uma"><i data-lucide="door-open" class="w-4 h-4"></i><span class="hidden sm:inline">Salas</span></button>
+            <button onclick="openAgExport()" data-tour="ag-export" class="flex items-center gap-2 h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)]" title="Gera as imagens da agenda — como as páginas do Canva, mas sempre atualizadas"><i data-lucide="image-down" class="w-4 h-4"></i><span class="hidden sm:inline">Exportar imagens</span></button>
+            <button onclick="openNewTurma()" data-tour="ag-nova" class="flex items-center gap-2 h-10 px-4 rounded-xl text-white text-sm font-semibold" style="background:linear-gradient(135deg,#1E3765,#2F539A)"><i data-lucide="plus" class="w-4 h-4"></i>Nova turma</button>
+          </div>
+        </div>
+
+        <!-- fila: alunos sem turma -->
+        <div id="agSemTurma" class="mb-4"></div>
+
+        <!-- visões + filtros transversais -->
+        <div class="surface rounded-2xl p-3 mb-4 flex flex-wrap items-center gap-2" data-tour="ag-filtros">
+          <div class="flex items-center bg-[var(--hover)] rounded-xl p-1 text-sm" data-tour="ag-views">
+            <button id="agvGrade" onclick="setAgView('grade')" class="px-3 py-1.5 rounded-lg bg-[var(--card)] shadow-sm font-medium">Grade</button>
+            <button id="agvSalas" onclick="setAgView('salas')" class="px-3 py-1.5 rounded-lg text-[var(--muted)]">Salas</button>
+            <button id="agvNiveis" onclick="setAgView('niveis')" class="px-3 py-1.5 rounded-lg text-[var(--muted)]">Níveis</button>
+          </div>
+          <div class="flex items-center bg-[var(--hover)] rounded-xl p-1 text-sm" id="agParSeg" data-tour="ag-par">
+            <button id="agpSq" onclick="setAgPar('seg-qua')" class="px-3 py-1.5 rounded-lg bg-[var(--card)] shadow-sm font-medium">Seg/Qua</button>
+            <button id="agpTq" onclick="setAgPar('ter-qui')" class="px-3 py-1.5 rounded-lg text-[var(--muted)]">Ter/Qui</button>
+          </div>
+          <button id="agVagasBtn" onclick="toggleAgVagas()" data-tour="ag-vagas" class="h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium flex items-center gap-1.5 transition" title="Mostra só as turmas que ainda têm vaga — o modo 'onde cabe aluno?'"><i data-lucide="armchair" class="w-4 h-4"></i>Só com vagas</button>
+          <span id="agPeriodoWrap"></span>
+          <span id="agProfWrap"></span>
+        </div>
+
+        <div id="agBody"></div>
       </section>
 
       <!-- ====================== DETALHE DO ALUNO ====================== -->
@@ -866,7 +932,7 @@
                 <div><p class="font-medium text-sm">Rever as dicas desta tela</p><p class="text-xs text-[var(--muted)]">O botão "?" no canto faz o mesmo em qualquer tela</p></div>
                 <i data-lucide="play-circle" class="w-5 h-5 text-brand-light"></i>
               </div>
-              <div onclick="localStorage.removeItem('ep-tours-off');['overview','alunos','editor','contratos','modelos','emails','usuarios','atividade','config'].forEach(v=>localStorage.removeItem('ep-tour-seen-'+v));toast('Dicas reativadas em todas as telas!')" class="flex items-center justify-between pt-3 border-t cursor-pointer hover:bg-[var(--hover)] -mx-2 px-2 py-1.5 rounded-lg transition" style="border-color:var(--border)">
+              <div onclick="localStorage.removeItem('ep-tours-off');['overview','alunos','agenda','editor','contratos','modelos','emails','usuarios','atividade','config'].forEach(v=>localStorage.removeItem('ep-tour-seen-'+v));toast('Dicas reativadas em todas as telas!')" class="flex items-center justify-between pt-3 border-t cursor-pointer hover:bg-[var(--hover)] -mx-2 px-2 py-1.5 rounded-lg transition" style="border-color:var(--border)">
                 <div><p class="font-medium text-sm">Reativar dicas em todas as telas</p><p class="text-xs text-[var(--muted)]">Volta a mostrar os tours uma vez por tela</p></div>
                 <i data-lucide="rotate-ccw" class="w-5 h-5 text-[var(--muted)]"></i>
               </div>
@@ -990,22 +1056,123 @@ const EXIT_REASONS=[
   { k:'completed',  ic:'graduation-cap',  l:'Concluiu o curso',               d:'O aluno alcançou o objetivo e encerrou o ciclo na escola' },
   { k:'other',      ic:'pencil-line',     l:'Outro motivo',                   d:'Descreva abaixo o que aconteceu' },
 ];
+
+/* ====================== SALAS · NÍVEIS · TURMAS ======================
+   O modelo real da escola: 13 salas com nome de cor; professor + sala andam
+   juntos no semestre (teacher é OPCIONAL — aparece na agenda só se preenchido);
+   cada TURMA é sala × par de dias × horário, com um nível e até 7 lugares.
+   O aluno (kid) aponta para a turma via `tid` — irmãos podem ter turmas
+   diferentes, e aluno sem turma (tid:null) fica na fila "aguardando turma". */
+const SALAS=[
+  { id:'green',     n:'Green Room',     c:'#7CB342', prof:'Mariana Rios' },
+  { id:'vanilla',   n:'Vanilla Room',   c:'#D9B777', prof:'Júlia Tavares' },
+  { id:'peach',     n:'Peach Room',     c:'#F2997A', prof:'Letícia Prado' },
+  { id:'purple',    n:'Purple Room',    c:'#8E5AC8', prof:'Rafaela Pires' },
+  { id:'blue',      n:'Blue Room',      c:'#4A7FD4', prof:'Ana Castro' },
+  { id:'orange',    n:'Orange Room',    c:'#F08A3C', prof:'Bruno Costa' },
+  { id:'mint',      n:'Mint Room',      c:'#4DB89E', prof:'Carla Mendes' },
+  { id:'yellow',    n:'Yellow Room',    c:'#E8B931', prof:'Paula Vieira' },
+  { id:'guava',     n:'Guava Room',     c:'#E0606E', prof:null },
+  { id:'beige',     n:'Beige Room',     c:'#B9A189', prof:'Renata Lopes' },
+  { id:'rose',      n:'Rose Room',      c:'#E26D9F', prof:null },
+  { id:'turquoise', n:'Turquoise Room', c:'#31B5C4', prof:'Camila Duarte' },
+  { id:'lavender',  n:'Lavender Room',  c:'#A78BDB', prof:null },
+];
+/* 19 níveis em 4 famílias, em ordem de evolução (nem todo semestre tem todos) */
+const FAMS={ fun:{n:'Fun Plus',c:'#E8861B'}, conv:{n:'Conversation',c:'#E0457B'}, power:{n:'Power',c:'#2F539A'}, sprint:{n:'Sprint',c:'#7C3AED'} };
+const NIVEIS=[
+  { k:'fun-a',     n:'Fun Plus A',     fam:'fun',    ages:[4,5]  },
+  { k:'fun-b',     n:'Fun Plus B',     fam:'fun',    ages:[5,6]  },
+  { k:'conv-1',    n:'Conversation 1', fam:'conv',   ages:[5,7]  },
+  { k:'conv-2',    n:'Conversation 2', fam:'conv',   ages:[6,8]  },
+  { k:'conv-3',    n:'Conversation 3', fam:'conv',   ages:[7,9]  },
+  { k:'power-1',   n:'Power 1',        fam:'power',  ages:[8,10] },
+  { k:'power-2',   n:'Power 2',        fam:'power',  ages:[9,11] },
+  { k:'power-3',   n:'Power 3',        fam:'power',  ages:[10,12]},
+  { k:'power-4',   n:'Power 4',        fam:'power',  ages:[11,13]},
+  { k:'power-5',   n:'Power 5',        fam:'power',  ages:[12,14]},
+  { k:'power-6',   n:'Power 6',        fam:'power',  ages:[13,15]},
+  { k:'sprint-1a', n:'Sprint 1A',      fam:'sprint', ages:[12,14]},
+  { k:'sprint-1b', n:'Sprint 1B',      fam:'sprint', ages:[12,14]},
+  { k:'sprint-2a', n:'Sprint 2A',      fam:'sprint', ages:[13,15]},
+  { k:'sprint-2b', n:'Sprint 2B',      fam:'sprint', ages:[13,15]},
+  { k:'sprint-3a', n:'Sprint 3A',      fam:'sprint', ages:[14,16]},
+  { k:'sprint-3b', n:'Sprint 3B',      fam:'sprint', ages:[14,16]},
+  { k:'sprint-4a', n:'Sprint 4A',      fam:'sprint', ages:[15,17]},
+  { k:'sprint-4b', n:'Sprint 4B',      fam:'sprint', ages:[15,17]},
+];
+/* horários reais das aulas (1h cada; 15:30→16:45 tem intervalo) */
+const HORAS=['08:30','09:30','10:30','13:30','14:30','15:30','16:45','17:45'];
+/* as turmas do semestre — capacidade padrão (e máxima) de 7 lugares.
+   9 salas em uso, 4 vazias; 5 turmas de manhã; fun-b e os sprint-3b/4a/4b sem oferta. */
+const TURMAS=[
+  { id:1,  sala:'green',  par:'seg-qua', hora:'08:30', nivel:'fun-a',     cap:7 },
+  { id:2,  sala:'green',  par:'seg-qua', hora:'09:30', nivel:'conv-1',    cap:7 },
+  { id:3,  sala:'green',  par:'seg-qua', hora:'13:30', nivel:'conv-2',    cap:7 },
+  { id:4,  sala:'green',  par:'seg-qua', hora:'15:30', nivel:'conv-1',    cap:7 },
+  { id:5,  sala:'green',  par:'ter-qui', hora:'09:30', nivel:'conv-2',    cap:7 },
+  { id:6,  sala:'green',  par:'ter-qui', hora:'14:30', nivel:'conv-3',    cap:7 },
+  { id:7,  sala:'blue',   par:'seg-qua', hora:'10:30', nivel:'power-1',   cap:7 },
+  { id:8,  sala:'blue',   par:'seg-qua', hora:'14:30', nivel:'power-2',   cap:7 },
+  { id:9,  sala:'blue',   par:'seg-qua', hora:'16:45', nivel:'power-3',   cap:7 },
+  { id:10, sala:'blue',   par:'ter-qui', hora:'15:30', nivel:'power-1',   cap:7 },
+  { id:11, sala:'blue',   par:'ter-qui', hora:'16:45', nivel:'power-2',   cap:7 },
+  { id:12, sala:'peach',  par:'seg-qua', hora:'14:30', nivel:'conv-3',    cap:7 },
+  { id:13, sala:'peach',  par:'seg-qua', hora:'16:45', nivel:'fun-a',     cap:7 },
+  { id:14, sala:'peach',  par:'ter-qui', hora:'13:30', nivel:'conv-2',    cap:7 },
+  { id:15, sala:'peach',  par:'ter-qui', hora:'15:30', nivel:'conv-3',    cap:7 },
+  { id:16, sala:'mint',   par:'seg-qua', hora:'15:30', nivel:'sprint-1a', cap:7 },
+  { id:17, sala:'mint',   par:'seg-qua', hora:'17:45', nivel:'sprint-2b', cap:7 },
+  { id:18, sala:'mint',   par:'ter-qui', hora:'17:45', nivel:'sprint-1b', cap:7 },
+  { id:19, sala:'purple', par:'seg-qua', hora:'13:30', nivel:'power-4',   cap:7 },
+  { id:20, sala:'purple', par:'ter-qui', hora:'14:30', nivel:'power-5',   cap:7 },
+  { id:21, sala:'purple', par:'ter-qui', hora:'17:45', nivel:'power-6',   cap:7 },
+  { id:22, sala:'orange', par:'seg-qua', hora:'14:30', nivel:'sprint-3a', cap:7 },
+  { id:23, sala:'orange', par:'ter-qui', hora:'16:45', nivel:'sprint-2a', cap:7 },
+  { id:24, sala:'yellow', par:'seg-qua', hora:'16:45', nivel:'conv-3',    cap:7 },
+  { id:25, sala:'yellow', par:'ter-qui', hora:'10:30', nivel:'power-1',   cap:7 },
+  { id:26, sala:'rose',   par:'ter-qui', hora:'13:30', nivel:'conv-1',    cap:7 },
+  { id:27, sala:'rose',   par:'ter-qui', hora:'15:30', nivel:'conv-2',    cap:7 },
+  { id:28, sala:'guava',  par:'seg-qua', hora:'15:30', nivel:'power-3',   cap:7 },
+];
+let nextTurmaId=29;
+const turmaById=id=>TURMAS.find(t=>t.id===id);
+const salaById=id=>SALAS.find(s=>s.id===id);
+const nivelByK=k=>NIVEIS.find(n=>n.k===k);
+const nivelLabel=k=>nivelByK(k)?.n||'—';
+const famC=k=>FAMS[nivelByK(k)?.fam]?.c||'#64748B';
+const horaPeriodo=h=>+h.slice(0,2)<12?'m':'t';
+const kidTurma=k=>k&&k.tid?turmaById(k.tid):null;
+/* ocupação só conta alunos ativos */
+function activeKidsIn(tid){ let n=0; STUDENTS.forEach(s=>{ if(s.active===false) return; s.kids.forEach(k=>{ if(k.tid===tid) n++; }); }); return n; }
+const turmaVagas=t=>Math.max(0,t.cap-activeKidsIn(t.id));
+const turmaFull=t=>activeKidsIn(t.id)>=t.cap;
+const turmaShort=t=>`${salaById(t.sala).n.replace(' Room','')} · ${t.par==='seg-qua'?'Seg/Qua':'Ter/Qui'} ${t.hora}`;
+/* fila de alunos ativos sem turma (cadastrou primeiro, atrela depois) */
+function semTurmaKids(){ const out=[]; STUDENTS.forEach(s=>{ if(s.active===false) return; s.kids.forEach((k,i)=>{ if(!k.tid) out.push({s,k,ki:i}); }); }); return out; }
+/* badge NOVO/NOVA do quadro do Canva: entrou neste semestre (ou começa no próximo) */
+const isNovo=s=> s.since==='02/02/2026' || (typeof isFuture==='function'&&isFuture(s)) || dvNumSafe(s)>=20260501;
+const dvNumSafe=s=>{ const m=(s.date||'').split('/'); return m.length===3?parseInt(m[2]+m[1]+m[0],10):0; };
+const novoTag=k=>/a$/i.test((k.n.split(' ')[0]||''))?'NOVA':'NOVO';
+
 const STUDENTS = [
-  { id:1, kids:[{n:'Helena Duarte Lima', age:8, b:'14/02/2018'}], resp:{n:'Mariana Duarte Lima', cpf:'047.812.336-50', phone:'(62) 99214-8870', email:'mariana.duarte@gmail.com', rel:'Mãe', b:'09/05/1989'}, second:{n:'Rafael Lima', phone:'(62) 98112-4471', rel:'Pai'}, fin:'Mariana Duarte Lima', addr:{cep:'74230-110', street:'Rua T-55', num:'180', comp:'Apto 902', bairro:'Setor Bueno', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'15h00–16h30', pay:'Boleto', status:'signed', media:true, since:'03/02/2025', date:'02/06/2026', hora:'20h14' },
-  { id:2, kids:[{n:'Théo Andrade Rocha', age:10, b:'22/08/2015'},{n:'Lara Andrade Rocha', age:7, b:'30/11/2018'}], resp:{n:'Patrícia Andrade', cpf:'118.553.701-22', phone:'(62) 99980-1245', email:'patricia.andrade@hotmail.com', rel:'Mãe', b:'17/03/1986'}, second:{n:'Bruno Rocha', phone:'(62) 99771-3380', rel:'Pai'}, fin:'Bruno Rocha', addr:{cep:'74115-030', street:'Av. T-9', num:'1240', comp:'', bairro:'Jardim Goiás', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'17h00–18h30', pay:'Boleto', status:'pending', media:true, since:'05/08/2024', date:'31/05/2026', hora:'19h32' },
-  { id:3, kids:[{n:'Miguel Ferreira Souza', age:12, b:'05/01/2014'}], resp:{n:'Camila Ferreira', cpf:'203.447.882-09', phone:'(62) 98341-6622', email:'camila.fsouza@gmail.com', rel:'Mãe', b:'25/07/1984'}, second:null, fin:'Camila Ferreira', addr:{cep:'74080-010', street:'Rua 90', num:'455', comp:'Casa 2', bairro:'Setor Sul', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'16h30–18h00', pay:'Boleto', status:'signed', media:false, since:'03/02/2025', date:'30/05/2026', hora:'10h05' },
-  { id:4, kids:[{n:'Sofia Mendes Castro', age:9, b:'19/09/2016'}], resp:{n:'Juliana Castro', cpf:'355.221.940-71', phone:'(62) 99657-2218', email:'ju.castro@outlook.com', rel:'Mãe', b:'12/12/1990'}, second:{n:'André Mendes', phone:'(62) 98220-9981', rel:'Pai'}, fin:'André Mendes', addr:{cep:'74810-100', street:'Rua C-140', num:'78', comp:'', bairro:'Jardim América', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'14h00–15h30', pay:'Boleto', status:'viewed', media:true, date:'29/05/2026', hora:'21h47' },
-  { id:5, kids:[{n:'Bernardo Pires Alves', age:6, b:'09/06/2020'}], resp:{n:'Fernanda Pires', cpf:'412.889.503-44', phone:'(62) 99102-7755', email:'fernanda.pires@gmail.com', rel:'Mãe', b:'28/02/1992'}, second:null, fin:'Fernanda Pires', addr:{cep:'74663-520', street:'Rua VP-7D', num:'320', comp:'Qd 12 Lt 4', bairro:'Vila São João', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'14h00–15h30', pay:'Boleto', status:'signed', media:true, date:'28/05/2026',hora:'14h22' },
-  { id:6, kids:[{n:'Alice Barbosa Nunes', age:11, b:'27/06/2015'}], resp:{n:'Renata Nunes', cpf:'509.334.118-60', phone:'(62) 98876-4400', email:'renata.nunes@yahoo.com', rel:'Mãe', b:'05/09/1983'}, second:{n:'Carlos Barbosa', phone:'(62) 99443-1102', rel:'Pai'}, fin:'Renata Nunes', addr:{cep:'74125-160', street:'Av. Mutirão', num:'2540', comp:'Apto 1503', bairro:'Setor Marista', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'16h30–18h00', pay:'Boleto', status:'signed', media:true, since:'01/08/2022', date:'27/05/2026', hora:'18h39' },
-  { id:7, kids:[{n:'Davi Cardoso Melo', age:13, b:'11/06/2013'}], resp:{n:'Aline Melo', cpf:'620.778.245-31', phone:'(62) 99320-8845', email:'aline.melo@gmail.com', rel:'Mãe', b:'19/11/1981'}, second:null, fin:'Aline Melo', addr:{cep:'74305-040', street:'Rua 1136', num:'95', comp:'', bairro:'Setor Pedro Ludovico', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'18h00–19h30', pay:'Boleto', status:'pending', media:false, since:'05/02/2024', date:'26/05/2026', hora:'20h51' },
-  { id:8, kids:[{n:'Manuela Teixeira Gomes', age:7, b:'08/07/2018'},{n:'Pedro Teixeira Gomes', age:9, b:'16/05/2016'}], resp:{n:'Vanessa Teixeira', cpf:'731.005.667-88', phone:'(62) 98990-3321', email:'va.teixeira@hotmail.com', rel:'Mãe', b:'03/06/1988'}, second:{n:'Marcos Gomes', phone:'(62) 99558-7700', rel:'Pai'}, fin:'Marcos Gomes', addr:{cep:'74884-120', street:'Av. Rio Verde', num:'1180', comp:'Cond. Jardins', bairro:'Jardim Atlântico', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'15h00–16h30', pay:'Boleto', status:'sent', media:true, since:'05/02/2024', date:'25/05/2026', hora:'16h08' },
-  { id:9, kids:[{n:'Isabela Ribeiro Dias', age:14, b:'02/02/2012'}], resp:{n:'Cristina Dias', cpf:'845.119.302-15', phone:'(62) 99701-2266', email:'cristina.dias@gmail.com', rel:'Mãe', b:'21/08/1979'}, second:null, fin:'Cristina Dias', addr:{cep:'74215-908', street:'Av. 136', num:'960', comp:'Sala 408', bairro:'Setor Sul', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'18h00–19h30', pay:'Boleto', status:'signed', media:false, active:false, exit:{ k:'moved', label:'Mudança de cidade ou bairro', note:'Família se mudou para Anápolis.', date:'28/05/2026' }, since:'06/02/2023', date:'24/05/2026', hora:'19h15' },
-  { id:10, kids:[{n:'Arthur Moraes Pinto', age:8, b:'29/10/2017'}], resp:{n:'Letícia Moraes', cpf:'956.443.870-02', phone:'(62) 98112-9943', email:'leticia.moraes@outlook.com', rel:'Mãe', b:'14/04/1991'}, second:{n:'Felipe Pinto', phone:'(62) 99887-6610', rel:'Pai'}, fin:'Felipe Pinto', addr:{cep:'74070-060', street:'Rua 22', num:'310', comp:'', bairro:'Setor Aeroporto', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'17h00–18h30', pay:'Boleto', status:'pending', media:true, active:false, exit:{ k:'financial', label:'Questões financeiras', note:'', date:'30/05/2026' }, date:'23/05/2026', hora:'11h26' },
-  { id:11, kids:[{n:'Laura Cavalcante Reis', age:10, b:'12/12/2015'}], resp:{n:'Daniela Reis', cpf:'063.778.221-49', phone:'(62) 99334-1180', email:'dani.reis@gmail.com', rel:'Mãe', b:'30/01/1987'}, second:null, fin:'Daniela Reis', addr:{cep:'74343-230', street:'Rua RF-12', num:'140', comp:'Qd 8', bairro:'Residencial Forte', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'15h00–16h30', pay:'Boleto', status:'signed', media:true, since:'07/08/2023', date:'22/05/2026', hora:'20h33' },
-  { id:12, kids:[{n:'Gabriel Fonseca Lopes', age:11, b:'07/08/2014'}], resp:{n:'Simone Fonseca', cpf:'174.882.605-77', phone:'(62) 98445-2290', email:'simone.fonseca@yahoo.com', rel:'Mãe', b:'08/10/1982'}, second:{n:'Thiago Lopes', phone:'(62) 99221-5544', rel:'Pai'}, fin:'Thiago Lopes', addr:{cep:'74150-020', street:'Av. T-63', num:'880', comp:'Apto 701', bairro:'Setor Bueno', city:'Goiânia', uf:'GO'}, sch:'ter-qui', t:'16h30–18h00', pay:'Boleto', status:'viewed', media:true, date:'21/05/2026',hora:'17h44' },
-  { id:13, kids:[{n:'Valentina Almeida Prado', age:9, b:'15/04/2017'},{n:'Henrique Almeida Prado', age:11, b:'20/09/2014'},{n:'Cecília Almeida Prado', age:6, b:'02/01/2020'}], resp:{n:'Roberta Almeida Prado', cpf:'288.443.190-66', phone:'(62) 99845-7733', email:'roberta.prado@gmail.com', rel:'Mãe', b:'11/07/1985'}, second:{n:'Eduardo Prado', phone:'(62) 99102-8844', rel:'Pai'}, fin:'Eduardo Prado', addr:{cep:'74110-100', street:'Rua 9', num:'520', comp:'Casa 1', bairro:'Setor Oeste', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'16h30–18h00', pay:'Boleto', status:'signed', media:true, since:'06/02/2023', date:'20/05/2026', hora:'19h58' },
+  { id:1, kids:[{n:'Helena Duarte Lima', age:8, b:'14/02/2018', tid:3}], resp:{n:'Mariana Duarte Lima', cpf:'047.812.336-50', phone:'(62) 99214-8870', email:'mariana.duarte@gmail.com', rel:'Mãe', b:'09/05/1989'}, second:{n:'Rafael Lima', phone:'(62) 98112-4471', rel:'Pai'}, fin:'Mariana Duarte Lima', addr:{cep:'74230-110', street:'Rua T-55', num:'180', comp:'Apto 902', bairro:'Setor Bueno', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'signed', media:true, since:'03/02/2025', date:'02/06/2026', hora:'20h14' },
+  // irmãos em turmas (e salas) diferentes — o caso real que o modelo antigo não representava
+  { id:2, kids:[{n:'Théo Andrade Rocha', age:10, b:'22/08/2015', tid:10},{n:'Lara Andrade Rocha', age:7, b:'30/11/2018', tid:14}], resp:{n:'Patrícia Andrade', cpf:'118.553.701-22', phone:'(62) 99980-1245', email:'patricia.andrade@hotmail.com', rel:'Mãe', b:'17/03/1986'}, second:{n:'Bruno Rocha', phone:'(62) 99771-3380', rel:'Pai'}, fin:'Bruno Rocha', addr:{cep:'74115-030', street:'Av. T-9', num:'1240', comp:'', bairro:'Jardim Goiás', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'pending', media:true, since:'05/08/2024', date:'31/05/2026', hora:'19h32' },
+  { id:3, kids:[{n:'Miguel Ferreira Souza', age:12, b:'05/01/2014', tid:9}], resp:{n:'Camila Ferreira', cpf:'203.447.882-09', phone:'(62) 98341-6622', email:'camila.fsouza@gmail.com', rel:'Mãe', b:'25/07/1984'}, second:null, fin:'Camila Ferreira', addr:{cep:'74080-010', street:'Rua 90', num:'455', comp:'Casa 2', bairro:'Setor Sul', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'signed', media:false, since:'03/02/2025', date:'30/05/2026', hora:'10h05' },
+  { id:4, kids:[{n:'Sofia Mendes Castro', age:9, b:'19/09/2016', tid:6}], resp:{n:'Juliana Castro', cpf:'355.221.940-71', phone:'(62) 99657-2218', email:'ju.castro@outlook.com', rel:'Mãe', b:'12/12/1990'}, second:{n:'André Mendes', phone:'(62) 98220-9981', rel:'Pai'}, fin:'André Mendes', addr:{cep:'74810-100', street:'Rua C-140', num:'78', comp:'', bairro:'Jardim América', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'viewed', media:true, date:'29/05/2026', hora:'21h47' },
+  { id:5, kids:[{n:'Bernardo Pires Alves', age:6, b:'09/06/2020', tid:4}], resp:{n:'Fernanda Pires', cpf:'412.889.503-44', phone:'(62) 99102-7755', email:'fernanda.pires@gmail.com', rel:'Mãe', b:'28/02/1992'}, second:null, fin:'Fernanda Pires', addr:{cep:'74663-520', street:'Rua VP-7D', num:'320', comp:'Qd 12 Lt 4', bairro:'Vila São João', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'signed', media:true, date:'28/05/2026',hora:'14h22' },
+  { id:6, kids:[{n:'Alice Barbosa Nunes', age:11, b:'27/06/2015', tid:11}], resp:{n:'Renata Nunes', cpf:'509.334.118-60', phone:'(62) 98876-4400', email:'renata.nunes@yahoo.com', rel:'Mãe', b:'05/09/1983'}, second:{n:'Carlos Barbosa', phone:'(62) 99443-1102', rel:'Pai'}, fin:'Renata Nunes', addr:{cep:'74125-160', street:'Av. Mutirão', num:'2540', comp:'Apto 1503', bairro:'Setor Marista', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'signed', media:true, since:'01/08/2022', date:'27/05/2026', hora:'18h39' },
+  { id:7, kids:[{n:'Davi Cardoso Melo', age:13, b:'11/06/2013', tid:16}], resp:{n:'Aline Melo', cpf:'620.778.245-31', phone:'(62) 99320-8845', email:'aline.melo@gmail.com', rel:'Mãe', b:'19/11/1981'}, second:null, fin:'Aline Melo', addr:{cep:'74305-040', street:'Rua 1136', num:'95', comp:'', bairro:'Setor Pedro Ludovico', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'pending', media:false, since:'05/02/2024', date:'26/05/2026', hora:'20h51' },
+  { id:8, kids:[{n:'Manuela Teixeira Gomes', age:7, b:'08/07/2018', tid:14},{n:'Pedro Teixeira Gomes', age:9, b:'16/05/2016', tid:15}], resp:{n:'Vanessa Teixeira', cpf:'731.005.667-88', phone:'(62) 98990-3321', email:'va.teixeira@hotmail.com', rel:'Mãe', b:'03/06/1988'}, second:{n:'Marcos Gomes', phone:'(62) 99558-7700', rel:'Pai'}, fin:'Marcos Gomes', addr:{cep:'74884-120', street:'Av. Rio Verde', num:'1180', comp:'Cond. Jardins', bairro:'Jardim Atlântico', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'sent', media:true, since:'05/02/2024', date:'25/05/2026', hora:'16h08' },
+  { id:9, kids:[{n:'Isabela Ribeiro Dias', age:14, b:'02/02/2012', tid:17}], resp:{n:'Cristina Dias', cpf:'845.119.302-15', phone:'(62) 99701-2266', email:'cristina.dias@gmail.com', rel:'Mãe', b:'21/08/1979'}, second:null, fin:'Cristina Dias', addr:{cep:'74215-908', street:'Av. 136', num:'960', comp:'Sala 408', bairro:'Setor Sul', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'signed', media:false, active:false, exit:{ k:'moved', label:'Mudança de cidade ou bairro', note:'Família se mudou para Anápolis.', date:'28/05/2026' }, since:'06/02/2023', date:'24/05/2026', hora:'19h15' },
+  { id:10, kids:[{n:'Arthur Moraes Pinto', age:8, b:'29/10/2017', tid:5}], resp:{n:'Letícia Moraes', cpf:'956.443.870-02', phone:'(62) 98112-9943', email:'leticia.moraes@outlook.com', rel:'Mãe', b:'14/04/1991'}, second:{n:'Felipe Pinto', phone:'(62) 99887-6610', rel:'Pai'}, fin:'Felipe Pinto', addr:{cep:'74070-060', street:'Rua 22', num:'310', comp:'', bairro:'Setor Aeroporto', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'pending', media:true, active:false, exit:{ k:'financial', label:'Questões financeiras', note:'', date:'30/05/2026' }, date:'23/05/2026', hora:'11h26' },
+  { id:11, kids:[{n:'Laura Cavalcante Reis', age:10, b:'12/12/2015', tid:8}], resp:{n:'Daniela Reis', cpf:'063.778.221-49', phone:'(62) 99334-1180', email:'dani.reis@gmail.com', rel:'Mãe', b:'30/01/1987'}, second:null, fin:'Daniela Reis', addr:{cep:'74343-230', street:'Rua RF-12', num:'140', comp:'Qd 8', bairro:'Residencial Forte', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'signed', media:true, since:'07/08/2023', date:'22/05/2026', hora:'20h33' },
+  { id:12, kids:[{n:'Gabriel Fonseca Lopes', age:11, b:'07/08/2014', tid:11}], resp:{n:'Simone Fonseca', cpf:'174.882.605-77', phone:'(62) 98445-2290', email:'simone.fonseca@yahoo.com', rel:'Mãe', b:'08/10/1982'}, second:{n:'Thiago Lopes', phone:'(62) 99221-5544', rel:'Pai'}, fin:'Thiago Lopes', addr:{cep:'74150-020', street:'Av. T-63', num:'880', comp:'Apto 701', bairro:'Setor Bueno', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'viewed', media:true, date:'21/05/2026',hora:'17h44' },
+  // três irmãos, três turmas: 9 anos no Conversation 3, 11 no Power 2 e 6 no Conversation 1 (manhã)
+  { id:13, kids:[{n:'Valentina Almeida Prado', age:9, b:'15/04/2017', tid:12},{n:'Henrique Almeida Prado', age:11, b:'20/09/2014', tid:8},{n:'Cecília Almeida Prado', age:6, b:'02/01/2020', tid:2}], resp:{n:'Roberta Almeida Prado', cpf:'288.443.190-66', phone:'(62) 99845-7733', email:'roberta.prado@gmail.com', rel:'Mãe', b:'11/07/1985'}, second:{n:'Eduardo Prado', phone:'(62) 99102-8844', rel:'Pai'}, fin:'Eduardo Prado', addr:{cep:'74110-100', street:'Rua 9', num:'520', comp:'Casa 1', bairro:'Setor Oeste', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'signed', media:true, since:'06/02/2023', date:'20/05/2026', hora:'19h58' },
   // mesma mãe da Helena (id 1), em matrícula separada — agrupa ao ordenar por responsável
-  { id:14, kids:[{n:'Lorenzo Duarte Lima', age:5, b:'09/10/2021'}], resp:{n:'Mariana Duarte Lima', cpf:'047.812.336-50', phone:'(62) 99214-8870', email:'mariana.duarte@gmail.com', rel:'Mãe', b:'09/05/1989'}, second:{n:'Rafael Lima', phone:'(62) 98112-4471', rel:'Pai'}, fin:'Mariana Duarte Lima', addr:{cep:'74230-110', street:'Rua T-55', num:'180', comp:'Apto 902', bairro:'Setor Bueno', city:'Goiânia', uf:'GO'}, sch:'seg-qua', t:'14h00–15h30', pay:'Boleto', status:'sent', media:true, date:'19/05/2026',hora:'20h41' },
+  { id:14, kids:[{n:'Lorenzo Duarte Lima', age:5, b:'09/10/2021', tid:13}], resp:{n:'Mariana Duarte Lima', cpf:'047.812.336-50', phone:'(62) 99214-8870', email:'mariana.duarte@gmail.com', rel:'Mãe', b:'09/05/1989'}, second:{n:'Rafael Lima', phone:'(62) 98112-4471', rel:'Pai'}, fin:'Mariana Duarte Lima', addr:{cep:'74230-110', street:'Rua T-55', num:'180', comp:'Apto 902', bairro:'Setor Bueno', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'sent', media:true, date:'19/05/2026',hora:'20h41' },
 ];
 
 /* +~116 matrículas geradas com seed fixa (mesmos dados em todo reload), calibradas para a
@@ -1054,28 +1221,21 @@ const STUDENTS = [
     const addr={ cep:`74${inAparecida?9:int(0,6)}${int(0,9)}${int(0,9)}-${int(1,9)}${int(0,9)}0`, street:genStreet(), num:String(int(15,2400)), comp:genComp(), bairro:inAparecida?pick(APARECIDA):pick(hoodPool), city:inAparecida?'Aparecida de Goiânia':'Goiânia', uf:'GO' };
     return { resp, second, fin: second&&rnd()<.3?second.n:resp.n, addr, surA, surB };
   };
-  const mkKid=(fam,age)=>{ const first=rnd()<.5?pick(GIRLS):pick(BOYS);
-    return { n:`${first} ${fam.surB} ${fam.surA}`, age, b:genBirth(age) }; };
+  const mkKid=(fam,tid,age)=>{ const first=rnd()<.5?pick(GIRLS):pick(BOYS);
+    const a=age??ageFor(tid);
+    return { n:`${first} ${fam.surB} ${fam.surA}`, age:a, b:genBirth(a), tid:tid??null }; };
 
-  /* vagas restantes por turma p/ alunos ATIVOS (já descontando os 14 hand-written) —
-     fecha em: SQ 16/18!/19/18! · TQ 11/15/18!/13 = 128 ativos, 22 vagas livres */
-  const TURMAS=[
-    {sch:'seg-qua',t:'14h00–15h30',q:14},{sch:'seg-qua',t:'15h00–16h30',q:16},
-    {sch:'seg-qua',t:'16h30–18h00',q:15},{sch:'seg-qua',t:'18h00–19h30',q:17},
-    {sch:'ter-qui',t:'14h00–15h30',q:10},{sch:'ter-qui',t:'15h00–16h30',q:13},
-    {sch:'ter-qui',t:'16h30–18h00',q:16},{sch:'ter-qui',t:'17h00–18h30',q:11},
-  ];
-  const takeTurma=n=>{ const opts=TURMAS.filter(x=>x.q>=n);
-    if(!opts.length){ const f=TURMAS.slice().sort((a,b)=>b.q-a.q)[0]; f.q-=n; return f; }
-    const tot=opts.reduce((a,x)=>a+x.q,0); let r=rnd()*tot;
-    for(const o of opts){ r-=o.q; if(r<=0){ o.q-=n; return o; } }
-    opts[0].q-=n; return opts[0]; };
-
-  /* idades dos 112 ativos gerados → faixa etária fecha em 18/42/39/22/7 com os hand-written */
-  const agePool=[];
-  [[4,5],[5,5],[6,5],[7,12],[8,12],[9,12],[10,11],[11,11],[12,11],[13,7],[14,7],[15,7],[16,4],[17,3]]
-    .forEach(([a,q])=>{ for(let i=0;i<q;i++) agePool.push(a); });
-  shuffle(agePool);
+  /* lugares a preencher por turma (alunos ATIVOS gerados, já descontando os 14
+     hand-written): fecha em 122 alunos em turma + 6 aguardando = 128 ativos.
+     CHEIAS (7/7) com os hand-written: t4, t8 e t11. */
+  const SEED_Q={1:3,2:3,3:4,4:6,5:3,6:4,7:4,8:5,9:4,10:4,11:5,12:4,13:3,14:3,
+    15:4,16:4,17:4,18:4,19:4,20:4,21:3,22:3,23:4,24:3,25:4,26:3,27:3,28:4}; // soma 106
+  const slotPool=[];
+  Object.entries(SEED_Q).forEach(([id,q])=>{ for(let i=0;i<q;i++) slotPool.push(+id); });
+  shuffle(slotPool);
+  /* idade coerente com o nível da turma onde o aluno caiu */
+  const ageFor=tid=>{ if(!tid) return int(5,14);
+    const nv=NIVEIS.find(n=>n.k===turmaById(tid).nivel); return int(nv.ages[0],nv.ages[1]); };
 
   /* datas seguem o gráfico de matrículas por mês (Jul/25 → Jun/26) */
   const MONTHS=[['07',2025,13],['08',2025,10],['09',2025,8],['10',2025,11],['11',2025,9],['12',2025,6],['01',2026,10],['02',2026,12],['03',2026,10],['04',2026,15],['05',2026,7],['06',2026,5]];
@@ -1090,29 +1250,33 @@ const STUDENTS = [
     : rnd()<.97 ? 'signed' : pick(['sent','viewed','pending']);
 
   let nextId=100;
-  /* 96 matrículas ativas: 81 de 1 aluno + 14 duplas de irmãos + 1 trio = 112 alunos */
-  const plans=[3, ...Array(14).fill(2), ...Array(81).fill(1)];
-  const actives=plans.map(nKids=>{ const fam=mkFamily(); const tu=takeTurma(nKids); const dt=datePool.pop();
-    return { id:nextId++, kids:Array.from({length:nKids},()=>mkKid(fam,agePool.pop())),
+  /* 96 matrículas ativas: 81 de 1 aluno + 14 duplas de irmãos + 1 trio = 112 alunos.
+     As datas vão em ordem: quando os lugares das turmas acabam, os ÚLTIMOS alunos
+     (matrículas de Mai/Jun, maioria do 2026.2) ficam SEM TURMA → a fila "aguardando
+     turma" nasce com gente de verdade, recém-matriculada. */
+  const plans=shuffle([3, ...Array(14).fill(2), ...Array(81).fill(1)]);
+  const dts=datePool.sort((a,b)=>(a.y*100+ +a.m)-(b.y*100+ +b.m));
+  const actives=plans.map((nKids,i)=>{ const fam=mkFamily(); const dt=dts[i];
+    return { id:nextId++, kids:Array.from({length:nKids},()=>mkKid(fam, slotPool.length?slotPool.pop():null)),
       resp:fam.resp, second:fam.second, fin:fam.fin, addr:fam.addr,
-      sch:tu.sch, t:tu.t, pay:'Boleto', status:statusFor(dt), media:rnd()>=.2, date:mkDate(dt), hora:genHora() }; });
+      pay:'Boleto', status:statusFor(dt), media:rnd()>=.2, date:mkDate(dt), hora:genHora() }; });
   /* 5 famílias com matrículas separadas (mesmo responsável → agrupa e ganha badge de família) */
   for(let i=0;i<5;i++){ const a=actives[20+i*13], b=actives[26+i*13];
     b.resp=a.resp; b.second=a.second; b.fin=a.fin; b.addr=a.addr;
     /* sobrenome é sempre o par final do nome (primeiro nome pode ser composto, ex. João Pedro) */
     b.kids=b.kids.map(k=>{ const first=k.n.split(' ').slice(0,-2).join(' '); const sur=a.kids[0].n.split(' ').slice(-2).join(' '); return {...k, n:`${first} ${sur}`}; }); }
 
-  /* 20 matrículas desligadas (22 alunos), com motivo registrado */
-  const TNAMES=TURMAS.map(x=>({sch:x.sch,t:x.t}));
+  /* 20 matrículas desligadas (22 alunos), com motivo registrado — guardam a turma
+     onde estudavam (histórico), mas não contam na ocupação */
   const EX_NOTES={ adapt:['Sentiu dificuldade com a dinâmica da turma.',''], financial:['Pediram para retornar no próximo semestre.',''],
     competitor:['Foram para uma escola bilíngue de período integral.',''], moved:['Família se mudou de bairro.','Mudança para Senador Canedo.'],
     schedule:['Treinos de futebol passaram para o mesmo horário.',''], completed:['Encerrou o ciclo com avaliação excelente.',''],
     other:['Pausa por questões de saúde na família.','Foi morar com o pai em outro estado.','Vai estudar fora do país por um ano.'] };
-  const inactives=Array.from({length:20},(_, i)=>{ const fam=mkFamily(); const tu=pick(TNAMES); const dt=inactiveDates[i];
+  const inactives=Array.from({length:20},(_, i)=>{ const fam=mkFamily(); const tu=pick(TURMAS); const dt=inactiveDates[i];
     const reason=EXIT_REASONS[i%EXIT_REASONS.length]; const nKids=i<2?2:1;
-    return { id:nextId++, kids:Array.from({length:nKids},()=>mkKid(fam,int(5,15))),
+    return { id:nextId++, kids:Array.from({length:nKids},()=>mkKid(fam,tu.id)),
       resp:fam.resp, second:fam.second, fin:fam.fin, addr:fam.addr,
-      sch:tu.sch, t:tu.t, pay:'Boleto', status:'signed', media:rnd()>=.2, active:false,
+      pay:'Boleto', status:'signed', media:rnd()>=.2, active:false,
       exit:{ k:reason.k, label:reason.l, note:pick(EX_NOTES[reason.k]), date:`${pad(int(1,28))}/${pad(int(2,5))}/2026` },
       date:mkDate(dt), hora:genHora() }; });
 
@@ -1168,7 +1332,7 @@ function cselect(id, items, opts={}){
       <i data-lucide="chevron-down" class="cs-chev w-4 h-4 text-[var(--muted)] ml-auto"></i>
     </button>
     <div class="cs-menu hidden absolute left-0 top-[calc(100%+6px)] min-w-full w-max max-w-[280px] z-40 surface rounded-xl shadow-2xl p-1.5" id="csm-${id}">
-      ${items.map((it,i)=>`<button type="button" onclick="csPick('${id}',${i})" class="w-full flex items-center justify-between gap-3 text-left text-sm px-3 py-2 rounded-lg hover:bg-[var(--hover)] transition"><span>${it.l}</span><i data-lucide="check" class="w-4 h-4 ${it.v===SEL[id].value?'text-brand-light':'opacity-0'}"></i></button>`).join('')}
+      ${items.map((it,i)=>`<button type="button" onclick="csPick('${id}',${i})" class="w-full flex items-center justify-between gap-3 text-left text-sm px-3 py-2 ${it.pad?'pl-7':''} rounded-lg hover:bg-[var(--hover)] transition"><span class="flex items-center gap-2 min-w-0">${it.dot?`<span class="w-2 h-2 rounded-full shrink-0" style="background:${it.dot}"></span>`:''}<span class="truncate ${it.bold?'font-semibold':''}">${it.l}</span></span><i data-lucide="check" class="w-4 h-4 shrink-0 ${it.v===SEL[id].value?'text-brand-light':'opacity-0'}"></i></button>`).join('')}
     </div>
   </div>`;
 }
@@ -1187,8 +1351,9 @@ function go(view, el){
   document.querySelectorAll('[data-view]').forEach(s=>s.classList.toggle('view-active', s.dataset.view===view));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   if(el){ el.classList.add('active'); }
-  else { const map={overview:0,alunos:1,contratos:2,emails:3,editor:4,usuarios:5,atividade:6,config:7};
+  else { const map={overview:0,alunos:1,agenda:2,contratos:3,emails:4,editor:5,usuarios:6,atividade:7,config:8};
     const idx=map[view]; if(idx!=null) document.querySelectorAll('.nav-item')[idx]?.classList.add('active'); }
+  if(view==='agenda'&&typeof renderAgenda==='function'&&inited) renderAgenda();
   toggleSidebar(false); closeEdit();
   const ht=document.getElementById('headerTitle'); if(ht) ht.textContent=VIEW_LABEL[view]||'Visão geral';
   window.scrollTo(0,0);
@@ -1299,7 +1464,8 @@ const TOURS={
     { target:'[data-tour="strip"]', title:'Indicadores rápidos', body:'Média de idade, famílias com irmãos, ocupação das turmas, assinaturas e rematrículas — a régua da escola numa linha.', placement:'bottom' },
     { target:'[data-tour="enroll"]', title:'Novas × rematrículas', body:'A linha azul são as matrículas novas; a tracejada amarela, as rematrículas do semestre.', placement:'right' },
     { target:'[data-tour="health"]', title:'Cobrança sem dor de cabeça', body:'O funil do Autentique em tempo real: assinados, visualizados, enviados e pendentes — com aviso de contrato parado há 7+ dias. O botão verde leva direto para a lista filtrada nos pendentes.', placement:'left' },
-    { target:'[data-tour="vagas"]', title:'Onde ainda cabe aluno', body:'Ocupação por horário, com a etiqueta CHEIA nas turmas lotadas. No "Gerenciar" dá para criar horários novos, mudar capacidades e excluir turmas vazias.', placement:'right' },
+    { target:'[data-tour="vagas"]', title:'Onde ainda cabe aluno', body:'Ocupação de cada sala, com a etiqueta CHEIA nas lotadas. Toque numa sala para abrir a página dela na Agenda — turmas, horários e alunos.', placement:'right' },
+    { target:'[data-tour="niveis"]', title:'Quantos alunos por nível', body:'Do Fun Plus ao Sprint, cada nível com a sua cor. Ao lado, as entradas e saídas por sala — de onde mais saiu gente e onde mais entrou.', placement:'top' },
     { target:'[data-tour="hours"]', title:'A hora do clique', body:'Mostra em que horário as famílias costumam matricular pelo site — útil para saber quando responder rápido e impulsionar posts.', placement:'right' },
     { target:'[data-tour="bday"]', title:'Mimos que fidelizam', body:'Os próximos aniversariantes, com botão que prepara as mensagens de parabéns no WhatsApp.', placement:'left' },
     { target:'[data-tour="export"]', title:'Leve para o Excel', body:'Exporta todos os alunos numa planilha que abre no Excel ou Google Planilhas.', placement:'bottom' },
@@ -1309,7 +1475,8 @@ const TOURS={
     { target:'[data-tour="row-menu"]', title:'Tudo mora nos três pontinhos', body:'Cada linha tem um menu completo: ficha do aluno, editar os dados, ver e baixar contrato, enviar no WhatsApp, copiar telefone, marcar como enviado/assinado, desligar o aluno (com registro do motivo) e excluir cadastros errados.', placement:'left' },
     { target:'#tableHead', title:'Ordene por qualquer coluna', body:'Clique no título de uma coluna para ordenar (vem por nome). Clique de novo para inverter. Ordenando por Responsável, os irmãos de matrículas separadas ficam juntos.', placement:'bottom' },
     { target:'[data-tour="col-since"]', title:'Desde quando estuda aqui', body:'A coluna "Na escola" mostra quando o aluno entrou de fato (sempre fevereiro ou agosto) — diferente da data de matrícula, que é só a última rematrícula. O traço (—) é quem ainda não tem o registro: preencha em ⋮ → Editar dados.', placement:'bottom' },
-    { target:'[data-tour="filtros"]', title:'Busca e filtros', body:'Por horário, contrato, situação (estudando agora × começam no próximo período), bairro, idade, imagem, irmãos e período de matrícula (de/até) — o "Limpar" zera tudo de uma vez.', placement:'bottom' },
+    { target:'[data-tour="filtros"]', title:'Busca e filtros', body:'Por nível (o mais importante — dá para escolher a família inteira, ex.: "Todos os Power"), sala, teacher, horário, dias, período (manhã/tarde), contrato, situação, bairro, idade, imagem, irmãos e datas — o "Limpar" zera tudo de uma vez.', placement:'bottom' },
+    { target:'[data-tour="f-nivel"]', title:'O filtro de nível', body:'Quer ver só o Power 2? Ou todos os Sprint de uma vez? É aqui. O teacher tem até a opção "Sem teacher", e a sala tem "Sem turma" — os alunos que ainda esperam alocação.', placement:'bottom' },
     { target:'[data-tip="Autorizou uso de imagem"]', title:'Câmera verde, câmera vermelha', body:'A camerazinha ao lado do nome mostra se a família autorizou fotos: verde = pode postar, vermelha = não pode.', placement:'right' },
     { target:'[data-tour="nova"]', title:'Matrícula manual', body:'A secretaria pode adicionar uma matrícula direto por aqui, sem passar pelo site.', placement:'bottom' },
     { target:'[data-tour="import-al"]', title:'Traga a planilha de hoje', body:'Importa o arquivo da planilha atual de matrículas. Linhas repetidas somem sozinhas, quem já está na dashboard não duplica, e nomes iguais ou dados estranhos entram numa lista para conferir antes de confirmar.', placement:'bottom' },
@@ -1327,6 +1494,15 @@ const TOURS={
     { target:'[data-tour="cfiltros"]', title:'Ache qualquer contrato', body:'Busque por aluno ou responsável e filtre por status — pendente de envio, enviado, visualizado (a família abriu o link) e assinado — e por situação.', placement:'bottom' },
     { target:'[data-tour="cmodelos"]', title:'O PDF que as matrículas usam', body:'Aqui ficam os modelos de contrato: importe um PDF novo (editado no Google Docs), veja onde cada campo é carimbado e escolha qual modelo vale para as próximas matrículas.', placement:'bottom' },
     { target:'#contractGrid', title:'Parado? Cobre em um clique', body:'Contrato sem assinatura há 7+ dias ganha a etiqueta vermelha "parado". O botão verde prepara a cobrança no WhatsApp com o link de assinatura — e em "Abrir" dá para ver a linha do tempo completa: enviado, visualizado, assinado.', placement:'top', last:true },
+  ],
+  agenda:[
+    { target:null, title:'A agenda que se atualiza sozinha', body:'Chega de refazer o quadro no Canva: aqui a agenda é um reflexo vivo dos dados. Mudou um aluno de turma? Todas as visões — e as imagens exportadas — já mudaram juntas.', placement:'center', logo:true },
+    { target:'[data-tour="ag-views"]', title:'Três jeitos de ver', body:'Grade = o raio-X da escola (salas × horários). Salas = a página de cada sala, igual ao quadro do Canva. Níveis = responde "que dia tem Power 2 e onde tem vaga?".', placement:'bottom' },
+    { target:'[data-tour="ag-par"]', title:'Seg/Qua ⇄ Ter/Qui', body:'As turmas vivem em pares de dias. Este botão troca o par em todas as visões (na visão por nível, os dois aparecem juntos).', placement:'bottom' },
+    { target:'[data-tour="ag-vagas"]', title:'O modo "onde cabe aluno?"', body:'Liga o "Só com vagas" e as turmas cheias somem — sobra exatamente onde dá para encaixar alguém. Perfeito para responder uma família no telefone.', placement:'bottom' },
+    { target:'[data-tour="ag-fila"]', title:'Ninguém fica esquecido', body:'Aluno matriculado sem turma entra nesta fila. Clique no nome e o painel mostra só os destinos válidos — turmas com vaga, do nível certo primeiro.', placement:'bottom' },
+    { target:'[data-tour="ag-nova"]', title:'Criar turma', body:'Sala, dias, horário, nível e vagas (padrão 7, que é o máximo). Também dá para criar direto pelo + de qualquer horário vazio na grade.', placement:'bottom' },
+    { target:'[data-tour="ag-export"]', title:'As imagens do Canva, sem o Canva', body:'Exporta a página de uma sala, o pacote de todas as salas ou um nível inteiro — no mesmo formato do quadro de hoje, mas sempre com os dados de agora. Turma cheia sai com o "NÃO TEM VAGA" de sempre.', placement:'bottom', last:true },
   ],
   atividade:[
     { target:'[data-tour="act-list"]', title:'A memória do painel', body:'Toda ação fica registrada: o que cada pessoa fez, o que o sistema fez sozinho e o que o Autentique avisou (visualizações e assinaturas). Nada aqui pode ser editado ou apagado.', placement:'top' },
@@ -1473,12 +1649,30 @@ function endTour(done){
 }
 
 /* ====================== TABELA DE ALUNOS ====================== */
+/* chips e célula de turma — a turma agora é do ALUNO (kid.tid), não da matrícula */
+const semTurmaChip=()=>`<span class="tip text-xs font-medium px-2.5 py-1 rounded-lg whitespace-nowrap inline-flex items-center gap-1.5" data-tip="Matriculado, mas ainda sem turma — aloque pela Agenda" style="color:#B5860B;background:rgba(245,183,0,.14)"><i data-lucide="hourglass" class="w-3 h-3"></i>Sem turma</span>`;
+function kidTurmaChip(k){
+  const t=kidTurma(k);
+  if(!t) return semTurmaChip();
+  const sala=salaById(t.sala);
+  return `<span class="tip text-xs font-medium px-2.5 py-1 rounded-lg whitespace-nowrap inline-flex items-center gap-1.5" data-tip="${nivelLabel(t.nivel)} · ${sala.n}${sala.prof?' · Teacher '+sala.prof:''}" style="color:var(--text);background:var(--hover)"><span class="w-2 h-2 rounded-full shrink-0" style="background:${sala.c}"></span>${sala.n.replace(' Room','')} · ${schLabel(t.par)} ${t.hora}</span>`;
+}
+function turmaCellHTML(s){
+  const infos=s.kids.map(k=>({k,t:kidTurma(k)}));
+  const first=infos[0];
+  const extra=infos.slice(1).filter(x=>(x.t?.id||0)!==(first.t?.id||0));
+  const more=extra.length?`<span class="tip text-[10px] font-bold px-1.5 py-0.5 rounded-md whitespace-nowrap" data-tip="${extra.map(x=>`${x.k.n.split(' ')[0]}: ${x.t?turmaShort(x.t)+' · '+nivelLabel(x.t.nivel):'sem turma'}`).join('  ·  ')}" style="background:var(--hover);color:var(--muted)">+${extra.length}</span>`:'';
+  if(!first.t) return `<div class="flex items-center gap-1.5">${semTurmaChip()}${more}</div>`;
+  const sala=salaById(first.t.sala);
+  return `<div class="min-w-0">
+    <p class="text-xs font-medium flex items-center gap-1.5 whitespace-nowrap"><span class="w-2 h-2 rounded-full shrink-0" style="background:${sala.c}"></span><span class="truncate">${sala.n.replace(' Room','')} · ${first.t.hora}</span>${more}</p>
+    <p class="text-[10px] mt-0.5 font-semibold whitespace-nowrap" style="color:${famC(first.t.nivel)}">${nivelLabel(first.t.nivel)} · ${schLabel(first.t.par)}</p>
+  </div>`;
+}
 function rowHTML(s){
   const nSib=s.kids.length-1;
   const more = nSib>0 ? `<span class="text-[11px] px-1.5 py-0.5 rounded-md font-medium whitespace-nowrap" style="background:var(--hover);color:var(--muted)">+${nSib} irmã${nSib>1?'os':'o'}</span>` : '';
   const st=STATUS[s.status];
-  const schColor = s.sch==='seg-qua' ? '#2F539A' : '#B5860B';
-  const schBg = s.sch==='seg-qua' ? 'rgba(47,83,154,.10)' : 'rgba(245,183,0,.14)';
   const inactive=s.active===false;
   const mediaIcon = s.media===false
     ? '<span class="tip inline-grid place-content-center w-5 h-5 rounded-md shrink-0" data-tip="Não autorizou uso de imagem" style="background:rgba(220,38,38,.10);color:#dc2626"><i data-lucide="camera-off" class="w-3 h-3"></i></span>'
@@ -1486,7 +1680,7 @@ function rowHTML(s){
   const fam=STUDENTS.filter(x=>x.resp.cpf===s.resp.cpf).length;
   const famBadge=fam>1?`<span class="tip inline-grid place-content-center w-5 h-5 rounded-md shrink-0" data-tip="Mesma família: este responsável tem ${fam} matrículas" style="background:rgba(47,83,154,.12);color:#2F539A"><i data-lucide="users" class="w-3 h-3"></i></span>`:'';
   const avatar=`<div class="w-10 h-10 rounded-xl grid place-content-center text-white font-semibold text-sm shrink-0" style="background:linear-gradient(135deg,${palette[s.id%palette.length]},#2F539A);${inactive?'filter:grayscale(.7)':''}">${initials(s.kids[0].n)}</div>`;
-  const schChip=`<span class="text-xs font-medium px-2.5 py-1 rounded-lg whitespace-nowrap" style="color:${schColor};background:${schBg}">${schLabel(s.sch)}</span>`;
+  const mobChips=[...new Map(s.kids.map(k=>[(k.tid||0),k])).values()].map(k=>kidTurmaChip(k)).join('');
   const stPill=`<span class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap" style="color:${st.c};background:${st.bg}"><span class="w-1.5 h-1.5 rounded-full" style="background:${st.c}"></span>${st.t}</span>`;
   const exitTip = inactive&&s.exit ? ` title="Desligado em ${s.exit.date} — ${s.exit.label}"` : '';
   const fut=!inactive&&isFuture(s);
@@ -1501,14 +1695,14 @@ function rowHTML(s){
     : `<span class="tip text-xs text-[var(--muted)]" data-tip="Sem registro — use ⋮ → Editar dados para preencher">—</span>`;
   return `<div onclick="openDetail(${s.id})" class="cursor-pointer transition md:border-b md:last:border-0 hover:bg-[var(--hover)] ${inactive?'opacity-60':''}" style="border-color:var(--border)">
     <!-- desktop: linha da tabela -->
-    <div class="hidden md:grid md:grid-cols-[1.5fr_1.2fr_.7fr_.8fr_.7fr_.85fr_.8fr_52px] gap-3 px-5 py-3.5 items-center">
+    <div class="hidden md:grid md:grid-cols-[1.45fr_1.1fr_1fr_.8fr_.7fr_.85fr_.8fr_52px] gap-3 px-5 py-3.5 items-center">
       <div class="flex items-center gap-3 min-w-0">
         ${avatar}
         <div class="min-w-0"><p class="font-medium truncate flex items-center gap-2">${s.kids[0].n} ${more}${mediaIcon}</p>
           <p class="text-xs text-[var(--muted)]">${s.kids[0].age} anos · ${s.addr.bairro}</p></div>
       </div>
       <div class="min-w-0"><p class="text-sm truncate flex items-center gap-1.5">${s.resp.n}${famBadge}</p><p class="text-xs text-[var(--muted)]">${s.resp.rel} · ${s.resp.phone}</p></div>
-      <div>${schChip}</div>
+      <div class="min-w-0">${turmaCellHTML(s)}</div>
       <div>${stPill}</div>
       <div>${actPill}</div>
       <div>${sinceCell}</div>
@@ -1525,7 +1719,7 @@ function rowHTML(s){
         </div>
         ${kebab()}
       </div>
-      <div class="flex flex-wrap gap-1.5 mt-3">${schChip}${stPill}${actPill}${s.since?`<span class="text-xs font-medium px-2.5 py-1 rounded-lg whitespace-nowrap" style="color:var(--muted);background:var(--hover)">Desde ${s.since}</span>`:''}</div>
+      <div class="flex flex-wrap gap-1.5 mt-3">${mobChips}${stPill}${actPill}${s.since?`<span class="text-xs font-medium px-2.5 py-1 rounded-lg whitespace-nowrap" style="color:var(--muted);background:var(--hover)">Desde ${s.since}</span>`:''}</div>
       <div class="flex items-center justify-between gap-3 mt-3 pt-3 border-t text-xs text-[var(--muted)]" style="border-color:var(--border)">
         <span class="truncate flex items-center gap-1.5 min-w-0">${s.resp.n}${famBadge}</span>
         <span class="whitespace-nowrap shrink-0">${s.date}${s.hora?' · '+s.hora:''}</span>
@@ -1533,9 +1727,29 @@ function rowHTML(s){
     </div>
   </div>`;
 }
+/* lista dos filtros de Alunos (selects) — usada por limpar/contador/filtragem */
+const ALUNO_FILTERS=['fNivel','fSala','fProf','fHora','fDia','fPeriodo','fStatus','fActive','fHood','fAge','fMedia','fSib'];
+/* o aluno (kid) passa nos filtros que derivam da TURMA? — a matrícula entra se
+   ALGUM aluno dela passar em todos ao mesmo tempo */
+function kidTurmaOk(k){
+  const fn=SEL.fNivel?.value||'', fsl=SEL.fSala?.value||'', fp=SEL.fProf?.value||'';
+  const fhr=SEL.fHora?.value||'', fd=SEL.fDia?.value||'', fpe=SEL.fPeriodo?.value||'';
+  const t=kidTurma(k);
+  if(fp==='none'){ if(t&&salaById(t.sala).prof) return false; }
+  else if(fp){ if(!t||salaById(t.sala).prof!==fp) return false; }
+  if(fsl==='none'){ if(t) return false; }
+  else if(fsl){ if(!t||t.sala!==fsl) return false; }
+  if(fn){ if(!t) return false;
+    if(fn.startsWith('fam:')){ if(nivelByK(t.nivel).fam!==fn.slice(4)) return false; }
+    else if(t.nivel!==fn) return false; }
+  if(fhr){ if(!t||t.hora!==fhr) return false; }
+  if(fd){ if(!t||t.par!==fd) return false; }
+  if(fpe){ if(!t||horaPeriodo(t.hora)!==fpe) return false; }
+  return true;
+}
 function filteredStudents(){
   const q=(document.getElementById('alunoSearch')?.value||'').toLowerCase();
-  const fs=SEL.fSchedule?.value||'', fst=SEL.fStatus?.value||'', fa=SEL.fActive?.value||'';
+  const fst=SEL.fStatus?.value||'', fa=SEL.fActive?.value||'';
   const fh=SEL.fHood?.value||'', fage=SEL.fAge?.value||'', fm=SEL.fMedia?.value||'', fsib=SEL.fSib?.value||'';
   const from=dnum(document.getElementById('fFrom')?.value), to=dnum(document.getElementById('fTo')?.value);
   return STUDENTS.filter(s=>{
@@ -1545,7 +1759,7 @@ function filteredStudents(){
     const mediaOk = !fm || (fm==='yes' ? s.media!==false : s.media===false);
     const sibOk = !fsib || (fsib==='multi' ? s.kids.length>1 : s.kids.length===1);
     const dateOk = (!from||dvNum(s)>=from) && (!to||dvNum(s)<=to);
-    return hay.includes(q) && (!fs||s.sch===fs) && (!fst||s.status===fst) && act
+    return hay.includes(q) && s.kids.some(kidTurmaOk) && (!fst||s.status===fst) && act
       && (!fh||s.addr.bairro===fh) && ageOk && mediaOk && sibOk && dateOk;
   });
 }
@@ -1558,19 +1772,19 @@ function toggleFilters(rowId,chevId){
 function clearFilters(){
   const inp=document.getElementById('alunoSearch'); if(inp) inp.value='';
   ['fFrom','fTo'].forEach(id=>{ const e=document.getElementById(id); if(e) e.value=''; });
-  ['fSchedule','fStatus','fActive','fHood','fAge','fMedia','fSib'].forEach(id=>csSet(id,''));
+  ALUNO_FILTERS.forEach(id=>csSet(id,''));
   tableChanged();
   toast('Filtros limpos.');
 }
 /* ordenação por coluna (nome como padrão) */
 const TABLE_COLS=[
-  {k:'name', l:'Aluno'},{k:'resp', l:'Responsável'},{k:'sch', l:'Horário'},
+  {k:'name', l:'Aluno'},{k:'resp', l:'Responsável'},{k:'turma', l:'Turma'},
   {k:'status', l:'Contrato'},{k:'active', l:'Situação'},{k:'since', l:'Na escola'},{k:'date', l:'Matrícula'},
 ];
 const SORT_VAL={
   name:s=>s.kids[0].n.toLowerCase(),
   resp:s=>s.resp.n.toLowerCase(),
-  sch:s=>s.sch+s.t,
+  turma:s=>{ const t=kidTurma(s.kids[0]); return t?salaById(t.sala).n+t.par+t.hora:'zzz'; }, // sem turma vai pro fim
   status:s=>STATUS[s.status].t,
   active:s=>s.active===false?2:isFuture(s)?1:0,
   since:s=>s.since?s.since.split('/').reverse().join(''):'99999999', // sem registro vai pro fim
@@ -1592,7 +1806,7 @@ function renderTableHead(){
 function updateClearBtn(){
   const btn=document.getElementById('fClear'); if(!btn) return;
   const q=(document.getElementById('alunoSearch')?.value||'').trim();
-  const n=['fSchedule','fStatus','fActive','fHood','fAge','fMedia','fSib'].filter(id=>SEL[id]?.value).length + (q?1:0)
+  const n=ALUNO_FILTERS.filter(id=>SEL[id]?.value).length + (q?1:0)
     + (dnum(document.getElementById('fFrom')?.value)?1:0) + (dnum(document.getElementById('fTo')?.value)?1:0);
   btn.classList.toggle('hidden', n===0);
   btn.classList.toggle('flex', n>0);
@@ -1639,7 +1853,14 @@ function card(title,icon,body){ return `<div class="surface rounded-2xl p-5"><h3
 const phoneVal = (phone,name) => `${phone} <button onclick="event.stopPropagation();toast('Abrindo WhatsApp de ${name}…')" class="inline-grid place-content-center w-6 h-6 rounded-md transition hover:scale-110" style="background:rgba(37,211,102,.14);color:#1faa53" title="WhatsApp">${WA('w-3.5 h-3.5')}</button>`;
 function openDetail(id){
   const s=STUDENTS.find(x=>x.id===id); const st=STATUS[s.status];
-  const kidsCards = s.kids.map(k=>`<div class="flex items-center gap-3 p-3 rounded-xl" style="background:var(--hover)"><div class="w-10 h-10 rounded-xl grid place-content-center text-white font-semibold text-sm" style="background:linear-gradient(135deg,${palette[s.id%palette.length]},#2F539A)">${initials(k.n)}</div><div><p class="font-medium text-sm">${k.n}</p><p class="text-xs text-[var(--muted)]">${k.age} anos · nasc. ${k.b}</p></div></div>`).join('');
+  const kidsCards = s.kids.map((k,ki)=>{
+    const t=kidTurma(k);
+    const turmaLine = t
+      ? `<p class="text-xs mt-1 flex items-center gap-1.5 flex-wrap"><span class="w-2 h-2 rounded-full shrink-0" style="background:${salaById(t.sala).c}"></span><span class="font-medium">${salaById(t.sala).n}</span><span class="text-[var(--muted)]">· ${schLabel(t.par)} ${t.hora}</span><span class="font-semibold" style="color:${famC(t.nivel)}">${nivelLabel(t.nivel)}</span></p>`
+      : `<p class="text-xs mt-1 font-semibold flex items-center gap-1" style="color:#B5860B"><i data-lucide="hourglass" class="w-3 h-3"></i> Aguardando turma</p>`;
+    const moverBtn = s.active!==false ? `<button onclick="event.stopPropagation();openMoverKid(${s.id},${ki})" class="ml-auto shrink-0 h-8 px-2.5 rounded-lg border border-[var(--border)] text-xs font-semibold hover:bg-[var(--card)] transition flex items-center gap-1" title="${t?'Mover este aluno para outra turma':'Colocar este aluno numa turma'}"><i data-lucide="arrow-right-left" class="w-3 h-3"></i>${t?'Mover':'Alocar'}</button>` : '';
+    return `<div class="flex items-center gap-3 p-3 rounded-xl" style="background:var(--hover)"><div class="w-10 h-10 rounded-xl grid place-content-center text-white font-semibold text-sm shrink-0" style="background:linear-gradient(135deg,${palette[s.id%palette.length]},#2F539A)">${initials(k.n)}</div><div class="min-w-0"><p class="font-medium text-sm">${k.n}</p><p class="text-xs text-[var(--muted)]">${k.age} anos · nasc. ${k.b}</p>${turmaLine}</div>${moverBtn}</div>`;
+  }).join('');
   document.getElementById('detailContent').innerHTML=`
     <div class="surface rounded-2xl p-6 mb-4">
       <div class="flex flex-wrap items-start justify-between gap-4">
@@ -1648,7 +1869,7 @@ function openDetail(id){
           <div><h1 class="font-heading text-2xl font-semibold">${s.kids[0].n}</h1>
             <p class="text-[var(--muted)] text-sm">${s.kids.length>1?s.kids.length+' alunos (irmãos)':'1 aluno'} · matrícula em ${s.date}${s.hora?' às '+s.hora:''}</p>
             <div class="flex flex-wrap items-center gap-2 mt-2"><span class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full" style="color:${st.c};background:${st.bg}"><span class="w-1.5 h-1.5 rounded-full" style="background:${st.c}"></span>Contrato ${st.t.toLowerCase()}</span>
-              <span class="text-xs font-medium px-2.5 py-1 rounded-lg" style="color:#2F539A;background:rgba(47,83,154,.10)">${schLabel(s.sch)} · ${s.t}</span>
+              ${[...new Map(s.kids.map(k=>[(k.tid||0),k])).values()].map(k=>kidTurmaChip(k)).join('')}
               ${s.since
                 ?`<span class="tip text-xs font-medium px-2.5 py-1 rounded-lg" data-tip="Quando o aluno entrou na escola — a data da matrícula é só a última rematrícula" style="color:var(--muted);background:var(--hover)"><i data-lucide="school" class="w-3 h-3 inline -mt-0.5"></i> Na escola desde ${s.since}</span>`
                 :`<button onclick="event.stopPropagation();openEditEnrollment(${s.id})" class="tip text-xs font-medium px-2.5 py-1 rounded-lg border border-dashed transition hover:bg-[var(--hover)]" data-tip="Ainda não sabemos desde quando este aluno está na escola — clique para registrar" style="color:var(--muted);border-color:var(--border)"><i data-lucide="calendar-plus" class="w-3 h-3 inline -mt-0.5"></i> Registrar desde quando estuda aqui</button>`}
@@ -1817,7 +2038,9 @@ const ACT_ACTORS={
 };
 const ACTIVITY=[
   { who:'Sistema',           a:'Avisou: contrato de <b>Gabriel Fonseca Lopes</b> parado há 13 dias sem assinatura', t:'8h00',  day:'Hoje' },
+  { who:'Stefany Oliveira',  a:'Moveu <b>Sofia Mendes Castro</b> de Green Room · Ter/Qui 09:30 para <b>Green Room · Ter/Qui 14:30</b> (Conversation 3)', t:'9h40', day:'Hoje' },
   { who:'Stefany Oliveira',  a:'Cobrou a assinatura de <b>Davi Cardoso Melo</b> pelo WhatsApp', t:'9h12', day:'Hoje' },
+  { who:'Stefany Oliveira',  a:'Exportou o pacote de imagens da agenda (9 salas · Seg/Qua)', t:'15h20', day:'Ontem' },
   { who:'Priscylla Martins', a:'Entrou no painel', t:'8h47', day:'Hoje' },
   { who:'Autentique',        a:'Registrou a assinatura de <b>Helena Duarte Lima</b> — contrato concluído e painel atualizado', t:'10h02', day:'Hoje' },
   { who:'Autentique',        a:'Registrou que a família de <b>Sofia Mendes Castro</b> visualizou o contrato', t:'14h31', day:'Ontem' },
@@ -1915,122 +2138,539 @@ function renderHealth(){
   + (stale?`<p class="text-xs font-semibold flex items-center gap-1.5 mt-1" style="color:#DC2626"><i data-lucide="file-clock" class="w-3.5 h-3.5 shrink-0"></i>${stale} contrato${stale>1?'s':''} parado${stale>1?'s':''} há 7+ dias sem assinatura</p>`:'')
   + `<button onclick="goPendentes()" class="mt-1 w-full h-10 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 text-white transition hover:brightness-105" style="background:#25D366">${WA('w-4 h-4')} Cobrar pendentes no WhatsApp</button>`;
 }
-/* vagas por horário — ocupação real das turmas (capacidade fixa de 150 lugares) */
-const TURMA_CAP={ 'seg-qua':{'14h00–15h30':18,'15h00–16h30':18,'16h30–18h00':24,'18h00–19h30':18},
-                  'ter-qui':{'14h00–15h30':18,'15h00–16h30':18,'16h30–18h00':18,'17h00–18h30':18} };
+/* ocupação por sala — alunos ativos × capacidade (turmas de até 7) */
 function renderVagas(){
-  const cnt={}; let tot=0;
-  STUDENTS.forEach(s=>{ if(!inCohort(s)) return; cnt[s.sch+'|'+s.t]=(cnt[s.sch+'|'+s.t]||0)+s.kids.length; tot+=s.kids.length; });
-  const col=(sch,label)=>`<div class="space-y-3"><p class="text-[10px] font-bold uppercase tracking-wider text-[var(--muted)]">${label}</p>`+
-    Object.entries(TURMA_CAP[sch]).map(([t,cap])=>{ const v=cnt[sch+'|'+t]||0; const full=v>=cap; const pct=Math.min(100,Math.round(v/cap*100));
-      return `<div><div class="flex justify-between text-[13px] mb-1"><span class="font-medium">${t}${full?' <span class="text-[9px] font-bold px-1.5 py-0.5 rounded align-middle" style="background:rgba(245,183,0,.22);color:#B5860B">CHEIA</span>':''}</span><span class="text-[var(--muted)]">${v}/${cap}</span></div>
-      <div class="h-2 rounded-full overflow-hidden" style="background:var(--hover)"><div class="h-full rounded-full" style="width:${pct}%;background:${full?'#F5B700':'#2F539A'}"></div></div></div>`; }).join('')+`</div>`;
-  const grid=document.getElementById('vagasGrid'); if(grid) grid.innerHTML=col('seg-qua','Segunda / Quarta')+col('ter-qui','Terça / Quinta');
-  const totCap=Object.values(TURMA_CAP).reduce((a,ts)=>a+Object.values(ts).reduce((x,y)=>x+y,0),0);
+  const grid=document.getElementById('vagasGrid'); if(!grid) return;
+  const occ={}, caps={}; let tot=0;
+  TURMAS.forEach(t=>{ const v=activeKidsIn(t.id); caps[t.sala]=(caps[t.sala]||0)+t.cap; occ[t.sala]=(occ[t.sala]||0)+v; tot+=v; });
+  const rows=SALAS.filter(s=>caps[s.id]).map(s=>({s,v:occ[s.id]||0,cap:caps[s.id]})).sort((a,b)=>(b.v/b.cap)-(a.v/a.cap));
+  grid.innerHTML=rows.map(({s,v,cap})=>{ const pct=Math.min(100,Math.round(v/cap*100)); const full=v>=cap;
+    return `<div class="cursor-pointer" onclick="go('agenda');openSalaView('${s.id}')" title="Abrir a ${s.n} na Agenda">
+      <div class="flex justify-between text-[13px] mb-1"><span class="font-medium flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${s.c}"></span>${s.n}${full?' <span class="text-[9px] font-bold px-1.5 py-0.5 rounded align-middle" style="background:rgba(245,183,0,.22);color:#B5860B">CHEIA</span>':''}</span><span class="text-[var(--muted)]">${v}/${cap}</span></div>
+      <div class="h-2 rounded-full overflow-hidden" style="background:var(--hover)"><div class="h-full rounded-full" style="width:${pct}%;background:${s.c}"></div></div></div>`; }).join('');
+  const totCap=TURMAS.reduce((a,t)=>a+t.cap,0);
   const capEl=document.getElementById('capTotal'); if(capEl) capEl.textContent=totCap;
   const chip=document.getElementById('vagasChip'); if(chip) chip.textContent=`${Math.max(0,totCap-tot)} vagas livres`;
 }
+/* alunos por nível (cores das famílias) */
+function renderNiveis(){
+  const el=document.getElementById('nivelChart'); if(!el) return;
+  const cnt={};
+  STUDENTS.forEach(s=>{ if(!inCohort(s)) return; s.kids.forEach(k=>{ const t=kidTurma(k); if(t) cnt[t.nivel]=(cnt[t.nivel]||0)+1; }); });
+  const data=NIVEIS.filter(n=>cnt[n.k]).map(n=>({n,v:cnt[n.k]}));
+  const max=Math.max(1,...data.map(d=>d.v));
+  el.innerHTML=data.length?data.map(({n,v})=>`<div>
+    <div class="flex justify-between gap-3 text-sm mb-1.5"><span class="font-medium truncate" style="color:${FAMS[n.fam].c}">${n.n}</span><span class="text-[var(--muted)] whitespace-nowrap shrink-0">${v} aluno${v===1?'':'s'}</span></div>
+    <div class="h-2 rounded-full overflow-hidden" style="background:var(--hover)"><div class="h-full rounded-full" style="width:${Math.round(v/max*100)}%;background:${FAMS[n.fam].c}"></div></div></div>`).join('')
+    :'<p class="text-sm text-[var(--muted)]">Sem alunos alocados em turmas ainda.</p>';
+}
+/* entradas (matrículas de 2026) × saídas (desligamentos) por sala */
+function renderMovimento(){
+  const el=document.getElementById('movList'); if(!el) return;
+  const eIn={}, eOut={};
+  STUDENTS.forEach(s=>{ s.kids.forEach(k=>{ const t=kidTurma(k); if(!t) return;
+    if(s.active===false){ if(s.exit) eOut[t.sala]=(eOut[t.sala]||0)+1; }
+    else if(dvNum(s)>=20260101) eIn[t.sala]=(eIn[t.sala]||0)+1; }); });
+  const rows=SALAS.filter(s=>eIn[s.id]||eOut[s.id]).map(s=>({s,i:eIn[s.id]||0,o:eOut[s.id]||0})).sort((a,b)=>(b.i+b.o)-(a.i+a.o)).slice(0,7);
+  el.innerHTML=rows.length?rows.map(({s,i,o})=>`<div class="flex items-center gap-2.5 text-sm">
+    <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${s.c}"></span>
+    <span class="font-medium flex-1 truncate">${esc(s.n.replace(' Room',''))}</span>
+    <span class="tip text-xs font-semibold px-1.5 py-0.5 rounded-md" data-tip="${i} aluno${i===1?'':'s'} de matrículas novas de 2026" style="color:#16a34a;background:rgba(22,163,74,.10)">+${i}</span>
+    <span class="tip text-xs font-semibold px-1.5 py-0.5 rounded-md" data-tip="${o} aluno${o===1?'':'s'} desligado${o===1?'':'s'} da escola" style="color:#DC2626;background:rgba(220,38,38,.08)">−${o}</span>
+  </div>`).join(''):'<p class="text-sm text-[var(--muted)]">Sem movimento registrado.</p>';
+}
 
-/* --- CRUD de turmas/horários: capacidade, novo horário e exclusão de turma vazia --- */
-function turmaOcc(){
-  const occ={};
-  STUDENTS.forEach(s=>{ if(s.active===false) return; occ[s.sch+'|'+s.t]=(occ[s.sch+'|'+s.t]||0)+s.kids.length; });
-  return occ;
+/* ====================== AGENDA (salas × turmas × níveis) ======================
+   A tese da tela: a agenda não se "edita" — edita-se o dado (aluno ↔ turma) e
+   todas as visões se redesenham. Substitui o quadro feito à mão no Canva. */
+let agView='grade', agPar='seg-qua', agVagasOnly=false, agSala=null;
+function setAgView(v){ agView=v; if(v!=='salas') agSala=null; renderAgenda(); }
+function setAgPar(p){ agPar=p; renderAgenda(); }
+function toggleAgVagas(){ agVagasOnly=!agVagasOnly; renderAgenda(); }
+function openSalaView(id){ agView='salas'; agSala=id; renderAgenda(); }
+function turmaAt(sala,par,hora){ return TURMAS.find(t=>t.sala===sala&&t.par===par&&t.hora===hora); }
+function kidsOfTurma(tid){ const out=[]; STUDENTS.forEach(s=>{ if(s.active===false) return; s.kids.forEach((k,ki)=>{ if(k.tid===tid) out.push({s,k,ki}); }); }); return out.sort((a,b)=>a.k.n<b.k.n?-1:1); }
+function agPass(t){
+  if(agVagasOnly&&turmaFull(t)) return false;
+  const fpe=SEL.agPeriodo?.value||''; if(fpe&&horaPeriodo(t.hora)!==fpe) return false;
+  const fp=SEL.agProf?.value||''; if(fp){ const p=salaById(t.sala).prof; if(fp==='none'?!!p:p!==fp) return false; }
+  return true;
 }
-function openTurmas(){
-  openModal(`${modalHeader('Gerenciar turmas')}
-  <div class="p-5 space-y-4">
-    <div id="tmList"></div>
-    <div class="rounded-xl p-3 space-y-2.5" style="background:var(--hover)">
-      <p class="text-sm font-medium flex items-center gap-1.5"><i data-lucide="plus-circle" class="w-4 h-4 text-brand-light"></i> Novo horário</p>
-      <div class="grid grid-cols-2 gap-2">
-        <div id="ntSchWrap"></div>
-        <label class="block relative"><input id="ntCap" placeholder="Vagas (ex.: 18)" inputmode="numeric" oninput="this.value=this.value.replace(/\\D/g,'').slice(0,2)" class="${inputCls}" style="margin-top:0"></label>
-      </div>
-      <div class="grid grid-cols-2 gap-2">
-        <input id="ntIni" placeholder="Começa (ex.: 14h00)" oninput="maskHour(this)" class="${inputCls}" style="margin-top:0">
-        <input id="ntFim" placeholder="Termina (ex.: 15h30)" oninput="maskHour(this)" class="${inputCls}" style="margin-top:0">
-      </div>
-      <div id="ntErr"></div>
-      <button onclick="addTurma()" class="w-full h-10 rounded-xl text-white text-sm font-semibold" style="background:linear-gradient(135deg,#1E3765,#2F539A)">Adicionar horário</button>
-    </div>
-    <p class="text-xs text-[var(--muted)] flex items-start gap-1.5"><i data-lucide="info" class="w-3.5 h-3.5 shrink-0 mt-0.5"></i><span>A capacidade não desce abaixo dos alunos que já estão na turma, e só turmas <b>vazias</b> podem ser excluídas.</span></p>
-  </div>
-  <div class="p-5 pt-0"><button onclick="closeModal()" class="w-full h-11 rounded-xl border border-[var(--border)] font-medium text-sm">Fechar</button></div>`,'max-w-lg');
-  document.getElementById('ntSchWrap').innerHTML=cselect('ntSch',[{v:'seg-qua',l:'Seg/Qua'},{v:'ter-qui',l:'Ter/Qui'}],{block:true});
-  renderTurmasList();
-}
-function renderTurmasList(){
-  const el=document.getElementById('tmList'); if(!el) return;
-  const occ=turmaOcc();
-  el.innerHTML=Object.entries(TURMA_CAP).map(([sch,ts])=>`
-    <p class="text-[10px] font-bold uppercase tracking-wider text-[var(--muted)] mt-3 first:mt-0 mb-1.5">${schLabel(sch)}</p>
-    ${Object.entries(ts).map(([t,cap])=>{ const v=occ[sch+'|'+t]||0; const empty=v===0;
-      return `<div class="flex items-center gap-2.5 py-2 border-b last:border-0" style="border-color:var(--border)">
-        <span class="text-sm font-medium flex-1">${t}</span>
-        <span class="text-xs text-[var(--muted)] whitespace-nowrap">${v}/${cap} aluno${cap===1?'':'s'}</span>
-        <div class="flex items-center gap-1">
-          <button onclick="tCapStep('${sch}','${t}',-1)" class="w-7 h-7 rounded-lg border border-[var(--border)] grid place-content-center hover:bg-[var(--hover)] transition disabled:opacity-35" ${cap<=Math.max(v,1)?'disabled':''} title="Diminuir capacidade"><i data-lucide="minus" class="w-3.5 h-3.5"></i></button>
-          <span class="w-7 text-center text-sm font-semibold">${cap}</span>
-          <button onclick="tCapStep('${sch}','${t}',1)" class="w-7 h-7 rounded-lg border border-[var(--border)] grid place-content-center hover:bg-[var(--hover)] transition disabled:opacity-35" ${cap>=30?'disabled':''} title="Aumentar capacidade"><i data-lucide="plus" class="w-3.5 h-3.5"></i></button>
-        </div>
-        <button onclick="deleteTurma('${sch}','${t}')" class="w-7 h-7 rounded-lg border border-[var(--border)] grid place-content-center transition ${empty?'hover:bg-[var(--hover)]':'opacity-35 cursor-not-allowed'}" title="${empty?'Excluir esta turma':'Só turmas vazias podem ser excluídas — mova os alunos antes'}"><i data-lucide="trash-2" class="w-3.5 h-3.5" style="color:#DC2626"></i></button>
-      </div>`; }).join('')}`).join('');
+function renderAgenda(){
+  const body=document.getElementById('agBody'); if(!body) return;
+  const pill=(id,on)=>{ const b=document.getElementById(id); if(b) b.className='px-3 py-1.5 rounded-lg '+(on?'bg-[var(--card)] shadow-sm font-medium':'text-[var(--muted)]'); };
+  pill('agvGrade',agView==='grade'); pill('agvSalas',agView==='salas'); pill('agvNiveis',agView==='niveis');
+  pill('agpSq',agPar==='seg-qua'); pill('agpTq',agPar==='ter-qui');
+  const parSeg=document.getElementById('agParSeg'); if(parSeg) parSeg.style.display=agView==='niveis'?'none':'flex'; // a visão por nível mostra os dois pares
+  const vb=document.getElementById('agVagasBtn');
+  if(vb){ vb.style.background=agVagasOnly?'rgba(22,163,74,.10)':''; vb.style.color=agVagasOnly?'#16a34a':''; vb.style.borderColor=agVagasOnly?'rgba(22,163,74,.45)':''; }
+  renderAgFila();
+  body.innerHTML = agView==='grade'?agGradeHTML() : agView==='salas'?(agSala?agSalaPageWrap():agSalasHTML()) : agNiveisHTML();
+  const badge=document.getElementById('navAgBadge');
+  if(badge){ const n=semTurmaKids().length; badge.textContent=n?`${n} sem turma`:''; badge.style.display=n?'inline-block':'none'; }
   lucide.createIcons();
 }
-function tCapStep(sch,t,d){
-  const occ=turmaOcc()[sch+'|'+t]||0;
-  const cap=TURMA_CAP[sch][t]+d;
-  if(cap<Math.max(occ,1)||cap>30) return;
-  TURMA_CAP[sch][t]=cap;
-  renderTurmasList(); renderVagas();
+/* fila: matriculou primeiro, atrela depois */
+function renderAgFila(){
+  const el=document.getElementById('agSemTurma'); if(!el) return;
+  const fila=semTurmaKids();
+  if(!fila.length){ el.innerHTML=''; return; }
+  el.innerHTML=`<div class="rounded-2xl p-4 border" style="border-color:rgba(245,183,0,.55);background:rgba(245,183,0,.07)" data-tour="ag-fila">
+    <p class="text-sm font-semibold flex items-center gap-2 mb-2.5" style="color:#B5860B"><i data-lucide="hourglass" class="w-4 h-4"></i>${fila.length} aluno${fila.length>1?'s':''} aguardando turma <span class="font-normal text-xs text-[var(--muted)]">— clique no nome para alocar</span></p>
+    <div class="flex flex-wrap gap-2">${fila.map(({s,k,ki})=>`<button onclick="openMoverKid(${s.id},${ki})" class="flex items-center gap-2 h-9 pl-1.5 pr-3 rounded-xl border text-sm font-medium transition hover:shadow-md" style="border-color:var(--border);background:var(--card)"><span class="w-6 h-6 rounded-lg grid place-content-center text-white text-[10px] font-bold" style="background:linear-gradient(135deg,${palette[s.id%palette.length]},#2F539A)">${initials(k.n)}</span>${esc(k.n.split(' ').slice(0,2).join(' '))} <span class="text-xs text-[var(--muted)]">(${k.age})</span></button>`).join('')}</div>
+  </div>`;
 }
-function maskHour(el){
-  const v=el.value.replace(/\D/g,'').slice(0,4);
-  el.value=v.length>2?v.slice(0,2)+'h'+v.slice(2):v;
+/* ---- visão 1: grade geral (raio-X — colunas = salas, linhas = horários) ---- */
+function agGradeHTML(){
+  const cols=`grid-template-columns:84px repeat(${SALAS.length},132px)`;
+  let html=`<div id="agGridScroll" class="surface rounded-2xl"><div class="grid" style="${cols};min-width:max-content">`;
+  html+=`<div class="ag-sticky border-b border-r px-2 py-2.5 grid place-content-center text-[9px] font-bold uppercase tracking-wider text-[var(--muted)]" style="border-color:var(--border)">Horário</div>`;
+  html+=SALAS.map(s=>`<div class="border-b px-2 py-2 text-center cursor-pointer hover:bg-[var(--hover)] transition" style="border-color:var(--border)" onclick="openSalaView('${s.id}')" title="Abrir a página da ${esc(s.n)}">
+    <p class="text-[11px] font-bold truncate flex items-center justify-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${s.c}"></span>${esc(s.n.replace(' Room',''))}</p>
+    <p class="text-[9px] text-[var(--muted)] truncate">${s.prof?'Teacher '+esc(s.prof.split(' ')[0]):'sem teacher'}</p></div>`).join('');
+  const dividers={ '08:30':'Manhã', '13:30':'Tarde', '16:45':'· intervalo das 16:30 às 16:45 ·' };
+  HORAS.forEach(h=>{
+    if(dividers[h]) html+=`<div class="px-3 py-1 text-[9px] font-bold uppercase tracking-wider text-[var(--muted)] border-b" style="grid-column:1/-1;border-color:var(--border);background:var(--hover)">${dividers[h]}</div>`;
+    html+=`<div class="ag-sticky border-b border-r px-2 py-2 grid place-content-center text-xs font-semibold" style="border-color:var(--border)">${h}</div>`;
+    html+=SALAS.map(s=>{
+      const t=turmaAt(s.id,agPar,h);
+      if(!t) return `<div class="border-b p-1" style="border-color:var(--border)"><button onclick="openNewTurma('${s.id}','${agPar}','${h}')" class="w-full h-full min-h-[46px] rounded-xl border border-dashed border-transparent grid place-content-center text-[var(--muted)] opacity-30 hover:opacity-100 hover:border-[var(--border)] hover:bg-[var(--hover)] transition" title="Criar turma na ${esc(s.n)} · ${schLabel(agPar)} ${h}"><i data-lucide="plus" class="w-3.5 h-3.5"></i></button></div>`;
+      const v=activeKidsIn(t.id), full=v>=t.cap, dim=!agPass(t);
+      return `<div class="border-b p-1" style="border-color:var(--border)"><button onclick="openTurmaModal(${t.id})" class="w-full text-left rounded-xl px-2 py-1.5 transition hover:shadow-md ${dim?'opacity-25':''}" style="background:${famC(t.nivel)}14;border:1px solid ${famC(t.nivel)}45" title="${nivelLabel(t.nivel)} · ${v}/${t.cap} alunos — toque para abrir">
+        <p class="text-[10px] font-bold truncate" style="color:${famC(t.nivel)}">${nivelLabel(t.nivel)}</p>
+        <p class="text-[10px] text-[var(--muted)] mt-0.5">${v}/${t.cap}${full?' <span class="font-bold" style="color:#16a34a">· CHEIA</span>':` · ${t.cap-v} vaga${t.cap-v>1?'s':''}`}</p>
+      </button></div>`;
+    }).join('');
+  });
+  html+=`</div></div>
+  <p class="text-xs text-[var(--muted)] mt-3 flex items-center gap-1.5"><i data-lucide="mouse-pointer-click" class="w-3.5 h-3.5"></i> Toque numa turma para abrir (alunos, editar, mover) — ou no <b>+</b> de um horário vazio para criar uma turma ali.</p>`;
+  return html;
 }
-function ntError(msg){
-  const el=document.getElementById('ntErr');
-  if(el){ el.innerHTML=`<div class="rounded-xl p-2.5 text-xs flex items-start gap-2 bg-[var(--card)]" style="color:#DC2626"><i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i><span>${msg}</span></div>`; lucide.createIcons(); }
+/* ---- visão 2: salas (cards → página da sala no formato do Canva) ---- */
+function agSalasHTML(){
+  return `<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">${SALAS.map(s=>{
+    const ts=TURMAS.filter(t=>t.sala===s.id);
+    const tsP=ts.filter(t=>t.par===agPar&&agPass(t)).sort((a,b)=>HORAS.indexOf(a.hora)-HORAS.indexOf(b.hora));
+    const alunos=ts.reduce((a,t)=>a+activeKidsIn(t.id),0);
+    return `<div onclick="openSalaView('${s.id}')" class="surface rounded-2xl overflow-hidden cursor-pointer transition hover:shadow-lg">
+      <div class="px-5 py-3.5 flex items-center justify-between gap-3" style="background:${s.c}22;border-bottom:3px solid ${s.c}">
+        <div class="min-w-0"><p class="font-heading font-semibold truncate">${esc(s.n)}</p><p class="text-xs text-[var(--muted)] truncate">${s.prof?'Teacher '+esc(s.prof):'sem teacher definido'}</p></div>
+        <span class="w-4 h-4 rounded-full shrink-0" style="background:${s.c}"></span>
+      </div>
+      <div class="px-5 pt-3 pb-1 flex items-center gap-4 text-sm">
+        ${ts.length?`<span><b>${ts.length}</b> turma${ts.length===1?'':'s'}</span><span><b>${alunos}</b> aluno${alunos===1?'':'s'}</span>`:'<span class="text-xs text-[var(--muted)]">sala livre — toque para ver e criar turmas</span>'}
+      </div>
+      <div class="px-5 pb-4 pt-2 flex flex-wrap gap-1.5 min-h-[34px]">${tsP.slice(0,4).map(t=>`<span class="text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap" style="background:${famC(t.nivel)}1a;color:${famC(t.nivel)}">${t.hora} ${nivelLabel(t.nivel)}</span>`).join('')}${tsP.length>4?`<span class="text-[10px] text-[var(--muted)] font-semibold">+${tsP.length-4}</span>`:''}</div>
+    </div>`; }).join('')}</div>`;
 }
-function addTurma(){
-  const sch=SEL.ntSch?.value||'seg-qua';
-  const ini=document.getElementById('ntIni').value.trim();
-  const fim=document.getElementById('ntFim').value.trim();
-  const cap=parseInt(document.getElementById('ntCap').value,10);
-  if(!/^\d{2}h\d{2}$/.test(ini)||!/^\d{2}h\d{2}$/.test(fim)) return ntError('Preencha começo e fim no formato <b>14h00</b>.');
-  if(fim<=ini) return ntError('O fim precisa ser depois do começo.');
-  if(!(cap>=1&&cap<=30)) return ntError('Capacidade entre 1 e 30 vagas.');
-  const t=`${ini}–${fim}`;
-  if(TURMA_CAP[sch][t]!=null) return ntError(`${schLabel(sch)} ${t} já existe.`);
-  TURMA_CAP[sch][t]=cap;
-  ['ntIni','ntFim','ntCap'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('ntErr').innerHTML='';
-  renderTurmasList(); renderVagas();
-  toast(`Turma ${schLabel(sch)} ${t} criada com ${cap} vagas!`);
+/* a página da sala — réplica do quadro do Canva, gerada dos dados (e usada na exportação) */
+function salaPageHTML(salaId,par,forExport){
+  const sala=salaById(salaId);
+  const ts=TURMAS.filter(t=>t.sala===salaId&&t.par===par).sort((a,b)=>HORAS.indexOf(a.hora)-HORAS.indexOf(b.hora));
+  const slot=t=>{
+    const list=kidsOfTurma(t.id);
+    const items=list.map(({s,k,ki},i)=>`<li class="leading-snug${forExport?'':' cursor-pointer hover:underline'}" ${forExport?'':`onclick="openMoverKid(${s.id},${ki})" title="Mover ${esc(k.n.split(' ')[0])} de turma"`} style="color:#243250"><span style="color:${sala.c}">${i+1}.</span> <b>${esc(k.n.toUpperCase())}</b> <span style="color:#64748B">(${k.age})</span>${isNovo(s)?` <span style="color:#E0457B;font-weight:700">- ${novoTag(k)}</span>`:''}</li>`).join('');
+    return `<div class="mb-5" style="break-inside:avoid">
+      <p class="font-bold text-[13px]" style="color:#16233f">${t.hora} - <span style="color:${famC(t.nivel)}">${nivelLabel(t.nivel).toUpperCase()}</span></p>
+      <ol class="mt-1 space-y-0.5 text-[12px]">${items||`<li class="text-[11px]" style="color:#94a3b8">— sem alunos ainda${forExport?'':' (aloque pela fila)'}</li>`}</ol>
+      ${turmaFull(t)?'<p class="text-[11px] font-bold mt-1" style="color:#16a34a">NÃO TEM VAGA</p>':''}
+    </div>`;
+  };
+  return `<div class="bg-white rounded-2xl p-7 sm:p-8" style="min-height:380px;color:#16233f;font-family:Inter,system-ui,sans-serif">
+    <div class="flex items-start justify-between gap-4 mb-6">
+      <div class="rounded-2xl px-6 py-3 text-center" style="background:${sala.c}">
+        <p class="font-heading text-2xl font-bold tracking-wide text-white" style="text-shadow:0 1px 2px rgba(0,0,0,.18)">${esc(sala.n.toUpperCase())}</p>
+        ${sala.prof?`<p class="text-[15px] font-medium" style="color:rgba(255,255,255,.94)">Teacher ${esc(sala.prof)}</p>`:''}
+      </div>
+      <p class="font-bold text-lg pt-1" style="color:#16233f">${par==='seg-qua'?'Mon/Wed':'Tue/Thu'}</p>
+    </div>
+    ${ts.length?`<div class="sm:columns-2" style="column-gap:48px">${ts.map(slot).join('')}</div>`
+      :'<p class="text-sm" style="color:#94a3b8">Nenhuma turma neste par de dias — crie pelo botão "Nova turma" ou pelo + na grade.</p>'}
+  </div>`;
 }
-function deleteTurma(sch,t){
-  if((turmaOcc()[sch+'|'+t]||0)>0) return; // só turma vazia
-  if(Object.keys(TURMA_CAP[sch]).length===1){ ntError(`${schLabel(sch)} ficaria sem nenhum horário — crie outro antes de excluir este.`); return; }
+function agSalaPageWrap(){
+  const sala=salaById(agSala); if(!sala){ agSala=null; return agSalasHTML(); }
+  return `<div class="max-w-3xl">
+    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+      <button onclick="agSala=null;renderAgenda()" class="flex items-center gap-2 text-sm font-medium text-[var(--muted)] hover:text-[var(--text)]"><i data-lucide="arrow-left" class="w-4 h-4"></i> Todas as salas</button>
+      <div class="flex items-center gap-2">
+        <button onclick="openSalaEdit('${agSala}')" class="h-9 px-3 rounded-lg border border-[var(--border)] text-xs font-semibold hover:bg-[var(--hover)] transition flex items-center gap-1.5"><i data-lucide="pencil" class="w-3.5 h-3.5"></i> Editar sala</button>
+        <button onclick="exportSala('${agSala}','${agPar}')" class="h-9 px-3 rounded-lg text-white text-xs font-semibold transition hover:brightness-110 flex items-center gap-1.5" style="background:#1E3765"><i data-lucide="image-down" class="w-3.5 h-3.5"></i> Exportar imagem</button>
+      </div>
+    </div>
+    <div id="salaPage" class="shadow-xl rounded-2xl">${salaPageHTML(agSala,agPar,false)}</div>
+  </div>`;
+}
+/* ---- visão 3: por nível — "que dia tem Power 2 e onde tem vaga?" ---- */
+function agNiveisHTML(){
+  return Object.entries(FAMS).map(([fk,f])=>{
+    const lvls=NIVEIS.filter(n=>n.fam===fk);
+    return `<div class="mb-6">
+      <p class="text-[11px] font-bold uppercase tracking-wider mb-2 flex items-center gap-2" style="color:${f.c}"><span class="w-2.5 h-2.5 rounded-full" style="background:${f.c}"></span>${f.n}</p>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      ${lvls.map(nv=>{
+        const all=TURMAS.filter(t=>t.nivel===nv.k);
+        const ts=all.filter(agPass).sort((a,b)=>(a.par+a.hora)<(b.par+b.hora)?-1:1);
+        if(!all.length) return `<div class="surface rounded-2xl p-4 opacity-55">
+          <p class="font-heading font-semibold text-sm">${nv.n}</p>
+          <p class="text-xs text-[var(--muted)] mt-1">sem turma neste semestre</p>
+          <button onclick="openNewTurma(null,null,null,'${nv.k}')" class="mt-2 text-xs font-semibold text-brand-light hover:underline">+ criar turma deste nível</button></div>`;
+        const tot=all.reduce((a,t)=>a+activeKidsIn(t.id),0);
+        return `<div class="surface rounded-2xl p-4">
+          <div class="flex items-center justify-between mb-2"><p class="font-heading font-semibold text-sm">${nv.n}</p><span class="text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap" style="background:${f.c}1a;color:${f.c}">${tot} aluno${tot===1?'':'s'}</span></div>
+          ${ts.length?`<div class="space-y-1">${ts.map(t=>{ const v=turmaVagas(t); const sala=salaById(t.sala);
+            return `<button onclick="openTurmaModal(${t.id})" class="w-full flex items-center gap-2 text-left text-xs p-2 rounded-lg hover:bg-[var(--hover)] transition">
+              <span class="w-2 h-2 rounded-full shrink-0" style="background:${sala.c}"></span>
+              <span class="font-medium truncate">${esc(sala.n.replace(' Room',''))}</span>
+              <span class="text-[var(--muted)] whitespace-nowrap">${schLabel(t.par)} ${t.hora}</span>
+              <span class="ml-auto whitespace-nowrap font-bold" style="color:${v?'#16a34a':'#B5860B'}">${v?v+' vaga'+(v>1?'s':''):'CHEIA'}</span></button>`; }).join('')}</div>`
+          :'<p class="text-xs text-[var(--muted)]">todas as turmas ficaram fora dos filtros atuais</p>'}
+        </div>`;
+      }).join('')}
+      </div></div>`;
+  }).join('');
+}
+/* ---- mover / alocar aluno — só destinos válidos, com confirmação de nível ---- */
+let mvSel=null;
+function openMoverKid(sid,ki){
+  const s=STUDENTS.find(x=>x.id===sid); if(!s) return;
+  const k=s.kids[ki]; if(!k) return;
+  const cur=kidTurma(k);
+  mvSel=null;
+  const dest=TURMAS.filter(t=>t.id!==(cur?.id||0)&&!turmaFull(t));
+  const ageFit=t=>{ const nv=nivelByK(t.nivel); return k.age>=nv.ages[0]-1&&k.age<=nv.ages[1]+1; };
+  const sameLvl=dest.filter(t=>cur?t.nivel===cur.nivel:ageFit(t));
+  const others=dest.filter(t=>!sameLvl.includes(t));
+  const row=t=>{ const sala=salaById(t.sala); const v=turmaVagas(t);
+    return `<button type="button" id="mv-${t.id}" onclick="mvPick(${t.id})" class="w-full flex items-center gap-2.5 text-left p-2.5 rounded-xl border transition hover:bg-[var(--hover)]" style="border-color:var(--border)">
+      <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${sala.c}"></span>
+      <span class="min-w-0 flex-1"><span class="text-sm font-medium block truncate">${esc(sala.n.replace(' Room',''))} · ${schLabel(t.par)} ${t.hora}</span>
+      <span class="text-[11px] block truncate" style="color:${famC(t.nivel)}">${nivelLabel(t.nivel)}${sala.prof?' · Teacher '+esc(sala.prof):''}</span></span>
+      <span class="text-[11px] font-bold whitespace-nowrap" style="color:#16a34a">${v} vaga${v>1?'s':''}</span>
+      <span class="mv-check w-5 h-5 rounded-full border grid place-content-center shrink-0 transition" style="border-color:var(--border)"></span>
+    </button>`; };
+  openModal(`${modalHeader(cur?'Mover aluno de turma':'Alocar aluno numa turma')}
+  <div class="p-5 space-y-4">
+    <div class="flex items-center gap-3 p-3 rounded-xl" style="background:var(--hover)">
+      <div class="w-10 h-10 rounded-xl grid place-content-center text-white font-semibold text-sm shrink-0" style="background:linear-gradient(135deg,${palette[s.id%palette.length]},#2F539A)">${initials(k.n)}</div>
+      <div class="min-w-0"><p class="font-medium text-sm truncate">${esc(k.n)} <span class="text-xs text-[var(--muted)] font-normal">(${k.age} anos)</span></p>
+      <p class="text-xs ${cur?'text-[var(--muted)]':'font-semibold'}" ${cur?'':'style="color:#B5860B"'}>${cur?`hoje em ${turmaShort(cur)} · ${nivelLabel(cur.nivel)}`:'aguardando turma'}</p></div>
+    </div>
+    ${sameLvl.length?`<div><p class="text-[10px] font-bold uppercase tracking-wider text-[var(--muted)] mb-1.5">${cur?'Mesmo nível ('+nivelLabel(cur.nivel)+')':'Compatível com a idade'}</p><div class="space-y-1.5">${sameLvl.map(row).join('')}</div></div>`:''}
+    ${others.length?`<div><p class="text-[10px] font-bold uppercase tracking-wider text-[var(--muted)] mb-1.5">Outros níveis <span class="normal-case font-normal">(muda o nível do aluno — confirme com cuidado)</span></p><div class="space-y-1.5 max-h-[200px] overflow-y-auto pr-1">${others.map(row).join('')}</div></div>`:''}
+    ${!sameLvl.length&&!others.length?'<p class="text-sm text-[var(--muted)]">Nenhuma turma com vaga no momento — crie uma turma nova pela Agenda.</p>':''}
+    ${cur?`<button type="button" id="mv-0" onclick="mvPick(0)" class="w-full flex items-center gap-2.5 text-left p-2.5 rounded-xl border transition hover:bg-[var(--hover)]" style="border-color:var(--border)">
+      <i data-lucide="hourglass" class="w-4 h-4 shrink-0" style="color:#B5860B"></i>
+      <span class="text-sm font-medium flex-1">Deixar sem turma <span class="text-xs text-[var(--muted)] font-normal">(volta para a fila de alocação)</span></span>
+      <span class="mv-check w-5 h-5 rounded-full border grid place-content-center shrink-0 transition" style="border-color:var(--border)"></span>
+    </button>`:''}
+    <div id="mvWarn"></div>
+    <div class="flex gap-2">
+      <button onclick="closeModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] text-sm font-semibold hover:bg-[var(--hover)] transition">Cancelar</button>
+      <button id="mvGo" onclick="confirmMoverKid(${sid},${ki})" disabled class="flex-1 h-11 rounded-xl text-white text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed" style="background:linear-gradient(135deg,#1E3765,#2F539A)">${cur?'Mover aluno':'Alocar aluno'}</button>
+    </div>
+  </div>`,'max-w-lg');
+  openMoverKid._ctx={sid,ki};
+  lucide.createIcons();
+}
+function mvPick(tid){
+  mvSel=tid;
+  document.querySelectorAll('[id^="mv-"]').forEach(b=>{ if(!/^mv-\d+$/.test(b.id)) return;
+    const on=b.id==='mv-'+tid;
+    b.style.borderColor=on?'#2F539A':'var(--border)'; b.style.background=on?'rgba(47,83,154,.06)':'';
+    const c=b.querySelector('.mv-check'); if(c){ c.innerHTML=on?'<span class="w-2.5 h-2.5 rounded-full" style="background:#2F539A"></span>':''; c.style.borderColor=on?'#2F539A':'var(--border)'; } });
+  const go=document.getElementById('mvGo'); if(go) go.disabled=false;
+  const warn=document.getElementById('mvWarn');
+  if(warn){
+    const ctx=openMoverKid._ctx; const s=ctx&&STUDENTS.find(x=>x.id===ctx.sid); const k=s?.kids[ctx.ki];
+    const cur=k?kidTurma(k):null; const t=tid?turmaById(tid):null;
+    warn.innerHTML = (t&&cur&&t.nivel!==cur.nivel)
+      ? `<div class="rounded-xl p-2.5 text-xs flex items-start gap-2" style="background:rgba(245,183,0,.12);color:#B5860B"><i data-lucide="alert-triangle" class="w-4 h-4 shrink-0"></i><span>Mudança de nível: <b>${nivelLabel(cur.nivel)}</b> → <b>${nivelLabel(t.nivel)}</b>. Confirme se é isso mesmo.</span></div>`
+      : '';
+    lucide.createIcons();
+  }
+}
+function confirmMoverKid(sid,ki){
+  const s=STUDENTS.find(x=>x.id===sid); if(!s||mvSel===null) return;
+  const k=s.kids[ki]; const cur=kidTurma(k);
+  const t=mvSel?turmaById(mvSel):null;
+  if(mvSel&&!t) return;
+  if(t&&turmaFull(t)){ toast('Essa turma lotou agorinha — escolha outra.'); return; }
+  k.tid=t?t.id:null;
+  closeModal();
+  logAct(t ? (cur?`Moveu <b>${esc(k.n)}</b> de ${turmaShort(cur)} para <b>${turmaShort(t)}</b> (${nivelLabel(t.nivel)})`
+              :`Alocou <b>${esc(k.n)}</b> na turma <b>${turmaShort(t)}</b> (${nivelLabel(t.nivel)})`)
+          : `Tirou <b>${esc(k.n)}</b> da turma ${turmaShort(cur)} — voltou para a fila de alocação`);
+  refreshAll();
+  toast(t?`${k.n.split(' ')[0]} agora está em ${turmaShort(t)}!`:`${k.n.split(' ')[0]} voltou para a fila de alocação.`);
+  if(currentView()==='detalhe') openDetail(sid);
+}
+/* ---- CRUD de turma ---- */
+function nivelPickItems(){
+  const out=[];
+  Object.entries(FAMS).forEach(([fk,f])=>NIVEIS.filter(n=>n.fam===fk).forEach(n=>out.push({v:n.k,l:n.n,dot:f.c})));
+  return out;
+}
+function ntErrBox(id,msg){
+  const el=document.getElementById(id);
+  if(el){ el.innerHTML=msg?`<div class="rounded-xl p-2.5 text-xs flex items-start gap-2" style="background:rgba(220,38,38,.08);color:#DC2626"><i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i><span>${msg}</span></div>`:''; lucide.createIcons(); }
+}
+function openNewTurma(sala,par,hora,nivel){
+  openModal(`${modalHeader('Nova turma')}
+  <div class="p-5 space-y-3">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div><span class="text-sm font-medium">Sala</span><div class="mt-1.5" id="ntSalaWrap"></div></div>
+      <div><span class="text-sm font-medium">Dias</span><div class="mt-1.5" id="ntParWrap"></div></div>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div><span class="text-sm font-medium">Horário</span><div class="mt-1.5" id="ntHoraWrap"></div></div>
+      <label class="block"><span class="text-sm font-medium">Vagas <span class="text-xs font-normal text-[var(--muted)]">(padrão e máximo: 7)</span></span>
+        <input id="ntCap" value="7" inputmode="numeric" oninput="this.value=this.value.replace(/\\D/g,'').slice(0,1)" class="${inputCls}"></label>
+    </div>
+    <div><span class="text-sm font-medium">Nível</span><div class="mt-1.5" id="ntNivelWrap"></div></div>
+    <div id="ntErr"></div>
+    <p class="text-xs text-[var(--muted)] flex items-start gap-1.5"><i data-lucide="info" class="w-3.5 h-3.5 shrink-0 mt-0.5"></i><span>O teacher vem da <b>sala</b> (defina no botão "Salas") e aparece na agenda e nas imagens quando preenchido.</span></p>
+  </div>
+  <div class="p-5 pt-0 flex gap-2">
+    <button onclick="closeModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] font-medium text-sm">Cancelar</button>
+    <button onclick="agSaveTurma()" class="flex-1 h-11 rounded-xl text-white font-semibold text-sm" style="background:linear-gradient(135deg,#1E3765,#2F539A)">Criar turma</button>
+  </div>`,'max-w-lg');
+  document.getElementById('ntSalaWrap').innerHTML=cselect('ntSala',SALAS.map(s=>({v:s.id,l:s.n,dot:s.c})),{block:true,value:sala||SALAS[0].id});
+  document.getElementById('ntParWrap').innerHTML=cselect('ntPar',[{v:'seg-qua',l:'Seg/Qua'},{v:'ter-qui',l:'Ter/Qui'}],{block:true,value:par||agPar});
+  document.getElementById('ntHoraWrap').innerHTML=cselect('ntHora',HORAS.map(h=>({v:h,l:`${h} · ${horaPeriodo(h)==='m'?'manhã':'tarde'}`})),{block:true,value:hora||'13:30'});
+  document.getElementById('ntNivelWrap').innerHTML=cselect('ntNivel',nivelPickItems(),{block:true,value:nivel||'conv-1'});
+  lucide.createIcons();
+}
+function agSaveTurma(){
+  const sala=SEL.ntSala?.value, par=SEL.ntPar?.value, hora=SEL.ntHora?.value, nivel=SEL.ntNivel?.value;
+  const cap=parseInt(document.getElementById('ntCap')?.value,10);
+  if(!(cap>=1&&cap<=7)) return ntErrBox('ntErr','Vagas entre 1 e 7 — o padrão da escola é 7.');
+  if(turmaAt(sala,par,hora)) return ntErrBox('ntErr',`A ${salaById(sala).n} já tem turma ${schLabel(par)} às ${hora} — escolha outro horário ou outra sala.`);
+  TURMAS.push({ id:nextTurmaId++, sala, par, hora, nivel, cap });
+  closeModal(); refreshAll();
+  logAct(`Criou a turma <b>${esc(salaById(sala).n)} · ${schLabel(par)} ${hora}</b> (${nivelLabel(nivel)}, ${cap} vagas)`);
+  toast(`Turma de ${nivelLabel(nivel)} criada na ${salaById(sala).n}!`);
+}
+function openTurmaModal(tid){
+  const t=turmaById(tid); if(!t) return;
+  const sala=salaById(t.sala);
+  const list=kidsOfTurma(tid);
+  const occ=list.length;
+  openModal(`${modalHeader('Turma · '+esc(sala.n))}
+  <div class="p-5 space-y-4">
+    <div class="rounded-xl p-3 flex items-center gap-3" style="background:${sala.c}1f">
+      <span class="w-3.5 h-3.5 rounded-full shrink-0" style="background:${sala.c}"></span>
+      <div class="min-w-0 flex-1"><p class="text-sm font-semibold">${schLabel(t.par)} · ${t.hora} <span style="color:${famC(t.nivel)}">· ${nivelLabel(t.nivel)}</span></p>
+      <p class="text-xs text-[var(--muted)]">${sala.prof?'Teacher '+esc(sala.prof):'sem teacher definido'} · ${occ}/${t.cap} aluno${occ===1?'':'s'}${turmaFull(t)?' · <b style="color:#16a34a">NÃO TEM VAGA</b>':''}</p></div>
+    </div>
+    <div>
+      <p class="text-[10px] font-bold uppercase tracking-wider text-[var(--muted)] mb-1.5">Alunos</p>
+      ${list.length?`<div class="space-y-1">${list.map(({s,k,ki})=>`<div class="flex items-center gap-2.5 p-2 rounded-lg" style="background:var(--hover)">
+        <span class="w-7 h-7 rounded-lg grid place-content-center text-white text-[10px] font-bold shrink-0" style="background:linear-gradient(135deg,${palette[s.id%palette.length]},#2F539A)">${initials(k.n)}</span>
+        <button onclick="closeModal();openDetail(${s.id})" class="text-sm font-medium hover:underline truncate text-left flex-1 min-w-0">${esc(k.n)} <span class="text-xs text-[var(--muted)] font-normal">(${k.age})</span>${isNovo(s)?` <span class="text-[9px] font-bold" style="color:#E0457B">${novoTag(k)}</span>`:''}</button>
+        <button onclick="openMoverKid(${s.id},${ki})" class="h-7 px-2 rounded-md border border-[var(--border)] text-[11px] font-semibold hover:bg-[var(--card)] transition flex items-center gap-1 shrink-0" title="Mover de turma"><i data-lucide="arrow-right-left" class="w-3 h-3"></i>Mover</button>
+      </div>`).join('')}</div>`:'<p class="text-sm text-[var(--muted)]">Nenhum aluno ainda — aloque pela fila "aguardando turma" ou pela ficha do aluno.</p>'}
+    </div>
+    <div class="rounded-xl p-3 space-y-2.5" style="background:var(--hover)">
+      <p class="text-sm font-medium flex items-center gap-1.5"><i data-lucide="pencil" class="w-3.5 h-3.5 text-brand-light"></i> Editar turma</p>
+      <div class="grid grid-cols-2 gap-2">
+        <div id="etNivelWrap"></div>
+        <input id="etCap" value="${t.cap}" inputmode="numeric" oninput="this.value=this.value.replace(/\\D/g,'').slice(0,1)" class="${inputCls}" style="margin-top:0" title="Vagas (máximo 7)">
+      </div>
+      <div class="grid grid-cols-3 gap-2">
+        <div id="etSalaWrap"></div><div id="etParWrap"></div><div id="etHoraWrap"></div>
+      </div>
+      <div id="etErr"></div>
+      <button onclick="agUpdateTurma(${t.id})" class="w-full h-10 rounded-xl text-white text-sm font-semibold" style="background:linear-gradient(135deg,#1E3765,#2F539A)">Salvar alterações</button>
+    </div>
+    <div class="flex gap-2">
+      <button onclick="closeModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] text-sm font-semibold hover:bg-[var(--hover)] transition">Fechar</button>
+      <button onclick="agDeleteTurma(${t.id})" ${occ?'disabled':''} class="flex-1 h-11 rounded-xl text-sm font-semibold border transition disabled:opacity-35 disabled:cursor-not-allowed hover:bg-[var(--hover)]" style="border-color:rgba(220,38,38,.4);color:#DC2626" title="${occ?'Só turmas vazias podem ser excluídas — mova os alunos antes':'Excluir esta turma'}"><i data-lucide="trash-2" class="w-4 h-4 inline -mt-0.5"></i> Excluir turma</button>
+    </div>
+  </div>`,'max-w-lg');
+  document.getElementById('etNivelWrap').innerHTML=cselect('etNivel',nivelPickItems(),{block:true,value:t.nivel});
+  document.getElementById('etSalaWrap').innerHTML=cselect('etSala',SALAS.map(s=>({v:s.id,l:s.n.replace(' Room',''),dot:s.c})),{block:true,value:t.sala});
+  document.getElementById('etParWrap').innerHTML=cselect('etPar',[{v:'seg-qua',l:'Seg/Qua'},{v:'ter-qui',l:'Ter/Qui'}],{block:true,value:t.par});
+  document.getElementById('etHoraWrap').innerHTML=cselect('etHora',HORAS.map(h=>({v:h,l:h})),{block:true,value:t.hora});
+  lucide.createIcons();
+}
+function agUpdateTurma(tid){
+  const t=turmaById(tid); if(!t) return;
+  const occ=activeKidsIn(tid);
+  const cap=parseInt(document.getElementById('etCap')?.value,10);
+  const sala=SEL.etSala?.value, par=SEL.etPar?.value, hora=SEL.etHora?.value, nivel=SEL.etNivel?.value;
+  if(!(cap>=1&&cap<=7)) return ntErrBox('etErr','Vagas entre 1 e 7 — o padrão da escola é 7.');
+  if(cap<occ) return ntErrBox('etErr',`A turma tem ${occ} aluno${occ>1?'s':''} — a capacidade não pode ficar menor que isso.`);
+  const clash=turmaAt(sala,par,hora);
+  if(clash&&clash.id!==tid) return ntErrBox('etErr',`A ${salaById(sala).n} já tem turma ${schLabel(par)} às ${hora}.`);
+  Object.assign(t,{sala,par,hora,nivel,cap});
+  closeModal(); refreshAll();
+  logAct(`Editou a turma <b>${turmaShort(t)}</b> (${nivelLabel(t.nivel)}, ${cap} vagas)`);
+  toast('Turma atualizada!');
+}
+function agDeleteTurma(tid){
+  const t=turmaById(tid); if(!t||activeKidsIn(tid)>0) return;
   openModal(`${modalHeader('Excluir turma')}
   <div class="p-5 space-y-4">
     <div class="flex items-start gap-3 p-3 rounded-xl" style="background:rgba(220,38,38,.06)">
       <div class="w-10 h-10 rounded-xl grid place-content-center shrink-0" style="background:rgba(220,38,38,.12)"><i data-lucide="trash-2" class="w-5 h-5" style="color:#DC2626"></i></div>
-      <div class="min-w-0"><p class="font-medium text-sm">Excluir a turma ${schLabel(sch)} · ${t}?</p>
-      <p class="text-xs text-[var(--muted)] mt-0.5">Ela está vazia — o horário some das opções de matrícula e do painel de vagas.</p></div>
+      <div class="min-w-0"><p class="font-medium text-sm">Excluir a turma ${turmaShort(t)}?</p>
+      <p class="text-xs text-[var(--muted)] mt-0.5">Ela está vazia — some da grade, da página da sala e das opções de alocação.</p></div>
     </div>
     <div class="flex gap-2">
-      <button onclick="openTurmas()" class="flex-1 h-11 rounded-xl border border-[var(--border)] text-sm font-semibold hover:bg-[var(--hover)] transition">Cancelar</button>
-      <button onclick="confirmDeleteTurma('${sch}','${t}')" class="flex-1 h-11 rounded-xl text-white text-sm font-semibold transition hover:brightness-110" style="background:#DC2626">Excluir turma</button>
+      <button onclick="closeModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] text-sm font-semibold hover:bg-[var(--hover)] transition">Cancelar</button>
+      <button onclick="confirmAgDeleteTurma(${tid})" class="flex-1 h-11 rounded-xl text-white text-sm font-semibold transition hover:brightness-110" style="background:#DC2626">Excluir turma</button>
     </div>
   </div>`);
 }
-function confirmDeleteTurma(sch,t){
-  delete TURMA_CAP[sch][t];
-  renderVagas();
-  openTurmas();
-  toast(`Turma ${schLabel(sch)} ${t} excluída.`);
+function confirmAgDeleteTurma(tid){
+  const i=TURMAS.findIndex(t=>t.id===tid); if(i<0) return;
+  const t=TURMAS[i];
+  TURMAS.splice(i,1);
+  closeModal(); refreshAll();
+  logAct(`Excluiu a turma vazia <b>${turmaShort(t)}</b>`);
+  toast('Turma excluída.');
 }
+/* ---- salas: renomear, cor e teacher (opcional) ---- */
+const SALA_COLORS=['#7CB342','#D9B777','#F2997A','#8E5AC8','#4A7FD4','#F08A3C','#4DB89E','#E8B931','#E0606E','#B9A189','#E26D9F','#31B5C4','#A78BDB'];
+let seCor=null;
+function openSalasManage(){
+  const rows=SALAS.map(s=>{ const ts=TURMAS.filter(t=>t.sala===s.id); const nA=ts.reduce((a,t)=>a+activeKidsIn(t.id),0);
+    return `<div class="flex items-center gap-3 py-2 border-b last:border-0" style="border-color:var(--border)">
+      <span class="w-3.5 h-3.5 rounded-full shrink-0" style="background:${s.c}"></span>
+      <div class="min-w-0 flex-1"><p class="text-sm font-medium truncate">${esc(s.n)}</p>
+        <p class="text-[11px] text-[var(--muted)] truncate">${s.prof?'Teacher '+esc(s.prof):'sem teacher'} · ${ts.length} turma${ts.length===1?'':'s'} · ${nA} aluno${nA===1?'':'s'}</p></div>
+      <button onclick="openSalaEdit('${s.id}')" class="h-8 px-2.5 rounded-lg border border-[var(--border)] text-xs font-semibold hover:bg-[var(--hover)] transition">Editar</button>
+    </div>`; }).join('');
+  openModal(`${modalHeader('Salas da escola')}
+  <div class="p-5">
+    <div>${rows}</div>
+    <p class="text-xs text-[var(--muted)] mt-3 flex items-start gap-1.5"><i data-lucide="info" class="w-3.5 h-3.5 shrink-0 mt-0.5"></i><span>O teacher é <b>opcional</b> — quando preenchido, aparece no topo da página da sala e nas imagens exportadas. Teacher, sala e níveis ficam definidos no semestre.</span></p>
+  </div>
+  <div class="p-5 pt-0"><button onclick="closeModal()" class="w-full h-11 rounded-xl border border-[var(--border)] font-medium text-sm">Fechar</button></div>`,'max-w-lg');
+}
+function seCorPaint(){ document.querySelectorAll('#seCores button').forEach(b=>{ const on=b.dataset.c===seCor; b.style.outline=on?'3px solid var(--ring)':'none'; b.style.outlineOffset=on?'2px':'0'; }); }
+function seCorSet(c){ seCor=c; seCorPaint(); }
+function openSalaEdit(id){
+  const s=salaById(id); if(!s) return;
+  openModal(`${modalHeader('Editar sala')}
+  <div class="p-5 space-y-3">
+    <label class="block"><span class="text-sm font-medium">Nome da sala</span>
+      <input id="seNome" value="${esc(s.n).replace(/"/g,'&quot;')}" class="${inputCls}"></label>
+    <label class="block"><span class="text-sm font-medium">Teacher <span class="text-xs font-normal text-[var(--muted)]">(opcional — deixe vazio se ainda não tiver)</span></span>
+      <input id="seProf" value="${esc(s.prof||'')}" placeholder="Ex.: Mariana Rios" class="${inputCls}"></label>
+    <div><span class="text-sm font-medium">Cor da sala</span>
+      <div class="flex flex-wrap gap-2 mt-1.5" id="seCores">${SALA_COLORS.map(c=>`<button type="button" onclick="seCorSet('${c}')" data-c="${c}" class="w-8 h-8 rounded-full transition hover:scale-110" style="background:${c}" title="Usar esta cor"></button>`).join('')}</div></div>
+    <div id="seErr"></div>
+  </div>
+  <div class="p-5 pt-0 flex gap-2">
+    <button onclick="closeModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] font-medium text-sm">Cancelar</button>
+    <button onclick="saveSala('${id}')" class="flex-1 h-11 rounded-xl text-white font-semibold text-sm" style="background:linear-gradient(135deg,#1E3765,#2F539A)">Salvar sala</button>
+  </div>`);
+  seCor=s.c; seCorPaint();
+}
+function saveSala(id){
+  const s=salaById(id); if(!s) return;
+  const n=document.getElementById('seNome')?.value.trim();
+  if(!n) return ntErrBox('seErr','A sala precisa de um nome.');
+  if(SALAS.some(x=>x.id!==id&&x.n.toLowerCase()===n.toLowerCase())) return ntErrBox('seErr',`Já existe uma sala chamada <b>${esc(n)}</b>.`);
+  const prof=document.getElementById('seProf')?.value.trim();
+  const profMudou=(s.prof||'')!==(prof||'');
+  s.n=n; s.prof=prof||null; if(seCor) s.c=seCor;
+  closeModal(); refreshAll();
+  logAct(`Editou a sala <b>${esc(s.n)}</b>${profMudou?` — teacher: ${s.prof?esc(s.prof):'removido'}`:''}`);
+  toast('Sala atualizada!');
+}
+/* ---- exportação de imagens (as "páginas do Canva", sempre atualizadas) ---- */
+let h2iPromise=null;
+function ensureH2I(){
+  if(window.htmlToImage) return Promise.resolve();
+  if(!h2iPromise) h2iPromise=new Promise((res,rej)=>{ const sc=document.createElement('script');
+    sc.src='https://cdn.jsdelivr.net/npm/html-to-image@1.11.13/dist/html-to-image.min.js';
+    sc.onload=res; sc.onerror=()=>{ h2iPromise=null; rej(new Error('cdn')); };
+    document.head.appendChild(sc); });
+  return h2iPromise;
+}
+async function exportPng(html,filename){
+  const wrap=document.createElement('div');
+  wrap.style.cssText='position:fixed;left:-12000px;top:0;width:920px;background:#fff;z-index:-1;';
+  wrap.innerHTML=html;
+  document.body.appendChild(wrap);
+  try{
+    await ensureH2I();
+    const url=await window.htmlToImage.toPng(wrap.firstElementChild,{pixelRatio:2,backgroundColor:'#ffffff'});
+    const a=document.createElement('a'); a.href=url; a.download=filename; a.click();
+    return true;
+  }catch(e){ toast('Não consegui gerar a imagem — confira a internet e tente de novo.'); return false; }
+  finally{ wrap.remove(); }
+}
+const slugify=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+async function exportSala(salaId,par){
+  const sala=salaById(salaId); if(!sala) return;
+  toast(`Gerando a imagem da ${sala.n}…`);
+  if(await exportPng(salaPageHTML(salaId,par,true),`agenda-${slugify(sala.n)}-${par}.png`)){
+    logAct(`Exportou a imagem da agenda da <b>${esc(sala.n)}</b> (${schLabel(par)})`);
+    toast(`Imagem da ${sala.n} baixada!`);
+  }
+}
+async function exportTodasSalas(){
+  closeModal();
+  const list=SALAS.filter(s=>TURMAS.some(t=>t.sala===s.id&&t.par===agPar));
+  if(!list.length){ toast('Nenhuma sala com turmas neste par de dias.'); return; }
+  toast(`Gerando ${list.length} imagens (${schLabel(agPar)}) — os downloads chegam um a um…`);
+  for(const s of list){
+    if(!await exportPng(salaPageHTML(s.id,agPar,true),`agenda-${slugify(s.n)}-${agPar}.png`)) return;
+    await new Promise(r=>setTimeout(r,350));
+  }
+  logAct(`Exportou o pacote de imagens da agenda (${list.length} salas · ${schLabel(agPar)})`);
+  toast('Pacote da agenda exportado!');
+}
+function nivelPageHTML(k){
+  const nv=nivelByK(k); const f=FAMS[nv.fam];
+  const ts=TURMAS.filter(t=>t.nivel===k).sort((a,b)=>(a.par+a.hora)<(b.par+b.hora)?-1:1);
+  const block=t=>{ const sala=salaById(t.sala); const list=kidsOfTurma(t.id);
+    return `<div class="mb-5" style="break-inside:avoid">
+      <p class="font-bold text-[13px]" style="color:#16233f"><span style="color:${sala.c}">●</span> ${esc(sala.n)} — ${t.par==='seg-qua'?'Mon/Wed':'Tue/Thu'} ${t.hora}${sala.prof?` <span style="color:#64748B;font-weight:500">· Teacher ${esc(sala.prof)}</span>`:''}</p>
+      <ol class="mt-1 space-y-0.5 text-[12px]">${list.map(({s,k:kid},i)=>`<li style="color:#243250"><span style="color:${sala.c}">${i+1}.</span> <b>${esc(kid.n.toUpperCase())}</b> <span style="color:#64748B">(${kid.age})</span>${isNovo(s)?` <span style="color:#E0457B;font-weight:700">- ${novoTag(kid)}</span>`:''}</li>`).join('')||'<li class="text-[11px]" style="color:#94a3b8">— sem alunos ainda</li>'}</ol>
+      ${turmaFull(t)?'<p class="text-[11px] font-bold mt-1" style="color:#16a34a">NÃO TEM VAGA</p>':''}
+    </div>`; };
+  return `<div class="bg-white rounded-2xl p-8" style="color:#16233f;font-family:Inter,system-ui,sans-serif">
+    <div class="flex items-center justify-between mb-6">
+      <div class="rounded-2xl px-6 py-3" style="background:${f.c}">
+        <p class="font-heading text-2xl font-bold tracking-wide text-white" style="text-shadow:0 1px 2px rgba(0,0,0,.18)">${esc(nv.n.toUpperCase())}</p>
+      </div>
+      <p class="text-sm font-semibold" style="color:#64748B">${ts.reduce((a,t)=>a+activeKidsIn(t.id),0)} alunos · ${ts.length} turma${ts.length===1?'':'s'}</p>
+    </div>
+    ${ts.length?`<div class="sm:columns-2" style="column-gap:48px">${ts.map(block).join('')}</div>`:'<p class="text-sm" style="color:#94a3b8">Sem turmas deste nível neste semestre.</p>'}
+  </div>`;
+}
+async function exportNivel(k){
+  closeModal();
+  const nv=nivelByK(k); if(!nv) return;
+  toast(`Gerando a imagem do ${nv.n}…`);
+  if(await exportPng(nivelPageHTML(k),`agenda-nivel-${slugify(nv.n)}.png`)){
+    logAct(`Exportou a imagem do nível <b>${nv.n}</b> (todas as turmas)`);
+    toast(`Imagem do ${nv.n} baixada!`);
+  }
+}
+function openAgExport(){
+  openModal(`${modalHeader('Exportar imagens da agenda')}
+  <div class="p-5 space-y-3">
+    <p class="text-sm text-[var(--muted)]">As imagens saem no formato do quadro do Canva — só que geradas dos dados de <b>agora</b>, sem refazer nada à mão.</p>
+    ${agSala?`<button onclick="closeModal();exportSala('${agSala}','${agPar}')" class="w-full h-11 rounded-xl border border-[var(--border)] text-sm font-semibold hover:bg-[var(--hover)] transition flex items-center justify-center gap-2"><i data-lucide="image-down" class="w-4 h-4 text-brand-light"></i> Sala atual (${esc(salaById(agSala)?.n||'')} · ${schLabel(agPar)})</button>`:''}
+    <button onclick="exportTodasSalas()" class="w-full h-11 rounded-xl border border-[var(--border)] text-sm font-semibold hover:bg-[var(--hover)] transition flex items-center justify-center gap-2"><i data-lucide="images" class="w-4 h-4 text-brand-light"></i> Todas as salas com turma (${schLabel(agPar)})</button>
+    <div class="rounded-xl p-3 space-y-2" style="background:var(--hover)">
+      <p class="text-sm font-medium">Ou um nível específico <span class="text-xs font-normal text-[var(--muted)]">(todas as turmas dele, nos dois pares)</span></p>
+      <div id="exNivelWrap"></div>
+      <button onclick="exportNivel(SEL.exNivel?.value)" class="w-full h-10 rounded-xl text-white text-sm font-semibold" style="background:linear-gradient(135deg,#1E3765,#2F539A)">Exportar o nível escolhido</button>
+    </div>
+  </div>
+  <div class="p-5 pt-0"><button onclick="closeModal()" class="w-full h-11 rounded-xl border border-[var(--border)] font-medium text-sm">Fechar</button></div>`,'max-w-lg');
+  document.getElementById('exNivelWrap').innerHTML=cselect('exNivel',nivelPickItems(),{block:true,value:'power-2'});
+  lucide.createIcons();
+}
+/* re-render geral após mudanças em turmas/alunos */
+function refreshAll(){ renderTable(); renderContracts(); refreshOverviewData(); }
 /* recalcula tudo que deriva da base (chamado no init e após desligar/reativar/nova matrícula).
    ovCohort: ''=todos · 'on'=estudando agora · 'next'=matrículas do período aberto (2026.2) */
 let ovCohort='';
@@ -2058,12 +2698,18 @@ function refreshOverviewData(){
   set('stAge',(actKids.reduce((a,k)=>a+k.age,0)/(actKids.length||1)).toFixed(1).replace('.',',')+' anos');
   const fams={}; act.forEach(s=>{ fams[s.resp.cpf]=(fams[s.resp.cpf]||0)+s.kids.length; });
   set('stFam',Object.values(fams).filter(n=>n>1).length+' famílias');
-  set('stOcc',Math.round(actKids.length/150*100)+'%');
+  const totCap=TURMAS.reduce((a,t)=>a+t.cap,0);
+  const emTurma=allAct.reduce((a,s)=>a+s.kids.filter(k=>k.tid).length,0);
+  set('stOcc',Math.round(emTurma/(totCap||1)*100)+'%');
+  set('stSemTurma',String(semTurmaKids().length));
   set('stSigned',Math.round(act.filter(s=>s.status==='signed').length/(act.length||1)*100)+'%');
   set('alunosSub',`${allKids} alunos em ${allAct.length} matrículas ativas`);
-  renderHealth(); renderPayLegend(); renderVagas(); renderHoods(); renderBirthdays(); renderRecent();
+  renderHealth(); renderPayLegend(); renderVagas(); renderNiveis(); renderMovimento(); renderHoods(); renderBirthdays(); renderRecent(); renderAgenda();
   /* gráficos que derivam da base */
-  if(charts.sch){ charts.sch.data.datasets[0].data=['seg-qua','ter-qui'].map(sc=>act.filter(s=>s.sch===sc).reduce((a,s)=>a+s.kids.length,0)); charts.sch.update(); }
+  const kidsByPar=p=>act.reduce((a,s)=>a+s.kids.filter(k=>kidTurma(k)?.par===p).length,0);
+  const nSq=kidsByPar('seg-qua'), nTq=kidsByPar('ter-qui');
+  set('legSq',nSq); set('legTq',nTq);
+  if(charts.sch){ charts.sch.data.datasets[0].data=[nSq,nTq]; charts.sch.update(); }
   if(charts.age){ const b=[0,0,0,0,0]; actKids.forEach(k=>{ b[k.age<=6?0:k.age<=9?1:k.age<=12?2:k.age<=15?3:4]++; }); charts.age.data.datasets[0].data=b; charts.age.update(); }
   if(charts.pay){ charts.pay.data.datasets[0].data=payData().map(p=>p[1]); charts.pay.update(); }
 }
@@ -2423,7 +3069,19 @@ function toast(msg){
 function init(){
   // selects customizados
   document.getElementById('periodSelWrap').innerHTML=cselect('period',[{v:'6m',l:'Últimos 6 meses'},{v:'ano',l:'Últimos 12 meses'},{v:'mes',l:'Este mês'}],{icon:'calendar',onChange:applyPeriod});
-  document.getElementById('fScheduleWrap').innerHTML=cselect('fSchedule',[{v:'',l:'Todos os horários'},{v:'seg-qua',l:'Seg/Qua'},{v:'ter-qui',l:'Ter/Qui'}],{onChange:tableChanged});
+  /* filtros derivados da turma do aluno — nível primeiro (o mais importante) */
+  const nivelFilterItems=[{v:'',l:'Nível: todos'}];
+  Object.entries(FAMS).forEach(([fk,f])=>{
+    nivelFilterItems.push({v:'fam:'+fk,l:'Todos os '+f.n,dot:f.c,bold:true});
+    NIVEIS.filter(n=>n.fam===fk).forEach(n=>nivelFilterItems.push({v:n.k,l:n.n,pad:true}));
+  });
+  document.getElementById('fNivelWrap').innerHTML=cselect('fNivel',nivelFilterItems,{onChange:tableChanged});
+  document.getElementById('fSalaWrap').innerHTML=cselect('fSala',[{v:'',l:'Sala: todas'},...SALAS.map(s=>({v:s.id,l:s.n,dot:s.c})),{v:'none',l:'Sem turma',dot:'#B5860B'}],{onChange:tableChanged});
+  const PROFS=[...new Set(SALAS.map(s=>s.prof).filter(Boolean))].sort();
+  document.getElementById('fProfWrap').innerHTML=cselect('fProf',[{v:'',l:'Teacher: todos'},...PROFS.map(p=>({v:p,l:p})),{v:'none',l:'Sem teacher',dot:'#B5860B'}],{onChange:tableChanged});
+  document.getElementById('fHoraWrap').innerHTML=cselect('fHora',[{v:'',l:'Horário: todos'},...HORAS.map(h=>({v:h,l:h}))],{onChange:tableChanged});
+  document.getElementById('fDiaWrap').innerHTML=cselect('fDia',[{v:'',l:'Dias: todos'},{v:'seg-qua',l:'Seg/Qua'},{v:'ter-qui',l:'Ter/Qui'}],{onChange:tableChanged});
+  document.getElementById('fPeriodoWrap').innerHTML=cselect('fPeriodo',[{v:'',l:'Período: todos'},{v:'m',l:'Matutino'},{v:'t',l:'Vespertino'}],{onChange:tableChanged});
   document.getElementById('fStatusWrap').innerHTML=cselect('fStatus',[{v:'',l:'Contrato: todos'},{v:'signed',l:'Assinado'},{v:'viewed',l:'Visualizado'},{v:'sent',l:'Enviado'},{v:'pending',l:'Pendente'}],{onChange:tableChanged});
   document.getElementById('fActiveWrap').innerHTML=cselect('fActive',[{v:'',l:'Situação: todas'},{v:'on',l:'Estudando agora'},{v:'next',l:'Começam em 2026.2'},{v:'off',l:'Inativas'}],{onChange:tableChanged});
   const hoods=[...new Set(STUDENTS.map(s=>s.addr.bairro))].sort();
@@ -2434,9 +3092,13 @@ function init(){
   document.getElementById('cStatusWrap').innerHTML=cselect('cStatus',[{v:'',l:'Status: todos'},{v:'pending',l:'Pendentes de envio'},{v:'sent',l:'Enviados, sem abrir'},{v:'viewed',l:'Visualizados, sem assinar'},{v:'signed',l:'Assinados'}],{onChange:contractsChanged});
   document.getElementById('cActiveWrap').innerHTML=cselect('cActive',[{v:'',l:'Situação: todas'},{v:'on',l:'Estudando agora'},{v:'next',l:'Começam em 2026.2'},{v:'off',l:'Inativas'}],{onChange:contractsChanged});
   renderTableHead();
+  /* filtros transversais da Agenda (valem nas 3 visões) */
+  document.getElementById('agPeriodoWrap').innerHTML=cselect('agPeriodo',[{v:'',l:'Manhã e tarde'},{v:'m',l:'Só manhã'},{v:'t',l:'Só tarde'}],{icon:'sun',onChange:renderAgenda});
+  const AGPROFS=[...new Set(SALAS.map(s=>s.prof).filter(Boolean))].sort();
+  document.getElementById('agProfWrap').innerHTML=cselect('agProf',[{v:'',l:'Teacher: todos'},...AGPROFS.map(p=>({v:p,l:p})),{v:'none',l:'Sem teacher',dot:'#B5860B'}],{onChange:renderAgenda});
   const actE=STUDENTS.filter(s=>s.active!==false);
-  const kidsOf=sc=>actE.filter(s=>s.sch===sc).reduce((a,s)=>a+s.kids.length,0);
-  document.getElementById('emailToWrap').innerHTML=cselect('emailTo',[{v:'all',l:`Todos os responsáveis (${actE.length})`},{v:'sq',l:`Apenas turma Seg/Qua (${kidsOf('seg-qua')})`},{v:'tq',l:`Apenas turma Ter/Qui (${kidsOf('ter-qui')})`},{v:'pend',l:`Contratos pendentes (${actE.filter(s=>s.status!=='signed').length})`}],{block:true});
+  const kidsOf=par=>actE.reduce((a,s)=>a+s.kids.filter(k=>kidTurma(k)?.par===par).length,0);
+  document.getElementById('emailToWrap').innerHTML=cselect('emailTo',[{v:'all',l:`Todos os responsáveis (${actE.length})`},{v:'sq',l:`Apenas turmas de Seg/Qua (${kidsOf('seg-qua')} alunos)`},{v:'tq',l:`Apenas turmas de Ter/Qui (${kidsOf('ter-qui')} alunos)`},{v:'pend',l:`Contratos pendentes (${actE.filter(s=>s.status!=='signed').length})`}],{block:true});
   document.getElementById('actWhoWrap').innerHTML=cselect('actWho',[{v:'',l:'Todos'},...Object.keys(ACT_ACTORS).map(w=>({v:w,l:w}))],{icon:'user-round',onChange:renderActivity});
   // conteúdo
   document.querySelectorAll('.wa-slot').forEach(s=>s.innerHTML=WA('w-4 h-4'));
@@ -2483,7 +3145,7 @@ function openNewEnrollment(){
       <label class="block relative"><span class="text-sm font-medium">Nascimento</span>
         <input id="nmBirth" placeholder="dd/mm/aaaa" oninput="maskDate(this)" inputmode="numeric" class="${inputCls} pr-10">
         <button type="button" onclick="openDatePicker(event,'nmBirth',2018)" class="dp-btn absolute right-2 bottom-[9px] p-1 rounded-md text-[var(--muted)] hover:text-brand-light hover:bg-[var(--hover)] transition" title="Abrir calendário"><i data-lucide="calendar" class="w-4 h-4"></i></button></label>
-      <div><span class="text-sm font-medium">Horário</span><div class="mt-1.5" id="nmSchWrap"></div></div>
+      <div><span class="text-sm font-medium">Turma <span class="text-xs font-normal text-[var(--muted)]">(dá para alocar depois)</span></span><div class="mt-1.5" id="nmTurmaWrap"></div></div>
     </div>
     <label class="block"><span class="text-sm font-medium">Responsável legal</span>
       <input id="nmResp" placeholder="Nome do responsável" class="${inputCls}"></label>
@@ -2503,7 +3165,9 @@ function openNewEnrollment(){
     <button onclick="closeModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] font-medium text-sm">Cancelar</button>
     <button onclick="submitNewEnrollment()" class="flex-1 h-11 rounded-xl text-white font-semibold text-sm" style="background:linear-gradient(135deg,#1E3765,#2F539A)">Adicionar matrícula</button>
   </div>`);
-  document.getElementById('nmSchWrap').innerHTML=cselect('nmSch',[{v:'seg-qua',l:'Seg/Qua'},{v:'ter-qui',l:'Ter/Qui'}],{block:true});
+  const opts=[{v:'',l:'Sem turma — alocar depois pela Agenda',dot:'#B5860B'},
+    ...TURMAS.filter(t=>!turmaFull(t)).map(t=>({v:String(t.id),l:`${turmaShort(t)} · ${nivelLabel(t.nivel)} (${turmaVagas(t)} vaga${turmaVagas(t)>1?'s':''})`,dot:salaById(t.sala).c}))];
+  document.getElementById('nmTurmaWrap').innerHTML=cselect('nmTurma',opts,{block:true});
   lucide.createIcons();
   document.getElementById('nmStudent').focus();
 }
@@ -2517,11 +3181,12 @@ function submitNewEnrollment(){
   const age=yr>1900?2026-yr:8;
   const hood=document.getElementById('nmHood').value.trim()||'Goiânia';
   const id=Math.max(...STUDENTS.map(s=>s.id))+1;
-  STUDENTS.unshift({ id, kids:[{n:name,age,b:b||'—'}],
+  const tid=SEL.nmTurma?.value?+SEL.nmTurma.value:null;
+  STUDENTS.unshift({ id, kids:[{n:name,age,b:b||'—',tid}],
     resp:{n:resp,cpf:'000.000.000-00',phone:document.getElementById('nmPhone').value.trim()||'(62) 9----',email:'—',rel:'Responsável',b:'—'},
     second:null, fin:resp,
     addr:{cep:'74000-000',street:'—',num:'',comp:'',bairro:hood,city:'Goiânia',uf:'GO'},
-    sch:SEL.nmSch?.value||'seg-qua', t:'15h00–16h30', pay:'Boleto',
+    pay:'Boleto',
     status:'pending', media:true, active:true, date:'03/06/2026', hora:'16h05' });
   NOTIFS.unshift({type:'enroll',sid:id,title:'Nova matrícula',desc:`${name} · ${hood}`,time:'agora',unread:true});
   renderTable(); renderContracts(); renderNotifs(); refreshOverviewData();
@@ -2539,7 +3204,8 @@ function openEditEnrollment(id){
       <label class="block relative"><span class="text-sm font-medium">Nascimento</span>
         <input id="edKidB${i}" value="${k.b}" placeholder="dd/mm/aaaa" oninput="maskDate(this)" inputmode="numeric" class="${inputCls} pr-10">
         <button type="button" onclick="openDatePicker(event,'edKidB${i}',2018)" class="dp-btn absolute right-2 bottom-[9px] p-1 rounded-md text-[var(--muted)] hover:text-brand-light hover:bg-[var(--hover)] transition" title="Abrir calendário"><i data-lucide="calendar" class="w-4 h-4"></i></button></label>
-    </div>`).join('');
+    </div>
+    <div><span class="text-sm font-medium">Turma ${s.kids.length>1?'do aluno '+(i+1):''} <span class="text-xs font-normal text-[var(--muted)]">(cada aluno tem a sua)</span></span><div class="mt-1.5" id="edTurmaWrap${i}"></div></div>`).join('');
   const sec=t=>`<p class="text-[10px] font-bold uppercase tracking-wider text-[var(--muted)] pt-2">${t}</p>`;
   const ckSvg='<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3"><polyline points="20 6 9 17 4 12"/></svg>';
   openModal(`${modalHeader('Editar matrícula')}
@@ -2602,11 +3268,6 @@ function openEditEnrollment(id){
       <label class="block"><span class="text-sm font-medium">Cidade</span>
         <input id="edCity" value="${(s.addr.city||'').replace(/"/g,'&quot;')}" class="${inputCls}"></label>
     </div>
-    ${sec('Turma')}
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-      <div><span class="text-sm font-medium">Dias</span><div class="mt-1.5" id="edSchWrap"></div></div>
-      <div><span class="text-sm font-medium">Turma (horário)</span><div class="mt-1.5" id="edTWrap"></div></div>
-    </div>
     <div class="rounded-xl p-3 space-y-2" style="background:var(--hover)">
       <label class="block relative"><span class="text-sm font-medium">Na escola desde</span>
         <input id="edSince" value="${s.since||''}" placeholder="dd/mm/aaaa" oninput="maskDate(this)" inputmode="numeric" class="${inputCls} pr-10" style="background:var(--card)">
@@ -2618,12 +3279,13 @@ function openEditEnrollment(id){
     <button onclick="closeModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] font-medium text-sm">Cancelar</button>
     <button onclick="saveEditEnrollment(${id})" class="flex-1 h-11 rounded-xl text-white font-semibold text-sm" style="background:linear-gradient(135deg,#1E3765,#2F539A)">Salvar alterações</button>
   </div>`,'max-w-xl');
-  const tOpts=sch=>Object.keys(TURMA_CAP[sch]).map(t=>({v:t,l:t}));
-  document.getElementById('edSchWrap').innerHTML=cselect('edSch',[{v:'seg-qua',l:'Seg/Qua'},{v:'ter-qui',l:'Ter/Qui'}],{block:true,value:s.sch,onChange:v=>{
-    document.getElementById('edTWrap').innerHTML=cselect('edT',tOpts(v),{block:true});
-    lucide.createIcons();
-  }});
-  document.getElementById('edTWrap').innerHTML=cselect('edT',tOpts(s.sch),{block:true,value:s.t});
+  /* turma por aluno: só destinos com vaga (a atual sempre aparece) + "Sem turma" */
+  s.kids.forEach((k,i)=>{
+    const opts=[{v:'',l:'Sem turma — fica na fila de alocação',dot:'#B5860B'},
+      ...TURMAS.filter(t=>t.id===k.tid||!turmaFull(t)).map(t=>({v:String(t.id),l:`${turmaShort(t)} · ${nivelLabel(t.nivel)}${t.id===k.tid?' (atual)':` (${turmaVagas(t)} vaga${turmaVagas(t)>1?'s':''})`}`,dot:salaById(t.sala).c}))];
+    const wrap=document.getElementById('edTurmaWrap'+i);
+    if(wrap) wrap.innerHTML=cselect('edTurma'+i,opts,{block:true,value:k.tid?String(k.tid):''});
+  });
   lucide.createIcons();
 }
 function saveEditEnrollment(id){
@@ -2634,7 +3296,9 @@ function saveEditEnrollment(id){
   s.kids=s.kids.map((k,i)=>{
     const n=document.getElementById('edKid'+i)?.value.trim()||k.n;
     const b=document.getElementById('edKidB'+i)?.value.trim()||k.b;
-    return { ...k, n, b, age: ageFrom(b)??k.age };
+    const tv=SEL['edTurma'+i]?.value;
+    const tid=tv===undefined?k.tid:(tv?+tv:null);
+    return { ...k, n, b, age: ageFrom(b)??k.age, tid };
   });
   const gv=id=>document.getElementById(id)?.value.trim()||'';
   s.resp.n=gv('edResp')||s.resp.n;
@@ -2658,8 +3322,6 @@ function saveEditEnrollment(id){
   const sv=gv('edSince');
   if(!sv) delete s.since;
   else if(/^\d{2}\/\d{2}\/\d{4}$/.test(sv)) s.since=sv;
-  s.sch=SEL.edSch?.value||s.sch;
-  s.t=SEL.edT?.value||s.t;
   closeModal();
   renderTable(); renderContracts(); refreshOverviewData();
   logAct(`Editou os dados da matrícula de <b>${s.kids.map(k=>k.n).join(' e ')}</b>`);
@@ -3084,10 +3746,13 @@ function openChangePass(){
 /* --- exportar CSV (de verdade) --- */
 function exportCSV(useFilters){
   const rows=useFilters?filteredStudents():STUDENTS;
-  const head=['Aluno','Idade','Nascimento','Responsável','Telefone','Horário','Status contrato','Situação','Na escola desde','Bairro','Cidade','Matrícula em','Hora','Desligado em','Motivo do desligamento','Observações do desligamento'];
-  const csv=[head.join(';')].concat(rows.flatMap(s=>s.kids.map(k=>
-    [k.n,k.age,k.b,s.resp.n,s.resp.phone,schLabel(s.sch)+' '+s.t,STATUS[s.status].t,s.active===false?'Inativa':isFuture(s)?'Começa em 2026.2':'Estudando',s.since||'',s.addr.bairro,s.addr.city,s.date,s.hora||'',s.exit?.date||'',s.exit?.label||'',(s.exit?.note||'').replace(/;/g,',')].join(';')
-  ))).join('\n');
+  const head=['Aluno','Idade','Nascimento','Responsável','Telefone','Sala','Dias e horário','Nível','Teacher','Status contrato','Situação','Na escola desde','Bairro','Cidade','Matrícula em','Hora','Desligado em','Motivo do desligamento','Observações do desligamento'];
+  const csv=[head.join(';')].concat(rows.flatMap(s=>s.kids.map(k=>{
+    const t=kidTurma(k); const sala=t?salaById(t.sala):null;
+    return [k.n,k.age,k.b,s.resp.n,s.resp.phone,
+      sala?sala.n:'Sem turma', t?schLabel(t.par)+' '+t.hora:'', t?nivelLabel(t.nivel):'', sala?.prof||'',
+      STATUS[s.status].t,s.active===false?'Inativa':isFuture(s)?'Começa em 2026.2':'Estudando',s.since||'',s.addr.bairro,s.addr.city,s.date,s.hora||'',s.exit?.date||'',s.exit?.label||'',(s.exit?.note||'').replace(/;/g,',')].join(';');
+  }))).join('\n');
   const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob); a.download='alunos-english-patio.csv'; a.click();
@@ -3225,27 +3890,29 @@ function runImport(text, sourceName){
     byKid.set(kid,r); // a última linha do mesmo aluno+responsável vence
   }
   const novos=[...byKid.entries()];
-  /* monta as matrículas (horário entra na turma com mais vagas — ajusta depois se precisar) */
+  /* monta as matrículas — cada ALUNO entra na turma com vaga cujo nível combina com a
+     idade; sem turma compatível, fica "aguardando turma" (a planilha não traz turma) */
   const ageFrom=(b,fb)=>{ const p=b.split('/').map(Number); return p[2]>1900 ? 2026-p[2]-((p[1]*100+p[0])>603?1:0) : (parseInt(fb,10)||8); };
-  const occ={}; STUDENTS.forEach(s=>{ if(s.active!==false) occ[s.sch+'|'+s.t]=(occ[s.sch+'|'+s.t]||0)+s.kids.length; });
-  const freest=n=>{ let best=null,free=-1;
-    Object.entries(TURMA_CAP).forEach(([sch,ts])=>Object.entries(ts).forEach(([t,cap])=>{ const f=cap-(occ[sch+'|'+t]||0); if(f>=n&&f>free){ free=f; best={sch,t}; } }));
-    best=best||{sch:'seg-qua',t:'15h00–16h30'}; occ[best.sch+'|'+best.t]=(occ[best.sch+'|'+best.t]||0)+n; return best; };
+  const occ={}; TURMAS.forEach(t=>occ[t.id]=activeKidsIn(t.id));
+  const takeFor=age=>{ let best=null,free=-1;
+    TURMAS.forEach(t=>{ const nv=nivelByK(t.nivel); if(age<nv.ages[0]-1||age>nv.ages[1]+1) return;
+      const f=t.cap-occ[t.id]; if(f>0&&f>free){ free=f; best=t; } });
+    if(best){ occ[best.id]++; return best.id; } return null; };
+  const mkImpKid=(n,b,fb)=>{ const age=ageFrom(b,fb); return { n, b:b||'—', age, tid:takeFor(age) }; };
   let nid=Math.max(...STUDENTS.map(s=>s.id))+1;
   pendingImport=novos.map(([kid,r])=>{
-    const kids=[{n:val(r,C.a1), b:val(r,C.b1)||'—', age:ageFrom(val(r,C.b1),val(r,C.i1))}];
-    if(val(r,C.a2)) kids.push({n:val(r,C.a2), b:val(r,C.b2)||'—', age:ageFrom(val(r,C.b2),val(r,C.i2))});
+    const kids=[mkImpKid(val(r,C.a1), val(r,C.b1), val(r,C.i1))];
+    if(val(r,C.a2)) kids.push(mkImpKid(val(r,C.a2), val(r,C.b2), val(r,C.i2)));
     const ts=val(r,C.ts), dParts=ts.split(' ');
     const date=/^\d{2}\/\d{2}\/\d{4}$/.test(dParts[0])?dParts[0]:'03/06/2026';
     const hora=/^\d{1,2}:\d{2}/.test(dParts[1]||'')?dParts[1].split(':').slice(0,2).join('h'):'';
     const endRaw=val(r,C.end), ci=endRaw.indexOf(',');
-    const tu=freest(kids.length);
     const o={ id:nid++, kids,
       resp:{ n:val(r,C.resp), cpf:val(r,C.cpf)||'—', phone:val(r,C.tel)||'—', email:val(r,C.mail)||'—', rel:val(r,C.rel)||'Responsável', b:val(r,C.rb)||'—' },
       second: val(r,C.sr)?{ n:val(r,C.sr), phone:val(r,C.srt)||'—', rel:val(r,C.srr)||'Responsável' }:null,
       fin: val(r,C.fin)||val(r,C.resp),
       addr:{ cep:val(r,C.cep)||'—', street:ci>0?endRaw.slice(0,ci):endRaw||'—', num:ci>0?endRaw.slice(ci+1).trim():'', comp:'', bairro:val(r,C.hood)||'—', city:val(r,C.city)||'Goiânia', uf:val(r,C.uf)||'GO' },
-      sch:tu.sch, t:tu.t, pay:'Boleto', status:'signed', media:norm(val(r,C.media))!=='não', date, hora,
+      pay:'Boleto', status:'signed', media:norm(val(r,C.media))!=='não', date, hora,
       _warn:[...(nameWarns[kid]||[]), ...(dataWarns[kid]||[])] };
     /* "na escola desde" só vem se a planilha tiver a coluna — senão fica em branco p/ preencher depois */
     const sv=val(r,C.since);
@@ -3877,7 +4544,7 @@ function elLabel(el){
     || '<'+el.tagName.toLowerCase()+'>';
 }
 function currentView(){ return document.querySelector('[data-view].view-active')?.dataset.view||'overview'; }
-const VIEW_LABEL={overview:'Visão geral',alunos:'Alunos',detalhe:'Detalhe do aluno',contratos:'Contratos',modelos:'Modelos de contrato',emails:'Comunicados',editor:'Editor do site',usuarios:'Usuários',atividade:'Registro de atividades',config:'Configurações',notifs:'Notificações'};
+const VIEW_LABEL={overview:'Visão geral',alunos:'Alunos',agenda:'Agenda',detalhe:'Detalhe do aluno',contratos:'Contratos',modelos:'Modelos de contrato',emails:'Comunicados',editor:'Editor do site',usuarios:'Usuários',atividade:'Registro de atividades',config:'Configurações',notifs:'Notificações'};
 
 function toggleCommentMode(){
   commentMode=!commentMode;

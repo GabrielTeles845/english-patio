@@ -25,19 +25,43 @@ async function boot(viewport) {
   return page;
 }
 
-const shot = async (page, name) => {
+const shot = async (page, name, full = true) => {
   await page.waitForTimeout(350);
-  await page.screenshot({ path: `${OUT}/${name}.png`, fullPage: true });
+  // modais são position:fixed — fullPage embaralha o overlay em páginas altas
+  await page.screenshot({ path: `${OUT}/${name}.png`, fullPage: full && !name.includes('modal') });
   console.log('  📸 ' + name);
 };
 
 /* ---------- desktop ---------- */
 const d = await boot({ width: 1440, height: 900 });
 
-for (const view of ['overview', 'alunos', 'contratos', 'emails', 'editor', 'usuarios', 'atividade', 'config', 'notifs']) {
+for (const view of ['overview', 'alunos', 'agenda', 'contratos', 'emails', 'editor', 'usuarios', 'atividade', 'config', 'notifs']) {
   await d.evaluate(v => go(v), view);
   await shot(d, `desktop-${view}`);
 }
+
+/* ---------- agenda: visões, página da sala, mover e modais ---------- */
+await d.evaluate(() => { go('agenda'); setAgView('grade'); setAgPar('ter-qui'); });
+await shot(d, 'desktop-agenda-grade-terqui');
+await d.evaluate(() => { setAgPar('seg-qua'); toggleAgVagas(); });
+await shot(d, 'desktop-agenda-so-com-vagas');
+await d.evaluate(() => { toggleAgVagas(); setAgView('salas'); });
+await shot(d, 'desktop-agenda-salas');
+await d.evaluate(() => openSalaView('green'));
+await shot(d, 'desktop-agenda-sala-green');
+await d.evaluate(() => setAgView('niveis'));
+await shot(d, 'desktop-agenda-niveis');
+await d.evaluate(() => { setAgView('grade'); const f = semTurmaKids()[0]; openMoverKid(f.s.id, f.ki); });
+await shot(d, 'desktop-agenda-modal-alocar');
+await d.evaluate(() => { closeModal(); openNewTurma('lavender', 'seg-qua', '10:30'); });
+await shot(d, 'desktop-agenda-modal-nova-turma');
+await d.evaluate(() => { closeModal(); openTurmaModal(TURMAS.find(t => activeKidsIn(t.id) >= t.cap).id); });
+await shot(d, 'desktop-agenda-modal-turma-cheia');
+await d.evaluate(() => { closeModal(); openAgExport(); });
+await shot(d, 'desktop-agenda-modal-exportar');
+await d.evaluate(() => { closeModal(); openSalasManage(); });
+await shot(d, 'desktop-agenda-modal-salas');
+await d.evaluate(() => closeModal());
 
 // telas derivadas e estados
 await d.evaluate(() => { setOvCohort('next'); go('overview'); });
@@ -93,10 +117,12 @@ await d.close();
 
 /* ---------- mobile ---------- */
 const m = await boot({ width: 390, height: 844 });
-for (const view of ['overview', 'alunos', 'contratos', 'emails']) {
+for (const view of ['overview', 'alunos', 'agenda', 'contratos', 'emails']) {
   await m.evaluate(v => go(v), view);
   await shot(m, `mobile-${view}`);
 }
+await m.evaluate(() => { go('agenda'); openSalaView('green'); });
+await shot(m, 'mobile-agenda-sala-green');
 await m.evaluate(() => toggleFilters('fRow', 'fChev') ?? go('alunos'));
 await m.evaluate(() => go('alunos'));
 await m.evaluate(() => toggleFilters('fRow', 'fChev'));
