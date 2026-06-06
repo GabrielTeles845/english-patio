@@ -188,16 +188,19 @@ section('Modal: editar matrícula');
   $('edCep').value = '74000-123';
   $('edStreet').value = 'Rua de Teste';
   $('edNum').value = '42';
-  $('edCity').value = 'Goiânia';
+  W.csSet('edCity', 'Goiânia'); // cidade agora é select, já marcado com o valor atual
   $('edFin').value = 'Financeiro Teste';
   $('edMedia').classList.remove('on'); // desautoriza imagem
   $('edSecN').value = 'Segundo Resp Teste';
   $('edSecP').value = '(62) 90000-0000';
   $('edSecR').value = 'Tio';
+  $('edSecC').value = '987.654.321-00'; // CPF do 2º responsável (campo do site)
   W.saveEditEnrollment(s.id);
   s.resp.cpf === '123.456.789-09' && s.addr.cep === '74000-123' && s.addr.street === 'Rua de Teste'
     && s.fin === 'Financeiro Teste' && s.media === false && s.second?.n === 'Segundo Resp Teste' && s.second?.rel === 'Tio'
     ? ok('edição completa salva (CPF, endereço, financeiro, imagem, 2º responsável)') : fail('edição completa não salvou tudo');
+  s.second?.cpf === '987.654.321-00' ? ok('CPF do 2º responsável salvo (paridade com o site)') : fail('CPF do 2º responsável não salvou');
+  s.addr.city === 'Goiânia' ? ok('cidade vem marcada e salva pelo select') : fail('cidade não salvou');
   W.openEditEnrollment(s.id);
   $('edSecN').value = ''; // nome vazio remove o 2º responsável
   W.saveEditEnrollment(s.id);

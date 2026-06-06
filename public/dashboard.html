@@ -1230,7 +1230,9 @@ function semTurmaKids(){ const out=[]; STUDENTS.forEach(s=>{ if(s.active===false
 /* badge NOVO/NOVA do quadro do Canva: entrou neste semestre (ou começa no próximo) */
 const isNovo=s=> s.since==='02/02/2026' || (typeof isFuture==='function'&&isFuture(s)) || dvNumSafe(s)>=20260501;
 const dvNumSafe=s=>{ const m=(s.date||'').split('/'); return m.length===3?parseInt(m[2]+m[1]+m[0],10):0; };
-const novoTag=k=>/a$/i.test((k.n.split(' ')[0]||''))?'NOVA':'NOVO';
+/* selo neutro de aluno novo — decisão 06/Jun: sempre "NOVO" (deduzir gênero pelo nome
+   errava com Luca/Noah etc.); dura o 1º semestre do aluno e some sozinho na virada */
+const novoTag=()=>'NOVO';
 
 const STUDENTS = [
   { id:1, kids:[{n:'Helena Duarte Lima', age:8, b:'14/02/2018', tid:3}], resp:{n:'Mariana Duarte Lima', cpf:'047.812.336-50', phone:'(62) 99214-8870', email:'mariana.duarte@gmail.com', rel:'Mãe', b:'09/05/1989'}, second:{n:'Rafael Lima', phone:'(62) 98112-4471', rel:'Pai'}, fin:'Mariana Duarte Lima', addr:{cep:'74230-110', street:'Rua T-55', num:'180', comp:'Apto 902', bairro:'Setor Bueno', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'signed', media:true, since:'03/02/2025', date:'02/06/2026', hora:'20h14' },
@@ -3825,13 +3827,15 @@ function openEditEnrollment(id){
         <input id="edEmail" type="email" value="${s.resp.email}" class="${inputCls}"></label>
     </div>
     ${sec('Segundo responsável')}
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
       <label class="block"><span class="text-sm font-medium">Nome</span>
         <input id="edSecN" value="${(s.second?.n||'').replace(/"/g,'&quot;')}" placeholder="Deixe vazio se não tiver" class="${inputCls}"></label>
-      <label class="block"><span class="text-sm font-medium">Telefone</span>
-        <input id="edSecP" value="${s.second?.phone||''}" oninput="maskPhone(this)" inputmode="numeric" class="${inputCls}"></label>
       <label class="block"><span class="text-sm font-medium">Parentesco</span>
         <input id="edSecR" value="${(s.second?.rel||'').replace(/"/g,'&quot;')}" placeholder="Pai, Mãe…" class="${inputCls}"></label>
+      <label class="block"><span class="text-sm font-medium">Telefone</span>
+        <input id="edSecP" value="${s.second?.phone||''}" oninput="maskPhone(this)" inputmode="numeric" class="${inputCls}"></label>
+      <label class="block"><span class="text-sm font-medium">CPF <span class="text-xs font-normal text-[var(--muted)]">(igual ao formulário do site)</span></span>
+        <input id="edSecC" value="${s.second?.cpf||''}" placeholder="000.000.000-00" oninput="maskCpf(this)" inputmode="numeric" class="${inputCls}"></label>
     </div>
     <p class="text-xs text-[var(--muted)] -mt-1">Para remover o segundo responsável, apague o nome e salve.</p>
     ${sec('Financeiro e autorizações')}
@@ -3850,15 +3854,18 @@ function openEditEnrollment(id){
       <label class="block sm:col-span-2"><span class="text-sm font-medium">Rua / avenida</span>
         <input id="edStreet" value="${(s.addr.street==='—'?'':s.addr.street).replace(/"/g,'&quot;')}" class="${inputCls}"></label>
     </div>
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+    <div class="grid grid-cols-3 gap-3">
       <label class="block"><span class="text-sm font-medium">Número</span>
         <input id="edNum" value="${s.addr.num||''}" class="${inputCls}"></label>
-      <label class="block"><span class="text-sm font-medium">Complemento</span>
-        <input id="edComp" value="${(s.addr.comp||'').replace(/"/g,'&quot;')}" class="${inputCls}"></label>
+      <label class="block col-span-2"><span class="text-sm font-medium">Complemento</span>
+        <input id="edComp" value="${(s.addr.comp||'').replace(/"/g,'&quot;')}" placeholder="Apto, quadra, lote…" class="${inputCls}"></label>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-[1.2fr_1fr_72px] gap-3">
       <label class="block"><span class="text-sm font-medium">Bairro</span>
         <input id="edHood" value="${s.addr.bairro.replace(/"/g,'&quot;')}" class="${inputCls}"></label>
-      <label class="block"><span class="text-sm font-medium">Cidade</span>
-        <input id="edCity" value="${(s.addr.city||'').replace(/"/g,'&quot;')}" class="${inputCls}"></label>
+      <div><span class="text-sm font-medium">Cidade</span><div class="mt-1.5" id="edCityWrap"></div></div>
+      <label class="block"><span class="text-sm font-medium">UF</span>
+        <input value="GO" readonly class="${inputCls} opacity-60 cursor-not-allowed text-center" title="Matrículas são só para Goiás — igual ao formulário do site"></label>
     </div>
     <div class="rounded-xl p-3 space-y-2" style="background:var(--hover)">
       <label class="block relative"><span class="text-sm font-medium">Na escola desde</span>
@@ -3878,6 +3885,10 @@ function openEditEnrollment(id){
     const wrap=document.getElementById('edTurmaWrap'+i);
     if(wrap) wrap.innerHTML=cselect('edTurma'+i,opts,{block:true,value:k.tid?String(k.tid):''});
   });
+  /* cidade: select já marcado com o valor atual (matrículas só em GO, igual ao site) */
+  const cities=[...new Set([s.addr.city,'Goiânia','Aparecida de Goiânia'].filter(Boolean))];
+  const cw=document.getElementById('edCityWrap');
+  if(cw) cw.innerHTML=cselect('edCity',cities.map(c=>({v:c,l:c})),{block:true,value:s.addr.city||'Goiânia'});
   lucide.createIcons();
 }
 function saveEditEnrollment(id){
@@ -3901,7 +3912,9 @@ function saveEditEnrollment(id){
   const rb=gv('edRespB'); if(/^\d{2}\/\d{2}\/\d{4}$/.test(rb)) s.resp.b=rb;
   /* segundo responsável: nome vazio remove; preenchido cria ou atualiza */
   const secN=gv('edSecN');
-  s.second = secN ? { n:secN, phone:gv('edSecP')||s.second?.phone||'—', rel:gv('edSecR')||s.second?.rel||'Responsável' } : null;
+  const secC=gv('edSecC');
+  s.second = secN ? { n:secN, phone:gv('edSecP')||s.second?.phone||'—', rel:gv('edSecR')||s.second?.rel||'Responsável',
+    ...(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(secC)?{cpf:secC}:s.second?.cpf?{cpf:s.second.cpf}:{}) } : null;
   s.fin=gv('edFin')||s.fin;
   s.media=document.getElementById('edMedia')?.classList.contains('on')??s.media;
   const cep=gv('edCep'); if(/^\d{5}-\d{3}$/.test(cep)) s.addr.cep=cep;
@@ -3909,7 +3922,7 @@ function saveEditEnrollment(id){
   s.addr.num=gv('edNum')||s.addr.num;
   s.addr.comp=gv('edComp'); // complemento pode ficar vazio
   s.addr.bairro=gv('edHood')||s.addr.bairro;
-  s.addr.city=gv('edCity')||s.addr.city;
+  s.addr.city=SEL.edCity?.value||s.addr.city;
   /* "na escola desde": vazio limpa o registro; data inválida não corrompe o que já existia */
   const sv=gv('edSince');
   if(!sv) delete s.since;
