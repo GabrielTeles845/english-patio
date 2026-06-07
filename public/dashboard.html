@@ -260,11 +260,12 @@
     <p class="text-sm text-[var(--muted)] mt-1">Enviaremos um link de redefinição para o e-mail cadastrado.</p>
     <div class="mt-4 flex items-center gap-2 surface rounded-xl px-3 h-11">
       <i data-lucide="mail" class="w-4 h-4 text-[var(--muted)]"></i>
-      <input type="email" placeholder="seu@email.com" class="flex-1 bg-transparent outline-none text-sm">
+      <input id="fpEmail" type="email" placeholder="seu@email.com" class="flex-1 bg-transparent outline-none text-sm">
     </div>
+    <div id="fpErr" class="mt-3"></div>
     <div class="mt-5 flex gap-2">
       <button onclick="closeForgot()" class="flex-1 h-10 rounded-xl border border-[var(--border)] font-medium text-sm">Cancelar</button>
-      <button onclick="closeForgot(); toast('Link de redefinição enviado!')" class="flex-1 h-10 rounded-xl text-white font-semibold text-sm" style="background:#1E3765">Enviar link</button>
+      <button onclick="sendForgot()" class="flex-1 h-10 rounded-xl text-white font-semibold text-sm" style="background:#1E3765">Enviar link</button>
     </div>
   </div>
 </div>
@@ -1235,23 +1236,23 @@ const dvNumSafe=s=>{ const m=(s.date||'').split('/'); return m.length===3?parseI
 const novoTag=()=>'NOVO';
 
 const STUDENTS = [
-  { id:1, kids:[{n:'Helena Duarte Lima', age:8, b:'14/02/2018', tid:3}], resp:{n:'Mariana Duarte Lima', cpf:'047.812.336-50', phone:'(62) 99214-8870', email:'mariana.duarte@gmail.com', rel:'Mãe', b:'09/05/1989'}, second:{n:'Rafael Lima', phone:'(62) 98112-4471', rel:'Pai'}, fin:'Mariana Duarte Lima', addr:{cep:'74230-110', street:'Rua T-55', num:'180', comp:'Apto 902', bairro:'Setor Bueno', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'signed', media:true, since:'03/02/2025', date:'02/06/2026', hora:'20h14' },
+  { id:1, kids:[{n:'Helena Duarte Lima', age:8, b:'14/02/2018', tid:3}], resp:{n:'Mariana Duarte Lima', cpf:'047.812.336-19', phone:'(62) 99214-8870', email:'mariana.duarte@gmail.com', rel:'Mãe', b:'09/05/1989'}, second:{n:'Rafael Lima', phone:'(62) 98112-4471', rel:'Pai'}, fin:'Mariana Duarte Lima', addr:{cep:'74230-110', street:'Rua T-55', num:'180', comp:'Apto 902', bairro:'Setor Bueno', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'signed', media:true, since:'03/02/2025', date:'02/06/2026', hora:'20h14' },
   // irmãos em turmas (e salas) diferentes — o caso real que o modelo antigo não representava
-  { id:2, kids:[{n:'Théo Andrade Rocha', age:10, b:'22/08/2015', tid:10},{n:'Lara Andrade Rocha', age:7, b:'30/11/2018', tid:14}], resp:{n:'Patrícia Andrade', cpf:'118.553.701-22', phone:'(62) 99980-1245', email:'patricia.andrade@hotmail.com', rel:'Mãe', b:'17/03/1986'}, second:{n:'Bruno Rocha', phone:'(62) 99771-3380', rel:'Pai'}, fin:'Bruno Rocha', addr:{cep:'74115-030', street:'Av. T-9', num:'1240', comp:'', bairro:'Jardim Goiás', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'pending', media:true, since:'05/08/2024', date:'31/05/2026', hora:'19h32' },
-  { id:3, kids:[{n:'Miguel Ferreira Souza', age:12, b:'05/01/2014', tid:9}], resp:{n:'Camila Ferreira', cpf:'203.447.882-09', phone:'(62) 98341-6622', email:'camila.fsouza@gmail.com', rel:'Mãe', b:'25/07/1984'}, second:null, fin:'Camila Ferreira', addr:{cep:'74080-010', street:'Rua 90', num:'455', comp:'Casa 2', bairro:'Setor Sul', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'signed', media:false, since:'03/02/2025', date:'30/05/2026', hora:'10h05' },
-  { id:4, kids:[{n:'Sofia Mendes Castro', age:9, b:'19/09/2016', tid:6}], resp:{n:'Juliana Castro', cpf:'355.221.940-71', phone:'(62) 99657-2218', email:'ju.castro@outlook.com', rel:'Mãe', b:'12/12/1990'}, second:{n:'André Mendes', phone:'(62) 98220-9981', rel:'Pai'}, fin:'André Mendes', addr:{cep:'74810-100', street:'Rua C-140', num:'78', comp:'', bairro:'Jardim América', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'viewed', media:true, date:'29/05/2026', hora:'21h47' },
-  { id:5, kids:[{n:'Bernardo Pires Alves', age:6, b:'09/06/2020', tid:4}], resp:{n:'Fernanda Pires', cpf:'412.889.503-44', phone:'(62) 99102-7755', email:'fernanda.pires@gmail.com', rel:'Mãe', b:'28/02/1992'}, second:null, fin:'Fernanda Pires', addr:{cep:'74663-520', street:'Rua VP-7D', num:'320', comp:'Qd 12 Lt 4', bairro:'Vila São João', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'signed', media:true, date:'28/05/2026',hora:'14h22' },
-  { id:6, kids:[{n:'Alice Barbosa Nunes', age:11, b:'27/06/2015', tid:11}], resp:{n:'Renata Nunes', cpf:'509.334.118-60', phone:'(62) 98876-4400', email:'renata.nunes@yahoo.com', rel:'Mãe', b:'05/09/1983'}, second:{n:'Carlos Barbosa', phone:'(62) 99443-1102', rel:'Pai'}, fin:'Renata Nunes', addr:{cep:'74125-160', street:'Av. Mutirão', num:'2540', comp:'Apto 1503', bairro:'Setor Marista', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'signed', media:true, since:'01/08/2022', date:'27/05/2026', hora:'18h39' },
-  { id:7, kids:[{n:'Davi Cardoso Melo', age:13, b:'11/06/2013', tid:16}], resp:{n:'Aline Melo', cpf:'620.778.245-31', phone:'(62) 99320-8845', email:'aline.melo@gmail.com', rel:'Mãe', b:'19/11/1981'}, second:null, fin:'Aline Melo', addr:{cep:'74305-040', street:'Rua 1136', num:'95', comp:'', bairro:'Setor Pedro Ludovico', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'pending', media:false, since:'05/02/2024', date:'26/05/2026', hora:'20h51' },
-  { id:8, kids:[{n:'Manuela Teixeira Gomes', age:7, b:'08/07/2018', tid:14},{n:'Pedro Teixeira Gomes', age:9, b:'16/05/2016', tid:15}], resp:{n:'Vanessa Teixeira', cpf:'731.005.667-88', phone:'(62) 98990-3321', email:'va.teixeira@hotmail.com', rel:'Mãe', b:'03/06/1988'}, second:{n:'Marcos Gomes', phone:'(62) 99558-7700', rel:'Pai'}, fin:'Marcos Gomes', addr:{cep:'74884-120', street:'Av. Rio Verde', num:'1180', comp:'Cond. Jardins', bairro:'Jardim Atlântico', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'sent', media:true, since:'05/02/2024', date:'25/05/2026', hora:'16h08' },
-  { id:9, kids:[{n:'Isabela Ribeiro Dias', age:14, b:'02/02/2012', tid:17}], resp:{n:'Cristina Dias', cpf:'845.119.302-15', phone:'(62) 99701-2266', email:'cristina.dias@gmail.com', rel:'Mãe', b:'21/08/1979'}, second:null, fin:'Cristina Dias', addr:{cep:'74215-908', street:'Av. 136', num:'960', comp:'Sala 408', bairro:'Setor Sul', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'signed', media:false, active:false, exit:{ k:'moved', label:'Mudança de cidade ou bairro', note:'Família se mudou para Anápolis.', date:'28/05/2026' }, since:'06/02/2023', date:'24/05/2026', hora:'19h15' },
-  { id:10, kids:[{n:'Arthur Moraes Pinto', age:8, b:'29/10/2017', tid:5}], resp:{n:'Letícia Moraes', cpf:'956.443.870-02', phone:'(62) 98112-9943', email:'leticia.moraes@outlook.com', rel:'Mãe', b:'14/04/1991'}, second:{n:'Felipe Pinto', phone:'(62) 99887-6610', rel:'Pai'}, fin:'Felipe Pinto', addr:{cep:'74070-060', street:'Rua 22', num:'310', comp:'', bairro:'Setor Aeroporto', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'pending', media:true, active:false, exit:{ k:'financial', label:'Questões financeiras', note:'', date:'30/05/2026' }, date:'23/05/2026', hora:'11h26' },
-  { id:11, kids:[{n:'Laura Cavalcante Reis', age:10, b:'12/12/2015', tid:8}], resp:{n:'Daniela Reis', cpf:'063.778.221-49', phone:'(62) 99334-1180', email:'dani.reis@gmail.com', rel:'Mãe', b:'30/01/1987'}, second:null, fin:'Daniela Reis', addr:{cep:'74343-230', street:'Rua RF-12', num:'140', comp:'Qd 8', bairro:'Residencial Forte', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'signed', media:true, since:'07/08/2023', date:'22/05/2026', hora:'20h33' },
-  { id:12, kids:[{n:'Gabriel Fonseca Lopes', age:11, b:'07/08/2014', tid:11}], resp:{n:'Simone Fonseca', cpf:'174.882.605-77', phone:'(62) 98445-2290', email:'simone.fonseca@yahoo.com', rel:'Mãe', b:'08/10/1982'}, second:{n:'Thiago Lopes', phone:'(62) 99221-5544', rel:'Pai'}, fin:'Thiago Lopes', addr:{cep:'74150-020', street:'Av. T-63', num:'880', comp:'Apto 701', bairro:'Setor Bueno', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'viewed', media:true, date:'21/05/2026',hora:'17h44' },
+  { id:2, kids:[{n:'Théo Andrade Rocha', age:10, b:'22/08/2015', tid:10},{n:'Lara Andrade Rocha', age:7, b:'30/11/2018', tid:14}], resp:{n:'Patrícia Andrade', cpf:'118.553.701-58', phone:'(62) 99980-1245', email:'patricia.andrade@hotmail.com', rel:'Mãe', b:'17/03/1986'}, second:{n:'Bruno Rocha', phone:'(62) 99771-3380', rel:'Pai'}, fin:'Bruno Rocha', addr:{cep:'74115-030', street:'Av. T-9', num:'1240', comp:'', bairro:'Jardim Goiás', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'pending', media:true, since:'05/08/2024', date:'31/05/2026', hora:'19h32' },
+  { id:3, kids:[{n:'Miguel Ferreira Souza', age:12, b:'05/01/2014', tid:9}], resp:{n:'Camila Ferreira', cpf:'203.447.882-70', phone:'(62) 98341-6622', email:'camila.fsouza@gmail.com', rel:'Mãe', b:'25/07/1984'}, second:null, fin:'Camila Ferreira', addr:{cep:'74080-010', street:'Rua 90', num:'455', comp:'Casa 2', bairro:'Setor Sul', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'signed', media:false, since:'03/02/2025', date:'30/05/2026', hora:'10h05' },
+  { id:4, kids:[{n:'Sofia Mendes Castro', age:9, b:'19/09/2016', tid:6}], resp:{n:'Juliana Castro', cpf:'355.221.940-49', phone:'(62) 99657-2218', email:'ju.castro@outlook.com', rel:'Mãe', b:'12/12/1990'}, second:{n:'André Mendes', phone:'(62) 98220-9981', rel:'Pai'}, fin:'André Mendes', addr:{cep:'74810-100', street:'Rua C-140', num:'78', comp:'', bairro:'Jardim América', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'viewed', media:true, date:'29/05/2026', hora:'21h47' },
+  { id:5, kids:[{n:'Bernardo Pires Alves', age:6, b:'09/06/2020', tid:4}], resp:{n:'Fernanda Pires', cpf:'412.889.503-22', phone:'(62) 99102-7755', email:'fernanda.pires@gmail.com', rel:'Mãe', b:'28/02/1992'}, second:null, fin:'Fernanda Pires', addr:{cep:'74663-520', street:'Rua VP-7D', num:'320', comp:'Qd 12 Lt 4', bairro:'Vila São João', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'signed', media:true, date:'28/05/2026',hora:'14h22' },
+  { id:6, kids:[{n:'Alice Barbosa Nunes', age:11, b:'27/06/2015', tid:11}], resp:{n:'Renata Nunes', cpf:'509.334.118-55', phone:'(62) 98876-4400', email:'renata.nunes@yahoo.com', rel:'Mãe', b:'05/09/1983'}, second:{n:'Carlos Barbosa', phone:'(62) 99443-1102', rel:'Pai'}, fin:'Renata Nunes', addr:{cep:'74125-160', street:'Av. Mutirão', num:'2540', comp:'Apto 1503', bairro:'Setor Marista', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'signed', media:true, since:'01/08/2022', date:'27/05/2026', hora:'18h39' },
+  { id:7, kids:[{n:'Davi Cardoso Melo', age:13, b:'11/06/2013', tid:16}], resp:{n:'Aline Melo', cpf:'620.778.245-30', phone:'(62) 99320-8845', email:'aline.melo@gmail.com', rel:'Mãe', b:'19/11/1981'}, second:null, fin:'Aline Melo', addr:{cep:'74305-040', street:'Rua 1136', num:'95', comp:'', bairro:'Setor Pedro Ludovico', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'pending', media:false, since:'05/02/2024', date:'26/05/2026', hora:'20h51' },
+  { id:8, kids:[{n:'Manuela Teixeira Gomes', age:7, b:'08/07/2018', tid:14},{n:'Pedro Teixeira Gomes', age:9, b:'16/05/2016', tid:15}], resp:{n:'Vanessa Teixeira', cpf:'731.005.667-18', phone:'(62) 98990-3321', email:'va.teixeira@hotmail.com', rel:'Mãe', b:'03/06/1988'}, second:{n:'Marcos Gomes', phone:'(62) 99558-7700', rel:'Pai'}, fin:'Marcos Gomes', addr:{cep:'74884-120', street:'Av. Rio Verde', num:'1180', comp:'Cond. Jardins', bairro:'Jardim Atlântico', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'sent', media:true, since:'05/02/2024', date:'25/05/2026', hora:'16h08' },
+  { id:9, kids:[{n:'Isabela Ribeiro Dias', age:14, b:'02/02/2012', tid:17}], resp:{n:'Cristina Dias', cpf:'845.119.302-10', phone:'(62) 99701-2266', email:'cristina.dias@gmail.com', rel:'Mãe', b:'21/08/1979'}, second:null, fin:'Cristina Dias', addr:{cep:'74215-908', street:'Av. 136', num:'960', comp:'Sala 408', bairro:'Setor Sul', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'signed', media:false, active:false, exit:{ k:'moved', label:'Mudança de cidade ou bairro', note:'Família se mudou para Anápolis.', date:'28/05/2026' }, since:'06/02/2023', date:'24/05/2026', hora:'19h15' },
+  { id:10, kids:[{n:'Arthur Moraes Pinto', age:8, b:'29/10/2017', tid:5}], resp:{n:'Letícia Moraes', cpf:'956.443.870-54', phone:'(62) 98112-9943', email:'leticia.moraes@outlook.com', rel:'Mãe', b:'14/04/1991'}, second:{n:'Felipe Pinto', phone:'(62) 99887-6610', rel:'Pai'}, fin:'Felipe Pinto', addr:{cep:'74070-060', street:'Rua 22', num:'310', comp:'', bairro:'Setor Aeroporto', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'pending', media:true, active:false, exit:{ k:'financial', label:'Questões financeiras', note:'', date:'30/05/2026' }, date:'23/05/2026', hora:'11h26' },
+  { id:11, kids:[{n:'Laura Cavalcante Reis', age:10, b:'12/12/2015', tid:8}], resp:{n:'Daniela Reis', cpf:'063.778.221-62', phone:'(62) 99334-1180', email:'dani.reis@gmail.com', rel:'Mãe', b:'30/01/1987'}, second:null, fin:'Daniela Reis', addr:{cep:'74343-230', street:'Rua RF-12', num:'140', comp:'Qd 8', bairro:'Residencial Forte', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'signed', media:true, since:'07/08/2023', date:'22/05/2026', hora:'20h33' },
+  { id:12, kids:[{n:'Gabriel Fonseca Lopes', age:11, b:'07/08/2014', tid:11}], resp:{n:'Simone Fonseca', cpf:'174.882.605-03', phone:'(62) 98445-2290', email:'simone.fonseca@yahoo.com', rel:'Mãe', b:'08/10/1982'}, second:{n:'Thiago Lopes', phone:'(62) 99221-5544', rel:'Pai'}, fin:'Thiago Lopes', addr:{cep:'74150-020', street:'Av. T-63', num:'880', comp:'Apto 701', bairro:'Setor Bueno', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'viewed', media:true, date:'21/05/2026',hora:'17h44' },
   // três irmãos, três turmas: 9 anos no Conversation 3, 11 no Power 2 e 6 no Conversation 1 (manhã)
-  { id:13, kids:[{n:'Valentina Almeida Prado', age:9, b:'15/04/2017', tid:12},{n:'Henrique Almeida Prado', age:11, b:'20/09/2014', tid:8},{n:'Cecília Almeida Prado', age:6, b:'02/01/2020', tid:2}], resp:{n:'Roberta Almeida Prado', cpf:'288.443.190-66', phone:'(62) 99845-7733', email:'roberta.prado@gmail.com', rel:'Mãe', b:'11/07/1985'}, second:{n:'Eduardo Prado', phone:'(62) 99102-8844', rel:'Pai'}, fin:'Eduardo Prado', addr:{cep:'74110-100', street:'Rua 9', num:'520', comp:'Casa 1', bairro:'Setor Oeste', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'signed', media:true, since:'06/02/2023', date:'20/05/2026', hora:'19h58' },
+  { id:13, kids:[{n:'Valentina Almeida Prado', age:9, b:'15/04/2017', tid:12},{n:'Henrique Almeida Prado', age:11, b:'20/09/2014', tid:8},{n:'Cecília Almeida Prado', age:6, b:'02/01/2020', tid:2}], resp:{n:'Roberta Almeida Prado', cpf:'288.443.190-04', phone:'(62) 99845-7733', email:'roberta.prado@gmail.com', rel:'Mãe', b:'11/07/1985'}, second:{n:'Eduardo Prado', phone:'(62) 99102-8844', rel:'Pai'}, fin:'Eduardo Prado', addr:{cep:'74110-100', street:'Rua 9', num:'520', comp:'Casa 1', bairro:'Setor Oeste', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'signed', media:true, since:'06/02/2023', date:'20/05/2026', hora:'19h58' },
   // mesma mãe da Helena (id 1), em matrícula separada — agrupa ao ordenar por responsável
-  { id:14, kids:[{n:'Lorenzo Duarte Lima', age:5, b:'09/10/2021', tid:13}], resp:{n:'Mariana Duarte Lima', cpf:'047.812.336-50', phone:'(62) 99214-8870', email:'mariana.duarte@gmail.com', rel:'Mãe', b:'09/05/1989'}, second:{n:'Rafael Lima', phone:'(62) 98112-4471', rel:'Pai'}, fin:'Mariana Duarte Lima', addr:{cep:'74230-110', street:'Rua T-55', num:'180', comp:'Apto 902', bairro:'Setor Bueno', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'sent', media:true, date:'19/05/2026',hora:'20h41' },
+  { id:14, kids:[{n:'Lorenzo Duarte Lima', age:5, b:'09/10/2021', tid:13}], resp:{n:'Mariana Duarte Lima', cpf:'047.812.336-19', phone:'(62) 99214-8870', email:'mariana.duarte@gmail.com', rel:'Mãe', b:'09/05/1989'}, second:{n:'Rafael Lima', phone:'(62) 98112-4471', rel:'Pai'}, fin:'Mariana Duarte Lima', addr:{cep:'74230-110', street:'Rua T-55', num:'180', comp:'Apto 902', bairro:'Setor Bueno', city:'Goiânia', uf:'GO'}, pay:'Boleto', status:'sent', media:true, date:'19/05/2026',hora:'20h41' },
 ];
 
 /* +~116 matrículas geradas com seed fixa (mesmos dados em todo reload), calibradas para a
@@ -1398,6 +1399,37 @@ const isFuture = s => dvNum(s)>=20260501;
 const dnum = v => { const m=(v||'').match(/^(\d{2})\/(\d{2})\/(\d{4})$/); return m?parseInt(m[3]+m[2]+m[1],10):null; };
 const inCohort = s => s.active!==false && (typeof ovCohort==='undefined'||ovCohort===''||(ovCohort==='on'?!isFuture(s):isFuture(s)));
 const maskCPF = c => c.slice(0,4)+'•••.•••'+c.slice(-3);
+/* ====================== VALIDAÇÕES (espelham src/utils/validators.ts do site) ======================
+   Regras combinadas: campos que o contrato carimba são OBRIGATÓRIOS e validados de verdade
+   (CPF com dígitos verificadores, telefone celular com 11 dígitos, e-mail, datas reais).
+   CPF repetido NÃO é erro — é como irmãos em matrículas separadas viram "família";
+   só vira aviso quando o mesmo CPF aparece com OUTRO nome de responsável. */
+const onlyDigits=v=>String(v||'').replace(/\D/g,'');
+function validCPF(cpf){
+  const c=onlyDigits(cpf);
+  if(c.length!==11||/^(\d)\1{10}$/.test(c)) return false;
+  let d1=0; for(let i=0;i<9;i++) d1+=+c[i]*(10-i); d1%=11; d1=d1<2?0:11-d1;
+  if(d1!==+c[9]) return false;
+  let d2=0; for(let i=0;i<10;i++) d2+=+c[i]*(11-i); d2%=11; d2=d2<2?0:11-d2;
+  return d2===+c[10];
+}
+const validEmail=v=>/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v||'').trim());
+const validPhone=v=>{ const d=onlyDigits(v); return d.length===11&&d[2]==='9'; };
+const validFullName=v=>String(v||'').trim().split(/\s+/).filter(p=>!['e','de','da','do','dos','das'].includes(p.toLowerCase())).length>=2;
+function parseDateBR(v){ const m=String(v||'').match(/^(\d{2})\/(\d{2})\/(\d{4})$/); if(!m) return null;
+  const d=+m[1],mo=+m[2],y=+m[3]; if(mo<1||mo>12||d<1||d>new Date(y,mo,0).getDate()) return null; return {d,m:mo,y}; }
+/* idade na data de referência do preview (03/06/2026) */
+function ageAtRef(v){ const p=parseDateBR(v); if(!p) return null; return 2026-p.y-((p.m*100+p.d)>603?1:0); }
+const validNewPass=p=>p.length>=10&&/[a-zA-Z]/.test(p)&&/\d/.test(p);
+/* a quem este CPF pertence em OUTRA matrícula (para o aviso de nome divergente) */
+function cpfOwner(cpf,ignoreId){ const c=onlyDigits(cpf); if(c.length!==11) return null;
+  const s=STUDENTS.find(x=>x.id!==ignoreId&&onlyDigits(x.resp.cpf)===c); return s?s.resp.n:null; }
+const nrmName=v=>String(v||'').toLowerCase().replace(/\s+/g,' ').trim();
+/* caracteres que quebram o HTML gerado (e seriam XSS no produto real) — bloqueados nos textos */
+const badChars=v=>/[<>"'&]/.test(String(v||''));
+const BAD_CHARS_MSG='Remova os caracteres especiais (sinais de maior/menor, aspas e &) dos campos de texto — use só letras, números e pontuação simples.';
+/* avisos que pedem "clique de novo para confirmar" (não bloqueiam, só dão chance de revisar) */
+let nmWarnOk=false, edWarnOk=false, etWarnOk=false;
 const waBtn = (name,cls='w-8 h-8') => `<button onclick="event.stopPropagation();toast('Abrindo WhatsApp de ${name}…')" class="${cls} rounded-lg grid place-content-center transition hover:scale-105" style="background:rgba(37,211,102,.14);color:#1faa53" title="Chamar no WhatsApp">${WA('w-[17px] h-[17px]')}</button>`;
 
 /* ====================== SELECT CUSTOMIZADO ====================== */
@@ -1501,7 +1533,12 @@ function doLogin(){
 }
 function logout(){ document.getElementById('app').classList.add('hidden'); document.getElementById('login').style.display='flex'; }
 function openForgot(e){ e.preventDefault(); document.getElementById('forgot').classList.replace('hidden','flex'); lucide.createIcons(); }
-function closeForgot(){ document.getElementById('forgot').classList.replace('flex','hidden'); }
+function closeForgot(){ document.getElementById('forgot').classList.replace('flex','hidden'); ntErrBox('fpErr',''); }
+function sendForgot(){
+  const e=document.getElementById('fpEmail')?.value.trim()||'';
+  if(!validEmail(e)) return ntErrBox('fpErr','Digite um e-mail válido para receber o link.');
+  closeForgot(); toast('Link de redefinição enviado!');
+}
 
 /* ====================== NOTIFICAÇÕES ====================== */
 const NOTIFS=[
@@ -1981,7 +2018,10 @@ function openDetail(id){
   if(cv&&cv!=='detalhe') detailBack=cv;
   const lbl=document.getElementById('detailBackLabel');
   if(lbl) lbl.textContent='Voltar para '+(VIEW_LABEL[detailBack]||'Alunos').toLowerCase();
-  const s=STUDENTS.find(x=>x.id===id); const st=STATUS[s.status];
+  /* a matrícula pode ter sido excluída depois (ex.: clique numa notificação antiga) */
+  const s=STUDENTS.find(x=>x.id===id);
+  if(!s){ toast('Esta matrícula não existe mais — o cadastro foi excluído.'); return; }
+  const st=STATUS[s.status];
   const kidsCards = s.kids.map((k,ki)=>{
     const t=kidTurma(k);
     const turmaLine = t
@@ -2014,7 +2054,7 @@ function openDetail(id){
     ${s.active===false?`<div class="rounded-2xl p-4 mb-4 flex flex-wrap items-center gap-3" style="background:rgba(100,116,139,.10);border:1px solid rgba(100,116,139,.25)">
       <div class="w-10 h-10 rounded-xl grid place-content-center shrink-0" style="background:rgba(100,116,139,.15)"><i data-lucide="user-round-x" class="w-5 h-5" style="color:#64748B"></i></div>
       <div class="min-w-0 flex-1"><p class="text-sm font-semibold" style="color:#475569">Aluno desligado da escola${s.exit?' em '+s.exit.date:''}</p>
-        <p class="text-xs text-[var(--muted)]">${s.exit?`Motivo: <b>${s.exit.label}</b>${s.exit.note?' — “'+s.exit.note+'”':''}`:'Matrícula inativa.'}</p></div>
+        <p class="text-xs text-[var(--muted)]">${s.exit?`Motivo: <b>${s.exit.label}</b>${s.exit.note?' — “'+esc(s.exit.note)+'”':''}`:'Matrícula inativa.'}</p></div>
       <button onclick="reactivateStudent(${s.id});openDetail(${s.id})" class="h-9 px-3.5 rounded-lg text-sm font-semibold border transition hover:bg-[var(--hover)]" style="border-color:rgba(22,163,74,.4);color:#16a34a"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5 inline -mt-0.5"></i> Reativar</button>
     </div>`:''}
     <div class="grid lg:grid-cols-3 gap-4">
@@ -2729,6 +2769,16 @@ function mvToggleFull(){
 function mvAskFull(tid){
   const ctx=openMoverKid._ctx; if(!ctx) return;
   const s=STUDENTS.find(x=>x.id===ctx.sid); const k=s?.kids[ctx.ki]; const t=turmaById(tid); if(!k||!t) return;
+  /* no máximo 2 vagas extras além do padrão de 7 — mais que isso não cabe na sala */
+  if(t.cap>=9){
+    openModal(`${modalHeader('Limite de vagas extras')}
+    <div class="p-5 space-y-4">
+      <p class="text-sm">A turma <b>${turmaShort(t)}</b> já está com <b>${t.cap} lugares</b> — 2 vagas extras além do padrão de 7. Abrir mais uma passaria do que cabe na sala.</p>
+      <p class="text-sm text-[var(--muted)]">Escolha outra turma com vaga ou crie uma turma nova pela Agenda.</p>
+      <button onclick="openMoverKid(${ctx.sid},${ctx.ki})" class="w-full h-11 rounded-xl border border-[var(--border)] font-medium text-sm">Voltar</button>
+    </div>`,'max-w-md');
+    return;
+  }
   openModal(`${modalHeader('Abrir uma vaga extra?')}
   <div class="p-5 space-y-3">
     <div class="flex items-center gap-3 p-3 rounded-xl" style="background:var(--hover)">
@@ -2778,7 +2828,14 @@ function nivelPickItems(){
 }
 function ntErrBox(id,msg){
   const el=document.getElementById(id);
-  if(el){ el.innerHTML=msg?`<div class="rounded-xl p-2.5 text-xs flex items-start gap-2" style="background:rgba(220,38,38,.08);color:#DC2626"><i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i><span>${msg}</span></div>`:''; lucide.createIcons(); }
+  if(el){ el.innerHTML=msg?`<div class="rounded-xl p-2.5 text-xs flex items-start gap-2" style="background:rgba(220,38,38,.08);color:#DC2626"><i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i><span>${msg}</span></div>`:''; lucide.createIcons();
+    if(msg) el.scrollIntoView({behavior:'smooth',block:'nearest'}); }
+}
+/* aviso amarelo: situação suspeita mas possivelmente legítima — pede um segundo clique */
+function ntWarnBox(id,msg){
+  const el=document.getElementById(id);
+  if(el){ el.innerHTML=msg?`<div class="rounded-xl p-2.5 text-xs flex items-start gap-2" style="background:rgba(245,183,0,.12);color:#B5860B"><i data-lucide="alert-triangle" class="w-4 h-4 shrink-0"></i><span>${msg}</span></div>`:''; lucide.createIcons();
+    if(msg) el.scrollIntoView({behavior:'smooth',block:'nearest'}); }
 }
 function openNewTurma(sala,par,hora,nivel){
   openModal(`${modalHeader('Nova turma')}
@@ -2818,6 +2875,7 @@ function agSaveTurma(){
 }
 function openTurmaModal(tid){
   const t=turmaById(tid); if(!t) return;
+  etWarnOk=false;
   const sala=salaById(t.sala);
   const list=kidsOfTurma(tid);
   const occ=list.length;
@@ -2864,10 +2922,16 @@ function agUpdateTurma(tid){
   const occ=activeKidsIn(tid);
   const cap=parseInt(document.getElementById('etCap')?.value,10);
   const sala=SEL.etSala?.value, par=SEL.etPar?.value, hora=SEL.etHora?.value, nivel=SEL.etNivel?.value;
-  if(!(cap>=1&&cap<=7)) return ntErrBox('etErr','Vagas entre 1 e 7 — o padrão da escola é 7.');
+  /* turma com vaga extra aberta (cap>7) continua editável — o teto vale o limite atual dela */
+  const maxCap=Math.max(7,t.cap);
+  if(!(cap>=1&&cap<=maxCap)) return ntErrBox('etErr',`Vagas entre 1 e ${maxCap}${maxCap>7?' (esta turma tem vaga extra aberta)':''} — o padrão da escola é 7.`);
   if(cap<occ) return ntErrBox('etErr',`A turma tem ${occ} aluno${occ>1?'s':''} — a capacidade não pode ficar menor que isso.`);
   const clash=turmaAt(sala,par,hora);
   if(clash&&clash.id!==tid) return ntErrBox('etErr',`A ${salaById(sala).n} já tem turma ${schLabel(par)} às ${hora}.`);
+  /* mudar o nível de uma turma COM alunos muda o nível de todo mundo de uma vez — confirmação */
+  if(nivel!==t.nivel&&occ>0&&!etWarnOk){ etWarnOk=true;
+    return ntWarnBox('etErr',`Esta turma tem <b>${occ} aluno${occ>1?'s':''}</b> — mudar o nível de <b>${nivelLabel(t.nivel)}</b> para <b>${nivelLabel(nivel)}</b> muda a turma inteira. <b>Se for isso mesmo, clique de novo em "Salvar alterações".</b>`); }
+  etWarnOk=false;
   Object.assign(t,{sala,par,hora,nivel,cap});
   closeModal(); refreshAll();
   logAct(`Editou a turma <b>${turmaShort(t)}</b> (${nivelLabel(t.nivel)}, ${cap} vagas)`);
@@ -2977,6 +3041,7 @@ function smAssignTeacher(i,salaId){
 function smAddSala(){
   const inp=document.getElementById('smNewSala'); const n=(inp?.value||'').trim();
   if(!n){ inp?.focus(); return; }
+  if(badChars(n)){ toast('O nome da sala não pode ter sinais de maior/menor, aspas ou & — use só letras e números.'); return; }
   if(SALAS.some(s=>s.n.toLowerCase()===n.toLowerCase())){ toast('Já existe uma sala com esse nome.'); return; }
   let id=slugify(n); while(SALAS.some(s=>s.id===id)) id+='-2';
   const usadas=new Set(SALAS.map(s=>s.c));
@@ -3016,6 +3081,7 @@ function confirmSmRemoveSala(id){
 function smAddTeacher(){
   const inp=document.getElementById('smNewProf'); const n=(inp?.value||'').trim();
   if(!n){ inp?.focus(); return; }
+  if(badChars(n)){ toast('O nome do teacher não pode ter sinais de maior/menor, aspas ou & — use só letras.'); return; }
   if(TEACHERS.some(t=>t.toLowerCase()===n.toLowerCase())){ toast('Esse teacher já está cadastrado.'); return; }
   TEACHERS.push(n); TEACHERS.sort();
   logAct(`Cadastrou o teacher <b>${esc(n)}</b> (sem sala por enquanto)`);
@@ -3071,6 +3137,7 @@ function saveSala(id){
   const s=salaById(id); if(!s) return;
   const n=document.getElementById('seNome')?.value.trim();
   if(!n) return ntErrBox('seErr','A sala precisa de um nome.');
+  if(badChars(n)) return ntErrBox('seErr','O nome da sala não pode ter sinais de maior/menor, aspas ou & — use só letras e números.');
   if(SALAS.some(x=>x.id!==id&&x.n.toLowerCase()===n.toLowerCase())) return ntErrBox('seErr',`Já existe uma sala chamada <b>${esc(n)}</b>.`);
   s.n=n; if(seCor) s.c=seCor;
   closeModal(); refreshAll(); if(currentView()==='agenda') renderAgenda();
@@ -3718,8 +3785,8 @@ const modalHeader = t => `<div class="flex items-center justify-between px-5 h-1
   <button onclick="closeModal()" class="p-2 rounded-lg hover:bg-[var(--hover)]"><i data-lucide="x" class="w-5 h-5"></i></button></div>`;
 const inputCls='mt-1.5 w-full h-11 rounded-xl border border-[var(--border)] bg-[var(--card)] px-3 text-sm outline-none focus:ring-2 ring-brand-light';
 /* input de senha componentizado, com olhinho */
-const passInput=(label,extra='')=>`<label class="block relative ${extra}"><span class="text-sm font-medium">${label}</span>
-  <input type="password" class="${inputCls} pr-10">
+const passInput=(label,extra='',id='')=>`<label class="block relative ${extra}"><span class="text-sm font-medium">${label}</span>
+  <input type="password" ${id?`id="${id}" `:''}class="${inputCls} pr-10">
   <button type="button" onclick="togglePass(this)" class="absolute right-2 bottom-[9px] p-1 rounded-md text-[var(--muted)] hover:text-brand-light hover:bg-[var(--hover)] transition" title="Mostrar/ocultar senha"><i data-lucide="eye" class="w-4 h-4"></i></button></label>`;
 function togglePass(btn){
   const inp=btn.parentElement.querySelector('input'); if(!inp) return;
@@ -3731,6 +3798,7 @@ function togglePass(btn){
 
 /* --- nova matrícula --- */
 function openNewEnrollment(){
+  nmWarnOk=false;
   openModal(`${modalHeader('Nova matrícula')}
   <div class="p-5 space-y-3">
     <label class="block"><span class="text-sm font-medium">Nome do aluno</span>
@@ -3742,10 +3810,16 @@ function openNewEnrollment(){
       <div><span class="text-sm font-medium">Turma <span class="text-xs font-normal text-[var(--muted)]">(dá para alocar depois)</span></span><div class="mt-1.5" id="nmTurmaWrap"></div></div>
     </div>
     <label class="block"><span class="text-sm font-medium">Responsável legal</span>
-      <input id="nmResp" placeholder="Nome do responsável" class="${inputCls}"></label>
+      <input id="nmResp" placeholder="Nome completo do responsável" class="${inputCls}"></label>
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <label class="block"><span class="text-sm font-medium">CPF do responsável</span>
+        <input id="nmCpf" placeholder="000.000.000-00" oninput="maskCpf(this)" inputmode="numeric" class="${inputCls}"></label>
       <label class="block"><span class="text-sm font-medium">Telefone</span>
         <input id="nmPhone" placeholder="(62) 9xxxx-xxxx" oninput="maskPhone(this)" inputmode="numeric" class="${inputCls}"></label>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <label class="block"><span class="text-sm font-medium">E-mail do responsável</span>
+        <input id="nmEmail" type="email" placeholder="email@exemplo.com" class="${inputCls}"></label>
       <label class="block"><span class="text-sm font-medium">Bairro</span>
         <input id="nmHood" placeholder="Ex.: Setor Bueno" class="${inputCls}"></label>
     </div>
@@ -3753,7 +3827,8 @@ function openNewEnrollment(){
       <div><p class="font-semibold" style="color:#2F539A">Boleto Bancário</p><p class="text-xs text-[var(--muted)]">Carnê em 6 parcelas — forma única, conforme o contrato</p></div>
       <i data-lucide="receipt" class="w-5 h-5" style="color:#2F539A"></i>
     </div>
-    <p class="text-xs text-[var(--muted)] flex items-center gap-1.5"><i data-lucide="info" class="w-3.5 h-3.5 shrink-0"></i> No produto final este formulário é completo (2º aluno, CPF, endereço via CEP, contrato etc.).</p>
+    <div id="nmErr"></div>
+    <p class="text-xs text-[var(--muted)] flex items-center gap-1.5"><i data-lucide="info" class="w-3.5 h-3.5 shrink-0"></i> No produto final este formulário é completo (2º aluno, segundo responsável, endereço via CEP, contrato etc.).</p>
   </div>
   <div class="p-5 pt-0 flex gap-2">
     <button onclick="closeModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] font-medium text-sm">Cancelar</button>
@@ -3766,18 +3841,42 @@ function openNewEnrollment(){
   document.getElementById('nmStudent').focus();
 }
 function submitNewEnrollment(){
-  const name=document.getElementById('nmStudent').value.trim();
-  const resp=document.getElementById('nmResp').value.trim();
-  if(!name){ document.getElementById('nmStudent').focus(); return; }
-  if(!resp){ document.getElementById('nmResp').focus(); return; }
-  const b=document.getElementById('nmBirth').value.trim();
-  const yr=+(b.split('/')[2]||0);
-  const age=yr>1900?2026-yr:8;
-  const hood=document.getElementById('nmHood').value.trim()||'Goiânia';
-  const id=Math.max(...STUDENTS.map(s=>s.id))+1;
+  const gv=i=>document.getElementById(i)?.value.trim()||'';
+  const name=gv('nmStudent'), b=gv('nmBirth'), resp=gv('nmResp'),
+        cpf=gv('nmCpf'), phone=gv('nmPhone'), email=gv('nmEmail'), hood=gv('nmHood');
+  /* obrigatórios e formatos — nada de placeholder no lugar de dado real (quebraria o banco) */
+  const errs=[];
+  if(!validFullName(name)) errs.push('Nome do aluno: informe nome e sobrenome.');
+  const age=ageAtRef(b);
+  if(age===null) errs.push('Nascimento do aluno: use uma data válida (dd/mm/aaaa).');
+  else if(age<1||age>20) errs.push(`Nascimento do aluno: a data dá ${age} anos — alunos têm de 1 a 20; confira.`);
+  if(!validFullName(resp)) errs.push('Responsável: informe nome e sobrenome.');
+  if(!validCPF(cpf)) errs.push('CPF do responsável: obrigatório e com dígitos válidos.');
+  if(!validPhone(phone)) errs.push('Telefone: DDD + celular com 9, ex.: (62) 99999-0000.');
+  if(!validEmail(email)) errs.push('E-mail do responsável inválido.');
+  if(!hood) errs.push('Bairro: obrigatório.');
+  if([name,resp,hood].some(badChars)) errs.push(BAD_CHARS_MSG);
+  if(errs.length){ nmWarnOk=false; return ntErrBox('nmErr','<b>Corrija antes de adicionar:</b><br>'+errs.join('<br>')); }
+  /* mesmo aluno + mesmo responsável = matrícula duplicada de verdade → bloqueia */
+  const dup=STUDENTS.find(s=>s.kids.some(k=>nrmName(k.n)===nrmName(name))&&nrmName(s.resp.n)===nrmName(resp));
+  if(dup) return ntErrBox('nmErr',`<b>${esc(name)}</b> já tem matrícula com esse responsável — use ⋮ → Editar dados na existente em vez de criar outra.`);
+  /* situações suspeitas mas possivelmente legítimas → avisa e pede um segundo clique */
+  const warns=[];
+  const owner=cpfOwner(cpf);
+  if(owner&&nrmName(owner)!==nrmName(resp)) warns.push(`Este CPF já está cadastrado no nome de <b>${esc(owner)}</b> — confira se o CPF ou o nome estão certos.`);
+  const homon=STUDENTS.find(s=>s.kids.some(k=>nrmName(k.n)===nrmName(name)));
+  if(homon) warns.push(`Já existe um aluno chamado <b>${esc(name)}</b> (responsável: ${esc(homon.resp.n)}) — confira se não é a mesma criança cadastrada duas vezes.`);
   const tid=SEL.nmTurma?.value?+SEL.nmTurma.value:null;
-  STUDENTS.unshift({ id, kids:[{n:name,age,b:b||'—',tid}],
-    resp:{n:resp,cpf:'000.000.000-00',phone:document.getElementById('nmPhone').value.trim()||'(62) 9----',email:'—',rel:'Responsável',b:'—'},
+  if(tid){ const nv=nivelByK(turmaById(tid).nivel);
+    if(age<nv.ages[0]-1||age>nv.ages[1]+1) warns.push(`A turma escolhida é de <b>${nv.n}</b> (${nv.ages[0]}–${nv.ages[1]} anos) e o aluno tem ${age} — confirme se é isso mesmo.`); }
+  if(warns.length&&!nmWarnOk){ nmWarnOk=true;
+    return ntWarnBox('nmErr',warns.join('<br>')+'<br><b>Se estiver tudo certo, clique de novo em "Adicionar matrícula".</b>'); }
+  /* a turma pode ter lotado entre abrir o modal e salvar */
+  if(tid){ const t=turmaById(tid);
+    if(!t||turmaFull(t)){ nmWarnOk=false; return ntErrBox('nmErr','A turma escolhida lotou agorinha — escolha outra ou deixe "Sem turma" para alocar depois.'); } }
+  const id=Math.max(...STUDENTS.map(s=>s.id))+1;
+  STUDENTS.unshift({ id, kids:[{n:name,age,b,tid}],
+    resp:{n:resp,cpf,phone,email,rel:'Responsável',b:'—'},
     second:null, fin:resp,
     addr:{cep:'74000-000',street:'—',num:'',comp:'',bairro:hood,city:'Goiânia',uf:'GO'},
     pay:'Boleto',
@@ -3785,12 +3884,17 @@ function submitNewEnrollment(){
   NOTIFS.unshift({type:'enroll',sid:id,title:'Nova matrícula',desc:`${name} · ${hood}`,time:'agora',unread:true});
   renderTable(); renderContracts(); renderNotifs(); refreshOverviewData();
   logAct(`Adicionou a matrícula de <b>${name}</b> manualmente`);
-  closeModal(); go('alunos'); toast(`Matrícula de ${name.split(' ')[0]} adicionada!`);
+  closeModal(); go('alunos');
+  /* mesmo CPF + mesmo nome = irmãos em matrículas separadas — agrupa como família, sem fricção */
+  toast(owner&&nrmName(owner)===nrmName(resp)
+    ? `Matrícula de ${name.split(' ')[0]} adicionada — agrupada com a família de ${resp.split(' ')[0]}!`
+    : `Matrícula de ${name.split(' ')[0]} adicionada!`);
 }
 
 /* --- editar matrícula (CRUD) --- */
 function openEditEnrollment(id){
   const s=STUDENTS.find(x=>x.id===id); if(!s) return;
+  edWarnOk=false;
   const kidFields=s.kids.map((k,i)=>`
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
       <label class="block"><span class="text-sm font-medium">Aluno ${s.kids.length>1?i+1:''}</span>
@@ -3873,6 +3977,7 @@ function openEditEnrollment(id){
         <button type="button" onclick="openDatePicker(event,'edSince',2023)" class="dp-btn absolute right-2 bottom-[9px] p-1 rounded-md text-[var(--muted)] hover:text-brand-light hover:bg-[var(--hover)] transition" title="Abrir calendário"><i data-lucide="calendar" class="w-4 h-4"></i></button></label>
       <p class="text-xs text-[var(--muted)]">Quando o aluno <b>entrou na escola</b> (sempre fevereiro ou agosto) — diferente da data da matrícula, que mostra só a última rematrícula. Pode deixar em branco se ainda não souber.</p>
     </div>
+    <div id="edErr"></div>
   </div>
   <div class="p-5 pt-0 flex gap-2">
     <button onclick="closeModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] font-medium text-sm">Cancelar</button>
@@ -3893,40 +3998,77 @@ function openEditEnrollment(id){
 }
 function saveEditEnrollment(id){
   const s=STUDENTS.find(x=>x.id===id); if(!s) return;
-  const ageFrom=b=>{ const p=b.split('/').map(Number);
-    if(p.length!==3||!(p[0]>=1&&p[0]<=31)||!(p[1]>=1&&p[1]<=12)||!(p[2]>=2000&&p[2]<=2026)) return null;
-    const a=2026-p[2]-((p[1]*100+p[0])>603?1:0); return (a>=1&&a<=25)?a:null; };
-  s.kids=s.kids.map((k,i)=>{
-    const n=document.getElementById('edKid'+i)?.value.trim()||k.n;
-    const b=document.getElementById('edKidB'+i)?.value.trim()||k.b;
+  const gv=i=>document.getElementById(i)?.value.trim()||'';
+  /* validação ANTES de aplicar: erro aparece na caixa, nada é engolido em silêncio —
+     campo obrigatório vazio ou dado inválido não salva (no produto real quebraria o banco) */
+  const errs=[];
+  const kidVals=s.kids.map((k,i)=>{
+    const n=gv('edKid'+i), b=gv('edKidB'+i);
+    const who=s.kids.length>1?`Aluno ${i+1}`:'Aluno';
+    if(!validFullName(n)) errs.push(`${who}: informe nome e sobrenome.`);
+    const age=ageAtRef(b);
+    if(age===null) errs.push(`${who}: data de nascimento inválida (dd/mm/aaaa).`);
+    else if(age<1||age>20) errs.push(`${who}: a data dá ${age} anos — alunos têm de 1 a 20; confira.`);
     const tv=SEL['edTurma'+i]?.value;
-    const tid=tv===undefined?k.tid:(tv?+tv:null);
-    return { ...k, n, b, age: ageFrom(b)??k.age, tid };
+    return { ...k, n, b, age:age??k.age, tid: tv===undefined?k.tid:(tv?+tv:null) };
   });
-  const gv=id=>document.getElementById(id)?.value.trim()||'';
-  s.resp.n=gv('edResp')||s.resp.n;
-  s.resp.rel=gv('edRespRel')||s.resp.rel;
-  s.resp.phone=gv('edPhone')||s.resp.phone;
-  s.resp.email=gv('edEmail')||s.resp.email;
-  const cpf=gv('edCpf'); if(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(cpf)) s.resp.cpf=cpf;
-  const rb=gv('edRespB'); if(/^\d{2}\/\d{2}\/\d{4}$/.test(rb)) s.resp.b=rb;
-  /* segundo responsável: nome vazio remove; preenchido cria ou atualiza */
-  const secN=gv('edSecN');
-  const secC=gv('edSecC');
-  s.second = secN ? { n:secN, phone:gv('edSecP')||s.second?.phone||'—', rel:gv('edSecR')||s.second?.rel||'Responsável',
-    ...(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(secC)?{cpf:secC}:s.second?.cpf?{cpf:s.second.cpf}:{}) } : null;
-  s.fin=gv('edFin')||s.fin;
-  s.media=document.getElementById('edMedia')?.classList.contains('on')??s.media;
-  const cep=gv('edCep'); if(/^\d{5}-\d{3}$/.test(cep)) s.addr.cep=cep;
-  s.addr.street=gv('edStreet')||s.addr.street;
-  s.addr.num=gv('edNum')||s.addr.num;
-  s.addr.comp=gv('edComp'); // complemento pode ficar vazio
-  s.addr.bairro=gv('edHood')||s.addr.bairro;
-  s.addr.city=SEL.edCity?.value||s.addr.city;
-  /* "na escola desde": vazio limpa o registro; data inválida não corrompe o que já existia */
+  const resp=gv('edResp'), rel=gv('edRespRel'), cpf=gv('edCpf'), phone=gv('edPhone'), email=gv('edEmail'), rb=gv('edRespB');
+  if(!validFullName(resp)) errs.push('Responsável legal: informe nome e sobrenome.');
+  if(!rel) errs.push('Parentesco do responsável: obrigatório (Mãe, Pai, Avó…).');
+  if(!validCPF(cpf)) errs.push('CPF do responsável: obrigatório e com dígitos válidos.');
+  if(!validPhone(phone)) errs.push('Telefone do responsável: DDD + celular com 9, ex.: (62) 99999-0000.');
+  if(!validEmail(email)) errs.push('E-mail do responsável inválido.');
+  if(rb){ const a=ageAtRef(rb);
+    if(a===null) errs.push('Nascimento do responsável: data inválida.');
+    else if(a<18) errs.push('Nascimento do responsável: precisa ter 18 anos ou mais.'); }
+  /* segundo responsável é opcional — mas, se tem nome, precisa estar consistente */
+  const secN=gv('edSecN'), secP=gv('edSecP'), secR=gv('edSecR'), secC=gv('edSecC');
+  if(secN&&!validFullName(secN)) errs.push('Segundo responsável: informe nome e sobrenome (ou apague para remover).');
+  if(secN&&!validPhone(secP)) errs.push('Telefone do segundo responsável: obrigatório quando há segundo responsável.');
+  if(secC&&!validCPF(secC)) errs.push('CPF do segundo responsável com dígitos inválidos — corrija ou deixe vazio.');
+  if(!gv('edFin')) errs.push('Responsável financeiro: obrigatório.');
+  const cep=gv('edCep'); if(!/^\d{5}-\d{3}$/.test(cep)) errs.push('CEP: obrigatório, no formato 00000-000.');
+  if(!gv('edStreet')) errs.push('Rua/avenida: obrigatório.');
+  if(!gv('edNum')) errs.push('Número: obrigatório (use "s/n" se não houver).');
+  if(!gv('edHood')) errs.push('Bairro: obrigatório.');
+  /* "na escola desde": vazio é permitido; preenchido tem que ser início de semestre (fev/ago) */
   const sv=gv('edSince');
-  if(!sv) delete s.since;
-  else if(/^\d{2}\/\d{2}\/\d{4}$/.test(sv)) s.since=sv;
+  if(sv){ const p=parseDateBR(sv);
+    if(!p) errs.push('"Na escola desde": data inválida.');
+    else if(p.m!==2&&p.m!==8) errs.push('"Na escola desde": o semestre começa em fevereiro ou agosto — use a data de início do semestre de entrada.'); }
+  if([...kidVals.map(k=>k.n),resp,rel,secN,gv('edFin'),gv('edStreet'),gv('edComp'),gv('edHood')].some(badChars)) errs.push(BAD_CHARS_MSG);
+  /* vagas: dois irmãos não podem ocupar a mesma última vaga, nem entrar em turma já cheia */
+  if(s.active!==false){
+    const delta={};
+    kidVals.forEach((kv,i)=>{ const prev=s.kids[i].tid;
+      if(prev!==kv.tid){ if(kv.tid) delta[kv.tid]=(delta[kv.tid]||0)+1; if(prev) delta[prev]=(delta[prev]||0)-1; } });
+    Object.entries(delta).forEach(([ts,n])=>{ if(n<=0) return; const t=turmaById(+ts); if(!t) return;
+      const livre=t.cap-activeKidsIn(t.id);
+      if(n>livre) errs.push(`A turma ${turmaShort(t)} não tem vaga suficiente (${livre>0?`só ${livre} livre${livre>1?'s':''}`:'está cheia'}) para ${n>1?'os '+n+' alunos':'este aluno'} — escolha outra ou abra vaga extra pela Agenda.`); });
+  }
+  if(errs.length){ edWarnOk=false; return ntErrBox('edErr','<b>Corrija antes de salvar:</b><br>'+errs.join('<br>')); }
+  /* CPF que já pertence a OUTRO nome → confirmação (mesmo CPF + mesmo nome = família, segue direto) */
+  const owner=cpfOwner(cpf,id);
+  if(owner&&nrmName(owner)!==nrmName(resp)&&!edWarnOk){
+    edWarnOk=true;
+    return ntWarnBox('edErr',`Este CPF já está em outra matrícula no nome de <b>${esc(owner)}</b> — confira se o CPF ou o nome estão certos. <b>Se estiver tudo certo, clique de novo em "Salvar alterações".</b>`);
+  }
+  edWarnOk=false;
+  s.kids=kidVals;
+  s.resp.n=resp; s.resp.rel=rel; s.resp.cpf=cpf; s.resp.phone=phone; s.resp.email=email;
+  if(rb) s.resp.b=rb;
+  /* segundo responsável: nome vazio remove; preenchido cria ou atualiza */
+  s.second = secN ? { n:secN, phone:secP, rel:secR||'Responsável',
+    ...(secC?{cpf:secC}:s.second?.cpf?{cpf:s.second.cpf}:{}) } : null;
+  s.fin=gv('edFin');
+  s.media=document.getElementById('edMedia')?.classList.contains('on')??s.media;
+  s.addr.cep=cep;
+  s.addr.street=gv('edStreet');
+  s.addr.num=gv('edNum');
+  s.addr.comp=gv('edComp'); // complemento pode ficar vazio
+  s.addr.bairro=gv('edHood');
+  s.addr.city=SEL.edCity?.value||s.addr.city;
+  if(!sv) delete s.since; else s.since=sv;
   closeModal();
   renderTable(); renderContracts(); refreshOverviewData();
   logAct(`Editou os dados da matrícula de <b>${s.kids.map(k=>k.n).join(' e ')}</b>`);
@@ -3937,6 +4079,10 @@ function saveEditEnrollment(id){
 /* --- excluir matrícula (CRUD) — diferente de desligar: apaga de vez --- */
 function openDeleteModal(id){
   const s=STUDENTS.find(x=>x.id===id); if(!s) return;
+  const ckSvg='<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3"><polyline points="20 6 9 17 4 12"/></svg>';
+  /* contrato assinado e matrícula ativa = exclusão quase sempre é engano — aviso reforçado */
+  const signedWarn = s.status==='signed'&&s.active!==false
+    ? `<div class="rounded-xl p-3 text-xs flex items-start gap-2" style="background:rgba(220,38,38,.08);color:#DC2626"><i data-lucide="alert-triangle" class="w-4 h-4 shrink-0 mt-0.5"></i><span>Esta matrícula está <b>ativa e com contrato assinado</b> — excluir aqui apaga também o registro do contrato. Tem certeza de que não é um caso de <b>Desligar aluno</b>?</span></div>` : '';
   openModal(`${modalHeader('Excluir matrícula')}
   <div class="p-5 space-y-4">
     <div class="flex items-start gap-3 p-3 rounded-xl" style="background:rgba(220,38,38,.06)">
@@ -3944,15 +4090,25 @@ function openDeleteModal(id){
       <div class="min-w-0"><p class="font-medium text-sm">${s.kids.map(k=>k.n.split(' ')[0]).join(' e ')} — apagar de vez?</p>
       <p class="text-xs text-[var(--muted)] mt-0.5">A matrícula, os dados e o contrato somem da dashboard. <b>Não tem como desfazer.</b></p></div>
     </div>
+    ${signedWarn}
     <div class="rounded-xl p-3 text-xs flex items-start gap-2" style="background:rgba(245,183,0,.10);color:#B5860B">
       <i data-lucide="lightbulb" class="w-4 h-4 shrink-0 mt-0.5"></i>
       <span>Use <b>excluir</b> só para cadastros errados ou de teste. Se o aluno saiu da escola, prefira <b>Desligar aluno</b> — o histórico fica guardado e dá para reativar depois.</span>
     </div>
+    <button type="button" onclick="delArm(this)" class="w-full flex items-center gap-2.5 text-left px-1 py-0.5">
+      <span class="ck shrink-0">${ckSvg}</span>
+      <span class="text-sm">Entendi que a exclusão é definitiva e quero apagar mesmo assim</span>
+    </button>
     <div class="flex gap-2">
       <button onclick="closeModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] text-sm font-semibold hover:bg-[var(--hover)] transition">Cancelar</button>
-      <button onclick="confirmDelete(${id})" class="flex-1 h-11 rounded-xl text-white text-sm font-semibold transition hover:brightness-110" style="background:#DC2626">Excluir de vez</button>
+      <button id="delGo" onclick="confirmDelete(${id})" disabled class="flex-1 h-11 rounded-xl text-white text-sm font-semibold transition hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed" style="background:#DC2626">Excluir de vez</button>
     </div>
   </div>`);
+}
+function delArm(btn){
+  const ck=btn.querySelector('.ck'); if(!ck) return;
+  ck.classList.toggle('on');
+  const go=document.getElementById('delGo'); if(go) go.disabled=!ck.classList.contains('on');
 }
 function confirmDelete(id){
   const i=STUDENTS.findIndex(x=>x.id===id); if(i<0) return;
@@ -3975,6 +4131,7 @@ function openInvite(){
       <input id="invEmail" type="email" placeholder="email@exemplo.com" class="${inputCls}"></label>
     <div><span class="text-sm font-medium">Papel</span><div class="mt-1.5" id="invRoleWrap"></div></div>
     <p class="text-xs text-[var(--muted)] flex items-center gap-1.5"><i data-lucide="shield-check" class="w-3.5 h-3.5 shrink-0"></i> A pessoa recebe um e-mail para criar a própria senha. Diretor faz tudo; Supervisor cuida da agenda e consulta alunos; Secretaria cadastra alunos e turmas e envia contratos.</p>
+    <div id="invErr"></div>
   </div>
   <div class="p-5 pt-0 flex gap-2">
     <button onclick="closeModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] font-medium text-sm">Cancelar</button>
@@ -3987,8 +4144,12 @@ function openInvite(){
 function submitInvite(){
   const n=document.getElementById('invName').value.trim();
   const e=document.getElementById('invEmail').value.trim();
-  if(!n){ document.getElementById('invName').focus(); return; }
-  if(!e){ document.getElementById('invEmail').focus(); return; }
+  const errs=[];
+  if(!validFullName(n)) errs.push('Informe nome e sobrenome.');
+  if(badChars(n)) errs.push(BAD_CHARS_MSG);
+  if(!validEmail(e)) errs.push('E-mail inválido.');
+  else if(USERS.some(u=>u.e.toLowerCase()===e.toLowerCase())) errs.push(`Já existe um usuário com o e-mail <b>${esc(e)}</b> — cada acesso tem o seu.`);
+  if(errs.length) return ntErrBox('invErr',errs.join('<br>'));
   const papel={diretor:'Diretor',supervisor:'Supervisor',secretaria:'Secretaria'}[SEL.invRole?.value]||'Diretor';
   USERS.push({id:Math.max(...USERS.map(u=>u.id))+1, n, e, r:papel, c:'#0891b2', pending:true});
   renderUsers(); closeModal();
@@ -4036,15 +4197,17 @@ function openEditUser(id){
 }
 function saveUser(id){
   const u=userById(id); if(!u) return;
+  const n=document.getElementById('euName').value.trim();
+  const e=document.getElementById('euEmail').value.trim();
   const novoPapel={diretor:'Diretor',supervisor:'Supervisor',secretaria:'Secretaria'}[SEL.euRole?.value]||'Diretor';
+  if(!validFullName(n)) return ntErrBox('euErr','Informe nome e sobrenome.');
+  if(badChars(n)) return ntErrBox('euErr',BAD_CHARS_MSG);
+  if(!validEmail(e)) return ntErrBox('euErr','E-mail inválido.');
+  if(USERS.some(x=>x.id!==id&&x.e.toLowerCase()===e.toLowerCase())) return ntErrBox('euErr',`Já existe outro usuário com o e-mail <b>${esc(e)}</b>.`);
   /* não deixa o painel sem nenhuma pessoa com papel Diretor */
-  if(u.r==='Diretor'&&novoPapel!=='Diretor'&&USERS.filter(x=>x.r==='Diretor').length===1){
-    document.getElementById('euErr').innerHTML=`<div class="rounded-xl p-3 text-sm flex items-start gap-2" style="background:rgba(220,38,38,.08);color:#DC2626"><i data-lucide="alert-circle" class="w-4 h-4 shrink-0 mt-0.5"></i><span>${esc(u.n.split(' ')[0])} é a única pessoa com papel Diretor — promova outra antes de mudar o papel.</span></div>`;
-    lucide.createIcons(); return;
-  }
-  u.n=document.getElementById('euName').value.trim()||u.n;
-  u.e=document.getElementById('euEmail').value.trim()||u.e;
-  u.r=novoPapel;
+  if(u.r==='Diretor'&&novoPapel!=='Diretor'&&USERS.filter(x=>x.r==='Diretor').length===1)
+    return ntErrBox('euErr',`${esc(u.n.split(' ')[0])} é a única pessoa com papel Diretor — promova outra antes de mudar o papel.`);
+  u.n=n; u.e=e; u.r=novoPapel;
   closeModal(); renderUsers();
   toast('Usuário atualizado!');
 }
@@ -4337,26 +4500,38 @@ function openContractModal(id){
 function openChangePass(){
   openModal(`${modalHeader('Trocar senha')}
   <div class="p-5 space-y-3">
-    ${passInput('Senha atual')}
-    ${passInput('Nova senha')}
-    ${passInput('Confirmar nova senha')}
+    ${passInput('Senha atual','','cpCur')}
+    ${passInput('Nova senha','','cpNew')}
+    ${passInput('Confirmar nova senha','','cpConf')}
     <p class="text-xs text-[var(--muted)] flex items-center gap-1.5"><i data-lucide="shield-check" class="w-3.5 h-3.5 shrink-0"></i> Mínimo de 10 caracteres, com letras e números.</p>
+    <div id="cpErr"></div>
   </div>
   <div class="p-5 pt-0 flex gap-2">
     <button onclick="closeModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] font-medium text-sm">Cancelar</button>
-    <button onclick="closeModal();toast('Senha alterada com sucesso!')" class="flex-1 h-11 rounded-xl text-white font-semibold text-sm" style="background:#1E3765">Salvar nova senha</button>
+    <button onclick="savePass()" class="flex-1 h-11 rounded-xl text-white font-semibold text-sm" style="background:#1E3765">Salvar nova senha</button>
   </div>`);
+}
+function savePass(){
+  const v=id=>document.getElementById(id)?.value||'';
+  if(!v('cpCur')) return ntErrBox('cpErr','Digite a senha atual.');
+  if(!validNewPass(v('cpNew'))) return ntErrBox('cpErr','A nova senha precisa de pelo menos 10 caracteres, com letras e números.');
+  if(v('cpNew')!==v('cpConf')) return ntErrBox('cpErr','A confirmação não bate com a nova senha — digite igual nos dois campos.');
+  closeModal(); toast('Senha alterada com sucesso!');
 }
 
 /* --- exportar CSV (de verdade) --- */
 function exportCSV(useFilters){
   const rows=useFilters?filteredStudents():STUDENTS;
+  /* célula segura: ponto e vírgula/aspas/quebra de linha viram campo entre aspas;
+     valor começando com = + - @ ganha apóstrofo para o Excel não executar como fórmula */
+  const cell=v=>{ v=String(v??''); if(/^[=+@]|^-[^ \d]/.test(v)) v="'"+v;
+    return /[;"\r\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; };
   const head=['Aluno','Idade','Nascimento','Responsável','Telefone','Sala','Dias e horário','Nível','Teacher','Status contrato','Situação','Na escola desde','Bairro','Cidade','Matrícula em','Hora','Desligado em','Motivo do desligamento','Observações do desligamento'];
   const csv=[head.join(';')].concat(rows.flatMap(s=>s.kids.map(k=>{
     const t=kidTurma(k); const sala=t?salaById(t.sala):null;
     return [k.n,k.age,k.b,s.resp.n,s.resp.phone,
       sala?sala.n:'Sem turma', t?schLabel(t.par)+' '+t.hora:'', t?nivelLabel(t.nivel):'', sala?.prof||'',
-      STATUS[s.status].t,s.active===false?'Inativa':isFuture(s)?'Começa em 2026.2':'Estudando',s.since||'',s.addr.bairro,s.addr.city,s.date,s.hora||'',s.exit?.date||'',s.exit?.label||'',(s.exit?.note||'').replace(/;/g,',')].join(';');
+      STATUS[s.status].t,s.active===false?'Inativa':isFuture(s)?'Começa em 2026.2':'Estudando',s.since||'',s.addr.bairro,s.addr.city,s.date,s.hora||'',s.exit?.date||'',s.exit?.label||'',s.exit?.note||''].map(cell).join(';');
   }))).join('\n');
   const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'});
   const a=document.createElement('a');
@@ -4385,14 +4560,14 @@ function parseCSV(text,sep){
 }
 const IMPORT_SAMPLE=[
   'Data/Hora,Nome Aluno 1,Data Nasc. Aluno 1,Idade Aluno 1,Nome Aluno 2,Data Nasc. Aluno 2,Idade Aluno 2,Responsável Legal,CPF Responsável,Telefone Responsável,Email Responsável,Parentesco,Data Nasc. Responsável,Segundo Responsável,Tel. Segundo Responsável,Parentesco 2º Resp.,CPF Segundo Responsável,Responsável Financeiro,CPF Responsável Financeiro,CEP,Endereço Completo,Bairro,Cidade,Estado,Formato Aula,Forma Pagamento,Autorização Mídia,Autorização Contrato,Horário Confirmado,Link PDF Contrato',
-  '15/05/2026 19:42:10,Maria Fernanda Sousa Cardoso,12/03/2017,9,-,-,-,Juliana Sousa,389.214.557-30,(62) 99318-2244,juliana.sousa@gmail.com,Mãe,04/08/1988,Carlos Cardoso,(62) 98551-7733,Pai,521.336.904-88,Juliana Sousa,389.214.557-30,74333-120,"Rua C-205, 142 - Apto 301",Jardim América,Goiânia,GO,Presencial na Sede,Boleto,Sim,Sim,Sim,https://drive.google.com/file/d/abc123',
-  '16/05/2026 10:08:55,Otto Faria Neves,22/09/2018,7,Igor Faria Neves,14/01/2016,10,Camila Faria,654.880.123-09,(62) 99662-8800,camila.faria@hotmail.com,Mãe,19/02/1990,-, -,-,-,Camila Faria,654.880.123-09,74455-200,"Av. T-7, 988",Setor Oeste,Goiânia,GO,Presencial na Sede,Boleto,Não,Sim,Sim,https://drive.google.com/file/d/def456',
-  '16/05/2026 21:30:02,Maria Fernanda Sousa Cardoso,12/03/2017,9,-,-,-,Juliana Sousa,389.214.557-30,(62) 99318-2244,juliana.sousa@gmail.com,Mãe,04/08/1988,Carlos Cardoso,(62) 98551-7733,Pai,521.336.904-88,Juliana Sousa,389.214.557-30,74333-120,"Rua C-205, 142 - Apto 301",Jardim América,Goiânia,GO,Presencial na Sede,Boleto,Sim,Sim,Sim,https://drive.google.com/file/d/zzz999',
-  '17/05/2026 08:21:14,Otto Faria Neves,22/09/2018,7,Igor Faria Neves,14/01/2016,10,Camila Faria,654.880.123-09,(62) 99662-8801,camila.faria@hotmail.com,Mãe,19/02/1990,-, -,-,-,Camila Faria,654.880.123-09,74455-200,"Av. T-7, 988",Setor Oeste,Goiânia,GO,Presencial na Sede,Boleto,Não,Sim,Sim,https://drive.google.com/file/d/def457',
-  '18/05/2026 14:12:40,Larissa Prado Gonçalves,30/06/2015,10,-,-,-,Renato Gonçalves,112.774.469-01,(62) 98123-9050,renato.goncalves@outlook.com,Pai,11/11/1984,-,-,-,-,Renato Gonçalves,112.774.469-01,74140-070,"Rua 56, 75",Setor Marista,Goiânia,GO,Presencial na Sede,Boleto,Sim,Sim,Sim,https://drive.google.com/file/d/ghi789',
-  '19/05/2026 16:02:09,Alice Barbosa Nunes,03/05/2017,9,-,-,-,Fernanda Almeida,512.667.039-20,(62) 99812-7745,fernanda.almeida@gmail.com,Mãe,22/09/1991,-,-,-,-,Fernanda Almeida,512.667.039-20,74230-200,"Rua T-36, 410",Setor Bueno,Goiânia,GO,Presencial na Sede,Boleto,Sim,Sim,Sim,https://drive.google.com/file/d/pqr678',
-  '02/06/2026 20:14:33,Helena Duarte Lima,14/02/2018,8,-,-,-,Mariana Duarte Lima,047.812.336-50,(62) 99214-8870,mariana.duarte@gmail.com,Mãe,09/05/1989,Rafael Lima,(62) 98112-4471,Pai,-,Mariana Duarte Lima,047.812.336-50,74230-110,"Rua T-55, 180 - Apto 902",Setor Bueno,Goiânia,GO,Presencial na Sede,Boleto,Sim,Sim,Sim,https://drive.google.com/file/d/jkl012',
-  '20/05/2026 09:45:21,Benjamin Castro Moura,08/12/2019,6,-,-,-,Paula Castro,778.290.541-66,(62) 99770-1188,paula.castro@gmail.com,Mãe,25/06/1993,-,-,-,-,Paula Castro,778.290.541-66,74810-330,"Av. 136, 1020",Setor Sul,Goiânia,GO,Presencial na Sede,Boleto,Não,Sim,Sim,https://drive.google.com/file/d/mno345',
+  '15/05/2026 19:42:10,Maria Fernanda Sousa Cardoso,12/03/2017,9,-,-,-,Juliana Sousa,389.214.557-10,(62) 99318-2244,juliana.sousa@gmail.com,Mãe,04/08/1988,Carlos Cardoso,(62) 98551-7733,Pai,521.336.904-92,Juliana Sousa,389.214.557-10,74333-120,"Rua C-205, 142 - Apto 301",Jardim América,Goiânia,GO,Presencial na Sede,Boleto,Sim,Sim,Sim,https://drive.google.com/file/d/abc123',
+  '16/05/2026 10:08:55,Otto Faria Neves,22/09/2018,7,Igor Faria Neves,14/01/2016,10,Camila Faria,654.880.123-70,(62) 99662-8800,camila.faria@hotmail.com,Mãe,19/02/1990,-, -,-,-,Camila Faria,654.880.123-70,74455-200,"Av. T-7, 988",Setor Oeste,Goiânia,GO,Presencial na Sede,Boleto,Não,Sim,Sim,https://drive.google.com/file/d/def456',
+  '16/05/2026 21:30:02,Maria Fernanda Sousa Cardoso,12/03/2017,9,-,-,-,Juliana Sousa,389.214.557-10,(62) 99318-2244,juliana.sousa@gmail.com,Mãe,04/08/1988,Carlos Cardoso,(62) 98551-7733,Pai,521.336.904-92,Juliana Sousa,389.214.557-10,74333-120,"Rua C-205, 142 - Apto 301",Jardim América,Goiânia,GO,Presencial na Sede,Boleto,Sim,Sim,Sim,https://drive.google.com/file/d/zzz999',
+  '17/05/2026 08:21:14,Otto Faria Neves,22/09/2018,7,Igor Faria Neves,14/01/2016,10,Camila Faria,654.880.123-70,(62) 99662-8801,camila.faria@hotmail.com,Mãe,19/02/1990,-, -,-,-,Camila Faria,654.880.123-70,74455-200,"Av. T-7, 988",Setor Oeste,Goiânia,GO,Presencial na Sede,Boleto,Não,Sim,Sim,https://drive.google.com/file/d/def457',
+  '18/05/2026 14:12:40,Larissa Prado Gonçalves,30/06/2015,10,-,-,-,Renato Gonçalves,112.774.469-03,(62) 98123-9050,renato.goncalves@outlook.com,Pai,11/11/1984,-,-,-,-,Renato Gonçalves,112.774.469-03,74140-070,"Rua 56, 75",Setor Marista,Goiânia,GO,Presencial na Sede,Boleto,Sim,Sim,Sim,https://drive.google.com/file/d/ghi789',
+  '19/05/2026 16:02:09,Alice Barbosa Nunes,03/05/2017,9,-,-,-,Fernanda Almeida,512.667.039-50,(62) 99812-7745,fernanda.almeida@gmail.com,Mãe,22/09/1991,-,-,-,-,Fernanda Almeida,512.667.039-50,74230-200,"Rua T-36, 410",Setor Bueno,Goiânia,GO,Presencial na Sede,Boleto,Sim,Sim,Sim,https://drive.google.com/file/d/pqr678',
+  '02/06/2026 20:14:33,Helena Duarte Lima,14/02/2018,8,-,-,-,Mariana Duarte Lima,047.812.336-19,(62) 99214-8870,mariana.duarte@gmail.com,Mãe,09/05/1989,Rafael Lima,(62) 98112-4471,Pai,-,Mariana Duarte Lima,047.812.336-19,74230-110,"Rua T-55, 180 - Apto 902",Setor Bueno,Goiânia,GO,Presencial na Sede,Boleto,Sim,Sim,Sim,https://drive.google.com/file/d/jkl012',
+  '20/05/2026 09:45:21,Benjamin Castro Moura,08/12/2019,6,-,-,-,Paula Castro,778.290.541-93,(62) 99770-1188,paula.castro@gmail.com,Mãe,25/06/1993,-,-,-,-,Paula Castro,778.290.541-93,74810-330,"Av. 136, 1020",Setor Sul,Goiânia,GO,Presencial na Sede,Boleto,Não,Sim,Sim,https://drive.google.com/file/d/mno345',
   '21/05/2026 11:34:55,Vicente Sales Ramos,17/03/2016,10,-,-,-,Tatiane Sales,12345678900,62 9812,tatiane.sales@gmail.com,Mãe,02/05/1989,-,-,-,-,Tatiane Sales,12345678900,74140-010,"Rua 56, 120",Setor Marista,Goiânia,GO,Presencial na Sede,Boleto,Sim,Sim,Sim,https://drive.google.com/file/d/stu901',
 ].join('\n');
 let pendingImport=null;
@@ -4414,8 +4589,9 @@ function openImportModal(){
       <p class="font-semibold flex items-center gap-1.5"><i data-lucide="shield-check" class="w-4 h-4 shrink-0"></i> O que é conferido sozinho antes de entrar:</p>
       <p>• <b>Linhas repetidas</b> (a mesma matrícula enviada duas vezes) são removidas — só a primeira conta.</p>
       <p>• <b>Quem já está na dashboard</b> não duplica.</p>
-      <p>• <b>Nomes iguais</b>, versões diferentes da mesma matrícula e <b>dados estranhos</b> (CPF, telefone, datas) entram numa lista para você conferir antes de confirmar.</p>
+      <p>• <b>Nomes iguais</b>, versões diferentes da mesma matrícula e <b>dados estranhos</b> (CPF — formato e dígitos —, telefone, datas, e-mail, endereço fora de GO) entram numa lista para você conferir antes de confirmar.</p>
       <p>• O campo <b>“Na escola desde”</b> não existe na planilha — as matrículas importadas chegam com ele em branco, para preencher depois.</p>
+      <p>• Alunos importados chegam <b>sem turma</b> (a planilha não diz dia nem horário) — eles entram na fila "aguardando turma" para alocar pela Agenda.</p>
     </div>
     <div id="importError"></div>
     <button onclick="runImport(IMPORT_SAMPLE,'planilha de exemplo')" class="w-full h-10 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)] transition flex items-center justify-center gap-2"><i data-lucide="sparkle" class="w-4 h-4 text-brand-light"></i> Testar com uma planilha de exemplo</button>
@@ -4469,6 +4645,9 @@ function runImport(text, sourceName){
   const keyOf=r=>r.filter((_,i)=>i!==C.ts&&i!==C.pdf).map(norm).join('|');
   const existing=new Set(STUDENTS.flatMap(s=>s.kids.map(k=>norm(k.n)+'|'+norm(s.resp.n))));
   const ownerOf=new Map(); STUDENTS.forEach(s=>s.kids.forEach(k=>{ const n=norm(k.n); if(!ownerOf.has(n)) ownerOf.set(n,s.resp.n); }));
+  /* CPF → nome do responsável já na dashboard (mesmo CPF + outro nome = provável digitação errada;
+     mesmo CPF + mesmo nome = família com matrículas separadas, segue normal) */
+  const cpfOwnerMap=new Map(); STUDENTS.forEach(s=>{ const c=onlyDigits(s.resp.cpf); if(c.length===11&&!cpfOwnerMap.has(c)) cpfOwnerMap.set(c,s.resp.n); });
   const seen=new Set(), byKid=new Map(), nameWarns={}, dataWarns={};
   let dups=0, jaExiste=0, incompletas=0;
   const val=(r,i)=>{ const v=i>=0?String(r[i]??'').trim():''; return v==='-'?'':v; };
@@ -4487,23 +4666,25 @@ function runImport(text, sourceName){
       const owner=ownerOf.get(norm(a1));
       if(owner) (nameWarns[kid]=nameWarns[kid]||[]).push(`Já existe um aluno com esse nome na dashboard (responsável: ${owner}) — confira se não é a mesma criança cadastrada duas vezes.`);
     }
-    const issues=[], cpf=val(r,C.cpf), tel=val(r,C.tel), b1=val(r,C.b1);
+    const issues=[], cpf=val(r,C.cpf), tel=val(r,C.tel), b1=val(r,C.b1), mail=val(r,C.mail), uf=val(r,C.uf);
     if(cpf&&!/^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(cpf)) issues.push(`CPF do responsável fora do padrão: “${cpf}”.`);
+    else if(cpf&&!validCPF(cpf)) issues.push(`CPF com dígitos verificadores inválidos: “${cpf}” — provável erro de digitação.`);
+    else if(cpf){ const own=cpfOwnerMap.get(onlyDigits(cpf));
+      if(own&&norm(own)!==norm(resp)) issues.push(`Este CPF já está na dashboard no nome de ${own} — confira se o CPF ou o nome estão certos.`); }
     if(tel&&!/^\(\d{2}\)\s?9?\d{4}-\d{4}$/.test(tel)) issues.push(`Telefone fora do padrão: “${tel}”.`);
     if(b1&&!/^\d{2}\/\d{2}\/\d{4}$/.test(b1)) issues.push(`Data de nascimento fora do padrão: “${b1}”.`);
+    if(mail&&!validEmail(mail)) issues.push(`E-mail fora do padrão: “${mail}”.`);
+    if(uf&&uf.toUpperCase()!=='GO') issues.push(`Endereço fora de Goiás (“${uf}”) — o site só aceita matrículas de GO.`);
+    if(badChars(a1)||badChars(resp)) issues.push('Nome do aluno ou do responsável com caracteres especiais — confira antes de importar.');
     if(issues.length) dataWarns[kid]=issues; else delete dataWarns[kid];
     byKid.set(kid,r); // a última linha do mesmo aluno+responsável vence
   }
   const novos=[...byKid.entries()];
-  /* monta as matrículas — cada ALUNO entra na turma com vaga cujo nível combina com a
-     idade; sem turma compatível, fica "aguardando turma" (a planilha não traz turma) */
+  /* monta as matrículas — alunos importados chegam SEM turma e caem na fila "aguardando
+     turma": a planilha não diz o dia nem o horário que a família escolheu, então alocar
+     sozinho colocaria a criança num horário errado em silêncio. A equipe aloca pela Agenda. */
   const ageFrom=(b,fb)=>{ const p=b.split('/').map(Number); return p[2]>1900 ? 2026-p[2]-((p[1]*100+p[0])>603?1:0) : (parseInt(fb,10)||8); };
-  const occ={}; TURMAS.forEach(t=>occ[t.id]=activeKidsIn(t.id));
-  const takeFor=age=>{ let best=null,free=-1;
-    TURMAS.forEach(t=>{ const nv=nivelByK(t.nivel); if(age<nv.ages[0]-1||age>nv.ages[1]+1) return;
-      const f=t.cap-occ[t.id]; if(f>0&&f>free){ free=f; best=t; } });
-    if(best){ occ[best.id]++; return best.id; } return null; };
-  const mkImpKid=(n,b,fb)=>{ const age=ageFrom(b,fb); return { n, b:b||'—', age, tid:takeFor(age) }; };
+  const mkImpKid=(n,b,fb)=>({ n, b:b||'—', age:ageFrom(b,fb), tid:null });
   let nid=Math.max(...STUDENTS.map(s=>s.id))+1;
   pendingImport=novos.map(([kid,r])=>{
     const kids=[mkImpKid(val(r,C.a1), val(r,C.b1), val(r,C.i1))];
@@ -4903,16 +5084,29 @@ function openAccountModal(){
       <input id="accEmail" type="email" value="${esc(u.e)}" class="${inputCls}"></label>
     <div class="pt-3 border-t" style="border-color:var(--border)">
       <p class="text-sm font-semibold mb-2">Trocar senha <span class="font-normal text-xs text-[var(--muted)]">(deixe em branco para manter)</span></p>
-      ${passInput('Senha atual','mb-2')}
-      ${passInput('Nova senha','mb-2')}
-      ${passInput('Confirmar nova senha')}
+      ${passInput('Senha atual','mb-2','acCur')}
+      ${passInput('Nova senha','mb-2','acNew')}
+      ${passInput('Confirmar nova senha','','acConf')}
     </div>
     <p class="text-xs text-[var(--muted)] flex items-center gap-1.5"><i data-lucide="shield-check" class="w-3.5 h-3.5 shrink-0"></i> Ao trocar e-mail ou senha, você recebe uma confirmação no e-mail antigo.</p>
+    <div id="accErr"></div>
   </div>
   <div class="p-5 pt-0 flex gap-2">
     <button onclick="closeModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] font-medium text-sm">Cancelar</button>
-    <button onclick="closeModal();toast('Dados da conta atualizados!')" class="flex-1 h-11 rounded-xl text-white font-semibold text-sm" style="background:#1E3765">Salvar alterações</button>
+    <button onclick="saveAccount()" class="flex-1 h-11 rounded-xl text-white font-semibold text-sm" style="background:#1E3765">Salvar alterações</button>
   </div>`);
+}
+function saveAccount(){
+  const email=document.getElementById('accEmail')?.value.trim()||'';
+  if(!validEmail(email)) return ntErrBox('accErr','E-mail de acesso inválido.');
+  const v=id=>document.getElementById(id)?.value||'';
+  /* senha só é validada se a pessoa começou a trocar (algum campo preenchido) */
+  if(v('acCur')||v('acNew')||v('acConf')){
+    if(!v('acCur')) return ntErrBox('accErr','Digite a senha atual para trocar a senha.');
+    if(!validNewPass(v('acNew'))) return ntErrBox('accErr','A nova senha precisa de pelo menos 10 caracteres, com letras e números.');
+    if(v('acNew')!==v('acConf')) return ntErrBox('accErr','A confirmação não bate com a nova senha — digite igual nos dois campos.');
+  }
+  closeModal(); toast('Dados da conta atualizados!');
 }
 
 /* ====================== MÁSCARAS DE INPUT ====================== */
@@ -5060,14 +5254,14 @@ function copyPhone(id){
 function markSigned(id){
   const s=STUDENTS.find(x=>x.id===id); if(!s) return;
   s.status='signed';
-  renderTable(); renderRecent(); renderContracts();
+  refreshAll(); // tabela, contratos E os KPIs da visão geral (pendentes, funil)
   logAct(`Marcou o contrato de <b>${s.kids[0].n}</b> como assinado`);
   toast('Contrato marcado como assinado!');
 }
 function markSent(id){
   const s=STUDENTS.find(x=>x.id===id); if(!s) return;
   s.status='sent';
-  renderTable(); renderRecent(); renderContracts();
+  refreshAll();
   logAct(`Marcou o contrato de <b>${s.kids[0].n}</b> como enviado`);
   toast('Contrato marcado como enviado!');
 }
@@ -5134,9 +5328,16 @@ function confirmExit(id){
 function reactivateStudent(id){
   const s=STUDENTS.find(x=>x.id===id); if(!s) return;
   s.active=true; delete s.exit;
+  /* a vaga não fica reservada para quem saiu: se a turma lotou nesse meio tempo,
+     o aluno volta pela fila de alocação em vez de estourar a capacidade */
+  const bumped=[];
+  s.kids.forEach(k=>{ const t=kidTurma(k);
+    if(t&&activeKidsIn(t.id)>t.cap){ bumped.push(`${k.n.split(' ')[0]} (a ${turmaShort(t)} lotou)`); k.tid=null; } });
   renderTable(); renderContracts(); refreshOverviewData();
-  logAct(`Reativou <b>${s.kids[0].n}</b> — matrícula ativa de novo`);
-  toast(`${s.kids[0].n.split(' ')[0]} voltou a ser aluno ativo!`);
+  logAct(`Reativou <b>${s.kids[0].n}</b> — matrícula ativa de novo${bumped.length?` (${bumped.join(', ')} — voltou pela fila de alocação)`:''}`);
+  toast(bumped.length
+    ? `${s.kids[0].n.split(' ')[0]} voltou a ser aluno ativo — ${bumped.join(', ')}; aloque pela Agenda.`
+    : `${s.kids[0].n.split(' ')[0]} voltou a ser aluno ativo!`);
 }
 
 /* ====================== COMENTÁRIOS (estilo Adobe XD) ====================== */
