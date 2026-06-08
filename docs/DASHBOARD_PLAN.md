@@ -238,6 +238,8 @@ preview — implementar igual:
 
 ## 8. Testes
 
+- **Matriz de validações:** `docs/DASHBOARD_VALIDACOES.md` — todo campo × a bateria de
+  checagens (a fonte dos testes negativos do `reg-05` e das lacunas a definir).
 - **Unit (Vitest):** validators, regras de turma (cap ≤7, slot único, destinos
   válidos), derivações (NOVO, "parado", período), RBAC helpers.
 - **API:** testes das rotas serverless com banco de teste (Neon branch) — auth, RBAC

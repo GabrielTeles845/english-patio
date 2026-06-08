@@ -1,0 +1,187 @@
+# Matriz de Validações — English Patio (dashboard + matrícula)
+
+Documento vivo, iniciado em **08/Jun/2026**. Não é código — é o **checklist** que a
+implementação tem que cumprir e a fonte dos **testes negativos** (`reg-05`, ver
+`docs/AGENDA_PLAN.md`/`DASHBOARD_PLAN.md §8.1`).
+
+**Por que existe:** em vez de "tentar lembrar" o que validar, passamos **todo campo**
+pela mesma bateria fixa de perguntas. O que ninguém pensou aparece como célula vazia /
+marcador **⚠ A DEFINIR** — consolidados na §99 no fim.
+
+**Fonte da verdade do código:** `src/utils/validators.ts` (canônico). O preview
+(`public/dashboard.html`) reimplementou inline porque é HTML solto; na versão React o
+módulo é **um só** (reúne validators.ts + as regras dashboard-only abaixo).
+
+---
+
+## A bateria (as 10 perguntas por campo)
+
+1. **Obrigatório?** (e obrigatório *quando* — pode depender de outro campo)
+2. **Formato/tipo** (CPF, e-mail, telefone, data real, CEP…)
+3. **Tamanho** mín. **e máx.**
+4. **Faixa/sanidade** (data não-futura, idade, valor ≥0)
+5. **Unicidade/idempotência**
+6. **Normalização** (trim, acentos, caixa, dígitos)
+7. **Consistência cruzada** (campo A depende de B)
+8. **Injeção/XSS**
+9. **Revalidação no servidor** (o front nunca é fonte de verdade)
+10. **Regra de segurança própria do campo** (senha, rate-limit, token)
+
+## Regras transversais (valem para TODO campo — não repetir nas tabelas)
+
+- **6. Normalização:** todo texto sofre `trim`; dígitos (CPF/tel/CEP) comparados sem
+  máscara (`replace(/\D/g,'')`); nomes comparados em minúsculas + espaços colapsados.
+- **8. XSS (`badChars`, dashboard-only):** campos de texto livre **bloqueiam** `< > " ' &`
+  — mensagem: *"Remova os caracteres especiais (… ) — use só letras, números e pontuação
+  simples."* No produto real isto é defesa de XSS, então **também valida no servidor**.
+- **9. Servidor:** **toda** rota `/api/*` revalida com **Zod** (mesmas regras). O client
+  só melhora a UX; nunca é autoridade. RBAC revalidado por papel.
+- **Máscaras (preview):** data `dd/mm/aaaa` (`maskDate`), telefone `(XX) 9XXXX-XXXX`
+  (`maskPhone`), CPF `000.000.000-00` (`maskCpf`), CEP `00000-000` (`maskCep`).
+- **⚠ Tamanho máximo:** o `validators.ts` de hoje **não tem teto** em nenhum texto.
+  Definir máx. por campo (anti-abuso) — ver §99.
+
+Legenda: **DO** = regra dashboard-only (não está no `validators.ts`). **⚠** = lacuna.
+
+---
+
+## 1. Matrícula — Alunos
+
+| Campo | Obrig. | Regra | Mensagem | Notas |
+|---|---|---|---|---|
+| `student1Name` | sim | nome completo: ≥2 partes significativas (ignora `e/de/da/do/dos/das`), cada ≥2 chars | "Digite o nome completo (nome e sobrenome)" | `isValidFullName`; máx ⚠ |
+| `student1BirthDate` | sim | data real `dd/mm/aaaa`, não-futura, **idade ≤ 20** | "Data inválida" / "Data não pode ser no futuro" / "Aluno não pode ter mais de 20 anos" | `isValidStudentBirthDate` |
+| `student1Age` | — | **derivado** da data (não digitável) | — | não validar isolado |
+| `hasStudent2` | — | boolean (toggle) | — | se `true` → aluno 2 vira obrigatório |
+| `student2Name` | se `hasStudent2` | = student1Name | idem | cross-7 com `hasStudent2` |
+| `student2BirthDate` | se `hasStudent2` | = student1BirthDate | idem | `isValidStudentBirthDate` |
+
+## 2. Matrícula — Responsável legal (principal)
+
+| Campo | Obrig. | Regra | Mensagem | Notas |
+|---|---|---|---|---|
+| `responsibleName` | sim | nome completo | "Digite o nome completo…" | `isValidFullName`; máx ⚠ |
+| `responsibleBirthDate` | sim | data real, não-futura, **idade ≥ 18** | "Data inválida" / "…futuro" / "Responsável deve ter no mínimo 18 anos" | `isValidResponsibleBirthDate` |
+| `responsibleCPF` | sim | 11 dígitos + **dígitos verificadores** | "CPF inválido" | `isValidCPF`. **CPF repetido NÃO é erro** = família; só **aviso** se o mesmo CPF aparece com **outro nome** de responsável (`cpfOwner`, **DO**) |
+| `responsiblePhone` | sim | 11 dígitos, **3º dígito = 9** | "Telefone deve começar com 9: (XX) 9XXXX-XXXX" | `isValidPhone` |
+| `responsibleRelationship` | sim | grau de parentesco | "Campo obrigatório" | hoje texto livre → **⚠ select?** |
+| `responsibleEmail` | sim | regex `x@y.z` | "E-mail inválido" | `isValidEmail`; máx ⚠ |
+
+## 3. Matrícula — Segundo responsável (opcional, só contato)
+
+| Campo | Obrig. | Regra | Mensagem | Notas |
+|---|---|---|---|---|
+| `hasSecondResponsible` | — | boolean | — | se `true` → campos abaixo obrigatórios |
+| `secondResponsibleName` | se toggle | nome completo | idem | cross-7 |
+| `secondResponsibleCPF` | se toggle | CPF válido | "CPF inválido" | `isValidCPF` |
+| `secondResponsiblePhone` | se toggle | telefone válido | idem | `isValidPhone` |
+| `secondResponsibleRelationship` | se toggle | parentesco | "Campo obrigatório" | ⚠ select? |
+
+## 4. Matrícula — Responsável financeiro
+
+| Campo | Obrig. | Regra | Mensagem | Notas |
+|---|---|---|---|---|
+| `financialResponsibleType` | sim | enum `legal` \| `second` \| `other` | — | cross-7 define os 2 abaixo |
+| `financialResponsibleName` | se `other` | nome completo | "Digite o nome completo…" | só usado se `other` |
+| `financialResponsibleCPF` | se `other` | CPF válido | "CPF inválido" | só usado se `other` |
+| `paymentMethod` | fixo | **sempre** `boleto/carnê 6x` | — | não inventar PIX/cartão (decisão registrada) |
+
+## 5. Matrícula — Endereço
+
+| Campo | Obrig. | Regra | Mensagem | Notas |
+|---|---|---|---|---|
+| `cep` | sim | 8 dígitos | "CEP inválido" | `isValidCEP`; busca em 4 APIs (`cepService`) |
+| `state` | sim | **deve ser `GO`** | "Atendemos apenas o estado de Goiás" | **regra de negócio crítica** (cepService rejeita fora de GO) |
+| `street` | sim | texto | "Campo obrigatório" | máx ⚠ |
+| `number` | sim | texto | "Campo obrigatório" | aceita "S/N"? formato **⚠** |
+| `complement` | não | texto livre | — | máx ⚠ |
+| `neighborhood` | sim | texto | "Campo obrigatório" | máx ⚠ |
+| `city` | sim | texto | "Campo obrigatório" | preenchido pelo CEP |
+
+## 6. Matrícula — Contrato & autorizações
+
+| Campo | Obrig. | Regra | Mensagem | Notas |
+|---|---|---|---|---|
+| `classFormat` | sim | enum `sede` \| `domicilio` | — | carimba no PDF (pg.2) |
+| `schedule` | sim | enum `seg-qua` \| `ter-qui` | — | sem sexta/sábado/1x |
+| `scheduleDay1Start/End`, `Day2Start/End` | sim | horário de slot válido | — | **⚠** validar contra os 8 horários reais (8:30…17:45) |
+| `authorizationContract` | sim | **deve ser `true`** (aceite) | "É preciso aceitar o contrato" | bloqueia envio |
+| `scheduleConfirmed` | sim | **deve ser `true`** | "Confirme o horário" | bloqueia envio |
+| `authorizationMedia` | não | boolean (uso de imagem) | — | carimba no PDF (pg.4); pode ser não |
+
+## 7. Auth — Login
+
+| Campo | Obrig. | Regra | Mensagem | Notas |
+|---|---|---|---|---|
+| email | sim | regex | "E-mail inválido" | `isValidEmail` |
+| senha | sim | não-vazia | "Campo obrigatório" | **rate-limit** por IP+e-mail (DASHBOARD_PLAN §3) |
+
+## 8. Auth — Senha (1ª senha, troca, reset)
+
+| Campo | Obrig. | Regra | Mensagem | Notas |
+|---|---|---|---|---|
+| nova senha | sim | **≥10 chars + ≥1 maiúscula + ≥1 minúscula + ≥1 número + ≥1 especial** | "A senha precisa de 10+ caracteres, com maiúscula, minúscula, número e especial" | **decidido 08/Jun**. ⚠ preview usa regra mais fraca (`validNewPass` ≥10+letra+número) — **trocar** |
+| confirmar senha | sim | == nova senha | "As senhas não conferem" | cross-7 |
+| senha atual | na troca | confere com a do usuário | "Senha atual incorreta" | só no "trocar senha" |
+| senha temporária | — | **forçar troca no 1º login** | — | decisão da 1ª senha (DASHBOARD_PLAN §6.10) |
+
+## 9. Usuários (Diretor cadastra)
+
+| Campo | Obrig. | Regra | Mensagem | Notas |
+|---|---|---|---|---|
+| nome | sim | nome completo | "Digite o nome completo…" | máx ⚠ |
+| e-mail | sim | regex + **único** entre usuários | "E-mail inválido" / "Já existe um usuário com esse e-mail" | unicidade-5 **⚠ confirmar msg** |
+| papel | sim | enum `director`\|`supervisor`\|`secretary` | — | **último Diretor não rebaixa/exclui/desativa** (cross-7) |
+| senha temporária | sim | = §8 (ou gera forte) | idem §8 | trocada no 1º login |
+
+## 10. Agenda — Turma
+
+| Campo | Obrig. | Regra | Mensagem | Notas |
+|---|---|---|---|---|
+| sala | sim | existe e ativa | — | — |
+| par de dias | sim | enum `seg-qua`\|`ter-qui` | — | — |
+| horário | sim | um dos 8 slots válidos | — | `8:30/9:30/10:30/13:30/14:30/15:30/16:45/17:45` |
+| (sala+par+horário) | — | **único** | "Já existe turma nesse horário/sala" | unicidade-5 (slot não duplica) |
+| nível | sim | um dos 19 níveis | — | — |
+| capacidade | sim | **1..7**; ao editar **nunca < ocupação atual** | "A capacidade não pode ser menor que os alunos já na turma" | cap padrão=máx=7 (DO) |
+| teacher | não | texto | — | opcional; máx ⚠ |
+
+## 11. Agenda — Sala
+
+| Campo | Obrig. | Regra | Mensagem | Notas |
+|---|---|---|---|---|
+| nome | sim | texto; **⚠ único?** | "Campo obrigatório" | 13 vêm prontas |
+| cor | sim | da paleta | — | — |
+| teacher | não | texto | — | opcional |
+| desativar | — | só **sem turmas** | "Mova as turmas antes de desativar a sala" | cross-7 |
+
+## 12. Modelos de contrato (PDF)
+
+| Campo | Obrig. | Regra | Mensagem | Notas |
+|---|---|---|---|---|
+| nome do modelo | sim | texto | "Campo obrigatório" | máx ⚠ |
+| arquivo | sim | **tipo = PDF**, **tamanho ≤ limite** | "Envie um PDF" / "Arquivo acima do limite" | ⚠ confirmar limite (preview usa 16MB p/ uploads de mídia) |
+| mapeamento de campos | sim p/ ativar | todos os campos posicionados | "Posicione os N campos pendentes antes de usar" | bloqueia "usar nas matrículas" |
+
+---
+
+## 99. ⚠ Lacunas — o que a matriz fez aparecer (decidir antes de codar)
+
+1. **Tamanho máximo de TODO texto** — `validators.ts` não tem teto. Definir máx. por
+   campo (nome, logradouro, complemento, bairro, teacher, nome de sala/modelo, parentesco).
+   Sem isso, é vetor de abuso e quebra de layout.
+2. **`number` do endereço** — formato livre hoje. Aceitar "S/N"? Só dígitos + "S/N"?
+3. **`relationship` (parentesco)** — texto livre nos dois responsáveis. Virar **select**
+   (mãe/pai/avó/…)? Padroniza relatório e evita lixo.
+4. **Horários do contrato** (`scheduleDayXStart/End`) — validar contra os **8 slots reais**
+   da Agenda, hoje não amarrado.
+5. **Unicidade de e-mail de usuário** — mensagem e comportamento ao repetir.
+6. **Unicidade/normalização de nome de sala** — pode haver duas "Green Room"?
+7. **Limite real de PDF do modelo** — confirmar o número (16MB? outro?).
+8. **Política de senha no preview** — `validNewPass` está mais fraca que o decidido;
+   trocar para `≥10 + maiúscula + minúscula + número + especial`.
+9. **Idempotência da matrícula** (`submission_id`) — regra de unicidade que mata as
+   duplicatas (DEBITOS_TECNICOS #1) — pertence à camada de save, mas nasce aqui.
+
+> Cada linha desta matriz (incl. as ⚠ quando resolvidas) vira um **teste negativo** no
+> `reg-05`: a regra que bloqueia salvar é exercida com um valor inválido e tem que falhar.
