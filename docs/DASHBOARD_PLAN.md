@@ -204,9 +204,13 @@ Derivado do mock do preview (nomes em inglês no banco; PT na UI).
    (no preview é o **painel do sininho** (`notifPanel`), não uma tela com rota própria)
 9. **Editor de site** — todos os textos de todas as páginas (inclui matrícula), hover
    pontilhado + painel lateral, preview desktop/mobile, publicação com pendências
-10. **Usuários & permissões** — 3 papéis (§4), convite por e-mail, edição de papel
-    (último Diretor não pode ser rebaixado), "Ver painel como…" vira recurso real de
-    suporte (Diretor visualiza como outro papel)
+10. **Usuários & permissões** — 3 papéis (§4). O **Diretor cadastra as pessoas** (nome,
+    e-mail, papel); cada uma faz login e **troca a própria senha** (modal da conta +
+    "Esqueci a senha", §3). **Sempre ≥1 Diretor ativo (decidido 08/Jun/2026):** o último
+    Diretor não pode ser **rebaixado, excluído nem desativado** — a UI bloqueia e mostra o
+    motivo. "Ver painel como…" vira recurso real de suporte (Diretor visualiza como outro
+    papel). _Decisão em aberto: a 1ª senha vem por **convite-link** (a pessoa define ao
+    aceitar) ou por **senha temporária** definida pelo Diretor e trocada no 1º login._
 11. **Registro de atividades** — auditoria somente leitura, busca + filtro por ator
 12. **Configurações** — tema (3 sidebars × claro/escuro, transição circular), conta,
     segurança (2FA futuro), sessões ativas, reativar tours
@@ -333,11 +337,14 @@ início da implementação:
   **Visão geral** também tem o estado-zero completo: KPIs/strip zerados, widgets com
   placeholder e overlay "Sem dados ainda" sobre os 5 gráficos Chart.js. O badge
   "Preview · dados fictícios" cicla os estados (normal → sem dados → erro) pra aprovação.
-- **Estados de erro** — ✅ FEITO (load): overlay "Não foi possível carregar esta tela"
-  com **Tentar de novo**, em qualquer tela (cobre falha ao carregar / offline / timeout),
-  via o ciclo do badge. Helpers `errorState`/`applyErrorOverlay`/`qaRetry`. **PENDENTE:**
-  falha ao **salvar** (toast amarelo + preservar o formulário) — depende dos forms reais
-  com backend; helper `toastErr` já existe pra plugar.
+- **Estados de erro** — ✅ FEITO. (1) **Carregar**: overlay "Não foi possível carregar
+  esta tela" com **Tentar de novo**, em qualquer tela (cobre falha ao carregar / offline /
+  timeout). (2) **Salvar**: nos 11 modais de salvar (turma nova/editar, sala, matrícula
+  nova/editar, convite, usuário, modelo editar/renomear, senha, conta), a gravação falha
+  com toast amarelo (ícone de alerta) e o **formulário fica aberto** preservando o que foi
+  digitado. Helpers `errorState`/`applyErrorOverlay`/`qaRetry`/`saveFails`/`toastErr`.
+  Tudo só aparece sob a condição real (carregando / 0 resultados / request falhou) — o
+  ciclo do badge é só o simulador do preview, **não** vai pro produto.
 - **Estados que só existem com backend** — update otimista + rollback, e **conflito de
   edição concorrente** (dois usuários na mesma turma/aluno). Inexistentes no preview.
 

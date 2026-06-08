@@ -1127,7 +1127,7 @@
 <!-- toast -->
 <div id="toast" class="fixed bottom-6 right-6 z-[90] translate-y-24 transition-transform duration-300 w-max max-w-[92vw]">
   <div class="surface flex items-center gap-3 pl-2.5 pr-5 py-2.5 rounded-2xl text-sm font-semibold shadow-2xl">
-    <span class="w-8 h-8 rounded-full grid place-content-center shrink-0" style="background:#F5B700">
+    <span id="toastIconWrap" class="w-8 h-8 rounded-full grid place-content-center shrink-0" style="background:#F5B700">
       <i data-lucide="check" class="w-4 h-4" style="color:#15294d"></i></span>
     <span id="toastMsg" class="text-[var(--text)]"></span>
   </div>
@@ -1581,8 +1581,11 @@ function applyErrorOverlay(){
   if(QA_ERROR){ _errEl.innerHTML=`<div class="surface rounded-2xl">${errorState({title:'Não foi possível carregar esta tela',sub:'Falha de conexão com o servidor. Verifique a internet e tente de novo — se persistir, recarregue a página.'})}</div>`; _errEl.classList.add('on'); if(window.lucide) lucide.createIcons(); }
   else _errEl.classList.remove('on');
 }
-/* toast de erro p/ falha ao salvar (amarelo, conforme o padrão — mantém o formulário aberto) */
-function toastErr(msg){ if(typeof toast==='function') toast(msg); }
+/* toast de erro p/ falha ao salvar (amarelo, conforme o padrão; só troca o ícone p/ alerta) */
+function toastErr(msg){ if(typeof toast==='function') toast(msg,'alert-triangle'); }
+/* gate dos modais de salvar: no estado de erro, a gravação "falha no servidor" e o
+   formulário continua aberto (preserva o que foi digitado). Devolve true = abortar. */
+function saveFails(msg){ if(QA_ERROR){ toastErr(msg||'Não foi possível salvar — falha de conexão com o servidor. Tente de novo.'); return true; } return false; }
 
 /* ====================== NAVEGAÇÃO ====================== */
 let CUR_VIEW='overview';
@@ -3001,7 +3004,7 @@ function openNewTurma(sala,par,hora,nivel){
   document.getElementById('ntNivelWrap').innerHTML=cselect('ntNivel',nivelPickItems(),{block:true,value:nivel||'conv-1'});
   lucide.createIcons();
 }
-function agSaveTurma(){
+function agSaveTurma(){ if(saveFails())return;
   const sala=SEL.ntSala?.value, par=SEL.ntPar?.value, hora=SEL.ntHora?.value, nivel=SEL.ntNivel?.value;
   const cap=parseInt(document.getElementById('ntCap')?.value,10);
   if(!(cap>=1&&cap<=7)) return ntErrBox('ntErr','Vagas entre 1 e 7 — o padrão da escola é 7.');
@@ -3055,7 +3058,7 @@ function openTurmaModal(tid){
   document.getElementById('etHoraWrap').innerHTML=cselect('etHora',HORAS.map(h=>({v:h,l:h})),{block:true,value:t.hora});
   lucide.createIcons();
 }
-function agUpdateTurma(tid){
+function agUpdateTurma(tid){ if(saveFails())return;
   const t=turmaById(tid); if(!t) return;
   const occ=activeKidsIn(tid);
   const cap=parseInt(document.getElementById('etCap')?.value,10);
@@ -3271,7 +3274,7 @@ function openSalaEdit(id){
   </div>`);
   seCor=s.c; seCorPaint();
 }
-function saveSala(id){
+function saveSala(id){ if(saveFails())return;
   const s=salaById(id); if(!s) return;
   const n=document.getElementById('seNome')?.value.trim();
   if(!n) return ntErrBox('seErr','A sala precisa de um nome.');
@@ -3839,8 +3842,10 @@ function refreshCharts(){ if(!charts.enroll) return; const c=chartColors(); Char
 
 /* ====================== TOAST ====================== */
 let toastTimer=null;
-function toast(msg){
+function toast(msg,icon){
   document.getElementById('toastMsg').textContent=msg;
+  const iw=document.getElementById('toastIconWrap');
+  if(iw){ iw.innerHTML=`<i data-lucide="${icon||'check'}" class="w-4 h-4" style="color:#15294d"></i>`; if(window.lucide) lucide.createIcons(); }
   const t=document.getElementById('toast');
   t.style.transform='translateY(0)';
   clearTimeout(toastTimer);
@@ -3979,7 +3984,7 @@ function openNewEnrollment(){
   lucide.createIcons();
   document.getElementById('nmStudent').focus();
 }
-function submitNewEnrollment(){
+function submitNewEnrollment(){ if(saveFails())return;
   const gv=i=>document.getElementById(i)?.value.trim()||'';
   const name=gv('nmStudent'), b=gv('nmBirth'), resp=gv('nmResp'),
         cpf=gv('nmCpf'), phone=gv('nmPhone'), email=gv('nmEmail'), hood=gv('nmHood');
@@ -4135,7 +4140,7 @@ function openEditEnrollment(id){
   if(cw) cw.innerHTML=cselect('edCity',cities.map(c=>({v:c,l:c})),{block:true,value:s.addr.city||'Goiânia'});
   lucide.createIcons();
 }
-function saveEditEnrollment(id){
+function saveEditEnrollment(id){ if(saveFails())return;
   const s=STUDENTS.find(x=>x.id===id); if(!s) return;
   const gv=i=>document.getElementById(i)?.value.trim()||'';
   /* validação ANTES de aplicar: erro aparece na caixa, nada é engolido em silêncio —
@@ -4280,7 +4285,7 @@ function openInvite(){
   lucide.createIcons();
   document.getElementById('invName').focus();
 }
-function submitInvite(){
+function submitInvite(){ if(saveFails())return;
   const n=document.getElementById('invName').value.trim();
   const e=document.getElementById('invEmail').value.trim();
   const errs=[];
@@ -4334,7 +4339,7 @@ function openEditUser(id){
   document.getElementById('euRoleWrap').innerHTML=cselect('euRole',[{v:'diretor',l:'Diretor'},{v:'supervisor',l:'Supervisor'},{v:'secretaria',l:'Secretaria'}],{block:true,value:{'Diretor':'diretor','Supervisor':'supervisor','Secretaria':'secretaria'}[u.r]||'diretor'});
   lucide.createIcons();
 }
-function saveUser(id){
+function saveUser(id){ if(saveFails())return;
   const u=userById(id); if(!u) return;
   const n=document.getElementById('euName').value.trim();
   const e=document.getElementById('euEmail').value.trim();
@@ -4441,7 +4446,7 @@ function openTplEdit(k){
   </div>`,'max-w-lg');
   document.getElementById('tplEL').focus();
 }
-function saveTplEdit(k){
+function saveTplEdit(k){ if(saveFails())return;
   const l=document.getElementById('tplEL').value.trim();
   const s=document.getElementById('tplES').value.trim();
   const b=document.getElementById('tplEB').value.trim();
@@ -4650,7 +4655,7 @@ function openChangePass(){
     <button onclick="savePass()" class="flex-1 h-11 rounded-xl text-white font-semibold text-sm" style="background:#1E3765">Salvar nova senha</button>
   </div>`);
 }
-function savePass(){
+function savePass(){ if(saveFails())return;
   const v=id=>document.getElementById(id)?.value||'';
   if(!v('cpCur')) return ntErrBox('cpErr','Digite a senha atual.');
   if(!validNewPass(v('cpNew'))) return ntErrBox('cpErr','A nova senha precisa de pelo menos 10 caracteres, com letras e números.');
@@ -5056,7 +5061,7 @@ function openTplRename(id){
   </div>`);
   document.getElementById('tplRN').focus();
 }
-function saveTplRename(id){
+function saveTplRename(id){ if(saveFails())return;
   const t=tplById(id); if(!t) return;
   const n=document.getElementById('tplRN').value.trim();
   const err=m=>{ document.getElementById('tplRNErr').innerHTML=`<div class="rounded-xl p-3 text-sm flex items-start gap-2" style="background:rgba(220,38,38,.08);color:#DC2626"><i data-lucide="alert-circle" class="w-4 h-4 shrink-0 mt-0.5"></i><span>${m}</span></div>`; lucide.createIcons(); };
@@ -5235,7 +5240,7 @@ function openAccountModal(){
     <button onclick="saveAccount()" class="flex-1 h-11 rounded-xl text-white font-semibold text-sm" style="background:#1E3765">Salvar alterações</button>
   </div>`);
 }
-function saveAccount(){
+function saveAccount(){ if(saveFails())return;
   const email=document.getElementById('accEmail')?.value.trim()||'';
   if(!validEmail(email)) return ntErrBox('accErr','E-mail de acesso inválido.');
   const v=id=>document.getElementById(id)?.value||'';
