@@ -361,3 +361,18 @@ Decisões ainda em aberto (não inventar na implementação — trazer pra mesa)
   "alerta"). Decidir se é novo status ou flag derivada.
 - **LGPD: apagamento do titular × `activity_log`** — apagar dados do menor mantendo o
   log de quem os acessou. Definir política (anonimizar o alvo no log? reter quanto?).
+
+## 12. Requisitos transversais de UX (confirmados 08/Jun/2026)
+
+Valem em todas as telas/formulários, não só numa:
+
+- **Botão de salvar com estado "enviando" + trava de duplo-clique** — ao submeter, o
+  botão vira "Salvando…"/spinner e fica desabilitado até a resposta. Evita gravação
+  duplicada (liga direto no `submission_id` idempotente do §5 e no
+  `DEBITOS_TECNICOS.md` #1 — matrículas duplicadas ao re-clicar).
+- **Confirmação real em ações destrutivas** — excluir aluno/turma/usuário/modelo (e
+  desligar aluno) pede confirmação em modal próprio dizendo a consequência; nunca
+  `confirm()` nativo.
+- **Cópia (textos) dos e-mails transacionais** — convite de usuário, reset de senha,
+  confirmação de matrícula e contrato (Autentique). Alguém precisa escrever esses textos;
+  ficam versionados junto aos templates (auth na Fase 1, Resend na Fase 5, Autentique §7).
