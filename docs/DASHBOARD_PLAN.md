@@ -157,7 +157,7 @@ Derivado do mock do preview (nomes em inglês no banco; PT na UI).
 
 ### Contratos & Autentique
 - **contracts** (id, enrollment_id, pdf_url, status
-  [`pending`|`sent`|`viewed`|`signed`], autentique_doc_id, sent_at, viewed_at,
+  [`pending`|`sent`|`viewed`|`signed`|`rejected`|`failed`], autentique_doc_id, sent_at, viewed_at,
   signed_at, sent_via[`email`|`whatsapp`]) — "parado" = `sent`/`viewed` há ≥7 dias
   (derivado, alimenta alertas)
 - **contract_events** (id, contract_id, event_id `unique` (dedup), type
@@ -193,7 +193,8 @@ Derivado do mock do preview (nomes em inglês no banco; PT na UI).
    mover/alocar com destinos válidos + confirmação de mudança de nível, CRUD de
    turma/sala, exportação PNG (sala, pacote do par, nível) — detalhes em
    `AGENDA_PLAN.md`
-5. **Contratos** — grid/lista, status Autentique de 4 etapas, timeline por contrato,
+5. **Contratos** — grid/lista, status Autentique (4 etapas do caminho feliz +
+   **Recusado/Falhou** num balde "precisa de ação", cor própria), timeline por contrato,
    badge "parado há N dias", cobrar por WhatsApp, baixar PDF
 6. **Modelos** — versões do PDF de contrato, importação + mapeamento de campos
    (no preview é **sub-tela**, não item de menu top-level — não criar rota de nav própria)
@@ -209,8 +210,9 @@ Derivado do mock do preview (nomes em inglês no banco; PT na UI).
     "Esqueci a senha", §3). **Sempre ≥1 Diretor ativo (decidido 08/Jun/2026):** o último
     Diretor não pode ser **rebaixado, excluído nem desativado** — a UI bloqueia e mostra o
     motivo. "Ver painel como…" vira recurso real de suporte (Diretor visualiza como outro
-    papel). _Decisão em aberto: a 1ª senha vem por **convite-link** (a pessoa define ao
-    aceitar) ou por **senha temporária** definida pelo Diretor e trocada no 1º login._
+    papel). **1ª senha (decidido 08/Jun/2026): senha temporária** — o Diretor define uma
+    senha provisória ao cadastrar; a pessoa é **obrigada a trocá-la no 1º login** (a senha
+    provisória não vale como definitiva). Sem fluxo de convite-link por e-mail.
 11. **Registro de atividades** — auditoria somente leitura, busca + filtro por ator
 12. **Configurações** — tema (3 sidebars × claro/escuro, transição circular), conta,
     segurança (2FA futuro), sessões ativas, reativar tours
@@ -225,7 +227,8 @@ preview — implementar igual:
    (`delivery_method: DELIVERY_METHOD_WHATSAPP` — custo extra a confirmar; a dona já
    aprovou pagar). Status → `sent`.
 2. Webhooks por evento: `signature.viewed` → `viewed` (roxo) · `signature.accepted` +
-   `document.finished` → `signed` · `signature.rejected` / `delivery_failed` → alerta.
+   `document.finished` → `signed` · `signature.rejected` → status `rejected` · `delivery_failed` → status `failed`
+   (ambos saem do caminho feliz, viram alerta + notificação e badge vermelho).
    HMAC + dedup por event id + idempotência (§3).
 3. Cada transição: atualiza timeline do contrato, loga em `activity_log`
    (ator `Autentique`), gera notificação e alimenta o funil da Visão geral.
@@ -350,15 +353,15 @@ início da implementação:
 
 Decisões ainda em aberto (não inventar na implementação — trazer pra mesa):
 
-- **Paginação da tabela de Alunos** — o preview mostra tudo numa tela; com dados reais
-  crescendo a cada semestre vai precisar. Adicionar paginação **é** mudar o design →
-  decidir se entra (e desenhar no preview).
+- ~~Paginação da tabela de Alunos~~ — **já existe no preview** (`PAGE_SIZE=20`, pager +
+  "Mostrando X–Y de Z"), em Alunos e Contratos. Não é decisão em aberto; só portar pro
+  React com paginação no servidor.
 - **Acessibilidade dos controles customizados** — a regra "sem controle nativo" tira o
   teclado/ARIA/foco de graça; cselect, datepicker e checkbox custom precisam
   reimplementar isso. Uso diário de staff. Definir nível de a11y alvo.
-- **Status de contrato recusado/falho** — o §5 só tem `pending|sent|viewed|signed`;
-  falta o estado visível de um `signature.rejected`/`delivery_failed` (hoje vira só
-  "alerta"). Decidir se é novo status ou flag derivada.
+- ~~Status de contrato recusado/falho~~ — **DECIDIDO 08/Jun**: status próprio
+  `rejected`/`failed` (5º/6º estado), fora do caminho feliz, com alerta + notificação.
+  Ver §5, §6.5 e §7.
 - **LGPD: apagamento do titular × `activity_log`** — apagar dados do menor mantendo o
   log de quem os acessou. Definir política (anonimizar o alvo no log? reter quanto?).
 
