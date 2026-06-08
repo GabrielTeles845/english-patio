@@ -206,8 +206,9 @@ Legenda: **DO** = regra dashboard-only (não está no `validators.ts`). **⚠** 
 > **Conferido na planilha REAL (08/Jun — `public/…xlsx`, NÃO versionada):** 30 colunas; a
 > coluna de aceite chama-se **"Aceitou termos do Contrato"** (não "Autorização Contrato").
 > **694 linhas → 568 matrículas únicas → 126 duplicadas (18%)** — confirma o bug e a dedup.
-> ⚠ **A planilha real é `.xlsx`**; o import do preview só aceita `.csv` → na versão real,
-> **ler xlsx** direto ou orientar o export para CSV.
+> **Formato (DECIDIDO 08/Jun): aceita CSV e XLSX.** O preview já lê os dois — `.xlsx` via
+> SheetJS (converte p/ CSV e reusa o mesmo pipeline de dedup/validação). Testado com o
+> arquivo real: 694 linhas → 127 repetidas removidas → 565 novas + 2 para conferir.
 > **Reset p/ testes:** o preview tem botão "Excluir todas as matrículas" no modal de importação.
 
 ## 17. Editor de site — textos editáveis

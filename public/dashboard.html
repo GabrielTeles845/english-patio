@@ -12,6 +12,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 <script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -4745,15 +4746,15 @@ function openImportModal(){
   pendingImport=null;
   openModal(`${modalHeader('Importar planilha de matrículas')}
   <div class="p-5 space-y-4" id="importBody">
-    <p class="text-sm text-[var(--muted)]">Use o arquivo exportado do Google Planilhas (<b>.csv</b>) com as colunas da planilha de matrículas atual.</p>
+    <p class="text-sm text-[var(--muted)]">Use a planilha de matrículas em <b>CSV</b> ou <b>Excel (.xlsx)</b> — com as colunas da planilha atual.</p>
     <div id="importDrop" ondragover="event.preventDefault();this.style.borderColor='#2F539A'" ondragleave="this.style.borderColor='var(--border)'"
       ondrop="event.preventDefault();this.style.borderColor='var(--border)';importDropped(event)"
       onclick="document.getElementById('importFile').click()"
       class="rounded-2xl border-2 border-dashed p-8 text-center cursor-pointer transition hover:bg-[var(--hover)]" style="border-color:var(--border)">
       <i data-lucide="file-up" class="w-8 h-8 mx-auto text-brand-light mb-2"></i>
       <p class="text-sm font-medium">Arraste o arquivo aqui ou <span class="text-brand-light">clique para escolher</span></p>
-      <p class="text-xs text-[var(--muted)] mt-1">Somente .csv — a planilha de matrículas exportada</p>
-      <input id="importFile" type="file" accept=".csv,text/csv" class="hidden" onchange="importPicked(this)">
+      <p class="text-xs text-[var(--muted)] mt-1">.csv ou .xlsx — a planilha de matrículas</p>
+      <input id="importFile" type="file" accept=".csv,.xlsx,text/csv" class="hidden" onchange="importPicked(this)">
     </div>
     <div class="rounded-xl p-3 text-xs space-y-1.5" style="background:rgba(245,183,0,.10);color:#B5860B">
       <p class="font-semibold flex items-center gap-1.5"><i data-lucide="shield-check" class="w-4 h-4 shrink-0"></i> O que é conferido sozinho antes de entrar:</p>
@@ -4784,12 +4785,25 @@ function importDropped(e){
   importReadFile(f);
 }
 function importReadFile(f){
-  if(!/\.csv$/i.test(f.name)){ importError(`<b>${esc(f.name)}</b> não é um arquivo .csv. Exporte a planilha do Google Planilhas em "Arquivo → Fazer download → CSV".`); return; }
-  if(f.size>10*1024*1024){ importError('Arquivo muito grande (limite de 10 MB). Confira se é mesmo a planilha de matrículas.'); return; }
+  const isCsv=/\.csv$/i.test(f.name), isXlsx=/\.xlsx?$/i.test(f.name);
+  if(!isCsv&&!isXlsx){ importError(`<b>${esc(f.name)}</b> não é .csv nem .xlsx. Use a planilha de matrículas (CSV ou Excel).`); return; }
+  if(f.size>16*1024*1024){ importError('Arquivo muito grande (limite de 16 MB). Confira se é mesmo a planilha de matrículas.'); return; }
   const r=new FileReader();
-  r.onload=()=>runImport(String(r.result||''), f.name);
-  r.onerror=()=>importError('Não foi possível ler o arquivo. Tente exportar a planilha de novo.');
-  r.readAsText(f,'utf-8');
+  r.onerror=()=>importError('Não foi possível ler o arquivo. Tente de novo.');
+  if(isXlsx){
+    r.onload=()=>{
+      if(typeof XLSX==='undefined'){ importError('A leitura de Excel ainda está carregando — tente de novo em 1 segundo.'); return; }
+      try{
+        const wb=XLSX.read(new Uint8Array(r.result),{type:'array'});
+        const ws=wb.Sheets[wb.SheetNames[0]];
+        runImport(XLSX.utils.sheet_to_csv(ws), f.name); /* reusa todo o pipeline de CSV (dedup + validação) */
+      }catch(_){ importError('Não foi possível ler este Excel. Salve como .xlsx novo ou exporte em CSV.'); }
+    };
+    r.readAsArrayBuffer(f);
+  } else {
+    r.onload=()=>runImport(String(r.result||''), f.name);
+    r.readAsText(f,'utf-8');
+  }
 }
 function runImport(text, sourceName){
   text=text.replace(/^﻿/,'');
