@@ -358,14 +358,17 @@ Decisões ainda em aberto (não inventar na implementação — trazer pra mesa)
 - ~~Paginação da tabela de Alunos~~ — **já existe no preview** (`PAGE_SIZE=20`, pager +
   "Mostrando X–Y de Z"), em Alunos e Contratos. Não é decisão em aberto; só portar pro
   React com paginação no servidor.
-- **Acessibilidade dos controles customizados** — a regra "sem controle nativo" tira o
-  teclado/ARIA/foco de graça; cselect, datepicker e checkbox custom precisam
-  reimplementar isso. Uso diário de staff. Definir nível de a11y alvo.
+- ~~Acessibilidade dos controles customizados~~ — **DECIDIDO 08/Jun: básico pragmático** —
+  teclado (Tab/Enter/Esc/setas), foco visível e label/ARIA nos controles custom (cselect,
+  datepicker, checkbox); **sem** perseguir WCAG AA formal. Reimplementar onde a regra "sem
+  nativo" tirou de graça.
 - ~~Status de contrato recusado/falho~~ — **DECIDIDO 08/Jun**: status próprio
   `rejected`/`failed` (5º/6º estado), fora do caminho feliz, com alerta + notificação.
   Ver §5, §6.5 e §7.
-- **LGPD: apagamento do titular × `activity_log`** — apagar dados do menor mantendo o
-  log de quem os acessou. Definir política (anonimizar o alvo no log? reter quanto?).
+- ~~LGPD: apagamento do titular × `activity_log`~~ — **DECIDIDO 08/Jun: anonimizar no log**
+  — apaga os dados pessoais do aluno e mantém as entradas de auditoria com o alvo
+  anonimizado (ex. "aluno #123 [removido]"): cumpre o direito de apagamento **e** preserva
+  a trilha de quem agiu.
 
 ## 12. Requisitos transversais de UX (confirmados 08/Jun/2026)
 

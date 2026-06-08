@@ -187,8 +187,8 @@ Legenda: **DO** = regra dashboard-only (não está no `validators.ts`). **⚠** 
 
 | Campo | Obrig. | Regra | Notas |
 |---|---|---|---|
-| assunto (`emailSubject`) | sim | texto, máx 150 (sug.) | **preview é leniente** (não trava vazio) → spec **exige** |
-| corpo (`emailBody`) | sim | texto, máx 2000 (sug.); **variáveis `{{nome_responsavel}}`/`{{nome_aluno}}` fechadas** | escape ao montar o e-mail (não `badChars` cru — é texto de e-mail) |
+| assunto (`emailSubject`) | sim | texto, **máx 150** | **preview é leniente** (não trava vazio) → spec **exige** |
+| corpo (`emailBody`) | sim | texto, **máx 2000**; **variáveis `{{nome_responsavel}}`/`{{nome_aluno}}` fechadas** | escape ao montar o e-mail (não `badChars` cru — é texto de e-mail) |
 | canais | sim | **≥1** de `email`/`whatsapp` (ou ambos) | — |
 | público (`emailTo`) | sim | select: todos · Seg/Qua · Ter/Qui · contratos pendentes | — |
 | variável aberta | — | `{{` sem `}}` **bloqueia** | regra de negócio (mesma ideia do `reg-05` do evollutezap) |
@@ -207,7 +207,7 @@ Legenda: **DO** = regra dashboard-only (não está no `validators.ts`). **⚠** 
 
 | Regra | Detalhe |
 |---|---|
-| cada texto | **XSS**: escapar ao renderizar; **tamanho máx** por campo (§99) |
+| cada texto | **XSS**: escapar ao renderizar; **teto por campo** — título 120 · subtítulo 200 · parágrafo 600 |
 | publicação | bloqueia/avisa quando há pendências |
 
 ---
@@ -234,8 +234,14 @@ de validação é nas telas da **dashboard** (que reusam as mesmas regras).
    `≥10 + maiúscula + minúscula + número + especial` (decidido antes).
 9. **Idempotência da matrícula** (`submission_id`) — mata duplicatas (DEBITOS #1); camada
    de save.
-10. **Comunicado — máx de assunto/corpo** — sugestão **150 / 2000**; confirmar. E o envio
-    do preview é **leniente** (não trava assunto/corpo vazios) — a spec **exige** ambos.
+10. **Comunicado — máx de assunto/corpo** — DECIDIDO: **150 / 2000**. (O envio do preview
+    é leniente — não trava vazios; a spec **exige** assunto + corpo.)
+11. **Texto do site (editor)** — DECIDIDO: teto por campo — título 120 · subtítulo 200 ·
+    parágrafo 600 (protege o layout do site).
+12. **Acessibilidade** — DECIDIDO: **básico pragmático** (teclado, foco visível, ARIA nos
+    controles custom; sem WCAG AA formal). Ver `DASHBOARD_PLAN.md §11`.
+13. **LGPD (apagamento × log)** — DECIDIDO: **anonimizar o alvo no `activity_log`**. Ver
+    `DASHBOARD_PLAN.md §11`.
 
 > Cada linha desta matriz (incl. as ⚠ quando resolvidas) vira um **teste negativo** no
 > `reg-05`: a regra que bloqueia salvar é exercida com um valor inválido e tem que falhar.
