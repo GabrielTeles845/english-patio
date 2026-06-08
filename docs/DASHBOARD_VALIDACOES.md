@@ -164,6 +164,52 @@ Legenda: **DO** = regra dashboard-only (não está no `validators.ts`). **⚠** 
 | arquivo | sim | **PDF**, **≤ 16 MB** | "Envie um PDF" / "Arquivo acima do limite" | decidido 08/Jun |
 | mapeamento de campos | sim p/ ativar | todos os campos posicionados | "Posicione os N campos pendentes antes de usar" | bloqueia "usar nas matrículas" |
 
+## 13. Aluno — Mover / Alocar em turma (`openMoverKid`)
+
+| Regra | Detalhe | Bloqueio/aviso |
+|---|---|---|
+| destino obrigatório | botão "Mover/Alocar" **desabilitado** até escolher | — |
+| só turmas com vaga | turmas cheias só via "abrir vaga extra" explícito | — |
+| **mudança de nível** | destino de outro nível exige **confirmação** | "muda o nível do aluno — confirme com cuidado" |
+| **vaga extra** | cap 7→8→9 (**máx 2 extras**); a partir de 9 bloqueia | "já está com 9 lugares — passaria do que cabe na sala" |
+| compatibilidade de idade | sugere mesmo nível / faixa de idade primeiro | — |
+| auditoria | **toda** movimentação loga no Registro de atividades | — |
+
+## 14. Aluno — Desligamento (`openExitModal`)
+
+| Campo | Obrig. | Regra | Notas |
+|---|---|---|---|
+| motivo | sim | **select** (EXIT_REASONS) | botão desabilitado sem motivo |
+| observação | **condicional** | **obrigatória se motivo = "Outro"** ("Descreva o motivo *"); máx 500 | senão opcional |
+| (efeito) | — | matrícula vira **inativa** (reativável); dados/contratos ficam no histórico | não apaga |
+
+## 15. Comunicados — escrever + modelos
+
+| Campo | Obrig. | Regra | Notas |
+|---|---|---|---|
+| assunto (`emailSubject`) | sim | texto, máx 150 (sug.) | **preview é leniente** (não trava vazio) → spec **exige** |
+| corpo (`emailBody`) | sim | texto, máx 2000 (sug.); **variáveis `{{nome_responsavel}}`/`{{nome_aluno}}` fechadas** | escape ao montar o e-mail (não `badChars` cru — é texto de e-mail) |
+| canais | sim | **≥1** de `email`/`whatsapp` (ou ambos) | — |
+| público (`emailTo`) | sim | select: todos · Seg/Qua · Ter/Qui · contratos pendentes | — |
+| variável aberta | — | `{{` sem `}}` **bloqueia** | regra de negócio (mesma ideia do `reg-05` do evollutezap) |
+
+## 16. Importação de planilha de matrículas (`openImportModal`)
+
+| Regra | Detalhe | Mensagem |
+|---|---|---|
+| tipo de arquivo | **só `.csv`** (`accept=".csv,text/csv"`) | "Somente .csv" |
+| **dedup idempotente** | linhas iguais exceto **Data/Hora** e **Link PDF** = mesma matrícula → fica a 1ª | **mata o bug DEBITOS #1** (re-gerar contrato duplica) |
+| não re-duplica | quem já está na dashboard não entra de novo | — |
+| **validação por linha** | CPF (formato+dígito), telefone, datas, e-mail, **endereço fora de GO** → vão pra **fila de revisão** antes de confirmar | — |
+| campos ausentes | "Na escola desde" em branco; sem dia/horário → aluno entra **sem turma** (fila "aguardando turma") | — |
+
+## 17. Editor de site — textos editáveis
+
+| Regra | Detalhe |
+|---|---|
+| cada texto | **XSS**: escapar ao renderizar; **tamanho máx** por campo (§99) |
+| publicação | bloqueia/avisa quando há pendências |
+
 ---
 
 ## 99. Decisões (08/Jun/2026) — lacunas resolvidas
@@ -188,6 +234,8 @@ de validação é nas telas da **dashboard** (que reusam as mesmas regras).
    `≥10 + maiúscula + minúscula + número + especial` (decidido antes).
 9. **Idempotência da matrícula** (`submission_id`) — mata duplicatas (DEBITOS #1); camada
    de save.
+10. **Comunicado — máx de assunto/corpo** — sugestão **150 / 2000**; confirmar. E o envio
+    do preview é **leniente** (não trava assunto/corpo vazios) — a spec **exige** ambos.
 
 > Cada linha desta matriz (incl. as ⚠ quando resolvidas) vira um **teste negativo** no
 > `reg-05`: a regra que bloqueia salvar é exercida com um valor inválido e tem que falhar.
