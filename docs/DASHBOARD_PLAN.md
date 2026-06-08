@@ -353,7 +353,7 @@ início da implementação:
 - **Estados que só existem com backend** — update otimista + rollback, e **conflito de
   edição concorrente** (dois usuários na mesma turma/aluno). Inexistentes no preview.
 
-Decisões ainda em aberto (não inventar na implementação — trazer pra mesa):
+Decisões que estavam em aberto — **todas fechadas em 08/Jun/2026** (riscadas abaixo):
 
 - ~~Paginação da tabela de Alunos~~ — **já existe no preview** (`PAGE_SIZE=20`, pager +
   "Mostrando X–Y de Z"), em Alunos e Contratos. Não é decisão em aberto; só portar pro
