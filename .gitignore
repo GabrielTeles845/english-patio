@@ -34,9 +34,10 @@ dist-ssr
 .env.test.local
 .env.production.local
 
-# Planilhas/dados reais na raiz (NUNCA commitar — dados de menores/LGPD)
-# Ancorado na raiz para não afetar docs/planilha-modelo-matriculas.csv
-/*.csv
-/*.xlsx
-/*.xls
-/*.ods 
+# Planilhas/dados reais (NUNCA commitar — dados de menores/LGPD) — em QUALQUER pasta
+*.csv
+*.xlsx
+*.xls
+*.ods
+# exceto o modelo de colunas versionado:
+!docs/planilha-modelo-matriculas.csv 

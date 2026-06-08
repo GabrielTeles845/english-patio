@@ -203,6 +203,13 @@ Legenda: **DO** = regra dashboard-only (não está no `validators.ts`). **⚠** 
 | **validação por linha** | CPF (formato+dígito), telefone, datas, e-mail, **endereço fora de GO** → vão pra **fila de revisão** antes de confirmar | — |
 | campos ausentes | "Na escola desde" em branco; sem dia/horário → aluno entra **sem turma** (fila "aguardando turma") | — |
 
+> **Conferido na planilha REAL (08/Jun — `public/…xlsx`, NÃO versionada):** 30 colunas; a
+> coluna de aceite chama-se **"Aceitou termos do Contrato"** (não "Autorização Contrato").
+> **694 linhas → 568 matrículas únicas → 126 duplicadas (18%)** — confirma o bug e a dedup.
+> ⚠ **A planilha real é `.xlsx`**; o import do preview só aceita `.csv` → na versão real,
+> **ler xlsx** direto ou orientar o export para CSV.
+> **Reset p/ testes:** o preview tem botão "Excluir todas as matrículas" no modal de importação.
+
 ## 17. Editor de site — textos editáveis
 
 | Regra | Detalhe |

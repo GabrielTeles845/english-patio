@@ -2113,7 +2113,7 @@ function renderTable(){
   const pages=Math.max(1,Math.ceil(rows.length/PAGE_SIZE));
   tablePage=Math.min(tablePage,pages);
   const pageRows=rows.slice((tablePage-1)*PAGE_SIZE, tablePage*PAGE_SIZE);
-  document.getElementById('tableBody').innerHTML = pageRows.length ? pageRows.map(rowHTML).join('') : (QA_EMPTY
+  document.getElementById('tableBody').innerHTML = pageRows.length ? pageRows.map(rowHTML).join('') : ((QA_EMPTY||!STUDENTS.length)
     ? emptyState({icon:'graduation-cap',title:'Ainda não há alunos',sub:'Quando uma matrícula chegar pelo site, o aluno aparece aqui automaticamente.',action:emptyBtn('Nova matrícula','openNewEnrollment()')})
     : emptyState({icon:'search-x',title:'Nada encontrado',sub:'Nenhum aluno bate com esses filtros. Tente afrouxar a busca.',action:emptyGhost('Limpar filtros','clearFilters()')}));
   const from=rows.length?(tablePage-1)*PAGE_SIZE+1:0, to=Math.min(tablePage*PAGE_SIZE,rows.length);
@@ -2245,7 +2245,7 @@ function renderContracts(){
   const el=document.getElementById('contractGrid');
   if(!rows.length){
     el.className='surface rounded-2xl';
-    el.innerHTML = QA_EMPTY
+    el.innerHTML = (QA_EMPTY||!STUDENTS.length)
       ? emptyState({icon:'file-text',title:'Nenhum contrato ainda',sub:'Os contratos aparecem aqui assim que as primeiras matrículas forem feitas.'})
       : emptyState({icon:'search-x',title:'Nada encontrado',sub:'Nenhum contrato bate com esses filtros.',action:emptyGhost('Limpar filtros','clearContractFilters()')});
     lucide.createIcons(); return;
@@ -4714,6 +4714,32 @@ const IMPORT_SAMPLE=[
   '20/05/2026 09:45:21,Benjamin Castro Moura,08/12/2019,6,-,-,-,Paula Castro,778.290.541-93,(62) 99770-1188,paula.castro@gmail.com,Mãe,25/06/1993,-,-,-,-,Paula Castro,778.290.541-93,74810-330,"Av. 136, 1020",Setor Sul,Goiânia,GO,Presencial na Sede,Boleto,Não,Sim,Sim,https://drive.google.com/file/d/mno345',
   '21/05/2026 11:34:55,Vicente Sales Ramos,17/03/2016,10,-,-,-,Tatiane Sales,12345678900,62 9812,tatiane.sales@gmail.com,Mãe,02/05/1989,-,-,-,-,Tatiane Sales,12345678900,74140-010,"Rua 56, 120",Setor Marista,Goiânia,GO,Presencial na Sede,Boleto,Sim,Sim,Sim,https://drive.google.com/file/d/stu901',
 ].join('\n');
+/* excluir TODOS os dados (reset para testar a importação do zero) — destrutivo, com confirmação */
+function confirmWipeData(){
+  const n=STUDENTS.length;
+  openModal(`${modalHeader('Excluir todos os dados?')}
+  <div class="p-5 space-y-4">
+    <div class="flex items-center gap-3 p-3 rounded-xl" style="background:rgba(220,38,38,.06)">
+      <div class="w-10 h-10 rounded-xl grid place-content-center shrink-0" style="background:rgba(220,38,38,.12)"><i data-lucide="alert-triangle" class="w-5 h-5" style="color:#DC2626"></i></div>
+      <div class="min-w-0"><p class="text-sm font-semibold">Apagar ${n} matrícula${n===1?'':'s'}?</p>
+      <p class="text-xs text-[var(--muted)]">Remove todos os alunos e responsáveis. Turmas e salas continuam. No preview não dá para desfazer.</p></div>
+    </div>
+    <div class="flex gap-2">
+      <button onclick="closeModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] text-sm font-semibold hover:bg-[var(--hover)] transition">Cancelar</button>
+      <button onclick="wipeAllData()" class="flex-1 h-11 rounded-xl text-white text-sm font-semibold flex items-center justify-center gap-2" style="background:#DC2626"><i data-lucide="trash-2" class="w-4 h-4"></i> Excluir tudo</button>
+    </div>
+  </div>`,'max-w-md');
+  lucide.createIcons();
+}
+function wipeAllData(){
+  const n=STUDENTS.length;
+  STUDENTS.length=0;
+  tablePage=1; contractPage=1;
+  closeModal();
+  refreshAll(); if(typeof renderAgenda==='function') renderAgenda();
+  logAct(`Excluiu todos os dados — ${n} matrícula${n===1?'':'s'} removida${n===1?'':'s'}`);
+  toast(`${n} matrícula${n===1?'':'s'} excluída${n===1?'':'s'} — base zerada.`);
+}
 let pendingImport=null;
 function openImportModal(){
   pendingImport=null;
@@ -4739,6 +4765,10 @@ function openImportModal(){
     </div>
     <div id="importError"></div>
     <button onclick="runImport(IMPORT_SAMPLE,'planilha de exemplo')" class="w-full h-10 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)] transition flex items-center justify-center gap-2"><i data-lucide="sparkle" class="w-4 h-4 text-brand-light"></i> Testar com uma planilha de exemplo</button>
+    <div class="pt-3 mt-1 border-t" style="border-color:var(--border)">
+      <button onclick="confirmWipeData()" class="w-full h-10 rounded-xl border text-sm font-semibold flex items-center justify-center gap-2 transition" style="border-color:rgba(220,38,38,.4);color:#DC2626"><i data-lucide="trash-2" class="w-4 h-4"></i> Excluir todas as matrículas (${STUDENTS.length})</button>
+      <p class="text-[11px] text-[var(--muted)] text-center mt-1.5">Zera os dados para testar a importação do zero. Turmas e salas não são afetadas.</p>
+    </div>
   </div>`,'max-w-lg');
 }
 function importError(msg){
