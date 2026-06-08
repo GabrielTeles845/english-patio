@@ -114,8 +114,9 @@ Regras de design definidas pelo Gabriel — valem para o preview **e** para a ve
   senha com botão de mostrar/ocultar (olhinho).
 - **Toasts amarelos** (`#F5B700` com texto navy `#15294d`) — nunca verdes.
 - Linguagem **neutra** (sem "bem-vinda"/flexão feminina) e uso mínimo de emojis.
-- Papéis: **Administrador** (sem flexão de gênero; acesso total) e **Secretaria**
-  (só vê alunos e envia contratos).
+- Papéis (3, definidos 06/Jun/2026 — sem flexão de gênero): **Diretor** (acesso total),
+  **Supervisor** (Agenda com CRUD completo; alunos só leitura) e **Secretaria** (cadastra
+  alunos/turmas/salas e envia contratos). Matriz completa no `docs/DASHBOARD_PLAN.md` §4.
 - Forma de pagamento é **sempre boleto/carnê em 6 parcelas** (conforme o contrato real) —
   não inventar PIX/cartão/dinheiro.
 - Tema claro por padrão; 3 temas de sidebar (azul / branca / **amarela em tom pastel**,

@@ -43,9 +43,15 @@ Navegador (React SPA)
   Neon (Postgres)  +  Object Storage p/ PDFs (Vercel Blob ou R2/S3)
 ```
 
-- **Front-end:** Tailwind + **shadcn/ui** + **Lucide** + **Recharts** + **Framer
-  Motion**. Recriar em componentes React os padrões já calibrados no preview
-  (cselect, checkbox, tooltip global, datepicker, toasts, modais, tabela→cards mobile).
+- **Front-end (estratégia de fidelidade decidida 08/Jun/2026 — "o preview é a lei
+  visual"):** Tailwind + **Lucide**. **Gráficos = Chart.js** (`react-chartjs-2`) — o
+  preview já usa Chart.js 4.4.3; **não** trocar por Recharts (canvas vs SVG não
+  renderizam igual). **Dark mode circular = View Transitions API** (nativo, como no
+  preview), **não** Framer; Framer só pra animação incidental, se necessário.
+  **shadcn/ui = andaime secundário**, nunca a fonte visual: os controles que o preview
+  já calibrou (cselect, checkbox, tooltip global, datepicker, toasts, modais,
+  tabela→cards mobile) são **portados 1:1 do CSS do preview**, não substituídos pelos
+  defaults do shadcn.
 - **ORM:** Drizzle (TS-first, leve no Vercel).
 - **Storage dos contratos:** flexível — pode continuar no Google Drive por ora; o banco
   guarda só a URL do PDF, trocar storage depois é simples.
@@ -57,7 +63,13 @@ Navegador (React SPA)
 
 ## 3. Autenticação & Segurança (dados de MENORES → rigor extra, LGPD)
 
-- **Login:** e-mail + senha. Hash **bcrypt** (cost ≥ 12). Senha forte (mín. 10, regras).
+- **Login:** e-mail + senha. Hash **bcrypt** (cost ≥ 12). **Política de senha
+  (decidida 08/Jun/2026):** mín. **10 caracteres** com ≥1 maiúscula, ≥1 minúscula,
+  ≥1 número e ≥1 caractere especial — composição clássica. Vale onde a senha é
+  definida: aceite de convite, reset e "trocar senha" (não há cadastro aberto; contas
+  nascem por convite — §4). O preview hoje usa regra mais fraca (≥10 + letras +
+  números) — **substituir pela política acima**. _Evolução possível (não bloqueia o
+  MVP): checar contra base de senhas vazadas (HIBP k-anonymity)._
 - **Sessão:** JWT curto em cookie **httpOnly + secure + SameSite**, com refresh. CSRF
   token nas mutações.
 - **Esqueci a senha:** token de uso único com expiração curta, enviado por e-mail
@@ -184,10 +196,12 @@ Derivado do mock do preview (nomes em inglês no banco; PT na UI).
 5. **Contratos** — grid/lista, status Autentique de 4 etapas, timeline por contrato,
    badge "parado há N dias", cobrar por WhatsApp, baixar PDF
 6. **Modelos** — versões do PDF de contrato, importação + mapeamento de campos
+   (no preview é **sub-tela**, não item de menu top-level — não criar rota de nav própria)
 7. **Comunicados** — escrever 1x, entregar por e-mail e/ou WhatsApp (preparado por
    família), variáveis ({{nome_responsavel}}…), filtro de público, histórico,
    automáticos (confirmação de matrícula, eventos Autentique, contrato parado)
 8. **Notificações** — central de eventos com não-lidos, filtros, atalho pro aluno
+   (no preview é o **painel do sininho** (`notifPanel`), não uma tela com rota própria)
 9. **Editor de site** — todos os textos de todas as páginas (inclui matrícula), hover
    pontilhado + painel lateral, preview desktop/mobile, publicação com pendências
 10. **Usuários & permissões** — 3 papéis (§4), convite por e-mail, edição de papel
@@ -227,6 +241,40 @@ preview — implementar igual:
   (`scripts/dashboard-smoke.mjs`, 191+ asserções; `dashboard-prints.mjs`, 47 prints).
 - **Smoke do preview** continua rodando enquanto o preview for vitrine de decisões.
 
+### 8.1 Harness de regressão (adotar o padrão do evollutezap)
+
+Decisão (08/Jun/2026): adotar o **harness de teste do evollutezap**
+(`evollute projects/evollute-checkout/evollutezap/extension/test-harness/`) como
+modelo da suíte E2E/visual desta dashboard. É a evolução madura do que
+`dashboard-smoke.mjs`/`dashboard-prints.mjs` já fazem aqui — não um import estranho.
+
+O que **transfere direto** (o valor está aqui):
+- **`reg-NN` por módulo** — um script por tela (login, alunos, agenda, contratos,
+  comunicados…), cada um testando o caminho feliz **e os negativos que bloqueiam
+  salvar** ("regressão testa TUDO, inclusive os erros"): cap >7, slot duplicado,
+  CPF inválido, mover pra turma sem vaga, RBAC negando rota por papel.
+- **`reg-lib` compartilhada** — `launch()` (browser + sessão autenticada),
+  `makeReporter()` (`step/shot/dump`, ✅/❌, print automático no erro),
+  `startWatchdog()` (anti-trava: mata o processo após X ms) e `compareScreenshot()`
+  (**regressão visual com pixelmatch vs baseline commitado** — só acusa quando muda;
+  cria baseline na 1ª vez; `UPDATE_SNAPSHOTS=1` regrava). Diffs/prints caem em
+  `_review/` (gitignored), no espírito dos comentários estilo Figma da dona.
+- **Setup/teardown de 1 passo** + **fallback stub** (backend falso em memória) pros
+  fluxos de UI que não precisam de banco.
+
+O que **muda** (mais simples aqui — a dashboard é SPA, não extensão MV3):
+- Cai toda a parte de extensão (service worker, `chrome.storage`, `--load-extension`,
+  EXT_ID). Sobra Playwright dirigindo a SPA normalmente.
+- **Backend isolado → Neon branch de teste** (já previsto no §8). Portar a **guarda
+  anti-banco-dev** do evollutezap (`make-token.mjs` recusa rodar fora do banco de
+  teste): o setup só roda se a connection string for a do branch de teste, nunca a de
+  produção. **Crítico aqui por causa de dados de menores / LGPD (§3).**
+- Auth do harness usa o login real (cookie httpOnly + token de teste) em vez de
+  injeção em `chrome.storage`.
+
+Deps mínimas: `playwright`, `pixelmatch`, `pngjs`. Construir junto com cada fase
+(cada módulo entrega seu `reg-NN`), não no fim.
+
 ## 9. Fases de implementação
 
 - **Fase 0 — Preview (FEITO):** mockup navegável aprovado; Agenda implementada;
@@ -263,3 +311,46 @@ preview — implementar igual:
 - **Sala não é presa a família de nível** — nível é atributo da turma.
 - **Custos recorrentes** (Neon/Vercel/Autentique) são da escola; escopo novo =
   negociação nova.
+- **O preview é a lei visual** (decidido 08/Jun/2026): implementação tem que ficar
+  **idêntica**. Consequências: Chart.js (não Recharts), View Transitions (não Framer),
+  controles do preview portados 1:1 (shadcn é secundário). Detalhe no §2.
+
+## 11. Lacunas conhecidas & decisões pendentes (levantadas 08/Jun/2026)
+
+O preview validou o **caminho feliz síncrono**. Como ele é mock em memória que assume
+sucesso, há estados que **ele nunca mostrou** — e que, pela regra "o preview é a lei",
+precisam ser **adicionados ao próprio `dashboard.html` primeiro** (onde a dona valida),
+**não** improvisados direto no React. Completar o preview faz parte do escopo, antes/no
+início da implementação:
+
+- **Shimmers / skeletons de carregamento** — ✅ FEITO no preview (08/Jun): overlay de
+  skeleton por formato de tela (cards/tabela/grade/painel/editor), disparado a cada
+  navegação e no login. Helpers `skelFor`/`flashSkel` no `dashboard.html`.
+- **Telas sem dados (empty states)** — ✅ FEITO nas telas de lista (Alunos, Contratos,
+  Atividade, Usuários, Comunicados, Modelos), na **Agenda** (estado "agenda vazia" com
+  CTA "Criar primeira turma" — o 1º semestre nasce assim) e nas listas da Visão geral.
+  Componente `emptyState` distingue "nenhum dado ainda" de "filtro não achou". A
+  **Visão geral** também tem o estado-zero completo: KPIs/strip zerados, widgets com
+  placeholder e overlay "Sem dados ainda" sobre os 5 gráficos Chart.js. O badge
+  "Preview · dados fictícios" cicla os estados (normal → sem dados → erro) pra aprovação.
+- **Estados de erro** — ✅ FEITO (load): overlay "Não foi possível carregar esta tela"
+  com **Tentar de novo**, em qualquer tela (cobre falha ao carregar / offline / timeout),
+  via o ciclo do badge. Helpers `errorState`/`applyErrorOverlay`/`qaRetry`. **PENDENTE:**
+  falha ao **salvar** (toast amarelo + preservar o formulário) — depende dos forms reais
+  com backend; helper `toastErr` já existe pra plugar.
+- **Estados que só existem com backend** — update otimista + rollback, e **conflito de
+  edição concorrente** (dois usuários na mesma turma/aluno). Inexistentes no preview.
+
+Decisões ainda em aberto (não inventar na implementação — trazer pra mesa):
+
+- **Paginação da tabela de Alunos** — o preview mostra tudo numa tela; com dados reais
+  crescendo a cada semestre vai precisar. Adicionar paginação **é** mudar o design →
+  decidir se entra (e desenhar no preview).
+- **Acessibilidade dos controles customizados** — a regra "sem controle nativo" tira o
+  teclado/ARIA/foco de graça; cselect, datepicker e checkbox custom precisam
+  reimplementar isso. Uso diário de staff. Definir nível de a11y alvo.
+- **Status de contrato recusado/falho** — o §5 só tem `pending|sent|viewed|signed`;
+  falta o estado visível de um `signature.rejected`/`delivery_failed` (hoje vira só
+  "alerta"). Decidir se é novo status ou flag derivada.
+- **LGPD: apagamento do titular × `activity_log`** — apagar dados do menor mantendo o
+  log de quem os acessou. Definir política (anonimizar o alvo no log? reter quanto?).
