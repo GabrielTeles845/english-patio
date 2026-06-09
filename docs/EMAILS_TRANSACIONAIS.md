@@ -14,6 +14,7 @@ código/Resend. Referência: `DASHBOARD_PLAN.md §12`, `DASHBOARD_API.md §1/§8
   Resend — `DASHBOARD_PLAN.md §14`).
 - **Assinatura padrão:** `Equipe English Patio`.
 - **Variáveis:** `{{nome}}` (1º nome do destinatário), `{{nome_aluno}}`,
+  `{{nome_aluno_2}}` (2º aluno da matrícula, quando houver — irmãos),
   `{{nome_responsavel}}`, `{{email}}`, `{{link_dashboard}}`, `{{link_reset}}`,
   `{{prazo}}`, `{{periodo}}` (ex. `2026.2`). Toda variável é **escapada** ao montar o
   e-mail; variável aberta `{{` sem `}}` bloqueia o envio (VALIDACOES §15).
@@ -87,6 +88,7 @@ recebida com sucesso.
 Próximos passos:
 • Em breve você recebe o contrato para assinar digitalmente — é rápido e pelo celular.
 • Assim que a turma e o horário forem confirmados, avisamos por aqui.
+• Forma de pagamento: Boleto Bancário · Carnê em 6 parcelas (conforme o contrato).
 
 Qualquer dúvida, é só falar com a escola. Estamos à disposição.
 
@@ -108,7 +110,7 @@ Equipe English Patio
 Olá, {{nome_responsavel}}. Este é o contrato de matrícula de {{nome_aluno}} na English Patio
 para o período {{periodo}}. Leia com calma e, se estiver tudo certo, assine digitalmente por
 aqui mesmo — leva poucos minutos e pode ser pelo celular. Qualquer dúvida, fale com a escola
-antes de assinar. Obrigado!
+antes de assinar. Agradecemos!
 ```
 
 ---

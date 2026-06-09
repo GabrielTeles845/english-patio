@@ -931,7 +931,7 @@
         <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
           <div><h1 class="font-heading text-2xl sm:text-3xl font-semibold">Usuários & permissões</h1>
             <p class="text-[var(--muted)] text-sm mt-0.5">Quem tem acesso ao painel</p></div>
-          <button onclick="openInvite()" data-tour="convidar" class="h-10 px-4 rounded-xl text-white text-sm font-semibold flex items-center gap-2" style="background:linear-gradient(135deg,#1E3765,#2F539A)"><i data-lucide="user-plus" class="w-4 h-4"></i> Convidar</button>
+          <button onclick="openInvite()" data-tour="novo-usuario" class="h-10 px-4 rounded-xl text-white text-sm font-semibold flex items-center gap-2" style="background:linear-gradient(135deg,#1E3765,#2F539A)"><i data-lucide="user-plus" class="w-4 h-4"></i> Novo usuário</button>
         </div>
         <div class="surface rounded-2xl divide-y" style="border-color:var(--border)" id="userList"></div>
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4" data-tour="papeis">
@@ -1011,7 +1011,6 @@
             <div class="p-5 space-y-3">
               <div onclick="go('atividade')" class="flex items-center justify-between cursor-pointer hover:bg-[var(--hover)] -mx-2 px-2 py-1.5 rounded-lg transition"><div><p class="font-medium text-sm">Registro de atividades</p><p class="text-xs text-[var(--muted)]">Quem fez o quê no painel — toque para ver</p></div><span class="flex items-center gap-1.5"><span class="text-xs font-semibold px-2.5 py-1 rounded-full" style="background:rgba(22,163,74,.10);color:#16a34a">Ativo</span><i data-lucide="chevron-right" class="w-4 h-4 text-[var(--muted)]"></i></span></div>
               <div class="flex items-center justify-between pt-3 border-t" style="border-color:var(--border)"><div><p class="font-medium text-sm">Autenticação em 2 fatores</p><p class="text-xs text-[var(--muted)]">Código extra no celular ao entrar</p></div><span class="text-xs px-2.5 py-1 rounded-full bg-[var(--hover)] text-[var(--muted)]">Em breve</span></div>
-              <div class="flex items-center justify-between pt-3 border-t" style="border-color:var(--border)"><div><p class="font-medium text-sm">Sessões ativas</p><p class="text-xs text-[var(--muted)]">1 dispositivo conectado agora</p></div><i data-lucide="monitor-smartphone" class="w-5 h-5 text-[var(--muted)]"></i></div>
             </div>
           </div>
 
@@ -1813,7 +1812,7 @@ const TOURS={
     { target:'[data-tour="prevbtn"]', title:'Veja antes de enviar', body:'Mostra exatamente como a família recebe: o e-mail montado e a bolha do WhatsApp.', placement:'top', last:true },
   ],
   usuarios:[
-    { target:'[data-tour="convidar"]', title:'Chame o time', body:'Convide alguém por e-mail — a pessoa cria a própria senha no primeiro acesso.', placement:'bottom' },
+    { target:'[data-tour="novo-usuario"]', title:'Chame o time', body:'Cadastre alguém definindo uma senha provisória — a pessoa é obrigada a trocá-la no primeiro acesso.', placement:'bottom' },
     { target:'[data-tour="papeis"]', title:'Três papéis, sem confusão', body:'Diretor faz tudo; Supervisor cuida da agenda e consulta alunos; Secretaria cadastra alunos e turmas e envia contratos. Use "Ver o painel como…" para conferir o que cada papel enxerga.', placement:'top', last:true },
   ],
   config:[
@@ -2351,7 +2350,7 @@ function renderEmails(){
 }
 const USERS=[{id:1,n:'Priscylla Martins',e:'priscylla@englishpatio.com.br',r:'Diretor',c:'#1E3765'},{id:2,n:'Gabriel Teles',e:'gabriel@englishpatio.com.br',r:'Diretor',c:'#2F539A'},{id:3,n:'Camila Nogueira',e:'camila@englishpatio.com.br',r:'Supervisor',c:'#C2410C'},{id:4,n:'Stefany Oliveira',e:'stefany@englishpatio.com.br',r:'Secretaria',c:'#B5860B'},{id:5,n:'Beatriz Souza',e:'beatriz@englishpatio.com.br',r:'Secretaria',c:'#0d9488'}];
 function renderUsers(){
-  document.getElementById('userList').innerHTML=QA_EMPTY?emptyState({icon:'users-round',title:'Nenhum usuário ainda',sub:'Convide a equipe para acessar a dashboard — cada pessoa entra com o próprio papel.'}):USERS.map(x=>`<div class="flex items-center gap-3 p-4"><div class="w-10 h-10 rounded-full grid place-content-center text-white font-semibold" style="background:${x.c}">${initials(x.n)}</div><div class="flex-1 min-w-0"><p class="font-medium truncate">${x.n} ${x.pending?'<span class="text-[10px] font-semibold px-1.5 py-0.5 rounded-md align-middle" style="background:rgba(245,183,0,.16);color:#B5860B">convite pendente</span>':''}</p><p class="text-xs text-[var(--muted)] truncate">${x.e}</p></div><span class="text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap" style="background:var(--hover)">${x.r}</span><button onclick="openUserMenu(event,${x.id})" class="p-2 rounded-lg hover:bg-[var(--hover)]" title="Ações do usuário"><i data-lucide="more-vertical" class="w-4 h-4 text-[var(--muted)]"></i></button></div>`).join('');
+  document.getElementById('userList').innerHTML=QA_EMPTY?emptyState({icon:'users-round',title:'Nenhum usuário ainda',sub:'Cadastre a equipe para acessar a dashboard — cada pessoa entra com o próprio papel.'}):USERS.map(x=>`<div class="flex items-center gap-3 p-4"><div class="w-10 h-10 rounded-full grid place-content-center text-white font-semibold" style="background:${x.c}">${initials(x.n)}</div><div class="flex-1 min-w-0"><p class="font-medium truncate">${x.n} ${x.pending?'<span class="text-[10px] font-semibold px-1.5 py-0.5 rounded-md align-middle" style="background:rgba(245,183,0,.16);color:#B5860B">senha provisória</span>':''}</p><p class="text-xs text-[var(--muted)] truncate">${x.e}</p></div><span class="text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap" style="background:var(--hover)">${x.r}</span><button onclick="openUserMenu(event,${x.id})" class="p-2 rounded-lg hover:bg-[var(--hover)]" title="Ações do usuário"><i data-lucide="more-vertical" class="w-4 h-4 text-[var(--muted)]"></i></button></div>`).join('');
   lucide.createIcons();
 }
 
@@ -3052,7 +3051,7 @@ function openNewTurma(sala,par,hora,nivel){
   document.getElementById('ntNivelWrap').innerHTML=cselect('ntNivel',nivelPickItems(),{block:true,value:nivel||'conv-1'});
   lucide.createIcons();
 }
-// BACKEND → POST /api/classes (DASHBOARD_API §5): capacity≤7, startTime ∈ 8 slots reais, (room+par+hora) único → 409 SLOT_TAKEN, → activity_log.
+// BACKEND → POST /api/classes (DASHBOARD_API §5): capacity 1..7 na criação (vaga extra leva a 8–9 via fluxo próprio, §4.6), startTime ∈ 8 slots reais, (room+par+hora) único → 409 SLOT_TAKEN, → activity_log.
 function agSaveTurma(){ if(saveFails())return;
   const sala=SEL.ntSala?.value, par=SEL.ntPar?.value, hora=SEL.ntHora?.value, nivel=SEL.ntNivel?.value;
   const cap=parseInt(document.getElementById('ntCap')?.value,10);
@@ -4317,21 +4316,22 @@ function confirmDelete(id){
   toast(`Matrícula de ${nome} excluída.`);
 }
 
-/* --- convidar usuário --- */
+/* --- novo usuário (senha provisória — decidido 08/Jun: sem convite-link por e-mail) --- */
 function openInvite(){
-  openModal(`${modalHeader('Convidar para o painel')}
+  openModal(`${modalHeader('Novo usuário do painel')}
   <div class="p-5 space-y-3">
     <label class="block"><span class="text-sm font-medium">Nome</span>
       <input id="invName" placeholder="Nome completo" class="${inputCls}"></label>
     <label class="block"><span class="text-sm font-medium">E-mail</span>
       <input id="invEmail" type="email" placeholder="email@exemplo.com" class="${inputCls}"></label>
     <div><span class="text-sm font-medium">Papel</span><div class="mt-1.5" id="invRoleWrap"></div></div>
-    <p class="text-xs text-[var(--muted)] flex items-center gap-1.5"><i data-lucide="shield-check" class="w-3.5 h-3.5 shrink-0"></i> A pessoa recebe um e-mail para criar a própria senha. Diretor faz tudo; Supervisor cuida da agenda e consulta alunos; Secretaria cadastra alunos e turmas e envia contratos.</p>
+    ${passInput('Senha provisória','','invPass')}
+    <p class="text-xs text-[var(--muted)] flex items-center gap-1.5"><i data-lucide="shield-check" class="w-3.5 h-3.5 shrink-0"></i> Repasse a senha provisória por um canal seguro — a pessoa é obrigada a trocá-la no primeiro acesso. Diretor faz tudo; Supervisor cuida da agenda e consulta alunos; Secretaria cadastra alunos e turmas e envia contratos.</p>
     <div id="invErr"></div>
   </div>
   <div class="p-5 pt-0 flex gap-2">
     <button onclick="closeModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] font-medium text-sm">Cancelar</button>
-    <button onclick="submitInvite()" class="flex-1 h-11 rounded-xl text-white font-semibold text-sm flex items-center justify-center gap-2" style="background:linear-gradient(135deg,#1E3765,#2F539A)"><i data-lucide="send" class="w-4 h-4"></i> Enviar convite</button>
+    <button onclick="submitInvite()" class="flex-1 h-11 rounded-xl text-white font-semibold text-sm flex items-center justify-center gap-2" style="background:linear-gradient(135deg,#1E3765,#2F539A)"><i data-lucide="user-plus" class="w-4 h-4"></i> Criar usuário</button>
   </div>`);
   document.getElementById('invRoleWrap').innerHTML=cselect('invRole',[{v:'diretor',l:'Diretor'},{v:'supervisor',l:'Supervisor'},{v:'secretaria',l:'Secretaria'}],{block:true});
   lucide.createIcons();
@@ -4346,12 +4346,13 @@ function submitInvite(){ if(saveFails())return;
   if(badChars(n)) errs.push(BAD_CHARS_MSG);
   if(!validEmail(e)) errs.push('E-mail inválido.');
   else if(USERS.some(u=>u.e.toLowerCase()===e.toLowerCase())) errs.push(`Já existe um usuário com o e-mail <b>${esc(e)}</b> — cada acesso tem o seu.`);
+  if(!validNewPass(document.getElementById('invPass')?.value||'')) errs.push('A senha provisória precisa de pelo menos 10 caracteres, com letras e números.');
   if(errs.length) return ntErrBox('invErr',errs.join('<br>'));
   const papel={diretor:'Diretor',supervisor:'Supervisor',secretaria:'Secretaria'}[SEL.invRole?.value]||'Diretor';
   USERS.push({id:Math.max(...USERS.map(u=>u.id))+1, n, e, r:papel, c:'#0891b2', pending:true});
   renderUsers(); closeModal();
-  logAct(`Convidou <b>${esc(n)}</b> (${papel}) para o painel`);
-  toast(`Convite enviado para ${e}!`);
+  logAct(`Cadastrou <b>${esc(n)}</b> (${papel}) no painel`);
+  toast(`Usuário criado! Repasse a senha provisória — a troca é obrigatória no 1º acesso.`);
 }
 
 /* --- CRUD de usuários do painel (menu ⋮ de cada linha) --- */
@@ -4363,7 +4364,6 @@ function openUserMenu(e,id){
   const item=(ic,label,fn,style='')=>`<button onclick="closeRowMenu();${fn}" class="w-full flex items-center gap-2.5 text-left text-sm px-3 py-2 rounded-lg hover:bg-[var(--hover)] transition" ${style?`style="${style}"`:''}><i data-lucide="${ic}" class="w-4 h-4 ${style?'':'text-[var(--muted)]'}"></i>${label}</button>`;
   m.innerHTML=
     item('pencil','Editar usuário',`openEditUser(${id})`)+
-    (u.pending?item('send','Reenviar convite',`resendInvite(${id})`):'')+
     `<div class="h-px my-1" style="background:var(--border)"></div>`+
     item('user-round-x','Remover acesso',`openRemoveUser(${id})`,'color:#DC2626');
   m.classList.remove('hidden');
@@ -4409,10 +4409,6 @@ function saveUser(id){ if(saveFails())return;
   closeModal(); renderUsers();
   toast('Usuário atualizado!');
 }
-function resendInvite(id){
-  const u=userById(id); if(!u) return;
-  toast(`Convite reenviado para ${u.e}!`);
-}
 function openRemoveUser(id){
   const u=userById(id); if(!u) return;
   if(u.r==='Diretor'&&USERS.filter(x=>x.r==='Diretor').length===1){
@@ -4427,7 +4423,7 @@ function openRemoveUser(id){
     <div class="flex items-start gap-3 p-3 rounded-xl" style="background:rgba(220,38,38,.06)">
       <div class="w-10 h-10 rounded-full grid place-content-center text-white font-semibold shrink-0" style="background:${u.c}">${initials(u.n)}</div>
       <div class="min-w-0"><p class="font-medium text-sm">Remover o acesso de ${esc(u.n)}?</p>
-      <p class="text-xs text-[var(--muted)] mt-0.5">A pessoa não consegue mais entrar no painel. Dá para convidar de novo depois, se precisar.</p></div>
+      <p class="text-xs text-[var(--muted)] mt-0.5">A pessoa não consegue mais entrar no painel. Dá para cadastrar de novo depois, se precisar.</p></div>
     </div>
     <div class="flex gap-2">
       <button onclick="closeModal()" class="flex-1 h-11 rounded-xl border border-[var(--border)] text-sm font-semibold hover:bg-[var(--hover)] transition">Cancelar</button>

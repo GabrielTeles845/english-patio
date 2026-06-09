@@ -42,8 +42,10 @@ substituir pelos defaults do shadcn.
 | `--acc` / `--acc-text` (acento global) | `#F5B700` / `#15294d` | idem |
 
 Superfície padrão = `.surface` (`background:var(--card); border:1px solid var(--border)`).
-O **acento global `--acc`** acompanha o tema da sidebar: no tema **amarelo** vira navy
-(`--acc:#1E3765`) pra manter contraste.
+O **acento global `--acc`** acompanha o tema da sidebar: no tema **amarelo claro** vira
+navy (`--acc:#1E3765`, `--acc-text:#ffffff` — texto branco sobre navy, ok); no
+**amarelo + escuro** volta a `#F5B700` (a sidebar pastel escurece e o navy perderia
+contraste). Conferido no preview (l.45–46) em 09/Jun.
 
 ### 2.2 Marca
 - **Navy:** `#1E3765` (primária) · `#15294d` (escura, texto sobre amarelo) · `#2F539A` (clara/links/ring).
@@ -131,8 +133,11 @@ Aplicados por `html.dark` e `html[data-sidebar="blue|white|yellow"]`. **6 combin
   telefone `(XX) 9XXXX-XXXX`, CEP `00000-000`. Senha com botão de mostrar/ocultar (olhinho).
 - **Modais:** card `rounded-2xl`, header com título + `X`; **rodapé sticky** (botões sempre
   visíveis ao rolar); largura por tamanho (`max-w-md/lg`).
-- **Toasts:** **amarelos** (`#F5B700`, texto `#15294d`), ícone à esquerda, auto-dismiss.
-  **Nunca verdes.** Erro de salvar = toast amarelo com ícone de alerta + form preservado.
+- **Toasts:** card `.surface` (fundo `var(--card)`, texto `var(--text)`) com **círculo de
+  ícone amarelo** à esquerda (`#F5B700` com ícone navy `#15294d`), auto-dismiss (~2600ms,
+  anim. translateY). É essa a anatomia exata do preview — o corpo NÃO é todo amarelo; o
+  amarelo é o badge do ícone. **Nunca verdes.** Erro de salvar = mesmo toast com ícone de
+  alerta + form preservado.
 - **Botões:** primário = gradiente navy + texto branco; secundário/ghost = `border` +
   hover `--hover`; **WhatsApp** `#25D366`; destrutivo `#DC2626`. Ao submeter: vira
   **"Salvando…"** + desabilita (trava duplo-clique).

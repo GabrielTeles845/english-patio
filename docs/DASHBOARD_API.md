@@ -29,8 +29,14 @@ Fontes de verdade que este doc costura:
   `401` não autenticado · `403` sem permissão (RBAC) · `404` não achado · `409` conflito
   (slot duplicado, e-mail duplicado, edição concorrente) · `422` regra de negócio ·
   `429` rate-limit · `500` erro interno.
-- **Auth:** JWT curto em **cookie httpOnly + secure + SameSite=Lax**, com refresh
-  (DASHBOARD_PLAN §3). O front **nunca** lê o token.
+- **Auth:** JWT curto (~15 min) em **cookie httpOnly + secure + SameSite=Lax**, com
+  **renovação deslizante** (decidido 09/Jun): o servidor re-emite o cookie a cada request
+  autenticado, com **vida máxima absoluta** (~12h, gravada no token) — stateless, sem
+  tabela de sessões nem refresh token (DASHBOARD_PLAN §3). O front **nunca** lê o token.
+  **Duas checagens em toda rota autenticada** (recuperam a revogação na prática):
+  (1) `users.is_active` — desativar o usuário barra na requisição seguinte;
+  (2) JWT emitido **antes** de `users.password_changed_at` é recusado — trocar a senha
+  derruba todos os dispositivos.
 - **CSRF:** toda mutação (`POST/PATCH/PUT/DELETE`) exige header `x-csrf-token` (double
   submit cookie). `GET` é livre de CSRF.
 - **RBAC server-side:** toda rota revalida o papel da sessão (`director`|`supervisor`|
@@ -114,16 +120,22 @@ Limpa `mustChangePassword`. **→ log**.
 
 ## 3. Alunos & matrículas (leitura/lista) — `replaces`: `renderTable`, `filteredStudents`, `openDetail`
 
+> **Nomenclatura (decidido 09/Jun):** cada nome de recurso da API = exatamente 1 tabela.
+> **`/api/enrollments`** = a matrícula/família (tabela `enrollments`, com responsáveis,
+> endereço e contrato); **`/api/students`** = a criança individual (tabela `students`,
+> que tem turma e desligamento). Antes a lista usava `/api/students` pra família — gerava
+> ambiguidade.
+
 | Rota | RBAC | Descrição |
 |---|---|---|
-| `GET /api/students?…filtros…&page=&pageSize=&sort=` | director, secretary (CRUD); **supervisor (somente leitura)** | lista paginada |
-| `GET /api/students/:id` | idem | **detalhe** completo |
+| `GET /api/enrollments?…filtros…&page=&pageSize=&sort=` | director, secretary (CRUD); **supervisor (somente leitura)** | lista paginada (tela Alunos) |
+| `GET /api/enrollments/:id` | idem | **detalhe** completo da matrícula/família |
 
 - Filtros (query, todos derivados de `class_id`; ver AGENDA_PLAN §7): `level`, `room`,
   `teacher` (inclui `none`), `time`, `dayPair`, `period`, `contractStatus`, `status`
   (`active`|`inactive`), `neighborhood`, `hasSiblings`, `media`, `dateFrom`, `dateTo`,
   `q` (busca por nome/responsável). **CPF mascarado** na lista.
-- `GET /api/students/:id`: payload completo (alunos/kids, responsáveis, endereço, turma,
+- `GET /api/enrollments/:id`: payload completo (alunos/kids, responsáveis, endereço, turma,
   contrato, histórico). **Revela CPF ⇒ `→ log`** (`view_student_pii`, LGPD §3).
 - **Empty state** distinto: "nenhum dado ainda" × "filtro não achou" (DASHBOARD_PLAN §11).
 
@@ -136,9 +148,16 @@ Limpa `mustChangePassword`. **→ log**.
 - **Hoje** o `submitEnrollment` faz POST `no-cors` pro Apps Script com
   `{ formData, pdfBase64, timestamp }`. Na **Fase 7 (cutover)** esta rota vira o destino:
   mesmo payload **+ `submissionId`**.
-- Body: `{ source:"form"|"manual", submissionId, formData:<FormData>, pdfBase64?, timestamp }`.
+- Body: `{ source:"form"|"manual", submissionId?, formData:<FormData>, pdfBase64?, timestamp }`.
   `FormData` = a interface de `src/types/enrollment.ts` (student1/2, responsável legal/
-  segundo/financeiro, endereço, schedule, autorizações).
+  segundo/financeiro, endereço, schedule, autorizações) — **inclui `classFormat`
+  (`sede`|`domicilio`)**, obrigatório (coluna NOT NULL no schema).
+  `submissionId` é obrigatório quando `source="form"`; no fluxo **manual o SERVIDOR
+  gera** (`manual-<uuid>`) — o front da dashboard não conhece o campo (decidido 09/Jun).
+- **Anti-abuso (decidido 09/Jun — única rota pública de escrita fora do webhook):**
+  rate-limit por IP (mesma infra `login_attempts` do §1, janela curta — família real envia
+  1–2; robô envia centenas) + **teto de tamanho do `pdfBase64`** (~16 MB, o mesmo das
+  VALIDACOES §12). Excesso ⇒ `429 RATE_LIMITED` / `413`.
 - **Idempotência (crítico):** `submission_id` é `unique`; reenvio com o mesmo id **não
   duplica** — retorna a matrícula já criada (`200`), em vez de criar outra. Mata o bug
   DEBITOS #1 (re-clicar em "gerar contrato"). VALIDACOES §99.9.
@@ -162,8 +181,9 @@ Sem `pdfBase64` (PDF é gerado depois, na tela Contratos). Mesmas validações.
 ### 4.3 Editar matrícula — `replaces`: `saveEditEnrollment`
 **`PATCH /api/enrollments/:id`** · RBAC: **director, secretary**.
 - Body: campos editáveis de kids/responsáveis/endereço/"na escola desde". Validação por
-  campo (VALIDACOES). **Conflito de edição concorrente** (DASHBOARD_PLAN §11): usar
-  `If-Match`/`version`; divergência ⇒ `409 STALE_WRITE` (a UI reabre o form preservando o
+  campo (VALIDACOES). **Conflito de edição concorrente** (DASHBOARD_PLAN §11): o cliente
+  envia o `updatedAt` que leu (coluna `updated_at` das tabelas editáveis, decidido 09/Jun);
+  se o registro mudou desde então ⇒ `409 STALE_WRITE` (a UI reabre o form preservando o
   que foi digitado — DASHBOARD_PLAN §11 "Salvar"). **→ log** (diff dos campos).
 
 ### 4.4 Desligar aluno — `replaces`: `confirmExit`
@@ -180,8 +200,8 @@ Sem `pdfBase64` (PDF é gerado depois, na tela Contratos). Mesmas validações.
   Resposta lista os kids que caíram na fila. **→ log**.
 
 ### 4.6 Mover / alocar kid em turma — `replaces`: `dropMoveKid`, `openMoverKid`, `agDropEmpty`
-**`PATCH /api/students/:studentId/kids/:kidId/class`** · RBAC: **director, supervisor,
-secretary** (Agenda é CRUD pros 3 — §4).
+**`PATCH /api/students/:id/class`** · RBAC: **director, supervisor,
+secretary** (Agenda é CRUD pros 3 — §4). (`:id` = a criança — tabela `students`; ver §3.)
 - Body: `{ classId | null, allowLevelChange?:bool, extraSeat?:bool }`.
 - Regras (VALIDACOES §13, AGENDA_PLAN §5.2): destino tem que ter vaga, **salvo
   `extraSeat`** (cap 7→8→9, **máx 2 extras**; ≥9 ⇒ `422 ROOM_OVERFLOW`); mudança de nível
@@ -301,9 +321,13 @@ Devolve CSV (mesmos filtros da lista). **→ log** (`export_students` — LGPD, 
   duplicatas; processar **idempotente**; responder rápido (`200`) e processar.
 - Eventos → transição de `contracts.status`:
   `signature.viewed`→`viewed` · `signature.accepted`+`document.finished`→`signed` ·
-  `signature.rejected`→`rejected` · `delivery_failed`→`failed`.
+  `signature.rejected`→`rejected` · `signature.delivery_failed`→`failed`
+  (grafia **sempre completa**, com o prefixo `signature.` — é a da doc oficial e do enum
+  `contract_event_type`; decidido 09/Jun).
 - Cada transição: atualiza timeline, **→ log** (ator **`Autentique`**, não editável),
-  **→ notif** (`viewed`/`signed`/`stale`), alimenta o funil da Visão geral.
+  **→ notif** (`viewed`/`signed`/**`rejected`**/**`failed`** — os dois últimos alimentam o
+  balde "precisa de ação"; `stale` vem do cron §14, não do webhook), alimenta o funil da
+  Visão geral.
 
 ---
 
@@ -340,13 +364,14 @@ Devolve CSV (mesmos filtros da lista). **→ log** (`export_students` — LGPD, 
 
 | Rota | RBAC | Descrição |
 |---|---|---|
-| `GET /api/notifications` | sessão | lista do usuário (filtrada pelo papel) |
-| `POST /api/notifications/:id/read` | sessão | marcar 1 como lida |
-| `POST /api/notifications/read-all` | sessão | marcar todas |
+| `GET /api/notifications` | **director, secretary** | lista do usuário (filtrada pelo papel) |
+| `POST /api/notifications/:id/read` | director, secretary | marcar 1 como lida |
+| `POST /api/notifications/read-all` | director, secretary | marcar todas |
 
 - **Por papel** (DASHBOARD_PLAN §4): **Diretor e Secretaria** têm sino (conteúdo filtrado);
-  **Supervisor NÃO tem** central de notificações (o preview oculta o sino dele). Logo, as
-  rotas só retornam dados para director/secretary. Tipos: `enroll`|`signed`|`viewed`|`stale`|`email`|`rejected`|`failed`.
+  **Supervisor NÃO tem** central de notificações (o preview oculta o sino dele) —
+  Supervisor chamando qualquer rota daqui ⇒ **`403 FORBIDDEN`** (formalizado 09/Jun; antes
+  estava só em prosa). Tipos: `enroll`|`signed`|`viewed`|`stale`|`email`|`rejected`|`failed`.
 
 ---
 
@@ -357,9 +382,12 @@ Devolve CSV (mesmos filtros da lista). **→ log** (`export_students` — LGPD, 
 | `GET /api/site-content` | **director** | todos os textos por página/campo |
 | `PATCH /api/site-content` | director | salvar textos (com pendências) |
 
-- `site_content` (page_key, field_key, value). Tetos por campo (VALIDACOES §17: título 120,
-  subtítulo 200, parágrafo 600); **escape ao renderizar** no site (anti-XSS). **→ log**.
-- Publicação bloqueia/avisa quando há pendências.
+- `site_content` (page_key, field_key, value, **draft_value**, **published_at**). Tetos por
+  campo (VALIDACOES §17: título 120, subtítulo 200, parágrafo 600); **escape ao renderizar**
+  no site (anti-XSS). **→ log**.
+- **Pendências (decidido 09/Jun):** salvar grava em `draft_value` (rascunho); **publicar**
+  move `draft_value`→`value`, grava `published_at` e limpa o rascunho. "Pendência" =
+  linha com `draft_value` não nulo — é o que a tela de publicação lista/avisa.
 
 ---
 
@@ -376,7 +404,9 @@ Devolve CSV (mesmos filtros da lista). **→ log** (`export_students` — LGPD, 
 `BAD_CREDENTIALS` · `RATE_LIMITED` · `FORBIDDEN` · `NOT_FOUND` · `VALIDATION` (com
 `fields`) · `EMAIL_TAKEN` · `SLOT_TAKEN` · `ROOM_NAME_TAKEN` · `ROOM_HAS_CLASSES` ·
 `CLASS_NOT_EMPTY` · `ROOM_OVERFLOW` · `LEVEL_CHANGE_REQUIRES_CONFIRM` · `OUTSIDE_GO` ·
-`LAST_DIRECTOR` · `STALE_WRITE` (edição concorrente) · `UNMAPPED_FIELDS` · `INTERNAL`.
+`LAST_DIRECTOR` · `STALE_WRITE` (edição concorrente) · `UNMAPPED_FIELDS` ·
+`CSRF_INVALID` (403 — mutação sem/with `x-csrf-token` inválido, §0) ·
+`INVALID_SIGNATURE` (401 — HMAC do webhook Autentique inválido, §9) · `INTERNAL`.
 
 ---
 
@@ -390,13 +420,13 @@ Devolve CSV (mesmos filtros da lista). **→ log** (`export_students` — LGPD, 
 | `savePass` (4659) | `POST /api/account/password` | 1 |
 | `saveAccount` (5287) | `PATCH /api/account` | 1 |
 | `refreshOverviewData`/`renderHealth`/`renderVagas`/`renderNiveis`/`renderMovimento` | `GET /api/overview` | 2 |
-| `renderTable`/`filteredStudents` | `GET /api/students` | 3 |
-| `openDetail` | `GET /api/students/:id` | 3 |
+| `renderTable`/`filteredStudents` | `GET /api/enrollments` | 3 |
+| `openDetail` | `GET /api/enrollments/:id` | 3 |
 | `submitNewEnrollment` (3988) | `POST /api/enrollments` (manual) | 4.2 |
 | `saveEditEnrollment` (4144) | `PATCH /api/enrollments/:id` | 4.3 |
 | `confirmExit` (5506) | `POST /api/students/:id/deactivate` | 4.4 |
 | `reactivateStudent` (5516) | `POST /api/students/:id/reactivate` | 4.5 |
-| `dropMoveKid` (2591)/`openMoverKid`/`agDropEmpty` (2569) | `PATCH /api/students/:sid/kids/:ki/class` | 4.6 |
+| `dropMoveKid` (2591)/`openMoverKid`/`agDropEmpty` (2569) | `PATCH /api/students/:id/class` | 4.6 |
 | `importPicked` (4779)/`importDropped` (4783) | `POST /api/enrollments/import[/commit]` | 4.7 |
 | `exportCSV` (4668) | `GET /api/enrollments/export` | 4.8 |
 | `agSaveTurma` (3008) | `POST /api/classes` | 5 |

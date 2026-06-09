@@ -19,6 +19,10 @@
 --   - ON DELETE: dados de aluno NÃO se apagam por cascata sem intenção — o
 --     desligamento é soft (is_active=false). Apagamento LGPD é operação explícita
 --     que anonimiza o activity_log (DASHBOARD_PLAN §11), não um CASCADE.
+--   - updated_at (decidido 09/Jun): toda tabela editável pela UI tem updated_at,
+--     que serve de versão pro controle de concorrência otimista — o cliente envia
+--     o updated_at que leu; se divergir, 409 STALE_WRITE (DASHBOARD_API §4.3).
+--     A aplicação (Drizzle) atualiza updated_at em todo UPDATE.
 -- =============================================================================
 
 -- ----------------------------------------------------------------------------
@@ -36,7 +40,9 @@ CREATE TYPE responsible_type     AS ENUM ('legal', 'second', 'financial');
 CREATE TYPE contract_status      AS ENUM ('pending', 'sent', 'viewed', 'signed', 'rejected', 'failed');
 CREATE TYPE sent_via             AS ENUM ('email', 'whatsapp');
 CREATE TYPE contract_event_type  AS ENUM ('signature.viewed', 'signature.accepted', 'signature.rejected', 'signature.delivery_failed', 'document.finished');
-CREATE TYPE announcement_status  AS ENUM ('draft', 'scheduled', 'sending', 'sent', 'failed');
+CREATE TYPE announcement_status  AS ENUM ('sending', 'sent', 'failed');
+-- agendamento de comunicado ('draft'/'scheduled' + scheduled_at) = fase futura,
+-- cortado do MVP (decidido 09/Jun) — a API §8 só tem preview/enviar agora.
 CREATE TYPE announcement_kind    AS ENUM ('manual', 'automatic');
 CREATE TYPE channel              AS ENUM ('email', 'whatsapp');
 CREATE TYPE recipient_status     AS ENUM ('queued', 'sent', 'failed', 'prepared');
@@ -54,15 +60,17 @@ CREATE TABLE users (
   role                 user_role   NOT NULL,
   is_active            boolean     NOT NULL DEFAULT true,
   must_change_password boolean     NOT NULL DEFAULT true,   -- 1ª senha temporária (PLAN §6.10)
-  password_changed_at  timestamptz,
+  password_changed_at  timestamptz,                          -- JWTs emitidos ANTES disto são recusados (trocar senha = derrubar sessões; PLAN §3)
   last_login_at        timestamptz,
-  created_at           timestamptz NOT NULL DEFAULT now()
+  created_at           timestamptz NOT NULL DEFAULT now(),
+  updated_at           timestamptz NOT NULL DEFAULT now()
 );
 -- Regra "sempre >=1 Diretor ativo" (PLAN §6.10) é validada na camada /api (não dá
 -- CHECK confiável entre linhas); ver DASHBOARD_API §10 (422 LAST_DIRECTOR).
 -- BOOTSTRAP: o deploy semeia o 1º Diretor a partir de SEED_ADMIN_EMAIL/SEED_ADMIN_PASSWORD
--- (default admin@email.com / Senh@1234), com must_change_password=true. Resolve o
--- ovo-e-galinha (sem cadastro aberto); e-mail/senha trocáveis depois.
+-- (default admin@email.com / Senh@12345 — 10 chars, conforme a política de senha
+-- VALIDACOES §8), com must_change_password=true. Resolve o ovo-e-galinha (sem
+-- cadastro aberto); e-mail/senha trocáveis depois. Trocar a senha no 1º acesso.
 
 -- Rate-limit do login no próprio Postgres (PLAN §3) — sem Redis.
 CREATE TABLE login_attempts (
@@ -109,7 +117,8 @@ CREATE TABLE rooms (
   name          text    NOT NULL,
   color         text    NOT NULL,
   teacher_name  text,                                         -- PROFESSOR É DA SALA: 1 por sala
-  is_active     boolean NOT NULL DEFAULT true
+  is_active     boolean NOT NULL DEFAULT true,
+  updated_at    timestamptz NOT NULL DEFAULT now()
 );
 CREATE UNIQUE INDEX uq_rooms_name ON rooms(lower(name));      -- nome único case-insensitive (VALIDACOES §11)
 -- Seed: 13 salas (Green, Vanilla, Peach, Purple, Blue, Orange, Mint, Yellow,
@@ -133,6 +142,7 @@ CREATE TABLE classes (
   capacity    int         NOT NULL DEFAULT 7 CHECK (capacity BETWEEN 1 AND 9),  -- 7 padrão; vaga extra até 9 (VALIDACOES §13)
   period      text        NOT NULL,                            -- ex. '2026.2' — slot reusado a cada semestre (mesmo nome que enrollments.period)
   is_active   boolean     NOT NULL DEFAULT true,
+  updated_at  timestamptz NOT NULL DEFAULT now(),
   CHECK (start_time IN ('8:30','9:30','10:30','13:30','14:30','15:30','16:45','17:45'))
   -- SEM teacher: vem de rooms.teacher_name (1 professor por sala).
 );
@@ -159,8 +169,11 @@ CREATE TABLE enrollments (
   schedule_confirmed       boolean     NOT NULL,
   period                   text        NOT NULL,               -- ex. '2026.2'
   notes                    text,
-  submitted_at             timestamptz NOT NULL DEFAULT now()
+  submitted_at             timestamptz NOT NULL DEFAULT now(),
+  updated_at               timestamptz NOT NULL DEFAULT now()
 );
+-- submission_id: o formulário do site envia o seu; na matrícula MANUAL o SERVIDOR
+-- gera ('manual-<uuid>') — o front da dashboard não conhece o campo (decidido 09/Jun).
 CREATE INDEX idx_enroll_period ON enrollments(period);
 CREATE INDEX idx_enroll_status ON enrollments(status);
 
@@ -174,7 +187,8 @@ CREATE TABLE students (
   is_active       boolean     NOT NULL DEFAULT true,            -- desligamento = soft delete
   exit_reason     text,
   exit_note       text,
-  exit_date       date
+  exit_date       date,
+  updated_at      timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX idx_students_enroll ON students(enrollment_id);
 CREATE INDEX idx_students_class  ON students(class_id);
@@ -189,7 +203,8 @@ CREATE TABLE responsibles (
   phone         text,
   email         text,
   relationship  text,                                          -- Mãe/Pai/Avó/... (select)
-  birth_date    date
+  birth_date    date,
+  updated_at    timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX idx_resp_enroll ON responsibles(enrollment_id);
 CREATE INDEX idx_resp_cpf     ON responsibles(cpf);             -- CPF repetido = família (não é erro)
@@ -203,7 +218,8 @@ CREATE TABLE addresses (
   complement    text,
   neighborhood  text   NOT NULL,
   city          text   NOT NULL,
-  state         text   NOT NULL CHECK (state = 'GO')           -- atende só Goiás (regra de negócio crítica)
+  state         text   NOT NULL CHECK (state = 'GO'),          -- atende só Goiás (regra de negócio crítica)
+  updated_at    timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX idx_addr_enroll ON addresses(enrollment_id);
 
@@ -218,7 +234,8 @@ CREATE TABLE contract_templates (
   field_map    jsonb       NOT NULL,                           -- coordenadas dos campos (como o pdfService atual)
   version      int         NOT NULL DEFAULT 1,
   is_active    boolean     NOT NULL DEFAULT false,
-  archived_at  timestamptz
+  archived_at  timestamptz,
+  updated_at   timestamptz NOT NULL DEFAULT now()
 );
 
 CREATE TABLE contracts (
@@ -259,9 +276,8 @@ CREATE TABLE announcements (
   body            text                NOT NULL,                -- <= 2000; variáveis {{nome_responsavel}}/{{nome_aluno}}
   channels        channel[]           NOT NULL,                -- >= 1
   audience_filter jsonb,
-  status          announcement_status NOT NULL DEFAULT 'draft',
+  status          announcement_status NOT NULL DEFAULT 'sending',
   kind            announcement_kind   NOT NULL DEFAULT 'manual',
-  scheduled_at    timestamptz,
   sent_at         timestamptz,
   created_by      bigint              REFERENCES users(id) ON DELETE SET NULL
 );
@@ -288,12 +304,14 @@ CREATE TABLE notifications (
 CREATE INDEX idx_notif_user_unread ON notifications(user_id) WHERE read_at IS NULL;
 
 CREATE TABLE site_content (
-  id          bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  page_key    text        NOT NULL,
-  field_key   text        NOT NULL,
-  value       text        NOT NULL,                             -- escapar ao renderizar (anti-XSS); tetos VALIDACOES §17
-  updated_by  bigint      REFERENCES users(id) ON DELETE SET NULL,
-  updated_at  timestamptz NOT NULL DEFAULT now(),
+  id           bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  page_key     text        NOT NULL,
+  field_key    text        NOT NULL,
+  value        text        NOT NULL,                            -- texto PUBLICADO (o site exibe este); escapar ao renderizar (anti-XSS); tetos VALIDACOES §17
+  draft_value  text,                                            -- rascunho salvo e ainda não publicado; não nulo = "pendência" do editor (decidido 09/Jun)
+  published_at timestamptz,                                     -- última publicação; publicar = mover draft_value→value e limpar o rascunho
+  updated_by   bigint      REFERENCES users(id) ON DELETE SET NULL,
+  updated_at   timestamptz NOT NULL DEFAULT now(),
   UNIQUE (page_key, field_key)
 );
 

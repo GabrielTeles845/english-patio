@@ -1,8 +1,8 @@
 # Matriz de Validações — English Patio (dashboard + matrícula)
 
 Documento vivo, iniciado em **08/Jun/2026**. Não é código — é o **checklist** que a
-implementação tem que cumprir e a fonte dos **testes negativos** (`reg-05`, ver
-`docs/AGENDA_PLAN.md`/`DASHBOARD_PLAN.md §8.1`).
+implementação tem que cumprir e a fonte dos **testes negativos** (`reg-NN` por módulo —
+ver `DASHBOARD_PLAN.md §8.1`).
 
 **Por que existe:** em vez de "tentar lembrar" o que validar, passamos **todo campo**
 pela mesma bateria fixa de perguntas. O que ninguém pensou aparece como célula vazia /
@@ -197,7 +197,7 @@ Legenda: **DO** = regra dashboard-only (não está no `validators.ts`). **⚠** 
 
 | Regra | Detalhe | Mensagem |
 |---|---|---|
-| tipo de arquivo | **só `.csv`** (`accept=".csv,text/csv"`) | "Somente .csv" |
+| tipo de arquivo | **CSV ou XLSX** (decidido 08/Jun — ver nota abaixo; `.xlsx` via SheetJS, convertido p/ CSV no mesmo pipeline) | "Somente .csv ou .xlsx" |
 | **dedup idempotente** | linhas iguais exceto **Data/Hora** e **Link PDF** = mesma matrícula → fica a 1ª | **mata o bug DEBITOS #1** (re-gerar contrato duplica) |
 | não re-duplica | quem já está na dashboard não entra de novo | — |
 | **validação por linha** | CPF (formato+dígito), telefone, datas, e-mail, **endereço fora de GO** → vão pra **fila de revisão** antes de confirmar | — |

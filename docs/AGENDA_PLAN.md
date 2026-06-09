@@ -23,7 +23,7 @@ tempo todo (aluno troca de horário, aluno novo entra, turma lota). A tese da te
 | Dias | **Sempre** pares Seg/Qua ou Ter/Qui. Sem sexta, sábado ou 1x/semana. |
 | Horários (início) | `8:30 · 9:30 · 10:30` (manhã) `13:30 · 14:30 · 15:30 · 16:45 · 17:45` (tarde) |
 | Duração | **1h** (15:30→16:45 é intervalo). |
-| Capacidade | Por turma; **padrão 7 = máximo 7**. |
+| Capacidade | Por turma; **padrão 7** na criação. **"Vaga extra"** (oficializada 09/Jun, como o preview faz): turma existente pode abrir 7→8→9, **máx 2 extras**; a partir de 9 bloqueia. |
 | Teacher | Campo **opcional** no CRUD; aparece na agenda/exportação só se preenchido. |
 | Turma cheia | Mostrar **"NÃO TEM VAGA"** igual ao Canva (texto verde sob a lista). |
 | Aluno sem turma | Existe — cadastra primeiro, atrela depois; também muda de turma. |
@@ -96,8 +96,9 @@ mesmo modal de alocação (§5.2). Transforma o "esqueci de atrelar" em fila vis
 
 ### 5.1 Turmas
 - **Criar**: clique no `+` do slot vazio (grade ou visão da sala) → modal com sala/par/hora
-  pré-preenchidos; escolhe nível (select agrupado), cap (padrão 7, máx 7). **O professor
-  NÃO é da turma** — define-se por sala na aba "Salas & teachers".
+  pré-preenchidos; escolhe nível (select agrupado), cap (padrão 7; na criação máx 7 — a
+  vaga extra 7→9 é fluxo de turma existente). **O professor NÃO é da turma** — define-se
+  por sala na aba "Salas & teachers".
 - **Editar**: nível, cap (nunca abaixo da ocupação atual), mover de horário/sala
   (só pra slot livre — uma sala não tem 2 turmas no mesmo slot do mesmo par).
 - **Excluir**: só vazia; com alunos, oferece mover os alunos antes (em lote).
@@ -114,7 +115,8 @@ mesmo modal de alocação (§5.2). Transforma o "esqueci de atrelar" em fila vis
 - CRUD leve: renomear, trocar cor (paleta), desativar (só sem turmas). As 13 vêm prontas.
 
 ### 5.4 Bloqueios que o Canva não dá
-- Capacidade nunca estoura (máx 7); slot nunca duplica; excluir nunca órfã aluno.
+- Capacidade nunca estoura o teto (criação ≤7; com vaga extra, ≤9); slot nunca duplica;
+  excluir nunca órfã aluno.
 - Sem `confirm()` nativo — modais próprios, toasts amarelos.
 
 ## 6. Exportação de imagens (substitui o produto final do Canva)
@@ -122,9 +124,9 @@ mesmo modal de alocação (§5.2). Transforma o "esqueci de atrelar" em fila vis
 - **Por sala**: a página da visão 4.2 vira PNG (estilo Canva, com a identidade deles).
 - **Todas as salas**: gera o "pacote do semestre" (uma imagem por sala, do par escolhido).
 - **Por nível**: imagem com as turmas + alunos daquele nível.
-- Técnica no preview: nó DOM dedicado de exportação + render em canvas (lib leve via CDN,
-  ex. html-to-image) com download direto; fallback: folha de estilo de impressão
-  (`window.print()` → PDF). Decidir na implementação o que ficar melhor pixel-perfect.
+- Técnica **decidida** (validada no preview — `DASHBOARD_PLAN.md §2`): nó DOM dedicado de
+  exportação + **`html-to-image`** com download direto, empacotada como util. Fallback de
+  emergência: folha de estilo de impressão (`window.print()` → PDF).
 
 ## 7. Filtros novos na tela Alunos (o pedido original)
 

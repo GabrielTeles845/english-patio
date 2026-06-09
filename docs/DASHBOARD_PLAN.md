@@ -73,15 +73,22 @@ Navegador (React SPA)
 - **Login:** e-mail + senha. Hash **bcrypt** (cost ≥ 12). **Política de senha
   (decidida 08/Jun/2026):** mín. **10 caracteres** com ≥1 maiúscula, ≥1 minúscula,
   ≥1 número e ≥1 caractere especial — composição clássica. Vale onde a senha é
-  definida: aceite de convite, reset e "trocar senha" (não há cadastro aberto; contas
-  nascem por convite — §4). O preview hoje usa regra mais fraca (≥10 + letras +
-  números) — **substituir pela política acima**. _Evolução possível (não bloqueia o
+  definida: senha provisória (Diretor cadastrando alguém), reset e "trocar senha"
+  (não há cadastro aberto; contas nascem com **senha provisória** definida pelo
+  Diretor — §6.10, sem convite-link). O preview hoje usa regra mais fraca (≥10 +
+  letras + números) — **substituir pela política acima**. _Evolução possível (não bloqueia o
   MVP): checar contra base de senhas vazadas (HIBP k-anonymity)._
-- **Sessão:** JWT curto em cookie **httpOnly + secure + SameSite**, com refresh. CSRF
-  token nas mutações. **Stateless (decidido 09/Jun): sem tabela de sessões** — logout limpa
-  o cookie, **não** há revogação remota nem "sessões ativas"; por isso o JWT é curto.
+- **Sessão:** JWT curto (~15 min) em cookie **httpOnly + secure + SameSite**, com
+  **renovação deslizante** (decidido 09/Jun): re-emitido a cada request autenticado, vida
+  máxima absoluta ~12h. CSRF token nas mutações. **Stateless: sem tabela de sessões** —
+  logout limpa o cookie; por isso o JWT é curto. **Revogação na prática** (decidido
+  09/Jun), sem estado extra: toda rota checa `users.is_active` (desativar = barrar na
+  requisição seguinte) e recusa JWTs emitidos **antes** de `password_changed_at`
+  (trocar senha = derrubar todos os dispositivos). Sem revogação seletiva por
+  dispositivo — aceito (equipe pequena).
 - **Bootstrap do 1º Diretor (decidido 09/Jun):** a conta inicial é **semeada** no deploy —
-  `admin@email.com` / `Senh@1234` (via env `SEED_ADMIN_EMAIL`/`SEED_ADMIN_PASSWORD`), com
+  `admin@email.com` / `Senh@12345` (via env `SEED_ADMIN_EMAIL`/`SEED_ADMIN_PASSWORD`;
+  default com 10 caracteres, conforme a política de senha), com
   `must_change_password=true` (troca obrigatória no 1º acesso). Resolve o ovo-e-galinha
   (sem cadastro aberto). E-mail/senha podem ser trocados depois.
 - **Esqueci a senha:** token de uso único com expiração curta, enviado por e-mail
@@ -142,6 +149,8 @@ Três papéis, sem flexão de gênero. **"Administrador" foi renomeado para "Dir
 Derivado do mock do preview (nomes em inglês no banco; PT na UI). **O DDL Postgres
 completo e pronto pra rodar no Neon está em `docs/DASHBOARD_SCHEMA.sql`** (espelha esta
 seção já com a auditoria de 09/Jun); o Drizzle gera as migrations a partir dele.
+Toda tabela editável pela UI tem **`updated_at`** (decidido 09/Jun) — é a "versão" do
+controle de concorrência otimista (`409 STALE_WRITE`, DASHBOARD_API §4.3).
 
 ### Acesso & auditoria
 - **users** (id, name, email, password_hash, role[`director`|`supervisor`|`secretary`],
@@ -159,7 +168,9 @@ seção já com a auditoria de 09/Jun); o Drizzle gera as migrations a partir de
 - **levels** (id, key, name, family[`fun`|`conv`|`power`|`sprint`], sort_order) —
   19 níveis seed, ordem de evolução
 - **classes** (id, room_id, day_pair[`seg-qua`|`ter-qui`], start_time, level_id,
-  capacity default 7 check ≤7, **period** (ex. `2026.2` — mesmo nome que
+  capacity default 7 — **criação ≤7; "vaga extra" leva a 8–9, máx 2 extras** (check 1..9;
+  oficializado 09/Jun: é como o preview funciona — VALIDACOES §13), **period** (ex.
+  `2026.2` — mesmo nome que
   `enrollments.period`), is_active) — **sem `teacher_name`**: o professor vem da sala
   (`rooms.teacher_name`) — `unique(room_id, day_pair, start_time, period)` (o mesmo slot é
   reusado a cada semestre); aula de 1h; horários válidos:
@@ -200,13 +211,17 @@ seção já com a auditoria de 09/Jun); o Drizzle gera as migrations a partir de
 
 ### Comunicação & conteúdo
 - **announcements** (id, subject, body, channels[`email`,`whatsapp`], audience_filter
-  jsonb, status, kind[`manual`|`automatic`], scheduled_at, sent_at, created_by)
+  jsonb, status[`sending`|`sent`|`failed`], kind[`manual`|`automatic`], sent_at,
+  created_by) — **sem agendamento no MVP** (decidido 09/Jun: `scheduled_at` e os status
+  `draft`/`scheduled` entram quando a feature de agendar existir)
 - **announcement_recipients** (id, announcement_id, enrollment_id, channel, status
   [`queued`|`sent`|`failed`|`prepared`]) — WhatsApp = mensagem preparada por família
   (API oficial é fase futura)
 - **notifications** (id, user_id, type[`enroll`|`signed`|`viewed`|`stale`|`email`|`rejected`|`failed`],
   student_id nullable, title, body, read_at, created_at)
-- **site_content** (id, page_key, field_key, value, updated_by, updated_at)
+- **site_content** (id, page_key, field_key, value (publicado), **draft_value** (rascunho
+  não publicado = "pendência" do editor — decidido 09/Jun), **published_at**, updated_by,
+  updated_at)
 
 ## 6. Módulos / Telas (espelho do preview)
 
@@ -248,7 +263,8 @@ seção já com a auditoria de 09/Jun); o Drizzle gera as migrations a partir de
 11. **Registro de atividades** — auditoria somente leitura, busca + filtro por ator
 12. **Configurações** — tema (3 sidebars × claro/escuro, transição circular), conta,
     segurança (2FA futuro), reativar tours. **Sem "sessões ativas"** (decidido 09/Jun —
-    sessão stateless, §3); se o preview mostra o item, vira placeholder "Em breve".
+    sessão stateless, §3); o card foi **removido do preview** (09/Jun, decisão do Gabriel:
+    remover em vez de placeholder — com sessão deslizante o recurso nunca existiria).
 
 ## 7. Fluxo Autentique (assinatura digital)
 
@@ -263,7 +279,8 @@ anti-erro) em `docs/AUTENTIQUE_INTEGRACAO.md`** — conferido contra a doc ofici
    (`delivery_method: DELIVERY_METHOD_WHATSAPP` — custo extra a confirmar; a dona já
    aprovou pagar). Status → `sent`.
 2. Webhooks por evento: `signature.viewed` → `viewed` (roxo) · `signature.accepted` +
-   `document.finished` → `signed` · `signature.rejected` → status `rejected` · `delivery_failed` → status `failed`
+   `document.finished` → `signed` · `signature.rejected` → status `rejected` ·
+   `signature.delivery_failed` → status `failed`
    (ambos saem do caminho feliz, viram alerta + notificação e badge vermelho).
    HMAC + dedup por event id + idempotência (§3).
 3. Cada transição: atualiza timeline do contrato, loga em `activity_log`
@@ -283,7 +300,8 @@ anti-erro) em `docs/AUTENTIQUE_INTEGRACAO.md`** — conferido contra a doc ofici
 - **E2E (Playwright):** login, gating por papel (Diretor/Supervisor/Secretaria),
   fluxos completos (matrícula manual → alocar na agenda → enviar contrato → webhook
   simulado → assinado), exportação de imagem. Herda o espírito dos scripts do preview
-  (`scripts/dashboard-smoke.mjs`, 191+ asserções; `dashboard-prints.mjs`, 47 prints).
+  (`scripts/dashboard-smoke.mjs`, 242 asserções — apurado 09/Jun; `dashboard-prints.mjs`,
+  47 prints).
 - **Smoke do preview** continua rodando enquanto o preview for vitrine de decisões.
 
 ### 8.1 Harness de regressão (adotar o padrão do evollutezap)
@@ -317,8 +335,9 @@ O que **muda** (mais simples aqui — a dashboard é SPA, não extensão MV3):
 - Auth do harness usa o login real (cookie httpOnly + token de teste) em vez de
   injeção em `chrome.storage`.
 
-Deps mínimas: `playwright`, `pixelmatch`, `pngjs`. Construir junto com cada fase
-(cada módulo entrega seu `reg-NN`), não no fim.
+Deps mínimas: `playwright`, `pixelmatch`, `pngjs` (+ `jsdom` do smoke) — **já instaladas
+como devDependencies (09/Jun)**; os scripts do preview não dependem mais de outro projeto.
+Construir junto com cada fase (cada módulo entrega seu `reg-NN`), não no fim.
 
 ### 8.2 Paridade visual preview × React + testes "que dá pra ver"
 
@@ -349,7 +368,10 @@ rodando** — não basta passar no CI silenciosamente. Dois acréscimos ao §8.1
   fluxo Autentique simulado; tours; comentários estilo Figma.
 - **Fase 1 — Fundação:** Neon + schema (§5) + auth completa (login, esqueci senha,
   RBAC 3 papéis) + shell da dashboard (sidebar, temas, tela inicial por papel) +
-  deploy protegido. Sem dados reais.
+  deploy protegido. Sem dados reais. **Rotas (decidido 09/Jun):** o React vive em
+  **`/dashboard/<tela>`** (ex. `/dashboard/entrar`, `/dashboard/alunos`); o rewrite do
+  `vercel.json` só captura o **`/dashboard` exato**, que continua servindo o preview
+  (canal de feedback da dona) até a Fase 7 — convivem sem conflito.
 - **Fase 2 — Alunos & Agenda no banco (paralelo):** CRUD de alunos/turmas/salas +
   alocação + filtros + importação de planilha (dados de teste); gravação nova de
   matrícula no Neon com `submission_id` idempotente, testada **isolada**.
@@ -362,8 +384,8 @@ rodando** — não basta passar no CI silenciosamente. Dois acréscimos ao §8.1
   páginas para chaves editáveis.
 - **Fase 7 — Cutover & importação:** import da planilha (CSV) + PDFs do Drive;
   matrícula passa a gravar no Neon; aposentar Apps Script/planilha; remover
-  `dashboard.html` + rewrite do `vercel.json`. **Janela de manutenção curta e
-  planejada.**
+  `dashboard.html` + rewrite do `vercel.json` (o `/dashboard` exato passa a cair na
+  dashboard real). **Janela de manutenção curta e planejada.**
 - **Fase 8 — Futuro:** 2FA; API oficial do WhatsApp; arrastar-e-soltar na grade;
   assistente de virada de semestre; histórico Aluno × Matrícula (match por nome +
   nascimento do aluno, fila de revisão) junto com boletins — decisão registrada,
@@ -391,6 +413,15 @@ rodando** — não basta passar no CI silenciosamente. Dois acréscimos ao §8.1
   `activity_log` (§11). **Sem** expurgo automático por prazo.
 - **Sessão stateless + seed do 1º Diretor + rate-limit no Postgres (decididos 09/Jun):**
   ver §3 (sem tabela de sessões; bootstrap `admin@email.com`; `login_attempts`).
+- **Auditoria de consistência 09/Jun (decisões do Gabriel — não repropor):**
+  **vaga extra oficializada** (criação ≤7; 7→8→9, máx 2 — era só do preview/VALIDACOES,
+  agora é a regra) · **JWT com renovação deslizante** + checagens `is_active`/
+  `password_changed_at` (§3) · **`updated_at` como versão** (concorrência otimista) ·
+  **nomenclatura da API**: `/api/enrollments` = família, `/api/students` = criança ·
+  **sem agendamento de comunicado no MVP** · **editor com `draft_value`/`published_at`** ·
+  **convívio de rotas**: preview no `/dashboard` exato, React em `/dashboard/<tela>` (§9
+  Fase 1) · grafia única `signature.delivery_failed` · "Sessões ativas" removido do
+  preview · senha provisória no lugar de convite também **no preview** (§6.10).
 
 ## 11. Lacunas conhecidas & decisões pendentes (levantadas 08/Jun/2026)
 
@@ -413,7 +444,7 @@ início da implementação:
 - **Estados de erro** — ✅ FEITO. (1) **Carregar**: overlay "Não foi possível carregar
   esta tela" com **Tentar de novo**, em qualquer tela (cobre falha ao carregar / offline /
   timeout). (2) **Salvar**: nos 11 modais de salvar (turma nova/editar, sala, matrícula
-  nova/editar, convite, usuário, modelo editar/renomear, senha, conta), a gravação falha
+  nova/editar, novo usuário, usuário, modelo editar/renomear, senha, conta), a gravação falha
   com toast amarelo (ícone de alerta) e o **formulário fica aberto** preservando o que foi
   digitado. Helpers `errorState`/`applyErrorOverlay`/`qaRetry`/`saveFails`/`toastErr`.
   Tudo só aparece sob a condição real (carregando / 0 resultados / request falhou) — o

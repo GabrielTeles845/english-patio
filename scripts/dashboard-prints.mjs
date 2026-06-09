@@ -5,10 +5,9 @@
  * /tmp/dashboard-prints/ — desktop (1440×900) e mobile (390×844).
  *
  * Rodar:  node scripts/dashboard-prints.mjs
- * (usa o playwright já instalado no projeto lp-valhalla)
  */
 import { mkdirSync } from 'node:fs';
-import { chromium } from '/Users/gabrielteles/Projetos/lp-valhalla/node_modules/playwright/index.mjs';
+import { chromium } from 'playwright';
 
 const OUT = '/tmp/dashboard-prints';
 mkdirSync(OUT, { recursive: true });
