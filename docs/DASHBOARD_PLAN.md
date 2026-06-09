@@ -60,6 +60,11 @@ Navegador (React SPA)
   fluxo completo — ver §7.
 - **Exportação de imagens da Agenda:** mesma técnica validada no preview
   (nó DOM dedicado + `html-to-image`), empacotada como util.
+- **Contrato de API:** todas as rotas `/api/*` (método, payload, RBAC por papel,
+  validações, efeitos colaterais em `activity_log`/`notifications`, webhook Autentique)
+  estão especificadas em **`docs/DASHBOARD_API.md`** — incluindo o mapa "função mockada do
+  preview → rota real". É a fonte de verdade do backend; o `dashboard.html` aponta pra ela
+  em cada ponto de integração.
 
 ## 3. Autenticação & Segurança (dados de MENORES → rigor extra, LGPD)
 
@@ -284,6 +289,29 @@ O que **muda** (mais simples aqui — a dashboard é SPA, não extensão MV3):
 Deps mínimas: `playwright`, `pixelmatch`, `pngjs`. Construir junto com cada fase
 (cada módulo entrega seu `reg-NN`), não no fim.
 
+### 8.2 Paridade visual preview × React + testes "que dá pra ver"
+
+Pedido do Gabriel (09/Jun): a suíte tem que **cobrir todos os casos** e ser **vista
+rodando** — não basta passar no CI silenciosamente. Dois acréscimos ao §8.1:
+
+- **Paridade `dashboard.html` × front React (a checagem "o preview é a lei visual").**
+  Além do baseline pixelmatch contra snapshot commitado, rodar um teste que abre **a mesma
+  tela** no preview (`/dashboard`) e no React novo, tira print dos dois no mesmo viewport e
+  faz o diff. Acima de um limiar de diferença, falha com o diff anexado em `_review/`. É a
+  prova objetiva, tela a tela, de que a implementação ficou **idêntica** ao preview (§10).
+  Vale pros 12 módulos × claro/escuro × 3 sidebars × desktop/mobile (amostrar as combinações
+  relevantes pra não explodir o tempo).
+- **Modo visível (`--headed` + `slowMo`) pra revisão humana.** Um alvo de npm (ex.
+  `test:e2e:watch`) roda o Playwright com janela aberta e passos desacelerados, pra
+  acompanhar os cliques na tela; o CI roda headless. Os fluxos completos do §8 (login →
+  matrícula manual → alocar na agenda → enviar contrato → webhook simulado → assinado)
+  servem de "demo automatizada" além de teste.
+- **Cobertura = a matriz inteira.** Cada linha de `DASHBOARD_VALIDACOES.md` (incl. as ⚠
+  quando resolvidas) é um teste negativo no `reg-NN`; cada rota de `DASHBOARD_API.md` tem
+  teste de RBAC por papel (200 pro papel certo, 403 pros outros) e de caminho de erro
+  (`409`/`422` das regras de negócio). Sem buraco: validação, RBAC e webhook (HMAC inválido,
+  evento duplicado) são exercidos.
+
 ## 9. Fases de implementação
 
 - **Fase 0 — Preview (FEITO):** mockup navegável aprovado; Agenda implementada;
@@ -384,3 +412,60 @@ Valem em todas as telas/formulários, não só numa:
 - **Cópia (textos) dos e-mails transacionais** — convite de usuário, reset de senha,
   confirmação de matrícula e contrato (Autentique). Alguém precisa escrever esses textos;
   ficam versionados junto aos templates (auth na Fase 1, Resend na Fase 5, Autentique §7).
+
+## 13. Backup & recuperação (medo nº 1: perder dados de aluno)
+
+Dados de menores não podem se perder. Camadas redundantes e independentes entre si:
+
+1. **PITR do Neon (point-in-time recovery)** — nativo do Postgres gerenciado: dá pra
+   restaurar o banco a qualquer minuto recente, e **branches** permitem clonar o estado pra
+   investigar sem mexer em produção. É a primeira linha contra "apaguei sem querer".
+2. **Dump lógico agendado** — `pg_dump` diário (cron, §14) pra object storage (Vercel
+   Blob/R2), com retenção (ex. 30 diários + 12 mensais). Backup que **não depende** do
+   provedor estar de pé; restaurável em qualquer Postgres.
+3. **A planilha do Google continua viva** durante e após o cutover — **não se apaga no dia
+   da virada** (Fase 7). Como a importação é **idempotente** (`submission_id`), reimportar a
+   planilha quantas vezes for preciso é seguro e não duplica. Ela é um backup redundante e
+   independente do banco novo por todo o período de confiança.
+4. **PDFs dos contratos** permanecem no Drive (o banco guarda só a URL) — perder/trocar o
+   storage de banco não perde o documento assinado.
+5. **Trilha de auditoria preservada** — `activity_log` registra quem fez o quê; o
+   apagamento LGPD **anonimiza o alvo** mas mantém a entrada (§11), então nunca se perde o
+   "quem mexeu".
+
+> Resultado: pra perder dado de aluno teria que falhar **tudo ao mesmo tempo** — banco +
+> PITR + dump + planilha. Antes do cutover, **testar uma restauração de verdade** (restore
+> do dump num branch de teste) pra provar que o backup presta — backup não testado não é
+> backup.
+
+## 14. Apêndice — o que configurar (contas, serviços, env vars)
+
+Checklist operacional pra tirar a dashboard do papel (nada disso é necessário pro site
+atual; só pra o backend novo). Cada item vira passo-a-passo no estilo do
+`docs/INSTRUCOES-CONFIGURACAO.md` na hora da implementação.
+
+| Serviço | Pra quê | Conta | Custo inicial |
+|---|---|---|---|
+| **Neon (Postgres)** | banco principal + **branch de teste** | nova | free tier; paga ao crescer |
+| **Vercel** | já existe — ligar Serverless Functions + env vars + cron | atual | incluso |
+| **Resend** | e-mail transacional + comunicados; **verificar domínio** (SPF/DKIM) | nova | free tier generoso |
+| **Autentique** | assinatura digital (API GraphQL + webhook); usar **sandbox** nos testes | nova | por documento; WhatsApp extra (a dona aprovou) |
+| **Object storage** | dumps de backup e (opcional) PDFs — Vercel Blob ou Cloudflare R2 | nova/atual | baixo (pode adiar: PDF segue no Drive) |
+
+**Variáveis de ambiente (Vercel, prefixo conforme o uso):**
+
+```
+DATABASE_URL                 # Neon (produção)  — NUNCA usada pelo harness de teste (§8.1)
+DATABASE_URL_TEST            # Neon (branch de teste) — só o harness usa
+JWT_SECRET                   # assinatura do JWT da sessão
+CSRF_SECRET                  # token CSRF das mutações
+RESEND_API_KEY               # envio de e-mail
+AUTENTIQUE_TOKEN             # API GraphQL
+AUTENTIQUE_WEBHOOK_SECRET    # validar HMAC do webhook (§3, §7)
+BLOB_READ_WRITE_TOKEN        # object storage (backup/PDF), se Vercel Blob
+# as VITE_GOOGLE_APPS_SCRIPT_URL / VITE_EMAILJS_* atuais seguem como estão até o cutover
+```
+
+**Ordem sugerida de setup:** Neon (banco + branch teste) → env vars no Vercel → Resend
+(domínio verificado) → Autentique (sandbox) → cron de backup/`stale`. Custos recorrentes
+são da escola (decisão §10).
