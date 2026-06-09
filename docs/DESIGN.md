@@ -214,3 +214,203 @@ nativo" tirar acessibilidade de graça.
 Os 47 prints (desktop 1440×900 + mobile 390×844) ficam em `/tmp/dashboard-prints/` ao rodar
 `node scripts/dashboard-prints.mjs`. Cobrem todas as telas, modais, os 3 temas de sidebar,
 claro/escuro e mobile — a fonte de verdade visual ao lado do `public/dashboard.html`.
+
+---
+
+# 15. Handoff técnico — do preview (CSS+Tailwind CDN) para o React real
+
+O preview **não é descartável como design**: ele já usa **Tailwind** (via CDN) para layout e
+**CSS variables** para tema — exatamente os dois mecanismos do stack-alvo (Tailwind + shadcn,
+`DASHBOARD_PLAN.md §2`). Portanto a migração é **mecânica, não um rebuild visual**: as
+variáveis e classes do preview são **transplantadas**, não reinventadas. Esta seção é o passo
+a passo para isso ficar idêntico (a meta dos testes de paridade visual, `DASHBOARD_PLAN.md §8.2`).
+
+## 15.1 Stack & estrutura de pastas
+- **Front:** a SPA Vite + React + TS já existente. A dashboard vive em `/dashboard/*`
+  (rotas protegidas, `react-router`), reusando a base de componentes.
+- **Estilo:** Tailwind (já no projeto) + `globals.css` com os tokens (§15.3). **shadcn/ui =
+  andaime secundário** (Button/Dialog/Input base), **tematizado pelos nossos tokens** —
+  nunca o visual default do shadcn.
+- **Backend:** Vercel Functions em `/api/*` (`DASHBOARD_API.md`).
+```
+src/
+  pages/dashboard/            # uma pasta por tela (Overview, Alunos, Agenda, Contratos…)
+  components/dashboard/
+    ui/                       # controles portados do preview (CSelect, Checkbox, Tooltip,
+                              #   DatePicker, Toast, Modal, Badge, RowMenu, Skeleton…)
+    charts/                   # wrappers react-chartjs-2 (LineEnroll, BarLevels, DonutHours…)
+    agenda/                   # GridView, RoomPage (Canva), LevelView, MoveModal…
+  lib/
+    theme.tsx                 # ThemeProvider + useTheme (dark + sidebar) — §15.4
+    api.ts                    # fetch + envelope { ok, data|error } — §15.7
+    status.ts                 # STATUS map (cores/labels) — §15.6
+  styles/globals.css          # :root / .dark / [data-sidebar] + componentes (§15.3)
+```
+
+## 15.2 `tailwind.config.js` — tokens (extend, sem reinventar)
+Mapeie as cores para as **CSS vars** (assim `bg-card`, `text-muted`, `border-border`
+respeitam claro/escuro/sidebar automaticamente) e fixe as cores de marca/semânticas:
+```js
+// tailwind.config.js  → theme.extend
+export default {
+  darkMode: 'class',                         // troca por html.dark (igual ao preview)
+  theme: { extend: {
+    colors: {
+      bg: 'var(--bg)', card: 'var(--card)', fg: 'var(--text)', muted: 'var(--muted)',
+      border: 'var(--border)', hover: 'var(--hover)', ring: 'var(--ring)',
+      acc: { DEFAULT: 'var(--acc)', fg: 'var(--acc-text)' },
+      // marca (fixas)
+      primary: { DEFAULT: '#1E3765', light: '#2F539A', dark: '#15294d' },
+      accent:  { DEFAULT: '#F5B700', light: '#FFE17A' },
+      wa: '#25D366',
+      // status de contrato (§2.3) e famílias de nível (§2.4)
+      status: { pending:'#B5860B', sent:'#2F539A', viewed:'#7C3AED', signed:'#16a34a', rejected:'#DC2626', failed:'#EA580C' },
+      fam: { fun:'#E8861B', conv:'#E0457B', power:'#2F539A', sprint:'#7C3AED' },
+    },
+    fontFamily: { heading: ['Fredoka','system-ui','sans-serif'], sans: ['Inter','system-ui','sans-serif'] },
+    borderRadius: { lg: '12px', xl: '16px', '2xl': '24px' },
+    boxShadow: { sidebar: '6px 0 24px rgba(7,15,34,.22)', tip: '0 8px 20px rgba(0,0,0,.28)' },
+    keyframes: { 'skel-shine': { to: { transform: 'translateX(100%)' } },
+                 pop: { from:{opacity:0,transform:'translateY(-4px) scale(.98)'}, to:{opacity:1,transform:'none'} },
+                 'tour-pulse': { '0%,100%':{boxShadow:'0 0 0 4px rgba(245,183,0,.32)'}, '50%':{boxShadow:'0 0 0 11px rgba(245,183,0,.10)'} } },
+  }},
+}
+```
+
+## 15.3 `globals.css` — transplante direto do preview
+Copiar **verbatim** do `public/dashboard.html` (são CSS puro, independem de framework):
+- **Variáveis de tema + 3 sidebars × claro/escuro:** linhas **39–93** (`:root`, `html.dark`,
+  `html[data-sidebar="blue|white|yellow"]` e suas variantes dark). É o coração do tema.
+- **Componentes portados (CSS):** cselect `.cs/.cs-btn/.cs-menu` (156–164) · checkbox `.ck`
+  (171–175) · tooltip `#tipBubble` (148–153) · skeleton `.skel`/`skel-shine` (195–201) ·
+  editor `.editable` (122–130) · comentário `.cm-pin`/draft (131–144) · `tour-pulse` (146) ·
+  ajuda `.qm` (182–184) · drag `.ag-drop` (190–194) · **mobile tabela→cards** (114–121) ·
+  view-transition do dark (154–155).
+- Manter os nomes de classe (`.surface`, `.cs-*`, `.ck`, `.qm`, `.ag-drop`) — os componentes
+  React só **adicionam** esses className; não recriar com utilitários soltos.
+
+## 15.4 Tema em React (`lib/theme.tsx`)
+Replica o mecanismo do preview: classe `dark` no `<html>` + atributo `data-sidebar`, com a
+**transição circular** (View Transitions). Persistir em `localStorage` (§15.8).
+```tsx
+type Sidebar = 'blue' | 'white' | 'yellow';
+function applySidebar(s: Sidebar){ document.documentElement.setAttribute('data-sidebar', s); localStorage.setItem('ep-sb-theme', s); }
+function toggleDark(ev?: MouseEvent){
+  const run = () => { const dark = document.documentElement.classList.toggle('dark'); localStorage.setItem('ep-dark', dark ? '1' : '0'); };
+  if (!document.startViewTransition || !ev) return run();        // fallback
+  const x = ev.clientX, y = ev.clientY;
+  const r = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+  document.startViewTransition(run).ready.then(() => {
+    document.documentElement.animate(
+      { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${r}px at ${x}px ${y}px)`] },
+      { duration: 520, easing: 'ease-in-out', pseudoElement: '::view-transition-new(root)' });
+  });
+}
+// no boot: ler ep-dark / ep-sb-theme e aplicar antes do 1º paint (evita flash)
+```
+> O preview **não** persiste o dark (reseta ao recarregar) — no real, **persistir** em
+> `ep-dark` (melhoria assumida).
+
+## 15.5 Fontes, ícones, gráficos
+- **Fontes:** `@fontsource/fredoka` (títulos) + `@fontsource/inter` (corpo) — importar no entry;
+  já refletido no `fontFamily` do Tailwind.
+- **Ícones:** `lucide-react` (os mesmos nomes do preview: `file-x`, `mail-warning`,
+  `alert-triangle`, `file-clock`, `user-plus`…).
+- **Gráficos:** `react-chartjs-2` + `chart.js` 4.4.x (o preview usa Chart.js — **não** trocar
+  por Recharts, `DASHBOARD_PLAN.md §2/§10`). Espelhar os configs do preview (cores das
+  famílias, donut de horário, linha de matrículas, barras de nível/ocupação).
+
+## 15.6 Mapa de port — cada widget do preview → React
+| Preview (função/classe) | React | Base |
+|---|---|---|
+| `STATUS` map (cores/labels de contrato) | `lib/status.ts` + `<StatusBadge>` | port (§15.9) |
+| `cselect`/`csPick`/`csToggle` | `<CSelect>` | **port 1:1** (CSS `.cs-*`); NÃO usar Select do shadcn |
+| checkbox `.ck` | `<Checkbox>` | port (ou shadcn tematizado p/ virar `.ck`) |
+| tooltip global `#tipBubble`/`.tip` | `<Tooltip>` (portal único) | **port 1:1** |
+| `maskDate/maskCpf/maskPhone/maskCep` + datepicker | `<MaskedInput>` + `<DatePicker>` | port (máscaras) |
+| `openModal`/`closeModal` (rodapé sticky) | `<Modal>` | shadcn Dialog tematizado + footer sticky |
+| `toast()` (amarelo, translateY, 2600ms) | `<Toaster>`/`useToast()` | port (cor/anim do preview) |
+| `openRowMenu` (`⋮`, transições válidas) | `<RowMenu>` | shadcn DropdownMenu tematizado |
+| badges/pills de status | `<StatusBadge>`/`<Badge>` | port |
+| `renderTable`/cards mobile | `<DataTable>` (tabela↔card via `<768px`) | port (CSS 114–121) |
+| `renderHealth` (funil + "precisa de ação") | `<ContractFunnel>` | port + Chart.js |
+| `autentiqueTimeline` (passo de exceção vermelho) | `<ContractTimeline>` | port |
+| Agenda: grade / sala (Canva) / níveis / mover | `<AgendaGrid/RoomPage/LevelView/MoveModal>` | **port 1:1** (visual é a estrela) |
+| skeleton `flashSkel`/`skelFor` | `<Skeleton>` + `useRouteSkeleton()` | port |
+| empty/error states | `<EmptyState>`/`<ErrorState>` | port |
+| editor `.editable` | `<EditableText>` | port |
+| comentários `.cm-pin` | (fora do produto — era feedback da dona) | — |
+
+## 15.7 Dados: do mock em memória para `/api`
+Cada array mock (`STUDENTS`, `TURMAS`, `USERS`, `NOTIFS`, `ACTIVITY`…) vira fetch a uma rota
+do `DASHBOARD_API.md`. Usar **React Query** (cache + estados de loading/erro que casam com
+skeleton/error states). Helper único do envelope:
+```ts
+async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
+  const r = await fetch(`/api${path}`, { credentials: 'include',
+    headers: { 'Content-Type': 'application/json', ...(init?.method && init.method !== 'GET' ? { 'x-csrf-token': getCsrf() } : {}) }, ...init });
+  const json = await r.json();
+  if (!json.ok) throw new ApiError(json.error);   // .code → toast/UX (ex. SLOT_TAKEN, FORBIDDEN)
+  return json.data as T;
+}
+```
+- **Loading** → `<Skeleton>` (§15.6). **Erro de carregar** → `<ErrorState onRetry>`. **Erro de
+  salvar** → toast amarelo + manter o form aberto (`DASHBOARD_PLAN.md §11`).
+- **Update otimista + rollback** e **conflito concorrente (409 STALE_WRITE)**: tratar via
+  React Query mutations (estados que o preview não tinha — `DASHBOARD_PLAN.md §11`).
+
+## 15.8 Chaves de `localStorage` (manter as do preview)
+`ep-sb-theme` (tema da sidebar) · `ep-dark` (**novo** no real) · `ep-tours-off` (opt-out de
+tours) · `ep-tour-seen-<view>` (tour já visto por tela). (`ep-feedbacks`/`ep-fb-name` eram do
+modo comentário — fora do produto.)
+
+## 15.9 Exemplo de port (o padrão a seguir) — Status Badge
+Mostra como um pedaço do preview vira React+Tailwind mantendo os tokens. O `STATUS` do preview
+(`dashboard.html`) vira:
+```ts
+// lib/status.ts — espelha o STATUS do preview (§2.3)
+export const STATUS = {
+  pending:  { label: 'Pendente',       color: 'var(--c)', cls: 'text-status-pending  bg-status-pending/15' },
+  sent:     { label: 'Enviado',        cls: 'text-status-sent     bg-status-sent/15' },
+  viewed:   { label: 'Visualizado',    cls: 'text-status-viewed   bg-status-viewed/15' },
+  signed:   { label: 'Assinado',       cls: 'text-status-signed   bg-status-signed/15' },
+  rejected: { label: 'Recusado',       cls: 'text-status-rejected bg-status-rejected/15' },
+  failed:   { label: 'Falha no envio', cls: 'text-status-failed   bg-status-failed/15' },
+} as const;
+export type ContractStatus = keyof typeof STATUS;
+export const needsAction    = (s: ContractStatus) => s === 'rejected' || s === 'failed';
+export const needsSignature = (s: ContractStatus) => s === 'pending' || s === 'sent' || s === 'viewed';
+```
+```tsx
+// components/dashboard/ui/StatusBadge.tsx
+export function StatusBadge({ status }: { status: ContractStatus }) {
+  const s = STATUS[status];
+  return (
+    <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap ${s.cls}`}>
+      <span className="w-1.5 h-1.5 rounded-full bg-current" />{s.label}
+    </span>
+  );
+}
+```
+Mesmo padrão para `<CSelect>`, `<Tooltip>`, `<Modal>`, etc.: **className = as classes do
+preview** (`.cs-btn`, `.ck`, `.tip`) + lógica em React; o visual sai do `globals.css` (§15.3).
+
+## 15.10 "Definição de pronto" por tela
+1. Renderiza com dados reais da `/api` (loading=skeleton, vazio=empty, falha=error).
+2. RBAC respeitado (esconde no front **e** servidor barra — `DASHBOARD_API §0`).
+3. **Paridade visual** com o print correspondente (pixelmatch vs `/tmp/dashboard-prints/`,
+   `DASHBOARD_PLAN.md §8.2`) nos 3 sidebars × claro/escuro × desktop/mobile relevantes.
+4. `reg-NN` do módulo verde (caminho feliz + negativos da `DASHBOARD_VALIDACOES.md`).
+5. Sem controle nativo, toast amarelo, linguagem neutra (checklist §13).
+
+## 15.11 Ordem de port (determinística)
+1. `globals.css` (tokens §15.3) + `tailwind.config` (§15.2) + `theme.tsx` (§15.4) + fontes.
+2. Shell: sidebar (3 temas) + topbar + layout responsivo + `useTheme`.
+3. `ui/` primitives portadas (CSelect, Checkbox, Tooltip, Modal, Toast, Badge, Skeleton,
+   Empty/Error, MaskedInput, DatePicker, RowMenu).
+4. `lib/api.ts` + React Query + `lib/status.ts`.
+5. Telas, na ordem das fases (`DASHBOARD_PLAN.md §9`): Alunos → Agenda → Contratos → Visão
+   geral → Comunicados → Editor. Cada tela fecha com sua "definição de pronto" (§15.10).
+
+> Regra de ouro do handoff: **quando em dúvida visual, o `public/dashboard.html` + o print
+> mandam.** O React copia; não recria.
