@@ -344,8 +344,9 @@ Devolve CSV (mesmos filtros da lista). **→ log** (`export_students` — LGPD, 
 | `POST /api/notifications/:id/read` | sessão | marcar 1 como lida |
 | `POST /api/notifications/read-all` | sessão | marcar todas |
 
-- **Filtradas pelo papel** (DASHBOARD_PLAN §4): Supervisor **não** recebe eventos de
-  contrato. Tipos: `enroll`|`signed`|`viewed`|`stale`|`email`.
+- **Por papel** (DASHBOARD_PLAN §4): **Diretor e Secretaria** têm sino (conteúdo filtrado);
+  **Supervisor NÃO tem** central de notificações (o preview oculta o sino dele). Logo, as
+  rotas só retornam dados para director/secretary. Tipos: `enroll`|`signed`|`viewed`|`stale`|`email`.
 
 ---
 

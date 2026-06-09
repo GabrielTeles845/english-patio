@@ -125,8 +125,10 @@ Três papéis, sem flexão de gênero. **"Administrador" foi renomeado para "Dir
 
 - **Tela inicial por papel:** Diretor → Visão geral · Supervisor → Agenda ·
   Secretaria → Alunos.
-- **Notificações:** filtradas pelo que o papel enxerga (ex.: Supervisor não recebe
-  eventos de contrato).
+- **Notificações:** **Diretor e Secretaria** têm sino/central (conteúdo filtrado pelo
+  papel). **Supervisor NÃO tem** notificações — o preview oculta o sino dele
+  (`applyRoleView`), porque os eventos são de matrícula/contrato, fora do escopo do
+  Supervisor. (Conferido no preview 09/Jun — é a lei.)
 - Racional: a **Stefany (Secretaria) cadastra tudo** — alunos, turmas, salas — e envia
   contratos; o Supervisor cuida da operação pedagógica (agenda) e consulta alunos;
   comunicação em massa, modelos, editor do site e gestão de acesso são do Diretor.
@@ -428,7 +430,10 @@ Decisões que estavam em aberto — **todas fechadas em 08/Jun/2026** (riscadas 
   nativo" tirou de graça.
 - ~~Status de contrato recusado/falho~~ — **DECIDIDO 08/Jun**: status próprio
   `rejected`/`failed` (5º/6º estado), fora do caminho feliz, com alerta + notificação.
-  Ver §5, §6.5 e §7.
+  Ver §5, §6.5 e §7. **⚠ Pendência de preview (conferido 09/Jun):** o mock do
+  `dashboard.html` ainda só usa `pending`/`sent`/`viewed`/`signed` — `rejected`/`failed`
+  **não estão visualizados** lá. Implementar essa visualização (cor própria + balde
+  "precisa de ação") no preview é tarefa de "completar o preview", antes do React.
 - ~~LGPD: apagamento do titular × `activity_log`~~ — **DECIDIDO 08/Jun: anonimizar no log**
   — apaga os dados pessoais do aluno e mantém as entradas de auditoria com o alvo
   anonimizado (ex. "aluno #123 [removido]"): cumpre o direito de apagamento **e** preserva

@@ -1734,7 +1734,7 @@ function renderNotifs(){
 }
 function toggleNotif(e){ e&&e.stopPropagation(); document.getElementById('notifPanel').classList.toggle('hidden'); lucide.createIcons(); }
 function notifClick(i){ const n=NOTIFS[i]; n.unread=false; renderNotifs(); document.getElementById('notifPanel')?.classList.add('hidden'); if(n.sid) openDetail(n.sid); }
-// BACKEND → /api/notifications* (DASHBOARD_API §12): GET lista (FILTRADA pelo papel — Supervisor não recebe eventos de contrato), POST /:id/read e /read-all. markAllRead → POST /api/notifications/read-all.
+// BACKEND → /api/notifications* (DASHBOARD_API §12): GET lista (só Diretor/Secretaria têm sino; Supervisor NÃO tem — ver applyRoleView), POST /:id/read e /read-all. markAllRead → POST /api/notifications/read-all.
 function markAllRead(){ NOTIFS.forEach(n=>n.unread=false); renderNotifs(); }
 
 /* ====================== TOUR DE BOAS-VINDAS (spotlight nos elementos reais) ====================== */
