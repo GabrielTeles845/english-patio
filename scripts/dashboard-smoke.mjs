@@ -133,9 +133,18 @@ section('Modal: nova matrícula');
   $('nmStudent').value = 'Teste da Silva Sauro';
   $('nmResp').value = 'Mãe do Teste Sauro';
   $('nmBirth').value = '10/10/2017';
+  // o modal passou a exigir CPF/telefone/e-mail/bairro válidos (validação real do submit)
+  $('nmCpf').value = '111.444.777-35';   // CPF com dígitos verificadores corretos, fora do mock
+  $('nmPhone').value = '(62) 99999-0000';
+  $('nmEmail').value = 'teste@exemplo.com';
+  $('nmHood').value = 'Setor Bueno';
   W.submitNewEnrollment();
   STUDENTS.length === before + 1 ? ok('preenchido cria matrícula') : fail('não criou matrícula válida');
   STUDENTS[0].kids[0].n === 'Teste da Silva Sauro' ? ok('entrou no topo da lista') : fail('não está no topo');
+  // remove a matrícula de teste: os testes seguintes (desligar/editar/importar) usam
+  // STUDENTS.find(active) e a importação depende dos alunos originais (ex.: a Helena, que
+  // o IMPORT_SAMPLE espera encontrar) — deixar o aluno de teste aqui poluiria tudo
+  { const i = STUDENTS.findIndex(s => s.kids[0]?.n === 'Teste da Silva Sauro'); if (i >= 0) STUDENTS.splice(i, 1); }
 }
 
 /* ---------- desligamento: validações do modal ---------- */
@@ -595,9 +604,10 @@ section('Importação de planilha');
   // validação de tipo de arquivo
   W.openImportModal();
   W.importReadFile({ name: 'foto.png', size: 100 });
-  $('importError').innerHTML.includes('não é um arquivo .csv') ? ok('.png recusado') : fail('aceitou .png');
-  W.importReadFile({ name: 'grande.csv', size: 11 * 1024 * 1024 });
-  $('importError').innerHTML.includes('grande') ? ok('>10MB recusado') : fail('aceitou arquivo gigante');
+  $('importError').innerHTML.includes('não é .csv nem .xlsx') ? ok('.png recusado') : fail('aceitou .png');
+  // limite real é 16MB; 17MB é recusado pela checagem de tamanho ANTES de ler (não chega no FileReader)
+  W.importReadFile({ name: 'grande.csv', size: 17 * 1024 * 1024 });
+  $('importError').innerHTML.includes('grande') ? ok('>16MB recusado') : fail('aceitou arquivo gigante');
 }
 
 /* ---------- modelos de contrato ---------- */
