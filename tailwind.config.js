@@ -4,9 +4,16 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  darkMode: 'class', // usado só pela dashboard (html.dark); o site público nunca recebe .dark
   theme: {
     extend: {
       colors: {
+        // ===== tokens da dashboard (DESIGN.md §15.2 — espelham o preview) =====
+        brand: { DEFAULT: '#1E3765', light: '#2F539A', 50: '#eef2f9', 700: '#1E3765', 900: '#13243f' },
+        wa: '#25D366',
+        status: { pending: '#B5860B', sent: '#2F539A', viewed: '#7C3AED', signed: '#16a34a', rejected: '#DC2626', failed: '#EA580C' },
+        fam: { fun: '#E8861B', conv: '#E0457B', power: '#2F539A', sprint: '#7C3AED' },
+        // ===== tokens do site institucional =====
         primary: {
           DEFAULT: '#1E3765', // Azul Escuro
           light: '#2F539A',   // Azul mais claro
@@ -18,6 +25,7 @@ export default {
         accent: {
           DEFAULT: '#F5B700', // Amarelo
           light: '#FFE17A',   // Amarelo pastel
+          50: '#fff8e1',      // (dashboard) fundo suave do amarelo
         },
         background: {
           DEFAULT: '#FFFFFF', // Branco

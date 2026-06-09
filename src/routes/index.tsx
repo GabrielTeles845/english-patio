@@ -5,8 +5,11 @@ import VacationClasses from '../pages/VacationClasses';
 import Methodology from '../pages/Methodology';
 import Enrollment from '../pages/Enrollment';
 import WhatsAppButton from '../components/WhatsAppButton';
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+
+// Dashboard administrativa — chunk separado (fontes/CSS próprios não pesam no site)
+const DashboardApp = lazy(() => import('../pages/dashboard'));
 
 // Componente que faz scroll para o topo quando muda de rota
 const ScrollToTop = () => {
@@ -31,6 +34,17 @@ const RootLayout = () => {
 };
 
 export const router = createBrowserRouter([
+  {
+    // Fora do RootLayout: a dashboard não herda o WhatsAppButton do site.
+    // Em produção o /dashboard EXATO ainda serve o preview (vercel.json);
+    // o React atende /dashboard/<tela> (DASHBOARD_PLAN.md §9, Fase 1).
+    path: '/dashboard/*',
+    element: (
+      <Suspense fallback={null}>
+        <DashboardApp />
+      </Suspense>
+    ),
+  },
   {
     path: '/',
     element: <RootLayout />,
