@@ -346,7 +346,7 @@ Devolve CSV (mesmos filtros da lista). **→ log** (`export_students` — LGPD, 
 
 - **Por papel** (DASHBOARD_PLAN §4): **Diretor e Secretaria** têm sino (conteúdo filtrado);
   **Supervisor NÃO tem** central de notificações (o preview oculta o sino dele). Logo, as
-  rotas só retornam dados para director/secretary. Tipos: `enroll`|`signed`|`viewed`|`stale`|`email`.
+  rotas só retornam dados para director/secretary. Tipos: `enroll`|`signed`|`viewed`|`stale`|`email`|`rejected`|`failed`.
 
 ---
 

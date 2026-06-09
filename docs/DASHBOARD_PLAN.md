@@ -202,7 +202,7 @@ seção já com a auditoria de 09/Jun); o Drizzle gera as migrations a partir de
 - **announcement_recipients** (id, announcement_id, enrollment_id, channel, status
   [`queued`|`sent`|`failed`|`prepared`]) — WhatsApp = mensagem preparada por família
   (API oficial é fase futura)
-- **notifications** (id, user_id, type[`enroll`|`signed`|`viewed`|`stale`|`email`],
+- **notifications** (id, user_id, type[`enroll`|`signed`|`viewed`|`stale`|`email`|`rejected`|`failed`],
   student_id nullable, title, body, read_at, created_at)
 - **site_content** (id, page_key, field_key, value, updated_by, updated_at)
 
@@ -430,10 +430,12 @@ Decisões que estavam em aberto — **todas fechadas em 08/Jun/2026** (riscadas 
   nativo" tirou de graça.
 - ~~Status de contrato recusado/falho~~ — **DECIDIDO 08/Jun**: status próprio
   `rejected`/`failed` (5º/6º estado), fora do caminho feliz, com alerta + notificação.
-  Ver §5, §6.5 e §7. **⚠ Pendência de preview (conferido 09/Jun):** o mock do
-  `dashboard.html` ainda só usa `pending`/`sent`/`viewed`/`signed` — `rejected`/`failed`
-  **não estão visualizados** lá. Implementar essa visualização (cor própria + balde
-  "precisa de ação") no preview é tarefa de "completar o preview", antes do React.
+  Ver §5, §6.5 e §7. **✅ FEITO no preview (09/Jun):** `rejected` (Recusado, vermelho) e
+  `failed` (Falha no envio, laranja) implementados no `dashboard.html` — badge no mapa
+  `STATUS`, helpers `needsAction`/`needsSignature`, balde "precisa de ação" no funil da
+  Visão geral, filtros (Alunos e Contratos), timeline com passo de exceção em vermelho,
+  menu ⋮ com "reenviar" (transições válidas) e notificações próprias (ícone). 2 exemplos
+  no mock (ids 7 e 8).
 - ~~LGPD: apagamento do titular × `activity_log`~~ — **DECIDIDO 08/Jun: anonimizar no log**
   — apaga os dados pessoais do aluno e mantém as entradas de auditoria com o alvo
   anonimizado (ex. "aluno #123 [removido]"): cumpre o direito de apagamento **e** preserva

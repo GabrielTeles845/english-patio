@@ -40,7 +40,7 @@ CREATE TYPE announcement_status  AS ENUM ('draft', 'scheduled', 'sending', 'sent
 CREATE TYPE announcement_kind    AS ENUM ('manual', 'automatic');
 CREATE TYPE channel              AS ENUM ('email', 'whatsapp');
 CREATE TYPE recipient_status     AS ENUM ('queued', 'sent', 'failed', 'prepared');
-CREATE TYPE notification_type    AS ENUM ('enroll', 'signed', 'viewed', 'stale', 'email');
+CREATE TYPE notification_type    AS ENUM ('enroll', 'signed', 'viewed', 'stale', 'email', 'rejected', 'failed');
 
 -- ============================================================================
 -- ACESSO & AUDITORIA
