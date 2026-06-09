@@ -33,7 +33,9 @@ tempo todo (aluno troca de horário, aluno novo entra, turma lota). A tese da te
 ## 3. Modelo de dados (mock do preview)
 
 ```js
-SALAS  = [{ id, nome:'Green Room', cor:'#8BC34A' }, …]   // 13 fixas (CRUD de renomear/cor)
+SALAS  = [{ id, nome:'Green Room', cor:'#8BC34A', prof:'Mariana Rios'|null }, …]
+  // 13 fixas (CRUD: renomear/cor/teacher). O PROFESSOR é da SALA: 1 por sala, vale para
+  // todos os pares/horários dela (tela "Salas & teachers"). A turma NÃO tem professor.
 // Green, Vanilla, Peach, Purple, Blue, Orange, Mint, Yellow, Guava, Beige, Rose,
 // Turquoise, Lavender — cada uma com a cor do próprio nome (tons suaves, não saturados)
 
@@ -45,7 +47,7 @@ NIVEIS = 4 famílias, cada uma com cor de estágio:
 // 19 níveis em ordem de evolução; NEM TODO semestre oferece todos (mock reflete isso)
 
 TURMAS = [{ id, salaId, par:'seg-qua'|'ter-qui', hora:'14:30', nivel:'power-2',
-            cap:7 /* padrão = máx */, teacher:null|'Mariana Rios' }]
+            cap:7 /* padrão = máx */ }]   // sem teacher: o professor vem da SALA
 
 // kid (dentro da matrícula) ganha turmaId | null  ← null = "sem turma" (chip âmbar)
 // NOVO/NOVA do Canva = derivado do "na escola desde" (entrou neste semestre)
@@ -94,8 +96,9 @@ mesmo modal de alocação (§5.2). Transforma o "esqueci de atrelar" em fila vis
 
 ### 5.1 Turmas
 - **Criar**: clique no `+` do slot vazio (grade ou visão da sala) → modal com sala/par/hora
-  pré-preenchidos; escolhe nível (select agrupado), cap (padrão 7, máx 7), teacher opcional.
-- **Editar**: nível, cap (nunca abaixo da ocupação atual), teacher, mover de horário/sala
+  pré-preenchidos; escolhe nível (select agrupado), cap (padrão 7, máx 7). **O professor
+  NÃO é da turma** — define-se por sala na aba "Salas & teachers".
+- **Editar**: nível, cap (nunca abaixo da ocupação atual), mover de horário/sala
   (só pra slot livre — uma sala não tem 2 turmas no mesmo slot do mesmo par).
 - **Excluir**: só vazia; com alunos, oferece mover os alunos antes (em lote).
 

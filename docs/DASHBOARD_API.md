@@ -142,8 +142,10 @@ Limpa `mustChangePassword`. **→ log**.
 - **Idempotência (crítico):** `submission_id` é `unique`; reenvio com o mesmo id **não
   duplica** — retorna a matrícula já criada (`200`), em vez de criar outra. Mata o bug
   DEBITOS #1 (re-clicar em "gerar contrato"). VALIDACOES §99.9.
-- Mapeia 1 payload → linhas em `enrollments` + `students` (kids) + `responsibles`
-  (legal/second/financial) + `addresses` + `contracts` (status inicial `pending`).
+- Mapeia 1 payload → `enrollments` (com `financial_responsible_type` e a preferência de
+  horário `requested_day_pair`/`requested_times`) + `students` (kids) + `responsibles`
+  (legal/second; **`financial` só quando `type='other'`** — senão aponta pro legal/second) +
+  `addresses` + `contracts` (status inicial `pending`, com `template_id`).
   `payment_method` fixo `boleto-6x`. `state` **deve ser `GO`** (`422 OUTSIDE_GO`).
 - Validação: bateria inteira das VALIDACOES §§1–6 (CPF dígito, telefone 3º=9, datas
   ≤20/≥18, autorizações obrigatórias, slots de horário reais).
@@ -223,7 +225,9 @@ Devolve CSV (mesmos filtros da lista). **→ log** (`export_students` — LGPD, 
 | `POST /api/rooms/:id/deactivate` | os 3 | desativar (só sem turmas) |
 
 - **Turma** (VALIDACOES §10, AGENDA_PLAN): `{ roomId, dayPair, startTime, levelId,
-  capacity≤7, teacher? }`. `(roomId, dayPair, startTime)` **único** ⇒ `409 SLOT_TAKEN`.
+  capacity≤7, period }` — **sem professor** (é atributo da sala; define-se via
+  `PATCH /api/rooms/:id`). `(roomId, dayPair, startTime, period)` **único** ⇒
+  `409 SLOT_TAKEN` (o slot é reusado a cada semestre).
   `startTime` ∈ 8 slots reais. Editar `capacity` **nunca < ocupação atual** ⇒ `422`.
   `DELETE` só se vazia (`422 CLASS_NOT_EMPTY` — oferecer mover alunos antes).
 - **Sala** (VALIDACOES §11): nome **único** case-insensitive (`409 ROOM_NAME_TAKEN`),

@@ -129,42 +129,59 @@ Três papéis, sem flexão de gênero. **"Administrador" foi renomeado para "Dir
 
 ## 5. Modelo de dados (Neon / Postgres)
 
-Derivado do mock do preview (nomes em inglês no banco; PT na UI).
+Derivado do mock do preview (nomes em inglês no banco; PT na UI). **O DDL Postgres
+completo e pronto pra rodar no Neon está em `docs/DASHBOARD_SCHEMA.sql`** (espelha esta
+seção já com a auditoria de 09/Jun); o Drizzle gera as migrations a partir dele.
 
 ### Acesso & auditoria
 - **users** (id, name, email, password_hash, role[`director`|`supervisor`|`secretary`],
-  is_active, invite_pending, last_login_at, created_at)
+  is_active, **must_change_password** (1ª senha temporária → troca obrigatória no 1º login,
+  §6.10), **password_changed_at**, last_login_at, created_at) — **sem `invite_pending`**: o
+  fluxo decidido é senha temporária, não convite-link.
 - **password_reset_tokens** (id, user_id, token_hash, expires_at, used_at)
 - **activity_log** (id, actor_type[`user`|`system`|`autentique`], actor_id nullable,
   action, target_type, target_id, detail jsonb, ip, user_agent, created_at)
 
 ### Estrutura escolar (ver AGENDA_PLAN.md §3)
-- **rooms** (id, name, color, teacher_name nullable, is_active) — 13 salas seed
+- **rooms** (id, name, color, **teacher_name nullable**, is_active) — 13 salas seed.
+  **O professor é atributo da SALA** (1 por sala, vale pra todos os pares/horários dela —
+  é como o preview faz: tela "Salas & teachers", `sala.prof`). A turma **não** tem professor.
 - **levels** (id, key, name, family[`fun`|`conv`|`power`|`sprint`], sort_order) —
   19 níveis seed, ordem de evolução
 - **classes** (id, room_id, day_pair[`seg-qua`|`ter-qui`], start_time, level_id,
-  capacity default 7 check ≤7, teacher_name nullable) —
-  `unique(room_id, day_pair, start_time)`; aula de 1h; horários válidos:
-  8:30/9:30/10:30/13:30/14:30/15:30/16:45/17:45
+  capacity default 7 check ≤7, **period** (ex. `2026.2` — mesmo nome que
+  `enrollments.period`), is_active) — **sem `teacher_name`**: o professor vem da sala
+  (`rooms.teacher_name`) — `unique(room_id, day_pair, start_time, period)` (o mesmo slot é
+  reusado a cada semestre); aula de 1h; horários válidos:
+  8:30/9:30/10:30/13:30/14:30/15:30/16:45/17:45. `period` habilita "nem todo semestre
+  oferece todos os níveis" e a virada de semestre (Fase 8).
 
 ### Matrículas & alunos
-- **enrollments** (id, status, source[`form`|`import`|`manual`], submission_id `unique`
-  (**idempotência** — mata as duplicatas, ver `docs/DEBITOS_TECNICOS.md`), class_format,
-  payment_method fixo `boleto-6x`, authorization_media, authorization_contract,
+- **enrollments** (id, **status** [`active`|`cancelled`] (a matrícula em si — **não**
+  confundir com `contracts.status` nem `students.is_active`), source[`form`|`import`|`manual`],
+  submission_id `unique` (**idempotência** — mata as duplicatas, ver
+  `docs/DEBITOS_TECNICOS.md`), class_format, payment_method fixo `boleto-6x`,
+  **financial_responsible_type** [`legal`|`second`|`other`] (se `legal`/`second`, o
+  financeiro é o próprio responsável — **não** duplica linha em `responsibles`),
+  **requested_day_pair** + **requested_times** (jsonb — a preferência de horário da família
+  no formulário, antes de alocar numa turma), authorization_media, authorization_contract,
   schedule_confirmed, submitted_at, period (ex. `2026.2`), notes)
 - **students** (id, enrollment_id, name, birth_date, **class_id nullable** (turma é do
   ALUNO, não da matrícula — irmãos em turmas diferentes), **at_school_since** (deriva
   NOVO/NOVA na agenda), is_active, exit_reason, exit_note, exit_date)
 - **responsibles** (id, enrollment_id, type[`legal`|`second`|`financial`], name, cpf,
-  phone, email, relationship, birth_date)
+  phone, email, relationship, birth_date) — a linha `financial` **só** existe quando
+  `enrollments.financial_responsible_type='other'`; senão o financeiro aponta pro
+  `legal`/`second`, sem duplicar dados.
 - **addresses** (id, enrollment_id, cep, street, number, complement, neighborhood,
   city, state)
 
 ### Contratos & Autentique
-- **contracts** (id, enrollment_id, pdf_url, status
+- **contracts** (id, enrollment_id, **template_id** (qual modelo gerou o PDF →
+  `contract_templates`), pdf_url, status
   [`pending`|`sent`|`viewed`|`signed`|`rejected`|`failed`], autentique_doc_id, sent_at, viewed_at,
-  signed_at, sent_via[`email`|`whatsapp`]) — "parado" = `sent`/`viewed` há ≥7 dias
-  (derivado, alimenta alertas)
+  signed_at, **rejected_at**, **failed_at**, sent_via[`email`|`whatsapp`]) — "parado" =
+  `sent`/`viewed` há ≥7 dias (derivado, alimenta alertas)
 - **contract_events** (id, contract_id, event_id `unique` (dedup), type
   [`signature.viewed`|`signature.accepted`|`signature.rejected`|
   `signature.delivery_failed`|`document.finished`], payload jsonb, received_at)

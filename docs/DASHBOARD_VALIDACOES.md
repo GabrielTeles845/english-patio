@@ -144,8 +144,8 @@ Legenda: **DO** = regra dashboard-only (não está no `validators.ts`). **⚠** 
 | horário | sim | um dos 8 slots válidos | — | `8:30/9:30/10:30/13:30/14:30/15:30/16:45/17:45` |
 | (sala+par+horário) | — | **único** | "Já existe turma nesse horário/sala" | unicidade-5 (slot não duplica) |
 | nível | sim | um dos 19 níveis | — | — |
-| capacidade | sim | **1..7**; ao editar **nunca < ocupação atual** | "A capacidade não pode ser menor que os alunos já na turma" | cap padrão=máx=7 (DO) |
-| teacher | não | texto | — | opcional; máx ⚠ |
+| capacidade | sim | **1..7**; ao editar **nunca < ocupação atual** | "A capacidade não pode ser menor que os alunos já na turma" | cap padrão=máx=7 (DO); vaga extra leva a 8–9 (§13) |
+| ~~teacher~~ | — | **professor é da SALA (§11), não da turma** | — | decidido 09/Jun (ver `DASHBOARD_PLAN §5`); a turma não tem professor |
 
 ## 11. Agenda — Sala
 
