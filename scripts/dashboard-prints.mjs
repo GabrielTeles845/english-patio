@@ -26,6 +26,8 @@ async function boot(viewport) {
 }
 
 const shot = async (page, name, full = true) => {
+  // espera o overlay de skeleton (#mainSkel.on, dura ~560ms) sair antes de capturar
+  await page.waitForFunction(() => { const o = document.getElementById('mainSkel'); return !o || !o.classList.contains('on'); }).catch(() => {});
   await page.waitForTimeout(350);
   // modais são position:fixed — fullPage embaralha o overlay em páginas altas
   await page.screenshot({ path: `${OUT}/${name}.png`, fullPage: full && !name.includes('modal') });
