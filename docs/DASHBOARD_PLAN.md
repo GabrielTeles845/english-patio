@@ -51,7 +51,9 @@ Navegador (React SPA)
   **shadcn/ui = andaime secundário**, nunca a fonte visual: os controles que o preview
   já calibrou (cselect, checkbox, tooltip global, datepicker, toasts, modais,
   tabela→cards mobile) são **portados 1:1 do CSS do preview**, não substituídos pelos
-  defaults do shadcn.
+  defaults do shadcn. **O sistema de design completo (tokens de cor claro/escuro, 3 temas de
+  sidebar, tipografia, componentes, estados, status, voz) está em `docs/DESIGN.md`** — a lei
+  visual a seguir 1:1.
 - **ORM:** Drizzle (TS-first, leve no Vercel).
 - **Storage dos contratos:** flexível — pode continuar no Google Drive por ora; o banco
   guarda só a URL do PDF, trocar storage depois é simples.
