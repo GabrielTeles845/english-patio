@@ -293,6 +293,8 @@ Devolve CSV (mesmos filtros da lista). **→ log** (`export_students` — LGPD, 
 ## 9. Webhook Autentique (entrada de eventos) — `replaces`: a simulação de status do preview
 
 **`POST /api/webhooks/autentique`** · RBAC: **nenhum** (verificação por assinatura).
+> Guia completo e código (HMAC, raw body no Vercel, payload, dedup, eventos) em
+> **`docs/AUTENTIQUE_INTEGRACAO.md §3`**.
 - **HMAC** obrigatório (`x-autentique-signature`) — assinatura inválida ⇒ `401`, sem
   processar (DASHBOARD_PLAN §3, §7).
 - **Dedup por `event_id`** (`unique` em `contract_events`) — entrega sem ordem e com

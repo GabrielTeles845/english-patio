@@ -4619,9 +4619,11 @@ function openCommPreview(){
 }
 
 /* --- visualizar contrato (com a linha do tempo do Autentique) --- */
-/* Tudo aqui é o que a API do Autentique realmente entrega: criação do documento via API,
-   entrega do link por WhatsApp+e-mail (delivery_method) e webhooks signature.viewed /
-   signature.accepted — visualização e assinatura chegam sozinhas, em tempo real. */
+/* Tudo aqui é o que a API do Autentique realmente entrega: createDocument via API,
+   entrega do link por WhatsApp/e-mail (delivery_method) e webhooks que chegam sozinhos:
+   signature.viewed (visualizou) e document.finished (assinado, fonte de verdade) — além de
+   signature.rejected/delivery_failed (fora do caminho feliz). DETALHES E CÓDIGO EXATO em
+   docs/AUTENTIQUE_INTEGRACAO.md (HMAC, payload, dedup por event.id, retentativas). */
 function autentiqueTimeline(s){
   const done=k=> k==='in' ? true
     : k==='auto' ? s.status!=='pending'

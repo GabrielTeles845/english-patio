@@ -242,7 +242,10 @@ seção já com a auditoria de 09/Jun); o Drizzle gera as migrations a partir de
 ## 7. Fluxo Autentique (assinatura digital)
 
 Validado contra a doc oficial (docs.autentique.com.br). Já simulado por completo no
-preview — implementar igual:
+preview — implementar igual. **Guia de implementação completo (endpoint, `createDocument`,
+entrega por WhatsApp/e-mail, eventos exatos, payload, HMAC, dedup, retentativas, checklist
+anti-erro) em `docs/AUTENTIQUE_INTEGRACAO.md`** — conferido contra a doc oficial em
+09/Jun/2026.
 
 1. Secretaria/Diretor envia o contrato → API GraphQL cria o documento; o **próprio
    Autentique** entrega o link por e-mail e/ou **WhatsApp**
