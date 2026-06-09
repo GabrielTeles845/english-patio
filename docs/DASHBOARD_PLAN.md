@@ -76,10 +76,16 @@ Navegador (React SPA)
   números) — **substituir pela política acima**. _Evolução possível (não bloqueia o
   MVP): checar contra base de senhas vazadas (HIBP k-anonymity)._
 - **Sessão:** JWT curto em cookie **httpOnly + secure + SameSite**, com refresh. CSRF
-  token nas mutações.
+  token nas mutações. **Stateless (decidido 09/Jun): sem tabela de sessões** — logout limpa
+  o cookie, **não** há revogação remota nem "sessões ativas"; por isso o JWT é curto.
+- **Bootstrap do 1º Diretor (decidido 09/Jun):** a conta inicial é **semeada** no deploy —
+  `admin@email.com` / `Senh@1234` (via env `SEED_ADMIN_EMAIL`/`SEED_ADMIN_PASSWORD`), com
+  `must_change_password=true` (troca obrigatória no 1º acesso). Resolve o ovo-e-galinha
+  (sem cadastro aberto). E-mail/senha podem ser trocados depois.
 - **Esqueci a senha:** token de uso único com expiração curta, enviado por e-mail
   (Resend), hash do token no banco.
-- **Rate limiting** no login (por IP e por e-mail) + log de tentativas falhas.
+- **Rate limiting** no login (por IP e por e-mail) + log de tentativas falhas. Estado no
+  **próprio Postgres** (tabela `login_attempts`) — sem Redis/dependência extra.
 - **RBAC sempre no servidor** — o front esconde telas por papel (como o preview já
   demonstra), mas **nunca** é fonte de verdade de permissão; toda rota `/api/*` valida
   o papel de novo.
@@ -237,7 +243,8 @@ seção já com a auditoria de 09/Jun); o Drizzle gera as migrations a partir de
     provisória não vale como definitiva). Sem fluxo de convite-link por e-mail.
 11. **Registro de atividades** — auditoria somente leitura, busca + filtro por ator
 12. **Configurações** — tema (3 sidebars × claro/escuro, transição circular), conta,
-    segurança (2FA futuro), sessões ativas, reativar tours
+    segurança (2FA futuro), reativar tours. **Sem "sessões ativas"** (decidido 09/Jun —
+    sessão stateless, §3); se o preview mostra o item, vira placeholder "Em breve".
 
 ## 7. Fluxo Autentique (assinatura digital)
 
@@ -371,6 +378,15 @@ rodando** — não basta passar no CI silenciosamente. Dois acréscimos ao §8.1
 - **O preview é a lei visual** (decidido 08/Jun/2026): implementação tem que ficar
   **idêntica**. Consequências: Chart.js (não Recharts), View Transitions (não Framer),
   controles do preview portados 1:1 (shadcn é secundário). Detalhe no §2.
+- **PDF do contrato (decidido 09/Jun):** o backend **porta as coordenadas calibradas do
+  `pdfService.ts`** (pdf-lib rodando no servidor) no MVP; o `field_map` configurável por
+  modelo (§6.6) é **evolução futura**, não bloqueia o MVP. Carregar o `public/contrato.pdf`
+  atual como 1º modelo seed.
+- **Retenção LGPD (decidido 09/Jun):** aluno inativo é guardado **indefinidamente**;
+  expurgo só por **pedido de exclusão** do titular (acionado pelo Diretor), anonimizando o
+  `activity_log` (§11). **Sem** expurgo automático por prazo.
+- **Sessão stateless + seed do 1º Diretor + rate-limit no Postgres (decididos 09/Jun):**
+  ver §3 (sem tabela de sessões; bootstrap `admin@email.com`; `login_attempts`).
 
 ## 11. Lacunas conhecidas & decisões pendentes (levantadas 08/Jun/2026)
 
@@ -429,9 +445,10 @@ Valem em todas as telas/formulários, não só numa:
 - **Confirmação real em ações destrutivas** — excluir aluno/turma/usuário/modelo (e
   desligar aluno) pede confirmação em modal próprio dizendo a consequência; nunca
   `confirm()` nativo.
-- **Cópia (textos) dos e-mails transacionais** — convite de usuário, reset de senha,
-  confirmação de matrícula e contrato (Autentique). Alguém precisa escrever esses textos;
-  ficam versionados junto aos templates (auth na Fase 1, Resend na Fase 5, Autentique §7).
+- **Cópia (textos) dos e-mails transacionais** — **escritos e prontos em
+  `docs/EMAILS_TRANSACIONAIS.md`** (conta criada, reset de senha, confirmação de matrícula,
+  mensagem do contrato Autentique, lembrete de contrato parado + mensagens de WhatsApp).
+  Falta só a escola revisar/aprovar o tom antes de produção.
 
 ## 13. Backup & recuperação (medo nº 1: perder dados de aluno)
 
@@ -483,6 +500,8 @@ RESEND_API_KEY               # envio de e-mail
 AUTENTIQUE_TOKEN             # API GraphQL
 AUTENTIQUE_WEBHOOK_SECRET    # validar HMAC do webhook (§3, §7)
 BLOB_READ_WRITE_TOKEN        # object storage (backup/PDF), se Vercel Blob
+SEED_ADMIN_EMAIL             # 1º Diretor semeado no deploy (default admin@email.com)
+SEED_ADMIN_PASSWORD          # senha provisória do seed (troca obrigatória no 1º login)
 # as VITE_GOOGLE_APPS_SCRIPT_URL / VITE_EMAILJS_* atuais seguem como estão até o cutover
 ```
 

@@ -60,6 +60,21 @@ CREATE TABLE users (
 );
 -- Regra "sempre >=1 Diretor ativo" (PLAN §6.10) é validada na camada /api (não dá
 -- CHECK confiável entre linhas); ver DASHBOARD_API §10 (422 LAST_DIRECTOR).
+-- BOOTSTRAP: o deploy semeia o 1º Diretor a partir de SEED_ADMIN_EMAIL/SEED_ADMIN_PASSWORD
+-- (default admin@email.com / Senh@1234), com must_change_password=true. Resolve o
+-- ovo-e-galinha (sem cadastro aberto); e-mail/senha trocáveis depois.
+
+-- Rate-limit do login no próprio Postgres (PLAN §3) — sem Redis.
+CREATE TABLE login_attempts (
+  id          bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  email       text,                                          -- e-mail tentado (pode não existir)
+  ip          inet,
+  success     boolean     NOT NULL,
+  created_at  timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_login_attempts_email ON login_attempts(email, created_at DESC);
+CREATE INDEX idx_login_attempts_ip    ON login_attempts(ip, created_at DESC);
+-- rate-limit = contar tentativas recentes (janela curta) por email e por ip.
 
 CREATE TABLE password_reset_tokens (
   id          bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
