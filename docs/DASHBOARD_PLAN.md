@@ -361,6 +361,10 @@ rodando** — não basta passar no CI silenciosamente. Dois acréscimos ao §8.1
   teste de RBAC por papel (200 pro papel certo, 403 pros outros) e de caminho de erro
   (`409`/`422` das regras de negócio). Sem buraco: validação, RBAC e webhook (HMAC inválido,
   evento duplicado) são exercidos.
+- **Catálogo enumerado:** a lista caso-a-caso (cada `reg-NN.tNN`, com tipo e resultado
+  esperado) que materializa este princípio está em **`docs/DASHBOARD_TESTES.md`** — é o
+  checklist de "todos os casos de teste", cruzando VALIDACOES × API × papéis × webhook ×
+  sessão. Construir cada `reg-NN` a partir dele.
 
 ## 9. Fases de implementação
 
