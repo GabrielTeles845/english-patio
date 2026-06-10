@@ -161,7 +161,7 @@ describe('POST /api/rooms/:id/deactivate', () => {
     const ins = await db.insert(rooms).values({ name: `${PREFIX}WithClass`, color: '#444444' }).returning();
     const level = (await db.select().from(levels).limit(1))[0];
     const cls = await db.insert(classes).values({
-      roomId: ins[0].id, dayPair: 'seg-qua', startTime: '8:30', levelId: level.id, period: '2099.1',
+      roomId: ins[0].id, dayPair: 'seg-qua', startTime: '8:30', levelId: level.id, period: '2098.1',
     }).returning();
     createdClassIds.push(cls[0].id);
 
