@@ -17,7 +17,7 @@ const THEME_DOTS: Array<[SidebarTheme, string, string]> = [
   ['yellow', 'linear-gradient(135deg,#FFF6DB,#F5B700)', 'Sidebar amarela'],
 ];
 
-export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function Sidebar({ open, onClose, onOpenAccount }: { open: boolean; onClose: () => void; onOpenAccount: () => void }) {
   useDash();
   const { effectiveUser, effectiveRole, logout } = useAuth();
   const { dark, sidebar, setSidebar, toggleDark } = useTheme();
@@ -128,7 +128,8 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
           </div>
         </div>
         <div className="p-3 border-t" style={{ borderColor: 'var(--sb-border)' }}>
-          <div className="sb-item flex items-center gap-3 px-2 py-2 rounded-xl">
+          {/* clicar no usuário abre "Minha conta" (openAccountModal do preview) */}
+          <div className="sb-item flex items-center gap-3 px-2 py-2 rounded-xl cursor-pointer" onClick={onOpenAccount}>
             <div
               className="w-9 h-9 rounded-full grid place-content-center font-semibold"
               style={{ background: 'var(--sb-accent)', color: 'var(--sb-accent-text)' }}
@@ -145,7 +146,8 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
             </div>
             <button
               data-tip="Sair do painel"
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 logout();
                 navigate('/dashboard/entrar');
               }}

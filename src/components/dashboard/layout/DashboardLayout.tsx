@@ -7,6 +7,7 @@ import { SkeletonView, skeletonKindFor } from '../ui/Skeleton';
 import { TourProvider, useTour } from '../ui/Tour';
 import { Sidebar } from './Sidebar';
 import { Topbar } from './Topbar';
+import { AccountModal } from '../../../pages/dashboard/AccountModal';
 
 /* Shell da dashboard — sidebar + topbar + faixa "ver painel como…" + main.
    A cada navegação pisca o skeleton da tela (~560ms, igual ao flashSkel do
@@ -27,6 +28,7 @@ function LayoutInner() {
   const { startTour, maybeTourFor } = useTour();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
   const [skelView, setSkelView] = useState<string | null>(null);
 
   const segs = location.pathname.replace(/^\/dashboard\/?/, '').split('/');
@@ -61,7 +63,8 @@ function LayoutInner() {
 
   return (
     <div className="lg:flex min-h-screen">
-      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} onOpenAccount={() => setAccountOpen(true)} />
+      {accountOpen && <AccountModal onClose={() => setAccountOpen(false)} />}
 
       <div className="flex-1 min-w-0 flex flex-col">
         <Topbar title={VIEW_LABEL[view ?? ''] ?? 'Visão geral'} onOpenSidebar={() => setSidebarOpen(true)} />

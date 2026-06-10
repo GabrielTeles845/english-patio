@@ -1,13 +1,14 @@
+import { useState } from 'react';
 import { ChevronRight, LifeBuoy, Palette, Pencil, PlayCircle, RotateCcw, ShieldCheck, UserRound } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { initials, useAuth } from '../../lib/dashboard/auth';
 import { useTheme, type SidebarTheme } from '../../lib/dashboard/theme';
 import { useToast } from '../../components/dashboard/ui/Toast';
 import { useTour } from '../../components/dashboard/ui/Tour';
+import { AccountModal } from './AccountModal';
 
 /* Configurações — port da tela do preview: Aparência (modo escuro com animação
-   circular + 3 temas de sidebar), Minha conta, Segurança e Ajuda/tours.
-   O modal "Editar e-mail e senha" chega nas próximas fases. */
+   circular + 3 temas de sidebar), Minha conta, Segurança e Ajuda/tours. */
 
 const SB_OPTIONS: Array<[SidebarTheme, string, string]> = [
   ['blue', 'Azul', 'linear-gradient(135deg,#1E3765,#2F539A)'],
@@ -23,9 +24,11 @@ export default function Config() {
   const { toast } = useToast();
   const { startTour } = useTour();
   const navigate = useNavigate();
+  const [accountOpen, setAccountOpen] = useState(false);
 
   return (
     <section className="fade-in">
+      {accountOpen && <AccountModal onClose={() => setAccountOpen(false)} />}
       <h1 className="font-heading text-2xl sm:text-3xl font-semibold mb-1">Configurações</h1>
       <p className="text-[var(--muted)] text-sm mb-6">Aparência, conta e segurança do painel</p>
       <div className="grid lg:grid-cols-2 gap-4 items-start">
@@ -110,7 +113,7 @@ export default function Config() {
               </div>
             </div>
             <button
-              onClick={() => toast('A edição de conta chega junto com o backend de autenticação (Fase 1 do plano).')}
+              onClick={() => setAccountOpen(true)}
               className="mt-4 w-full h-10 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)] transition flex items-center justify-center gap-2"
             >
               <Pencil className="w-4 h-4" /> Editar e-mail e senha
