@@ -18,8 +18,11 @@ import Login from './Login';
 import Config from './Config';
 import Placeholder from './Placeholder';
 import Alunos from './Alunos';
+import Overview from './Overview';
 import Detalhe from './alunos/Detalhe';
 import Agenda from './Agenda';
+import Contratos from './Contratos';
+import Modelos from './contratos/Modelos';
 
 /* App da dashboard administrativa — vive em /dashboard/<tela> (PLAN §9 Fase 1).
    Em produção o /dashboard EXATO continua servindo o preview (rewrite no
@@ -50,11 +53,12 @@ export default function DashboardApp() {
               <Route path="entrar" element={<Login />} />
               <Route element={<RequireAuth />}>
                 <Route element={<DashboardLayout />}>
-                  <Route path="visao-geral" element={<Placeholder view="overview" sub="Resumo da escola" />} />
+                  <Route path="visao-geral" element={<Overview />} />
                   <Route path="alunos" element={<Alunos />} />
                   <Route path="alunos/:id" element={<Detalhe />} />
                   <Route path="agenda" element={<Agenda />} />
-                  <Route path="contratos" element={<Placeholder view="contratos" sub="Acompanhamento e assinatura" />} />
+                  <Route path="contratos" element={<Contratos />} />
+                  <Route path="contratos/modelos" element={<Modelos />} />
                   <Route path="comunicados" element={<Placeholder view="emails" sub="E-mail e WhatsApp para as famílias" />} />
                   <Route path="editor" element={<Placeholder view="editor" sub="Textos do site institucional" />} />
                   <Route path="usuarios" element={<Placeholder view="usuarios" sub="Equipe e permissões" />} />

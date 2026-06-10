@@ -20,8 +20,12 @@ export function DashboardLayout() {
 
   const segs = location.pathname.replace(/^\/dashboard\/?/, '').split('/');
   const slug = segs[0];
-  /* sub-rota /dashboard/alunos/:id = a view "detalhe" do preview (título e skeleton próprios) */
-  const view = slug === 'alunos' && segs[1] ? 'detalhe' : ALL_NAV_ITEMS.find((i) => i.slug === slug)?.view ?? null;
+  /* sub-rota /dashboard/alunos/:id = a view "detalhe" do preview (título e skeleton próprios);
+     /dashboard/contratos/modelos = a view "modelos" (sub-tela, só Diretor — go() l.1628) */
+  const view =
+    slug === 'alunos' && segs[1] ? 'detalhe'
+      : slug === 'contratos' && segs[1] === 'modelos' ? 'modelos'
+      : ALL_NAV_ITEMS.find((i) => i.slug === slug)?.view ?? null;
 
   useEffect(() => {
     if (!view) return;
