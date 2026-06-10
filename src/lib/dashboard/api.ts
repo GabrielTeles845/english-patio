@@ -6,13 +6,17 @@
 export interface ApiErrorShape {
   code: string;
   message?: string;
+  /* erros de validação (400) trazem o mapa campo→mensagem do envelope (DASHBOARD_API §0) */
+  fields?: Record<string, string>;
 }
 
 export class ApiError extends Error {
   code: string;
+  fields?: Record<string, string>;
   constructor(err: ApiErrorShape) {
     super(err.message ?? err.code);
     this.code = err.code;
+    this.fields = err.fields;
   }
 }
 

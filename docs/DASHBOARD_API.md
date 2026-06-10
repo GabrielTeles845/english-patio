@@ -20,8 +20,9 @@ Fontes de verdade que este doc costura:
 
 ## 0. Convenções (valem para TODAS as rotas)
 
-- **Base:** `/api/*` — Vercel Serverless Functions, mesmo projeto da SPA (gate `tsc`/lint
-  protege o deploy de produção; DASHBOARD_PLAN §2).
+- **Base:** `/api/*` — Vercel Serverless Functions, mesmo projeto da SPA (o gate `tsc`
+  do build protege o deploy de produção; DASHBOARD_PLAN §2). _Obs.: o `npm run lint` hoje
+  não roda no repo (sem config de ESLint) — `tsc` é o gate efetivo; reativar o lint é débito à parte._
 - **Formato:** JSON. Envelope único de resposta:
   - sucesso: `{ "ok": true, "data": <payload> }`
   - erro: `{ "ok": false, "error": { "code": "STRING", "message": "PT-BR", "fields"?: { campo: "msg" } } }`
@@ -157,7 +158,7 @@ Limpa `mustChangePassword`. **→ log**.
 - **Anti-abuso (decidido 09/Jun — única rota pública de escrita fora do webhook):**
   rate-limit por IP (mesma infra `login_attempts` do §1, janela curta — família real envia
   1–2; robô envia centenas) + **teto de tamanho do `pdfBase64`** (~16 MB, o mesmo das
-  VALIDACOES §12). Excesso ⇒ `429 RATE_LIMITED` / `413`.
+  VALIDACOES §12). Excesso ⇒ `429 RATE_LIMITED` (frequência) / `413 PAYLOAD_TOO_LARGE` (tamanho).
 - **Idempotência (crítico):** `submission_id` é `unique`; reenvio com o mesmo id **não
   duplica** — retorna a matrícula já criada (`200`), em vez de criar outra. Mata o bug
   DEBITOS #1 (re-clicar em "gerar contrato"). VALIDACOES §99.9.
@@ -248,7 +249,8 @@ Devolve CSV (mesmos filtros da lista). **→ log** (`export_students` — LGPD, 
   capacity≤7, period }` — **sem professor** (é atributo da sala; define-se via
   `PATCH /api/rooms/:id`). `(roomId, dayPair, startTime, period)` **único** ⇒
   `409 SLOT_TAKEN` (o slot é reusado a cada semestre).
-  `startTime` ∈ 8 slots reais. Editar `capacity` **nunca < ocupação atual** ⇒ `422`.
+  `startTime` ∈ 8 slots reais. Editar `capacity` **nunca < ocupação atual** ⇒
+  `422 CAPACITY_BELOW_OCCUPANCY`.
   `DELETE` só se vazia (`422 CLASS_NOT_EMPTY` — oferecer mover alunos antes).
 - **Sala** (VALIDACOES §11): nome **único** case-insensitive (`409 ROOM_NAME_TAKEN`),
   máx 40; desativar só **sem turmas** (`422 ROOM_HAS_CLASSES`).
@@ -264,7 +266,7 @@ Devolve CSV (mesmos filtros da lista). **→ log** (`export_students` — LGPD, 
 | `GET /api/contracts/:id` | director, secretary | detalhe + **timeline** |
 | `POST /api/contracts/:id/send` | director, secretary | envia via Autentique (sandbox em teste) |
 | `GET /api/contracts/:id/pdf` | director, secretary | baixar PDF (`→ log`) |
-| `POST /api/contracts/:id/remind` | director, secretary | preparar cobrança WhatsApp |
+| `POST /api/contracts/:id/remind` | director, secretary | preparar cobrança WhatsApp (`→ log`; rota nova, sem equivalente no preview) |
 
 - **Enviar** (`/send`): chama a **API GraphQL do Autentique**, que entrega o link por
   e-mail e/ou **WhatsApp** (`DELIVERY_METHOD_WHATSAPP`). Guarda `autentique_doc_id`,
@@ -403,7 +405,9 @@ Devolve CSV (mesmos filtros da lista). **→ log** (`export_students` — LGPD, 
 
 `BAD_CREDENTIALS` · `RATE_LIMITED` · `FORBIDDEN` · `NOT_FOUND` · `VALIDATION` (com
 `fields`) · `EMAIL_TAKEN` · `SLOT_TAKEN` · `ROOM_NAME_TAKEN` · `ROOM_HAS_CLASSES` ·
-`CLASS_NOT_EMPTY` · `ROOM_OVERFLOW` · `LEVEL_CHANGE_REQUIRES_CONFIRM` · `OUTSIDE_GO` ·
+`CLASS_NOT_EMPTY` · `ROOM_OVERFLOW` · `CAPACITY_BELOW_OCCUPANCY` (422 — reduzir capacity
+abaixo da ocupação atual, §5) · `LEVEL_CHANGE_REQUIRES_CONFIRM` · `OUTSIDE_GO` ·
+`PAYLOAD_TOO_LARGE` (413 — pdfBase64/upload acima do teto, §4.1/§7) ·
 `LAST_DIRECTOR` · `STALE_WRITE` (edição concorrente) · `UNMAPPED_FIELDS` ·
 `CSRF_INVALID` (403 — mutação sem/with `x-csrf-token` inválido, §0) ·
 `INVALID_SIGNATURE` (401 — HMAC do webhook Autentique inválido, §9) · `INTERNAL`.
@@ -419,7 +423,7 @@ Devolve CSV (mesmos filtros da lista). **→ log** (`export_students` — LGPD, 
 | `sendForgot` (1651) | `POST /api/auth/forgot` | 1 |
 | `savePass` (4659) | `POST /api/account/password` | 1 |
 | `saveAccount` (5287) | `PATCH /api/account` | 1 |
-| `refreshOverviewData`/`renderHealth`/`renderVagas`/`renderNiveis`/`renderMovimento` | `GET /api/overview` | 2 |
+| `refreshOverviewData`/`renderHealth`/`renderVagas`/`renderNiveis`/`renderMovimento`/`renderBirthdays`/`renderHoods` | `GET /api/overview` | 2 |
 | `renderTable`/`filteredStudents` | `GET /api/enrollments` | 3 |
 | `openDetail` | `GET /api/enrollments/:id` | 3 |
 | `submitNewEnrollment` (3988) | `POST /api/enrollments` (manual) | 4.2 |
