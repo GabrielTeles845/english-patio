@@ -4,6 +4,7 @@ import { eq } from 'drizzle-orm';
 import { db } from '../../server/db/client';
 import { users, loginAttempts } from '../../server/db/schema';
 import { hashPassword } from '../../server/lib/password';
+import login from '../../api/auth/login';
 
 export const TEST_IP = '198.51.100.5';
 
@@ -24,12 +25,12 @@ export function mkRes(): any {
 export function mkReq(
   method: string,
   body: unknown,
-  opts: { cookie?: string; csrf?: string } = {},
+  opts: { cookie?: string; csrf?: string; query?: Record<string, string> } = {},
 ): any {
   const headers: Record<string, unknown> = { 'x-forwarded-for': TEST_IP };
   if (opts.cookie) headers.cookie = opts.cookie;
   if (opts.csrf) headers['x-csrf-token'] = opts.csrf;
-  return { method, body, headers, socket: { remoteAddress: TEST_IP } };
+  return { method, body, headers, query: opts.query ?? {}, socket: { remoteAddress: TEST_IP } };
 }
 
 // Retorna o par "nome=valor" do Set-Cookie (sem os atributos), ou ''.
@@ -74,4 +75,15 @@ export async function clearAttempts(...emails: string[]): Promise<void> {
   for (const email of emails) {
     await db.delete(loginAttempts).where(eq(loginAttempts.email, email));
   }
+}
+
+// Faz login e devolve os cookies prontos pra usar nos testes autenticados.
+export async function loginAs(email: string, password: string): Promise<{
+  session: string; csrfPair: string; csrf: string; cookies: string;
+}> {
+  const res = mkRes();
+  await login(mkReq('POST', { email, password }), res);
+  const session = getCookie(res, 'ep_session');
+  const csrfPair = getCookie(res, 'ep_csrf');
+  return { session, csrfPair, csrf: cookieValue(csrfPair), cookies: `${session}; ${csrfPair}` };
 }

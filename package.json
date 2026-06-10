@@ -10,10 +10,11 @@
     "preview": "vite preview",
     "test:e2e": "node scripts/dashboard-e2e.mjs",
     "test:validations": "node scripts/dashboard-validations.mjs",
-    "test:api": "node --env-file=.env --import tsx --test tests/api/auth.test.ts",
+    "test:api": "node --env-file=.env --import tsx --test \"tests/api/*.test.ts\"",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "node --env-file=.env scripts/seed-admin.mjs",
+    "db:seed:agenda": "node --env-file=.env scripts/seed-agenda.mjs",
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
