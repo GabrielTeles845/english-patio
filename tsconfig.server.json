@@ -15,5 +15,5 @@
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true
   },
-  "include": ["server", "api", "drizzle.config.ts"]
+  "include": ["server", "api", "tests", "drizzle.config.ts"]
 }

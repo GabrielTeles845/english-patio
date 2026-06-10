@@ -51,6 +51,16 @@ export function clearAuthCookies(): string[] {
   ];
 }
 
+// CSRF double-submit (API §0): o cookie legível ep_csrf (setado no login) tem
+// que bater com o header x-csrf-token. Exigir em toda mutação autenticada.
+// login (bootstrap do token) e logout (só limpa cookie) ficam de fora.
+export function csrfValid(req: VercelRequest): boolean {
+  const cookie = readCookie(req, CSRF_COOKIE);
+  const raw = req.headers['x-csrf-token'];
+  const header = Array.isArray(raw) ? raw[0] : raw;
+  return !!cookie && !!header && cookie === header;
+}
+
 export interface Session {
   user: { id: number; name: string; email: string; role: string };
   mustChangePassword: boolean;
