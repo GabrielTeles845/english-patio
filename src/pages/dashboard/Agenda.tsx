@@ -74,19 +74,28 @@ type AgModal =
   | { kind: 'export' }
   | null;
 
+/* deep-links da Visão geral — equivalente ao go('agenda');setAgView(...)/
+   openSalaView(id)/openSalasManage('profs') do preview: a tela consome o
+   preset uma única vez ao montar */
+let agPreset: { view?: AgView; sala?: string; salasTab?: SmTab } | null = null;
+export function presetAgenda(p: { view?: AgView; sala?: string; salasTab?: SmTab }) {
+  agPreset = p;
+}
+
 export default function Agenda() {
   useDash();
   const { effectiveUser } = useAuth();
   const { toast, toastErr } = useToast();
   const who = effectiveUser?.name ?? 'Painel';
 
-  const [view, setViewRaw] = useState<AgView>('grade');
+  const [view, setViewRaw] = useState<AgView>(() => agPreset?.view ?? 'grade');
   const [par, setPar] = useState<Par>('seg-qua');
   const [vagasOnly, setVagasOnly] = useState(false);
-  const [agSala, setAgSala] = useState<string | null>(null);
+  const [agSala, setAgSala] = useState<string | null>(() => agPreset?.sala ?? null);
   const [fPeriodo, setFPeriodo] = useState('');
   const [fProf, setFProf] = useState('');
-  const [modal, setModal] = useState<AgModal>(null);
+  const [modal, setModal] = useState<AgModal>(() => (agPreset?.salasTab ? { kind: 'salas', tab: agPreset.salasTab } : null));
+  agPreset = null; // consumido — próxima visita à Agenda volta ao padrão
 
   /* clicar na pill sempre volta ao nível de cima (setAgView, l.2572) */
   const setView = (v: AgView) => {

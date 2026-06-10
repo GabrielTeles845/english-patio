@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { initials, useAuth } from '../../lib/dashboard/auth';
 import { useTheme, type SidebarTheme } from '../../lib/dashboard/theme';
 import { useToast } from '../../components/dashboard/ui/Toast';
+import { useTour } from '../../components/dashboard/ui/Tour';
 
 /* Configurações — port da tela do preview: Aparência (modo escuro com animação
    circular + 3 temas de sidebar), Minha conta, Segurança e Ajuda/tours.
-   O modal "Editar e-mail e senha" e o motor de tours chegam nas próximas fases. */
+   O modal "Editar e-mail e senha" chega nas próximas fases. */
 
 const SB_OPTIONS: Array<[SidebarTheme, string, string]> = [
   ['blue', 'Azul', 'linear-gradient(135deg,#1E3765,#2F539A)'],
@@ -20,6 +21,7 @@ export default function Config() {
   const { effectiveUser } = useAuth();
   const { dark, sidebar, setSidebar, toggleDark } = useTheme();
   const { toast } = useToast();
+  const { startTour } = useTour();
   const navigate = useNavigate();
 
   return (
@@ -56,7 +58,7 @@ export default function Config() {
               <p className="text-xs text-[var(--muted)] mb-3">
                 Com claro/escuro, são 6 combinações — as bolinhas no rodapé da sidebar também trocam
               </p>
-              <div className="flex gap-4">
+              <div className="flex gap-4" id="sbThemePicker">
                 {SB_OPTIONS.map(([key, label, bg]) => (
                   <button
                     key={key}
@@ -85,7 +87,7 @@ export default function Config() {
         </div>
 
         {/* conta */}
-        <div className="surface rounded-2xl overflow-hidden">
+        <div className="surface rounded-2xl overflow-hidden" data-tour="conta">
           <div className="flex items-center gap-3 px-5 py-4 border-b" style={{ borderColor: 'var(--border)' }}>
             <div className="w-10 h-10 rounded-xl grid place-content-center" style={{ background: 'rgba(47,83,154,.10)' }}>
               <UserRound className="w-5 h-5 text-brand-light" />
@@ -154,7 +156,7 @@ export default function Config() {
         </div>
 
         {/* ajuda */}
-        <div className="surface rounded-2xl overflow-hidden">
+        <div className="surface rounded-2xl overflow-hidden" data-tour="ajuda">
           <div className="flex items-center gap-3 px-5 py-4 border-b" style={{ borderColor: 'var(--border)' }}>
             <div className="w-10 h-10 rounded-xl grid place-content-center" style={{ background: 'rgba(124,58,237,.10)' }}>
               <LifeBuoy className="w-5 h-5" style={{ color: '#7C3AED' }} />
@@ -166,7 +168,7 @@ export default function Config() {
           </div>
           <div className="p-5 space-y-3">
             <div
-              onClick={() => toast('Os tours guiados chegam junto com cada tela portada do preview.')}
+              onClick={() => startTour('config')}
               className="flex items-center justify-between cursor-pointer hover:bg-[var(--hover)] -mx-2 px-2 py-1.5 rounded-lg transition"
             >
               <div>

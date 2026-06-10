@@ -61,6 +61,8 @@ import { useToast } from '../../components/dashboard/ui/Toast';
 import { WAIcon } from '../../components/dashboard/ui/icons';
 import { STATUS_INK } from './alunos/common';
 import { exportStudentsCSV } from './alunos/exportCsv';
+import { presetAlunos } from './Alunos';
+import { presetAgenda } from './Agenda';
 import { ChartShell } from '../../components/dashboard/charts/base';
 import { EnrollChart, type PeriodKey } from '../../components/dashboard/charts/EnrollChart';
 import { AgeChart } from '../../components/dashboard/charts/AgeChart';
@@ -119,8 +121,14 @@ export default function Overview() {
   const goAgenda = () => navigate('/dashboard/agenda');
   const goAlunos = () => navigate('/dashboard/alunos');
   const openDetail = (sid: number) => navigate(`/dashboard/alunos/${sid}`);
-  /* port de goPendentes (l.3550) — leva à lista de alunos para cobrar pelo ⋮ */
+  /* abre a Agenda já na visão/sala/aba certa (go('agenda');setAgView(…) do preview) */
+  const goAgendaEm = (p: Parameters<typeof presetAgenda>[0]) => () => {
+    presetAgenda(p);
+    goAgenda();
+  };
+  /* port de goPendentes (l.3550) — abre Alunos já filtrado em pendentes+estudando */
   const goPendentes = () => {
+    presetAlunos({ fStatus: 'pending', fActive: 'on' });
     goAlunos();
     toast('Mostrando os contratos pendentes — use o menu ⋮ de cada linha para cobrar.');
   };
@@ -501,7 +509,7 @@ export default function Overview() {
             {vagasRows.map(({ s, v, cap }) => {
               const full = v >= cap;
               return (
-                <div key={s.id} className="cursor-pointer" onClick={goAgenda} data-tip={`Abrir a ${s.n} na Agenda`}>
+                <div key={s.id} className="cursor-pointer" onClick={goAgendaEm({ view: 'salas', sala: s.id })} data-tip={`Abrir a ${s.n} na Agenda`}>
                   <div className="flex justify-between text-[13px] mb-1">
                     <span className="font-medium flex items-center gap-1.5">
                       <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: s.c }} />
@@ -651,7 +659,7 @@ export default function Overview() {
               <h3 className="font-heading font-semibold text-lg">Alunos por nível</h3>
               <p className="text-xs text-[var(--muted)]">Quantos alunos estudam em cada nível — só os níveis com turma neste semestre</p>
             </div>
-            <button onClick={goAgenda} className="text-sm font-medium text-brand-light hover:underline flex items-center gap-1 whitespace-nowrap">
+            <button onClick={goAgendaEm({ view: 'niveis' })} className="text-sm font-medium text-brand-light hover:underline flex items-center gap-1 whitespace-nowrap">
               Ver na agenda <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -708,7 +716,7 @@ export default function Overview() {
         <div className="surface rounded-2xl p-5 flex flex-col" data-tour="ov-teachers">
           <div className="flex items-center justify-between mb-1">
             <h3 className="font-heading font-semibold text-lg">Alunos por teacher</h3>
-            <button onClick={goAgenda} className="text-sm font-medium text-brand-light hover:underline whitespace-nowrap">
+            <button onClick={goAgendaEm({ salasTab: 'profs' })} className="text-sm font-medium text-brand-light hover:underline whitespace-nowrap">
               Gerenciar
             </button>
           </div>
@@ -734,7 +742,7 @@ export default function Overview() {
         <div className="surface rounded-2xl p-5 flex flex-col" data-tour="ov-vagas-nivel">
           <div className="flex items-center justify-between mb-1">
             <h3 className="font-heading font-semibold text-lg">Vagas por nível</h3>
-            <button onClick={goAgenda} className="text-sm font-medium text-brand-light hover:underline flex items-center gap-1 whitespace-nowrap">
+            <button onClick={goAgendaEm({ view: 'niveis' })} className="text-sm font-medium text-brand-light hover:underline flex items-center gap-1 whitespace-nowrap">
               Ver na agenda <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -744,7 +752,7 @@ export default function Overview() {
               <div
                 key={r.nv.k}
                 className="flex items-center gap-2.5 cursor-pointer hover:bg-[var(--hover)] -mx-1.5 px-1.5 py-0.5 rounded-lg transition"
-                onClick={goAgenda}
+                onClick={goAgendaEm({ view: 'niveis' })}
               >
                 <span
                   className="text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap w-[96px] text-center truncate shrink-0"
@@ -765,12 +773,13 @@ export default function Overview() {
           <p className="text-xs text-[var(--muted)] mb-4">O que merece um olho hoje — toque para resolver</p>
           <div className="flex-1 flex flex-col justify-evenly gap-1.5">
             {[
-              { Ic: UsersRound, label: 'Alunos aguardando turma', n: fila, tone: '#B5860B' },
-              { Ic: DoorClosed, label: 'Turmas lotadas', n: cheias, tone: '#16a34a' },
-              { Ic: Expand, label: 'Turmas com vaga extra aberta (limite acima de 7)', n: extras, tone: '#7C3AED' },
-              { Ic: UserRoundX, label: 'Salas com turma e sem teacher', n: semProfSalas.length, tone: '#DC2626' },
-            ].map(({ Ic, label, n, tone }) => (
-              <div key={label} onClick={goAgenda} className="flex items-center gap-2.5 cursor-pointer hover:bg-[var(--hover)] -mx-1.5 px-1.5 py-1.5 rounded-lg transition">
+              /* destinos = os mesmos onclicks do preview (renderOpsStats l.3506–3509) */
+              { Ic: UsersRound, label: 'Alunos aguardando turma', n: fila, tone: '#B5860B', go: goAgenda },
+              { Ic: DoorClosed, label: 'Turmas lotadas', n: cheias, tone: '#16a34a', go: goAgendaEm({ view: 'grade' }) },
+              { Ic: Expand, label: 'Turmas com vaga extra aberta (limite acima de 7)', n: extras, tone: '#7C3AED', go: goAgendaEm({ view: 'grade' }) },
+              { Ic: UserRoundX, label: 'Salas com turma e sem teacher', n: semProfSalas.length, tone: '#DC2626', go: goAgendaEm({ salasTab: 'profs' }) },
+            ].map(({ Ic, label, n, tone, go }) => (
+              <div key={label} onClick={go} className="flex items-center gap-2.5 cursor-pointer hover:bg-[var(--hover)] -mx-1.5 px-1.5 py-1.5 rounded-lg transition">
                 <div className="w-8 h-8 rounded-lg grid place-content-center shrink-0" style={{ background: `${tone}1a` }}>
                   <Ic className="w-4 h-4" style={{ color: tone }} />
                 </div>

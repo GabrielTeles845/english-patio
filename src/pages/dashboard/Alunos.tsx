@@ -79,6 +79,13 @@ const cache = {
   famGroup: false,
 };
 
+/* deep-link da Visão geral (goPendentes do preview, l.3550: csSet('fStatus',…)) —
+   pré-arma os filtros antes de navegar pra cá */
+export function presetAlunos(p: Partial<AlunoFilters>) {
+  cache.filters = { ...emptyFilters(), ...p };
+  cache.page = 1;
+}
+
 type ModalState =
   | null
   | { kind: 'new' }

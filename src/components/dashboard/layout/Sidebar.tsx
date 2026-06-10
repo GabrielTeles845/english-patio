@@ -3,6 +3,8 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { initials, roleAllows, useAuth } from '../../../lib/dashboard/auth';
 import { sidebarLogo, useTheme, type SidebarTheme } from '../../../lib/dashboard/theme';
 import { NAV_GROUPS } from '../../../lib/dashboard/nav';
+import { NOTIFS, STUDENTS, needsSignature, semTurmaKids } from '../../../lib/dashboard/data';
+import { useDash } from '../../../lib/dashboard/store';
 import { useToast } from '../ui/Toast';
 
 /* Sidebar — port 1:1 do preview: logo + "Dashboard", 3 grupos de navegação,
@@ -16,12 +18,25 @@ const THEME_DOTS: Array<[SidebarTheme, string, string]> = [
 ];
 
 export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
+  useDash();
   const { effectiveUser, effectiveRole, logout } = useAuth();
   const { dark, sidebar, setSidebar, toggleDark } = useTheme();
   const { toast } = useToast();
   const navigate = useNavigate();
 
   if (!effectiveUser || !effectiveRole) return null;
+
+  /* badges derivados da base — port navNewBadge (l.1739), navAgBadge (l.2668)
+     e o "pend." de Contratos (l.320; aqui derivado em vez de fixo) */
+  const newEnrolls = NOTIFS.filter((n) => n.unread && n.type === 'enroll').length;
+  const semTurma = semTurmaKids().length;
+  const pend = STUDENTS.filter((s) => needsSignature(s)).length;
+  const badgeFor = (view: string): { text: string; accent?: boolean } | null => {
+    if (view === 'alunos' && newEnrolls) return { text: `${newEnrolls} novas`, accent: true };
+    if (view === 'agenda' && semTurma) return { text: `${semTurma} sem turma` };
+    if (view === 'contratos' && pend) return { text: `${pend} pend.` };
+    return null;
+  };
 
   return (
     <>
@@ -63,6 +78,22 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
                       />
                       <item.icon className="w-[18px] h-[18px]" />
                       <span className="text-sm font-medium">{item.label}</span>
+                      {(() => {
+                        const b = badgeFor(item.view);
+                        if (!b) return null;
+                        return (
+                          <span
+                            className={`ml-auto text-[11px] px-2 py-0.5 rounded-full ${b.accent ? 'font-bold' : ''}`}
+                            style={
+                              b.accent
+                                ? { background: 'var(--sb-accent)', color: 'var(--sb-accent-text)' }
+                                : { background: 'var(--sb-badge-bg)', color: 'var(--sb-badge-text)' }
+                            }
+                          >
+                            {b.text}
+                          </span>
+                        );
+                      })()}
                     </NavLink>
                   ))}
                 </div>
