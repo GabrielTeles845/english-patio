@@ -1,11 +1,9 @@
-import { useState, type MouseEvent, type ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  CheckCircle2,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
-  Copy,
   Download,
   ExternalLink,
   FileClock,
@@ -13,26 +11,22 @@ import {
   FileText,
   FilterX,
   LayoutGrid,
-  MoreVertical,
   RotateCcw,
   Rows3,
   Search,
   SearchX,
-  Send,
   SlidersHorizontal,
-  UserRound,
 } from 'lucide-react';
 import { useAuth } from '../../lib/dashboard/auth';
-import { logAct, setContractStatus, useDash } from '../../lib/dashboard/store';
+import { useDash } from '../../lib/dashboard/store';
 import { dnum, dvNum, isFuture, isStale, PAGE_SIZE, staleDays, STUDENTS, type Student } from '../../lib/dashboard/data';
 import { STATUS } from '../../lib/dashboard/status';
 import { CSelect, type CSelectItem } from '../../components/dashboard/ui/CSelect';
 import { DateInput } from '../../components/dashboard/ui/DatePicker';
 import { EmptyState } from '../../components/dashboard/ui/EmptyState';
-import { RowMenu, type RowMenuEntry } from '../../components/dashboard/ui/RowMenu';
 import { useToast } from '../../components/dashboard/ui/Toast';
 import { WAIcon } from '../../components/dashboard/ui/icons';
-import { copyPhone, EmptyGhost, STATUS_INK } from './alunos/common';
+import { EmptyGhost, STATUS_INK } from './alunos/common';
 import { SORT_VAL } from './alunos/filters';
 import { ContractModal } from './alunos/ContractModal';
 
@@ -40,9 +34,9 @@ import { ContractModal } from './alunos/ContractModal';
    (markup l.733–777, JS l.2246–2336: setContractView, filteredContracts,
    clearContractFilters, renderContracts). Lista por padrão (fila de trabalho);
    recusado/falha têm dot vermelho/laranja no filtro = balde "precisa de ação".
-   ⋮ por linha com as transições VÁLIDAS por status (openRowMenu l.5465–5485)
-   — no preview essas ações ficam no ⋮ da tela Alunos; aqui a fila de trabalho
-   ganha o mesmo menu para resolver o contrato sem trocar de tela. */
+   Ações por linha = Abrir/Baixar/WhatsApp, como no preview; as transições de
+   status vivem no ⋮ da tela Alunos (qualquer mudança nasce no preview antes —
+   PLAN §11). */
 
 interface ContractFilters {
   q: string;
@@ -110,16 +104,14 @@ function StaleBadge({ s, extra = '' }: { s: Student; extra?: string }) {
 
 export default function Contratos() {
   useDash();
-  const { effectiveRole, effectiveUser } = useAuth();
+  const { effectiveRole } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const who = effectiveUser?.name ?? 'Equipe';
 
   const [f, setFState] = useState<ContractFilters>(cache.filters);
   const [page, setPageState] = useState(cache.page);
   const [view, setViewState] = useState<'list' | 'grid'>(cache.view);
   const [cfRowOpen, setCfRowOpen] = useState(false);
-  const [menu, setMenu] = useState<{ anchor: DOMRect; sid: number } | null>(null);
   const [modalSid, setModalSid] = useState<number | null>(null);
 
   const setF = (patch: Partial<ContractFilters>) => {
@@ -183,79 +175,6 @@ export default function Contratos() {
     { v: 'next', l: 'Começam em 2026.2' },
     { v: 'off', l: 'Inativas' },
   ];
-
-  /* ⋮ — transições VÁLIDAS por status (port openRowMenu l.5465; sem redundância.
-     Visualizado/assinado chegam sozinhos pelo Autentique — marcar manual é backup) */
-  const openMenu = (e: MouseEvent, sid: number) => {
-    e.stopPropagation();
-    setMenu({ anchor: (e.currentTarget as HTMLElement).getBoundingClientRect(), sid });
-  };
-  const menuItems = (s: Student): RowMenuEntry[] => {
-    const item = (icon: ReactNode, label: string, onClick: () => void): RowMenuEntry => ({ icon, label, onClick });
-    const wa = (label: string, msg: string): RowMenuEntry => ({
-      icon: (
-        <span style={{ color: '#1faa53' }}>
-          <WAIcon className="w-4 h-4" />
-        </span>
-      ),
-      label,
-      onClick: () => toast(msg),
-    });
-    const markSent = () => {
-      setContractStatus(s.id, 'sent');
-      logAct(who, `Marcou o contrato de <b>${s.kids[0].n}</b> como enviado`);
-      toast('Contrato marcado como enviado!');
-    };
-    const markSigned = () => {
-      setContractStatus(s.id, 'signed');
-      logAct(who, `Marcou o contrato de <b>${s.kids[0].n}</b> como assinado`);
-      toast('Contrato marcado como assinado!');
-    };
-    const statusActions: RowMenuEntry[] =
-      s.status === 'pending'
-        ? [
-            wa('Enviar contrato no WhatsApp', 'Contrato pronto para envio no WhatsApp!'),
-            'divider',
-            item(<Send className="w-4 h-4 text-[var(--muted)]" />, 'Marcar como enviado', markSent),
-            item(<CheckCircle2 className="w-4 h-4 text-[var(--muted)]" />, 'Marcar como assinado', markSigned),
-          ]
-        : s.status === 'sent' || s.status === 'viewed'
-          ? [
-              wa('Cobrar assinatura no WhatsApp', 'Cobrança preparada no WhatsApp — link de assinatura incluído!'),
-              'divider',
-              item(<CheckCircle2 className="w-4 h-4 text-[var(--muted)]" />, 'Marcar como assinado', markSigned),
-            ]
-          : s.status === 'failed'
-            ? [
-                /* falha na entrega: a ação válida é reenviar (volta pro caminho feliz como "enviado") */
-                wa('Reenviar link no WhatsApp', 'Reenvio preparado no WhatsApp — link de assinatura incluído!'),
-                'divider',
-                item(<RotateCcw className="w-4 h-4 text-[var(--muted)]" />, 'Reenviar contrato (marcar como enviado)', markSent),
-              ]
-            : s.status === 'rejected'
-              ? [
-                  /* recusado: só faz sentido refazer/reenviar o contrato */
-                  item(<RotateCcw className="w-4 h-4 text-[var(--muted)]" />, 'Reenviar contrato (marcar como enviado)', markSent),
-                ]
-              : [];
-    return [
-      item(<FileText className="w-4 h-4 text-[var(--muted)]" />, 'Ver contrato', () => setModalSid(s.id)),
-      item(<UserRound className="w-4 h-4 text-[var(--muted)]" />, 'Ver ficha do aluno', () => navigate(`/dashboard/alunos/${s.id}`)),
-      item(<Download className="w-4 h-4 text-[var(--muted)]" />, 'Baixar contrato', () => toast('Download iniciado (demo)')),
-      item(<Copy className="w-4 h-4 text-[var(--muted)]" />, 'Copiar telefone do responsável', () => copyPhone(s, toast)),
-      ...statusActions,
-    ];
-  };
-
-  const kebab = (s: Student, size: string) => (
-    <button
-      onClick={(e) => openMenu(e, s.id)}
-      data-tip="Todas as ações"
-      className={`${size} rounded-lg border border-[var(--border)] grid place-content-center hover:bg-[var(--hover)] transition shrink-0`}
-    >
-      <MoreVertical className="w-4 h-4 text-[var(--muted)]" />
-    </button>
-  );
 
   return (
     <section className="fade-in">
@@ -424,7 +343,6 @@ export default function Contratos() {
                   >
                     <WAIcon className="w-4 h-4" />
                   </button>
-                  {kebab(s, 'w-9 h-9')}
                 </div>
               </div>
             );
@@ -484,7 +402,6 @@ export default function Contratos() {
                   >
                     <WAIcon className="w-4 h-4" />
                   </button>
-                  {kebab(s, 'w-8 h-8')}
                 </div>
               </div>
             );
@@ -499,11 +416,6 @@ export default function Contratos() {
         </div>
       </div>
 
-      {menu && (() => {
-        const s = STUDENTS.find((x) => x.id === menu.sid);
-        if (!s) return null;
-        return <RowMenu anchor={menu.anchor} items={menuItems(s)} onClose={() => setMenu(null)} />;
-      })()}
       {modalSid !== null && (
         <ContractModal sid={modalSid} onClose={() => setModalSid(null)} onOpenDetail={() => navigate(`/dashboard/alunos/${modalSid}`)} />
       )}
