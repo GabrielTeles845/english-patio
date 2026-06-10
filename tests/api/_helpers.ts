@@ -77,6 +77,12 @@ export async function clearAttempts(...emails: string[]): Promise<void> {
   }
 }
 
+// Limpa as tentativas do IP de teste — o rate-limit por IP conta tentativas
+// falhas de QUALQUER e-mail na janela, então rodadas repetidas acumulariam.
+export async function clearAttemptsByIp(): Promise<void> {
+  await db.delete(loginAttempts).where(eq(loginAttempts.ip, TEST_IP));
+}
+
 // Faz login e devolve os cookies prontos pra usar nos testes autenticados.
 export async function loginAs(email: string, password: string): Promise<{
   session: string; csrfPair: string; csrf: string; cookies: string;

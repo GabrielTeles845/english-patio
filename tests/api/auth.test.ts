@@ -10,14 +10,14 @@ import logout from '../../api/auth/logout';
 import changePassword from '../../api/account/password';
 import patchAccount from '../../api/account/index';
 import {
-  mkReq, mkRes, getCookie, cookieValue, seedUser, removeUser, clearAttempts,
+  mkReq, mkRes, getCookie, cookieValue, seedUser, removeUser, clearAttempts, clearAttemptsByIp,
 } from './_helpers';
 
 const PASS = 'Senh@12345';
 
 describe('POST /api/auth/login', () => {
   const email = 'apitest-login@example.com';
-  before(async () => { await clearAttempts(email); await seedUser(email, PASS, { mustChange: true }); });
+  before(async () => { await clearAttemptsByIp(); await clearAttempts(email); await seedUser(email, PASS, { mustChange: true }); });
   after(async () => { await removeUser(email); await clearAttempts(email); });
 
   it('rejeita método != POST com 405', async () => {
