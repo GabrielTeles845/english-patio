@@ -138,6 +138,7 @@ CREATE TABLE classes (
   room_id     bigint      NOT NULL REFERENCES rooms(id),
   day_pair    day_pair    NOT NULL,
   start_time  text        NOT NULL,                            -- 8 slots: 8:30/9:30/10:30/13:30/14:30/15:30/16:45/17:45
+                                                               -- (mantido como text de propósito: casa com o formato '8:30' da UI/seed e o CHECK trava os valores; trocar por `time` daria '08:30:00' e exigiria formatar na app, sem ganho real)
   level_id    bigint      NOT NULL REFERENCES levels(id),
   capacity    int         NOT NULL DEFAULT 7 CHECK (capacity BETWEEN 1 AND 9),  -- 7 padrão; vaga extra até 9 (VALIDACOES §13)
   period      text        NOT NULL,                            -- ex. '2026.2' — slot reusado a cada semestre (mesmo nome que enrollments.period)
@@ -200,6 +201,7 @@ CREATE TABLE responsibles (
   type          responsible_type NOT NULL,                     -- 'financial' só existe quando financial_responsible_type='other'
   name          text             NOT NULL,
   cpf           text,                                          -- 11 dígitos, sem máscara (validado na app)
+                                                               -- LGPD: dado de menor. Neon já criptografa em repouso (suficiente p/ MVP); criptografia no nível da aplicação fica como evolução futura (DASHBOARD_PLAN §3/§11).
   phone         text,
   email         text,
   relationship  text,                                          -- Mãe/Pai/Avó/... (select)
@@ -208,6 +210,10 @@ CREATE TABLE responsibles (
 );
 CREATE INDEX idx_resp_enroll ON responsibles(enrollment_id);
 CREATE INDEX idx_resp_cpf     ON responsibles(cpf);             -- CPF repetido = família (não é erro)
+-- No máx. 1 responsável de cada tipo por matrícula: 1 legal, no máx. 1 second,
+-- no máx. 1 financial (só existe quando financial_responsible_type='other').
+-- Sem isto o banco aceitaria dois 'legal' na mesma matrícula (reparo 10/Jun).
+CREATE UNIQUE INDEX uq_resp_enroll_type ON responsibles(enrollment_id, type);
 
 CREATE TABLE addresses (
   id            bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -250,8 +256,11 @@ CREATE TABLE contracts (
   viewed_at       timestamptz,
   signed_at       timestamptz,
   rejected_at     timestamptz,
-  failed_at       timestamptz
+  failed_at       timestamptz,
+  created_at      timestamptz     NOT NULL DEFAULT now()        -- quando o contrato nasceu (as demais datas são por transição; reparo 10/Jun)
   -- "parado" = status sent/viewed há >= 7 dias (derivado em query; alimenta alertas)
+  -- SEM updated_at de propósito: o status vem do webhook do Autentique (não há
+  -- edição concorrente pela UI), então não precisa da "versão" de concorrência otimista.
 );
 CREATE INDEX idx_contracts_enroll ON contracts(enrollment_id);
 CREATE INDEX idx_contracts_status ON contracts(status);
