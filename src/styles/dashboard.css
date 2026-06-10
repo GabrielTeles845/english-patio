@@ -101,6 +101,12 @@ html.dark[data-sidebar="yellow"]{
 .cs-chev{ transition:transform .15s ease; }
 .cs-menu{ animation:pop .14s ease both; max-height:320px; overflow-y:auto; }
 
+/* agenda: grade geral com coluna de horários fixa (preview l.165–169) */
+#agGridScroll{ overflow-x:auto; cursor:grab; }
+#agGridScroll.panning{ cursor:grabbing; }
+#agGridScroll.panning *{ cursor:grabbing!important; }
+#agGridScroll .ag-sticky{ position:sticky; left:0; z-index:2; background:var(--card); }
+
 /* checkbox componentizada */
 .ck{ width:18px; height:18px; border-radius:6px; border:2px solid var(--border); display:inline-grid;
   place-content:center; transition:all .15s ease; cursor:pointer; background:var(--card); }

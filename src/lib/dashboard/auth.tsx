@@ -45,9 +45,9 @@ export function roleHasBell(role: Role): boolean {
   return role !== 'Supervisor';
 }
 
+/* iniciais das DUAS primeiras palavras — port exato do preview (l.1430) */
 export function initials(name: string): string {
-  const parts = name.trim().split(/\s+/);
-  return ((parts[0]?.[0] ?? '') + (parts[parts.length - 1]?.[0] ?? '')).toUpperCase();
+  return name.split(' ').filter(Boolean).slice(0, 2).map((x) => x[0]).join('').toUpperCase();
 }
 
 interface AuthCtx {

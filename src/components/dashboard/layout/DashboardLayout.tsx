@@ -18,8 +18,10 @@ export function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [skelView, setSkelView] = useState<string | null>(null);
 
-  const slug = location.pathname.replace(/^\/dashboard\/?/, '').split('/')[0];
-  const view = ALL_NAV_ITEMS.find((i) => i.slug === slug)?.view ?? null;
+  const segs = location.pathname.replace(/^\/dashboard\/?/, '').split('/');
+  const slug = segs[0];
+  /* sub-rota /dashboard/alunos/:id = a view "detalhe" do preview (título e skeleton próprios) */
+  const view = slug === 'alunos' && segs[1] ? 'detalhe' : ALL_NAV_ITEMS.find((i) => i.slug === slug)?.view ?? null;
 
   useEffect(() => {
     if (!view) return;

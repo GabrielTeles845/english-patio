@@ -10,6 +10,8 @@ export interface RowMenuItem {
   label: string;
   onClick: () => void;
   danger?: boolean;
+  /* cor custom (ex.: verde do "Reativar aluno") — sobrepõe danger */
+  color?: string;
 }
 
 export type RowMenuEntry = RowMenuItem | 'divider';
@@ -62,7 +64,7 @@ export function RowMenu({ anchor, items, onClose }: RowMenuProps) {
               it.onClick();
             }}
             className="w-full flex items-center gap-2.5 text-left text-sm px-3 py-2 rounded-lg hover:bg-[var(--hover)] transition"
-            style={it.danger ? { color: '#DC2626' } : undefined}
+            style={it.color ? { color: it.color } : it.danger ? { color: '#DC2626' } : undefined}
           >
             {it.icon}
             {it.label}
