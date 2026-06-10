@@ -1,5 +1,17 @@
 // Serializers de saída (DB → DTO da API). Datas em ISO 8601 (API §0); a UI formata.
-import type { rooms, classes, users } from '../db/schema';
+import type { rooms, classes, users, notifications } from '../db/schema';
+
+export function notificationDTO(n: typeof notifications.$inferSelect) {
+  return {
+    id: n.id,
+    type: n.type,
+    studentId: n.studentId,
+    title: n.title,
+    body: n.body,
+    readAt: n.readAt,
+    createdAt: n.createdAt,
+  };
+}
 
 // Nunca expõe password_hash.
 export function userDTO(u: typeof users.$inferSelect) {

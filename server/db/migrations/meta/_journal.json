@@ -15,6 +15,13 @@
       "when": 1781130666916,
       "tag": "0001_agenda_structure",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1781133239585,
+      "tag": "0002_full_schema",
+      "breakpoints": true
     }
   ]
 }

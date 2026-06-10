@@ -7,7 +7,7 @@ import { asc, eq, like } from 'drizzle-orm';
 import classesHandler from '../../api/classes/index';
 import classById from '../../api/classes/[id]';
 import { db } from '../../server/db/client';
-import { classes, rooms, levels } from '../../server/db/schema';
+import { classes, rooms, levels, enrollments, students } from '../../server/db/schema';
 import { mkReq, mkRes, seedUser, removeUser, clearAttempts, loginAs } from './_helpers';
 
 const EMAIL = 'apitest-classes@example.com';
@@ -171,8 +171,42 @@ describe('PATCH/DELETE /api/classes/:id', () => {
     assert.equal(res._body.data.id, idB);
   });
 
-  // Ocupação depende da tabela `students` (fatia futura); enquanto não existe, a
-  // ocupação é sempre 0. Cobrir quando os alunos entrarem:
-  it('PATCH capacidade < ocupação → 422 CAPACITY_BELOW_OCCUPANCY', { todo: 'depende de students' }, () => {});
-  it('DELETE turma com alunos → 422 CLASS_NOT_EMPTY', { todo: 'depende de students' }, () => {});
+});
+
+// Ocupação real (agora que students existe): turma com 2 alunos ativos.
+describe('ocupação da turma', () => {
+  let classId = 0;
+  let enrollmentId = 0;
+  const studentIds: number[] = [];
+  before(async () => {
+    const c = await db.insert(classes).values({ roomId, dayPair: 'seg-qua', startTime: '14:30', levelId: levelA, period: PERIOD }).returning();
+    classId = c[0].id;
+    const e = await db.insert(enrollments).values({
+      source: 'manual', submissionId: `test-occ-${PERIOD}`, classFormat: 'sede',
+      financialResponsibleType: 'legal', authorizationContract: true, scheduleConfirmed: true, period: PERIOD,
+    }).returning();
+    enrollmentId = e[0].id;
+    for (const name of ['Aluno Um', 'Aluno Dois']) {
+      const s = await db.insert(students).values({ enrollmentId, name, birthDate: '2015-01-01', classId, isActive: true }).returning();
+      studentIds.push(s[0].id);
+    }
+  });
+  after(async () => {
+    for (const id of studentIds) await db.delete(students).where(eq(students.id, id));
+    await db.delete(enrollments).where(eq(enrollments.id, enrollmentId));
+  });
+
+  it('DELETE turma com alunos → 422 CLASS_NOT_EMPTY', async () => {
+    const res = mkRes();
+    await classById(mkReq('DELETE', undefined, { cookie: auth.cookies, csrf: auth.csrf, query: { id: String(classId) } }), res);
+    assert.equal(res._status, 422);
+    assert.equal(res._body.error.code, 'CLASS_NOT_EMPTY');
+  });
+
+  it('PATCH capacidade (1) < ocupação (2) → 422 CAPACITY_BELOW_OCCUPANCY', async () => {
+    const res = mkRes();
+    await classById(mkReq('PATCH', { capacity: 1 }, { cookie: auth.cookies, csrf: auth.csrf, query: { id: String(classId) } }), res);
+    assert.equal(res._status, 422);
+    assert.equal(res._body.error.code, 'CAPACITY_BELOW_OCCUPANCY');
+  });
 });
