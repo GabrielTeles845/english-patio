@@ -146,6 +146,8 @@ export interface User {
   r: UserRole;
   c: string;
   pending?: boolean; // senha provisória ainda não trocada
+  active?: boolean; // ausente/true = ativo; false = acesso desativado (sem login)
+  last?: string; // último acesso (mock — no real vem da sessão)
 }
 
 export interface EmailTpl {
@@ -732,11 +734,11 @@ export const NOTIFS: Notif[] = [
 
 /* ====================== USUÁRIOS DO PAINEL (port l.2351) ====================== */
 export const USERS: User[] = [
-  { id: 1, n: 'Priscylla Martins', e: 'priscylla@englishpatio.com.br', r: 'Diretor', c: '#1E3765' },
-  { id: 2, n: 'Gabriel Teles', e: 'gabriel@englishpatio.com.br', r: 'Diretor', c: '#2F539A' },
-  { id: 3, n: 'Camila Nogueira', e: 'camila@englishpatio.com.br', r: 'Supervisor', c: '#C2410C' },
-  { id: 4, n: 'Stefany Oliveira', e: 'stefany@englishpatio.com.br', r: 'Secretaria', c: '#B5860B' },
-  { id: 5, n: 'Beatriz Souza', e: 'beatriz@englishpatio.com.br', r: 'Secretaria', c: '#0d9488' },
+  { id: 1, n: 'Priscylla Martins', e: 'priscylla@englishpatio.com.br', r: 'Diretor', c: '#1E3765', last: 'hoje, 8h47' },
+  { id: 2, n: 'Gabriel Teles', e: 'gabriel@englishpatio.com.br', r: 'Diretor', c: '#2F539A', last: 'ontem, 22h10' },
+  { id: 3, n: 'Camila Nogueira', e: 'camila@englishpatio.com.br', r: 'Supervisor', c: '#C2410C', last: 'ontem, 10h48' },
+  { id: 4, n: 'Stefany Oliveira', e: 'stefany@englishpatio.com.br', r: 'Secretaria', c: '#B5860B', last: 'hoje, 9h40' },
+  { id: 5, n: 'Beatriz Souza', e: 'beatriz@englishpatio.com.br', r: 'Secretaria', c: '#0d9488', last: 'ontem, 11h26' },
 ];
 export const userById = (id: number): User | undefined => USERS.find((u) => u.id === id);
 

@@ -144,6 +144,32 @@ html.dark .skel::after{ background:linear-gradient(90deg,transparent,rgba(255,25
 #mainSkel{ position:absolute; inset:0; z-index:15; background:var(--bg); display:none; }
 #mainSkel.on{ display:block; }
 
+/* ===== Editor de site (preview l.99–130) ===== */
+/* borda pontilhada no hover + etiqueta "editar"/"editando" */
+.editable{ position:relative; border-radius:8px; outline:2px dashed transparent; outline-offset:4px;
+  transition:outline-color .15s ease, background-color .15s ease; cursor:pointer; }
+.editor-on .editable:hover{ outline-color:#F5B700; background:rgba(245,183,0,.07); }
+.editor-on .editable:hover::after{ content:"editar"; position:absolute; top:-10px; right:-6px;
+  font-size:10px; font-weight:600; background:#F5B700; color:#15294d; padding:1px 7px; border-radius:999px;
+  font-family:'Inter'; box-shadow:0 2px 6px rgba(0,0,0,.18); z-index:5; }
+.editor-on .editable.editing{ outline-color:#F5B700; outline-style:solid; background:rgba(245,183,0,.10); }
+.editor-on .editable.editing::after{ content:"editando"; }
+/* preview mobile no editor de site */
+#editorPage.mob .ep-menu{ display:none !important; }
+#editorPage.mob .ep-burger{ display:block !important; }
+#editorPage.mob .ep-grid, #editorPage.mob .ep-feat{ grid-template-columns:1fr !important; }
+#editorPage.mob .ep-badge-float{ display:none !important; }
+/* tipografia proporcional a um celular de verdade */
+#editorPage.mob .ep-grid{ padding:1.5rem 1.25rem !important; }
+#editorPage.mob .ep-grid h2{ font-size:1.6rem !important; line-height:1.2 !important; }
+#editorPage.mob .ep-grid > div > p{ font-size:.9rem !important; }
+#editorPage.mob .ep-cols{ grid-template-columns:1fr !important; }
+#editorPage.mob .ep-row{ flex-direction:column !important; }
+#editorPage.mob .ep-title{ font-size:1.4rem !important; }
+#editorPage.mob .ep-sec{ padding:2rem 1.25rem !important; }
+#phoneScreen{ scrollbar-width:none; }
+#phoneScreen::-webkit-scrollbar{ display:none; }
+
 /* ===== estado sem dados (empty state) ===== */
 .empty-ico{ width:56px; height:56px; border-radius:18px; display:grid; place-content:center; background:var(--hover); margin-bottom:14px; }
 .chart-empty{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }

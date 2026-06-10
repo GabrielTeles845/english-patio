@@ -442,6 +442,11 @@ export function addUser(input: { n: string; e: string; r: UserRole }): (ActionRe
   return { ok: true, id };
 }
 
+/* guarda do último Diretor (l.4406/4414, API §10 LAST_DIRECTOR): conta só os
+   ATIVOS — um Diretor desativado não segura o painel. */
+const isLastActiveDirector = (u: User): boolean =>
+  u.r === 'Diretor' && u.active !== false && USERS.filter((x) => x.r === 'Diretor' && x.active !== false).length === 1;
+
 /* port de saveUser (l.4396): e-mail único + guarda do último Diretor (l.4406) */
 export function updateUser(id: number, input: { n: string; e: string; r: UserRole }): ActionResult {
   const u = USERS.find((x) => x.id === id);
@@ -449,7 +454,7 @@ export function updateUser(id: number, input: { n: string; e: string; r: UserRol
   const { n, e, r } = input;
   if (USERS.some((x) => x.id !== id && x.e.toLowerCase() === e.toLowerCase()))
     return fail(`Já existe outro usuário com o e-mail <b>${e}</b>.`);
-  if (u.r === 'Diretor' && r !== 'Diretor' && USERS.filter((x) => x.r === 'Diretor').length === 1)
+  if (r !== 'Diretor' && isLastActiveDirector(u))
     return fail(`${u.n.split(' ')[0]} é a única pessoa com papel Diretor — promova outra antes de mudar o papel.`);
   u.n = n;
   u.e = e;
@@ -463,9 +468,21 @@ export function removeUser(id: number): ActionResult {
   const i = USERS.findIndex((u) => u.id === id);
   if (i < 0) return fail('Usuário não encontrado.');
   const u: User = USERS[i];
-  if (u.r === 'Diretor' && USERS.filter((x) => x.r === 'Diretor').length === 1)
+  if (isLastActiveDirector(u))
     return fail(`${u.n.split(' ')[0]} é a única pessoa com papel Diretor — promova outra antes de remover o acesso.`);
   USERS.splice(i, 1);
+  bump();
+  return OK;
+}
+
+/* desativar/reativar acesso (PATCH /api/users/:id, API §10): mesma guarda —
+   o painel nunca fica sem nenhum Diretor em atividade. */
+export function setUserActive(id: number, active: boolean): ActionResult {
+  const u = USERS.find((x) => x.id === id);
+  if (!u) return fail('Usuário não encontrado.');
+  if (!active && isLastActiveDirector(u))
+    return fail(`${u.n.split(' ')[0]} é a única pessoa com papel Diretor — promova outra antes de desativar o acesso.`);
+  u.active = active;
   bump();
   return OK;
 }

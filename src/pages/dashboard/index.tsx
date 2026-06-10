@@ -16,13 +16,16 @@ import { GlobalTooltip } from '../../components/dashboard/ui/Tooltip';
 import { DashboardLayout } from '../../components/dashboard/layout/DashboardLayout';
 import Login from './Login';
 import Config from './Config';
-import Placeholder from './Placeholder';
+import Comunicados from './Comunicados';
+import Editor from './Editor';
 import Alunos from './Alunos';
 import Overview from './Overview';
 import Detalhe from './alunos/Detalhe';
 import Agenda from './Agenda';
 import Contratos from './Contratos';
 import Modelos from './contratos/Modelos';
+import Usuarios from './Usuarios';
+import Atividade from './Atividade';
 
 /* App da dashboard administrativa — vive em /dashboard/<tela> (PLAN §9 Fase 1).
    Em produção o /dashboard EXATO continua servindo o preview (rewrite no
@@ -59,10 +62,10 @@ export default function DashboardApp() {
                   <Route path="agenda" element={<Agenda />} />
                   <Route path="contratos" element={<Contratos />} />
                   <Route path="contratos/modelos" element={<Modelos />} />
-                  <Route path="comunicados" element={<Placeholder view="emails" sub="E-mail e WhatsApp para as famílias" />} />
-                  <Route path="editor" element={<Placeholder view="editor" sub="Textos do site institucional" />} />
-                  <Route path="usuarios" element={<Placeholder view="usuarios" sub="Equipe e permissões" />} />
-                  <Route path="atividade" element={<Placeholder view="atividade" sub="Auditoria do painel" />} />
+                  <Route path="comunicados" element={<Comunicados />} />
+                  <Route path="editor" element={<Editor />} />
+                  <Route path="usuarios" element={<Usuarios />} />
+                  <Route path="atividade" element={<Atividade />} />
                   <Route path="configuracoes" element={<Config />} />
                 </Route>
               </Route>
