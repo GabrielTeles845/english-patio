@@ -1,8 +1,10 @@
-// GET /api/enrollments — lista paginada de matrículas/famílias (tela Alunos).
-// RBAC: os 3 papéis leem (director/secretary têm CRUD; supervisor só leitura — §3).
-// CPF vem MASCARADO na lista (LGPD §3). Filtros via query (todos opcionais).
-// DASHBOARD_API §3.
+// GET  /api/enrollments — lista paginada de matrículas/famílias (tela Alunos).
+//        RBAC: os 3 papéis leem (supervisor só leitura). CPF mascarado (LGPD §3).
+// POST /api/enrollments — cria matrícula manual (director/secretary). Mapeia o
+//        FormData → enrollments + students + responsibles + addresses + contract
+//        (pending). DASHBOARD_API §3 e §4.1/4.2, VALIDACOES §1–6.
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { randomUUID } from 'node:crypto';
 import { and, desc, eq, inArray, sql } from 'drizzle-orm';
 import { db } from '../../server/db/client';
 import {
@@ -11,26 +13,27 @@ import {
   responsibles,
   addresses,
   contracts,
+  contractTemplates,
+  activityLog,
 } from '../../server/db/schema';
-import { ok, fail } from '../../server/lib/http';
-import { getSession } from '../../server/lib/auth';
+import { ok, fail, zodFields, clientIp } from '../../server/lib/http';
+import { getSession, csrfValid } from '../../server/lib/auth';
 import { hasRole, ALL_ROLES } from '../../server/lib/rbac';
-import {
-  enrollmentDTO,
-  studentDTO,
-  responsibleDTO,
-} from '../../server/lib/serializers';
+import { enrollmentDTO, studentDTO, responsibleDTO } from '../../server/lib/serializers';
+import { EnrollmentEnvelope, EnrollmentFormSchema } from '../../server/lib/enrollmentInput';
+import { onlyDigits, brDateToISO } from '../../server/lib/validators';
 
 function qstr(v: unknown): string {
   return typeof v === 'string' ? v.trim() : '';
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
-  if (req.method !== 'GET') return fail(res, 405, 'METHOD_NOT_ALLOWED', 'Método não permitido.');
-
   const session = await getSession(req);
   if (!session) return fail(res, 401, 'UNAUTHENTICATED', 'Sessão expirada ou inválida.');
   if (!hasRole(session, ALL_ROLES)) return fail(res, 403, 'FORBIDDEN', 'Sem permissão.');
+
+  if (req.method === 'POST') return createEnrollment(req, res, session);
+  if (req.method !== 'GET') return fail(res, 405, 'METHOD_NOT_ALLOWED', 'Método não permitido.');
 
   const page = Math.max(1, Number(req.query.page) || 1);
   const pageSize = Math.min(100, Math.max(1, Number(req.query.pageSize) || 20));
@@ -151,4 +154,114 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
   });
 
   return ok(res, { items, page, pageSize, total });
+}
+
+// ── POST: criação manual de matrícula ─────────────────────────────────────────
+// Driver HTTP do Neon = sem transação interativa; validamos TUDO antes e
+// inserimos em sequência (mesmo padrão das outras rotas).
+async function createEnrollment(
+  req: VercelRequest,
+  res: VercelResponse,
+  session: NonNullable<Awaited<ReturnType<typeof getSession>>>,
+): Promise<void> {
+  if (!hasRole(session, ['director', 'secretary'])) return fail(res, 403, 'FORBIDDEN', 'Sem permissão.');
+  if (!csrfValid(req)) return fail(res, 403, 'CSRF', 'Requisição não autorizada (CSRF).');
+
+  const env = EnrollmentEnvelope.safeParse(req.body ?? {});
+  if (!env.success) return fail(res, 400, 'VALIDATION', 'Dados inválidos.', zodFields(env.error));
+  const form = EnrollmentFormSchema.safeParse(env.data.formData);
+  if (!form.success) return fail(res, 400, 'VALIDATION', 'Dados inválidos.', zodFields(form.error));
+  const f = form.data;
+
+  if (f.state.trim().toUpperCase() !== 'GO') {
+    return fail(res, 422, 'OUTSIDE_GO', 'Atendemos apenas o estado de Goiás.', { state: 'Atendemos apenas Goiás.' });
+  }
+
+  // modelo de contrato ativo (se houver) carimba o contract.template_id.
+  const tpl = await db.select({ id: contractTemplates.id }).from(contractTemplates).where(eq(contractTemplates.isActive, true)).limit(1);
+  const templateId = tpl.length ? tpl[0].id : null;
+
+  const ins = await db
+    .insert(enrollments)
+    .values({
+      source: env.data.source, // 'manual'
+      submissionId: `manual-${randomUUID()}`,
+      classFormat: f.classFormat,
+      paymentMethod: 'boleto-6x',
+      financialResponsibleType: f.financialResponsibleType,
+      requestedDayPair: f.schedule,
+      requestedTimes: {
+        day1Start: f.scheduleDay1Start, day1End: f.scheduleDay1End,
+        day2Start: f.scheduleDay2Start, day2End: f.scheduleDay2End,
+      },
+      authorizationMedia: f.authorizationMedia,
+      authorizationContract: f.authorizationContract,
+      scheduleConfirmed: f.scheduleConfirmed,
+      period: env.data.period,
+    })
+    .returning();
+  const enrollmentId = ins[0].id;
+
+  // alunos (kids) — sem turma de início (entram na fila).
+  const studentRows = [
+    { enrollmentId, name: f.student1Name.trim(), birthDate: brDateToISO(f.student1BirthDate)! },
+    ...(f.hasStudent2
+      ? [{ enrollmentId, name: f.student2Name.trim(), birthDate: brDateToISO(f.student2BirthDate)! }]
+      : []),
+  ];
+  const insertedStudents = await db.insert(students).values(studentRows).returning();
+
+  // responsáveis: legal sempre; second se houver; financial só quando type='other'.
+  const respRows: (typeof responsibles.$inferInsert)[] = [
+    {
+      enrollmentId, type: 'legal', name: f.responsibleName.trim(), cpf: onlyDigits(f.responsibleCPF),
+      phone: onlyDigits(f.responsiblePhone), email: f.responsibleEmail.trim(),
+      relationship: f.responsibleRelationship.trim(), birthDate: brDateToISO(f.responsibleBirthDate),
+    },
+  ];
+  if (f.hasSecondResponsible) {
+    respRows.push({
+      enrollmentId, type: 'second', name: f.secondResponsibleName.trim(),
+      cpf: f.secondResponsibleCPF ? onlyDigits(f.secondResponsibleCPF) : null,
+      phone: onlyDigits(f.secondResponsiblePhone), relationship: f.secondResponsibleRelationship.trim(),
+    });
+  }
+  if (f.financialResponsibleType === 'other') {
+    respRows.push({
+      enrollmentId, type: 'financial', name: f.financialResponsibleName.trim(),
+      cpf: onlyDigits(f.financialResponsibleCPF),
+    });
+  }
+  await db.insert(responsibles).values(respRows);
+
+  await db.insert(addresses).values({
+    enrollmentId, cep: onlyDigits(f.cep), street: f.street.trim(), number: f.number.trim(),
+    complement: f.complement?.trim() || null, neighborhood: f.neighborhood.trim(),
+    city: f.city.trim(), state: 'GO',
+  });
+
+  const ctr = await db.insert(contracts).values({ enrollmentId, status: 'pending', templateId }).returning();
+
+  await db.insert(activityLog).values({
+    actorType: 'user', actorId: session.user.id, action: 'enrollment_created',
+    targetType: 'enrollment', targetId: enrollmentId,
+    detail: { student: f.student1Name.trim(), source: env.data.source }, ip: clientIp(req),
+  });
+
+  // notifica diretores + secretaria ativos (sino — §12). INSERT...SELECT atômico:
+  // seleciona e grava numa única instrução (sem janela entre ler destinatários e
+  // inserir). Best-effort: a matrícula já está criada (driver HTTP não tem
+  // transação), então uma falha aqui não deve derrubar o request.
+  try {
+    await db.execute(sql`
+      INSERT INTO notifications (user_id, type, title, body, student_id)
+      SELECT u.id, 'enroll', 'Nova matrícula', ${f.student1Name.trim()}, ${insertedStudents[0].id}
+      FROM users u
+      WHERE u.is_active = true AND u.role IN ('director', 'secretary')
+    `);
+  } catch (err) {
+    console.error('enrollment_created: falha ao gerar notificações', err);
+  }
+
+  return ok(res, { enrollmentId, students: insertedStudents.map(studentDTO), contractId: ctr[0].id }, 201);
 }

@@ -40,10 +40,15 @@ after(async () => {
 });
 
 describe('GET /api/notifications', () => {
+  // Asserções escopadas às notificações criadas aqui (por id): outras suítes que
+  // rodam em paralelo podem inserir 'enroll' no mesmo Diretor (produtor global de
+  // matrícula). Contar o inbox inteiro seria flaky.
+  const mine: number[] = [];
   before(async () => {
     await clearNotifs();
-    await db.insert(notifications).values({ userId: dirId, type: 'enroll', title: 'Nova matrícula' });
-    await db.insert(notifications).values({ userId: dirId, type: 'signed', title: 'Contrato assinado', readAt: new Date() });
+    const a = await db.insert(notifications).values({ userId: dirId, type: 'enroll', title: 'Nova matrícula' }).returning();
+    const b = await db.insert(notifications).values({ userId: dirId, type: 'signed', title: 'Contrato assinado', readAt: new Date() }).returning();
+    mine.push(a[0].id, b[0].id);
   });
 
   it('sem sessão → 401', async () => {
@@ -62,23 +67,27 @@ describe('GET /api/notifications', () => {
     const res = mkRes();
     await notifList(mkReq('GET', undefined, { cookie: dir.cookies }), res);
     assert.equal(res._status, 200);
-    assert.equal(res._body.data.length, 2);
+    const got = res._body.data.filter((n: any) => mine.includes(n.id));
+    assert.equal(got.length, 2);
   });
 
   it('?unread=true → só as não-lidas', async () => {
     const res = mkRes();
     await notifList(mkReq('GET', undefined, { cookie: dir.cookies, query: { unread: 'true' } }), res);
     assert.equal(res._status, 200);
-    assert.equal(res._body.data.length, 1);
-    assert.equal(res._body.data[0].readAt, null);
+    const got = res._body.data.filter((n: any) => mine.includes(n.id));
+    assert.equal(got.length, 1);
+    assert.equal(got[0].readAt, null);
   });
 });
 
 describe('POST /api/notifications/read-all', () => {
+  const mine: number[] = [];
   before(async () => {
     await clearNotifs();
-    await db.insert(notifications).values({ userId: dirId, type: 'enroll', title: 'A' });
-    await db.insert(notifications).values({ userId: dirId, type: 'viewed', title: 'B' });
+    const a = await db.insert(notifications).values({ userId: dirId, type: 'enroll', title: 'A' }).returning();
+    const b = await db.insert(notifications).values({ userId: dirId, type: 'viewed', title: 'B' }).returning();
+    mine.push(a[0].id, b[0].id);
   });
 
   it('sem CSRF → 403', async () => {
@@ -87,15 +96,18 @@ describe('POST /api/notifications/read-all', () => {
     assert.equal(res._status, 403);
   });
 
-  it('marca todas → updated >= 2 e depois 0 não-lidas', async () => {
+  it('marca todas → updated >= 2 e as minhas ficam lidas', async () => {
     const res = mkRes();
     await notifReadAll(mkReq('POST', undefined, { cookie: dir.cookies, csrf: dir.csrf }), res);
     assert.equal(res._status, 200);
     assert.ok(res._body.data.updated >= 2);
 
+    // escopado às minhas: nenhuma das que criei deve sobrar como não-lida
+    // (um produtor paralelo pode ter inserido outra 'enroll' depois do read-all).
     const after = mkRes();
     await notifList(mkReq('GET', undefined, { cookie: dir.cookies, query: { unread: 'true' } }), after);
-    assert.equal(after._body.data.length, 0);
+    const got = after._body.data.filter((n: any) => mine.includes(n.id));
+    assert.equal(got.length, 0);
   });
 });
 
