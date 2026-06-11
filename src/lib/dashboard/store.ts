@@ -15,12 +15,14 @@ import type { ContractStatus } from './status';
 import { ApiError } from './api';
 import { reloadData, currentPeriod, levelIdForKey } from './dataApi';
 import {
+  createEnrollmentApi,
   deactivateStudentApi,
   deleteEnrollmentApi,
   moveKidApi,
   reactivateStudentApi,
   setContractStatusApi,
 } from './studentsApi';
+import type { FormData } from '../../types/enrollment';
 import {
   createClassApi,
   updateClassApi,
@@ -44,13 +46,11 @@ import {
   STUDENTS,
   TEACHERS,
   turmaById,
-  turmaFull,
   type User,
   type UserRole,
   USERS,
   activeKidsIn,
   badChars,
-  nrmName,
   salaById,
   schLabel,
 } from './data';
@@ -264,52 +264,19 @@ export async function removeTeacher(name: string): Promise<ActionResult> {
 
 /* ====================== MATRÍCULAS — CRUD ====================== */
 
-export interface NewStudentInput {
-  name: string;
-  age: number;
-  b: string;
-  resp: string;
-  cpf: string;
-  phone: string;
-  email: string;
-  hood: string;
-  tid: number | null;
-}
-
-/* port de submitNewEnrollment (l.4037, só a parte de dados): bloqueia matrícula
-   duplicada (mesmo aluno + mesmo responsável) e turma que lotou no meio do
-   caminho; defaults iguais aos do preview (l.4072–4078). Formato dos campos e
-   avisos de 2º clique (CPF de outro nome, homônimo, idade × nível) são da UI. */
-export function addStudent(input: NewStudentInput): (ActionResult & { id?: number }) {
-  const { name, age, b, resp, cpf, phone, email, hood, tid } = input;
-  const dup = STUDENTS.find(
-    (s) => s.kids.some((k) => nrmName(k.n) === nrmName(name)) && nrmName(s.resp.n) === nrmName(resp)
-  );
-  if (dup)
-    return fail(`<b>${name}</b> já tem matrícula com esse responsável — use ⋮ → Editar dados na existente em vez de criar outra.`);
-  if (tid) {
-    const t = turmaById(tid);
-    if (!t || turmaFull(t))
-      return fail('A turma escolhida lotou agorinha — escolha outra ou deixe "Sem turma" para alocar depois.');
+/* POST /api/enrollments — criação manual com o MESMO formulário do site
+   (FormData). O backend valida tudo de novo (EnrollmentFormSchema) e devolve os
+   erros por campo (400 VALIDATION) ou 422 OUTSIDE_GO; a UI mostra na caixa. Os
+   alunos entram sem turma (fila de alocação), igual ao formulário do site. */
+export async function createEnrollment(formData: FormData): Promise<ActionResult & { id?: number; fields?: Record<string, string> }> {
+  try {
+    const r = await createEnrollmentApi(formData, currentPeriod());
+    await reloadData();
+    return { ok: true, id: r.enrollmentId };
+  } catch (err) {
+    if (err instanceof ApiError) return { ok: false, error: err.message, code: err.code, fields: err.fields };
+    return { ok: false, error: 'Algo deu errado ao salvar a matrícula. Tente de novo.' };
   }
-  const id = Math.max(...STUDENTS.map((s) => s.id)) + 1;
-  STUDENTS.unshift({
-    id,
-    kids: [{ n: name, age, b, tid }],
-    resp: { n: resp, cpf, phone, email, rel: 'Responsável', b: '—' },
-    second: null,
-    fin: resp,
-    addr: { cep: '74000-000', street: '—', num: '', comp: '', bairro: hood, city: 'Goiânia', uf: 'GO' },
-    pay: 'Boleto',
-    status: 'pending',
-    media: true,
-    active: true,
-    date: '03/06/2026', // "hoje" do preview
-    hora: '16h05',
-  });
-  NOTIFS.unshift({ type: 'enroll', sid: id, title: 'Nova matrícula', desc: `${name} · ${hood}`, time: 'agora', unread: true });
-  bump();
-  return { ok: true, id };
 }
 
 export interface StudentPatch {

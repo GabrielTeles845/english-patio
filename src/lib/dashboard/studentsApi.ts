@@ -2,6 +2,16 @@
    sobre apiFetch; o store.ts as orquestra (resolve ids reais + reloadData). */
 import { apiFetch } from './api';
 import type { ContractStatus } from './status';
+import type { FormData } from '../../types/enrollment';
+
+/* POST /api/enrollments — criação manual. O `formData` é o MESMO shape do
+   formulário do site (src/types/enrollment.ts), que o backend espelha. */
+export async function createEnrollmentApi(formData: FormData, period: string): Promise<{ enrollmentId: number; contractId: number }> {
+  return apiFetch('/enrollments', {
+    method: 'POST',
+    body: JSON.stringify({ source: 'manual', period, formData }),
+  });
+}
 
 export async function moveKidApi(
   studentId: number,
