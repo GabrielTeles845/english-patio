@@ -153,6 +153,25 @@ describe('POST /api/enrollments', () => {
     assert.ok(log.length >= 1);
   });
 
+  it('sem horário (form do site não coleta) → 201', async () => {
+    // O formulário do site não pede horário — os campos chegam vazios. O backend
+    // deve aceitar (horário é combinado fora do form), gravando requestedTimes vazio.
+    const res = mkRes();
+    await createList(mkReq('POST', body({
+      scheduleDay1Start: '', scheduleDay1End: '', scheduleDay2Start: '', scheduleDay2End: '',
+    }), { cookie: dir.cookies, csrf: dir.csrf }), res);
+    assert.equal(res._status, 201);
+    created.push(res._body.data.enrollmentId);
+  });
+
+  it('horário preenchido inválido (não é slot) → 400', async () => {
+    // Quando preenchido, o "Start" ainda precisa ser um slot real.
+    const res = mkRes();
+    await createList(mkReq('POST', body({ scheduleDay1Start: '07:00' }), { cookie: dir.cookies, csrf: dir.csrf }), res);
+    assert.equal(res._status, 400);
+    assert.ok(res._body.error.fields.scheduleDay1Start);
+  });
+
   it('2 alunos + segundo responsável + financeiro "other" → 2 students e 3 responsibles', async () => {
     const res = mkRes();
     await createList(mkReq('POST', body({

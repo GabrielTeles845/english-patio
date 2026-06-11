@@ -114,9 +114,10 @@ export const EnrollmentFormSchema = z
     if (!d.neighborhood.trim()) bad('neighborhood', 'Campo obrigatório.');
     if (!d.city.trim()) bad('city', 'Campo obrigatório.');
 
-    // Horário: os "Start" devem ser slots reais (8:30…17:45)
-    if (!STARTS.has(d.scheduleDay1Start)) bad('scheduleDay1Start', 'Horário inválido.');
-    if (!STARTS.has(d.scheduleDay2Start)) bad('scheduleDay2Start', 'Horário inválido.');
+    // Horário: opcional (o formulário do site não coleta horário — é combinado
+    // fora dele). Quando preenchido, o "Start" deve ser um slot real (8:30…17:45).
+    if (d.scheduleDay1Start && !STARTS.has(d.scheduleDay1Start)) bad('scheduleDay1Start', 'Horário inválido.');
+    if (d.scheduleDay2Start && !STARTS.has(d.scheduleDay2Start)) bad('scheduleDay2Start', 'Horário inválido.');
 
     // Autorizações obrigatórias
     if (d.authorizationContract !== true) bad('authorizationContract', 'É preciso aceitar o contrato.');
