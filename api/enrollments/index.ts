@@ -19,7 +19,7 @@ import {
 import { ok, fail, zodFields, clientIp } from '../../server/lib/http';
 import { getSession, csrfValid } from '../../server/lib/auth';
 import { hasRole, ALL_ROLES } from '../../server/lib/rbac';
-import { enrollmentDTO, studentDTO, responsibleDTO } from '../../server/lib/serializers';
+import { enrollmentDTO, studentDTO, responsibleDTO, addressDTO } from '../../server/lib/serializers';
 import { EnrollmentEnvelope, EnrollmentFormSchema } from '../../server/lib/enrollmentInput';
 import { buildEnrollmentConds } from '../../server/lib/enrollmentFilters';
 import { onlyDigits, brDateToISO } from '../../server/lib/validators';
@@ -68,23 +68,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
 
   const kidsBy = new Map<number, typeof kids>();
   for (const k of kids) (kidsBy.get(k.enrollmentId) ?? kidsBy.set(k.enrollmentId, []).get(k.enrollmentId)!).push(k);
+  const respsBy = new Map<number, typeof resps>();
+  for (const r of resps) (respsBy.get(r.enrollmentId) ?? respsBy.set(r.enrollmentId, []).get(r.enrollmentId)!).push(r);
   const legalBy = new Map<number, (typeof resps)[number]>();
   for (const r of resps) if (r.type === 'legal' && !legalBy.has(r.enrollmentId)) legalBy.set(r.enrollmentId, r);
-  const neighborhoodBy = new Map<number, string>();
-  for (const a of addrs) if (!neighborhoodBy.has(a.enrollmentId)) neighborhoodBy.set(a.enrollmentId, a.neighborhood);
+  const addrBy = new Map<number, (typeof addrs)[number]>();
+  for (const a of addrs) if (!addrBy.has(a.enrollmentId)) addrBy.set(a.enrollmentId, a);
   const contractBy = new Map<number, (typeof ctrs)[number]>(); // o mais recente (já ordenado desc)
   for (const c of ctrs) if (!contractBy.has(c.enrollmentId)) contractBy.set(c.enrollmentId, c);
 
   const items = pageRows.map((e) => {
     const ks = kidsBy.get(e.id) ?? [];
     const legal = legalBy.get(e.id);
+    const addr = addrBy.get(e.id);
     const contract = contractBy.get(e.id);
     return {
       ...enrollmentDTO(e),
       kids: ks.map(studentDTO),
       kidCount: ks.length,
-      responsible: legal ? responsibleDTO(legal) : null,
-      neighborhood: neighborhoodBy.get(e.id) ?? null,
+      responsible: legal ? responsibleDTO(legal) : null, // legal (CPF mascarado) — atalho p/ a UI
+      responsibles: (respsBy.get(e.id) ?? []).map((r) => responsibleDTO(r)), // todos (CPF mascarado)
+      address: addr ? addressDTO(addr) : null,
+      neighborhood: addr?.neighborhood ?? null,
       contractStatus: contract?.status ?? null,
     };
   });
