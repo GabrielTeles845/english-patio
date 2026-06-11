@@ -65,6 +65,7 @@ export interface Kid {
   age: number;
   b: string; // nascimento dd/mm/aaaa
   tid: number | null; // turma (null = fila "aguardando turma")
+  id?: number; // id real do aluno no banco (presente quando vem da API)
 }
 
 export interface Resp {

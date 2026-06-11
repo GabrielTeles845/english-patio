@@ -18,7 +18,7 @@ import {
   SlidersHorizontal,
 } from 'lucide-react';
 import { useAuth } from '../../lib/dashboard/auth';
-import { useDash } from '../../lib/dashboard/store';
+import { useDashboardData } from '../../lib/dashboard/dataApi';
 import { dnum, dvNum, isFuture, isStale, PAGE_SIZE, staleDays, STUDENTS, type Student } from '../../lib/dashboard/data';
 import { STATUS } from '../../lib/dashboard/status';
 import { CSelect, type CSelectItem } from '../../components/dashboard/ui/CSelect';
@@ -103,7 +103,7 @@ function StaleBadge({ s, extra = '' }: { s: Student; extra?: string }) {
 }
 
 export default function Contratos() {
-  useDash();
+  const { ready } = useDashboardData();
   const { effectiveRole } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -113,6 +113,14 @@ export default function Contratos() {
   const [view, setViewState] = useState<'list' | 'grid'>(cache.view);
   const [cfRowOpen, setCfRowOpen] = useState(false);
   const [modalSid, setModalSid] = useState<number | null>(null);
+
+  if (!ready) {
+    return (
+      <div className="grid place-content-center py-32">
+        <div className="w-8 h-8 rounded-full border-2 border-[var(--border)] border-t-brand-light animate-spin" />
+      </div>
+    );
+  }
 
   const setF = (patch: Partial<ContractFilters>) => {
     const next = { ...f, ...patch };

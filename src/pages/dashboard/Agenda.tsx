@@ -30,7 +30,8 @@ import {
   turmaFull,
   turmaShort,
 } from '../../lib/dashboard/data';
-import { allocateKid, logAct, updateTurma, useDash } from '../../lib/dashboard/store';
+import { allocateKid, logAct, updateTurma } from '../../lib/dashboard/store';
+import { useDashboardData } from '../../lib/dashboard/dataApi';
 import { useAuth } from '../../lib/dashboard/auth';
 import { useToast } from '../../components/dashboard/ui/Toast';
 import { CSelect } from '../../components/dashboard/ui/CSelect';
@@ -83,7 +84,7 @@ export function presetAgenda(p: { view?: AgView; sala?: string; salasTab?: SmTab
 }
 
 export default function Agenda() {
-  useDash();
+  const { ready } = useDashboardData();
   const { effectiveUser } = useAuth();
   const { toast, toastErr } = useToast();
   const who = effectiveUser?.name ?? 'Painel';
@@ -96,6 +97,14 @@ export default function Agenda() {
   const [fProf, setFProf] = useState('');
   const [modal, setModal] = useState<AgModal>(() => (agPreset?.salasTab ? { kind: 'salas', tab: agPreset.salasTab } : null));
   agPreset = null; // consumido — próxima visita à Agenda volta ao padrão
+
+  if (!ready) {
+    return (
+      <div className="grid place-content-center py-32">
+        <div className="w-8 h-8 rounded-full border-2 border-[var(--border)] border-t-brand-light animate-spin" />
+      </div>
+    );
+  }
 
   /* clicar na pill sempre volta ao nível de cima (setAgView, l.2572) */
   const setView = (v: AgView) => {

@@ -26,7 +26,8 @@ import {
   Trash2,
 } from 'lucide-react';
 import { initials, useAuth } from '../../lib/dashboard/auth';
-import { useDash, logAct, setContractStatus } from '../../lib/dashboard/store';
+import { logAct, setContractStatus } from '../../lib/dashboard/store';
+import { useDashboardData } from '../../lib/dashboard/dataApi';
 import {
   HORAS,
   FAMS,
@@ -96,7 +97,7 @@ type ModalState =
   | { kind: 'delete'; sid: number };
 
 export default function Alunos() {
-  useDash();
+  const { ready } = useDashboardData();
   const { effectiveRole, effectiveUser } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -176,6 +177,14 @@ export default function Alunos() {
     return [{ v: '', l: 'Bairro: todos' }, ...hoods.map((h) => ({ v: h, l: h }))];
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [STUDENTS.length]);
+
+  if (!ready) {
+    return (
+      <div className="grid place-content-center py-32">
+        <div className="w-8 h-8 rounded-full border-2 border-[var(--border)] border-t-brand-light animate-spin" />
+      </div>
+    );
+  }
 
   /* linhas: filtra → ordena → (famílias juntas) → pagina (port renderTable l.2149) */
   let rows = filteredStudents(f).slice().sort((a, b) => {

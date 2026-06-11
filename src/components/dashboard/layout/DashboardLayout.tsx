@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Eye } from 'lucide-react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { ROLE_HOME, roleAllows, useAuth } from '../../../lib/dashboard/auth';
+import { ensureData } from '../../../lib/dashboard/dataApi';
 import { ALL_NAV_ITEMS, VIEW_LABEL, viewToPath } from '../../../lib/dashboard/nav';
 import { SkeletonView, skeletonKindFor } from '../ui/Skeleton';
 import { TourProvider, useTour } from '../ui/Tour';
@@ -30,6 +31,11 @@ function LayoutInner() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [skelView, setSkelView] = useState<string | null>(null);
+
+  /* aquece a base (matrículas/salas/turmas) cedo — as telas pesadas esperam o ready */
+  useEffect(() => {
+    void ensureData();
+  }, []);
 
   const segs = location.pathname.replace(/^\/dashboard\/?/, '').split('/');
   const slug = segs[0];

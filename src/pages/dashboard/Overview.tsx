@@ -30,7 +30,8 @@ import {
   UsersRound,
 } from 'lucide-react';
 import { initials, useAuth } from '../../lib/dashboard/auth';
-import { useDash, logAct } from '../../lib/dashboard/store';
+import { logAct } from '../../lib/dashboard/store';
+import { useDashboardData } from '../../lib/dashboard/dataApi';
 import { useTheme } from '../../lib/dashboard/theme';
 import {
   FAMS,
@@ -99,7 +100,7 @@ function InlineBar({ pct, color }: { pct: number; color: string }) {
 }
 
 export default function Overview() {
-  useDash();
+  const { ready } = useDashboardData();
   const { dark } = useTheme();
   const { effectiveUser } = useAuth();
   const { toast } = useToast();
@@ -117,6 +118,14 @@ export default function Overview() {
     cache.period = v;
     setPeriodState(v);
   };
+
+  if (!ready) {
+    return (
+      <div className="grid place-content-center py-32">
+        <div className="w-8 h-8 rounded-full border-2 border-[var(--border)] border-t-brand-light animate-spin" />
+      </div>
+    );
+  }
 
   const goAgenda = () => navigate('/dashboard/agenda');
   const goAlunos = () => navigate('/dashboard/alunos');
