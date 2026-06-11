@@ -116,6 +116,8 @@ export interface Student {
   hora?: string; // ex.: '20h14'
   active?: boolean; // ausente/true = ativo; false = desligado
   exit?: ExitInfo;
+  contractId?: number; // id do contrato (vem da API; para enviar/cobrar/status)
+  _updatedAt?: string; // token de concorrência (STALE_WRITE) — vem da API
 }
 
 export interface Notif {

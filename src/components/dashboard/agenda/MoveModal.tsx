@@ -79,11 +79,11 @@ export function MoveModal({ sid, ki, presel, initialQuery, onClose, onAskFull }:
   const selT = sel ? turmaById(sel) : null;
   const warnLevel = selT && cur && selT.nivel !== cur.nivel;
 
-  const confirm = () => {
+  const confirm = async () => {
     if (sel === null) return;
     const t = sel ? turmaById(sel) : null;
     if (sel && !t) return;
-    const res = allocateKid(sid, ki, t ? t.id : null);
+    const res = await allocateKid(sid, ki, t ? t.id : null);
     if (!res.ok) {
       toastErr(res.error);
       return;
@@ -338,11 +338,14 @@ export function AskFullModal({ sid, ki, tid, onBack, onClose }: AskFullModalProp
     );
   }
 
-  const confirm = () => {
+  const confirm = async () => {
     const cur = kidTurma(k);
     const prevCap = t.cap;
-    const res = allocateKid(sid, ki, tid, { abrirVagaExtra: true });
-    if (!res.ok) return;
+    const res = await allocateKid(sid, ki, tid, { abrirVagaExtra: true });
+    if (!res.ok) {
+      toast(res.error);
+      return;
+    }
     logAct(
       effectiveUser?.name ?? 'Painel',
       `Abriu 1 vaga extra na turma <b>${turmaShort(t)}</b> (limite ${prevCap} → ${t.cap}) e ${cur ? 'moveu' : 'alocou'} <b>${esc(k.n)}</b> nela`,

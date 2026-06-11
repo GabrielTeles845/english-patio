@@ -26,10 +26,10 @@ export function DeleteModal({ sid, onClose, afterDelete }: { sid: number; onClos
   /* contrato assinado e matrícula ativa = exclusão quase sempre é engano — aviso reforçado */
   const signedWarn = s.status === 'signed' && s.active !== false;
 
-  const confirm = () => {
+  const confirm = async () => {
     const nomeFull = s.kids[0].n, nome = nomeFull.split(' ')[0];
-    const res = removeStudent(sid);
-    if (!res.ok) return;
+    const res = await removeStudent(sid);
+    if (!res.ok) return toast(res.error);
     onClose();
     afterDelete?.();
     logAct(effectiveUser?.name ?? 'Equipe', `Excluiu a matrícula de <b>${nomeFull}</b> (cadastro errado ou de teste)`);

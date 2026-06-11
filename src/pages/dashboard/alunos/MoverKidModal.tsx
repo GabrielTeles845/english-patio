@@ -77,11 +77,11 @@ export function MoverKidModal({ sid, ki, onClose }: { sid: number; ki: number; o
       ? `Mudança de nível: <b>${nivelLabel(cur.nivel)}</b> → <b>${nivelLabel(turmaById(sel)!.nivel)}</b>. Confirme se é isso mesmo.`
       : '';
 
-  const confirm = () => {
+  const confirm = async () => {
     if (sel === null) return;
     const t = sel ? turmaById(sel) : null;
     if (sel && !t) return;
-    const res = allocateKid(sid, ki, sel || null);
+    const res = await allocateKid(sid, ki, sel || null);
     if (!res.ok) {
       toast(res.error);
       return;
@@ -119,8 +119,8 @@ export function MoverKidModal({ sid, ki, onClose }: { sid: number; ki: number; o
         </Modal>
       );
     }
-    const confirmFull = () => {
-      const res = allocateKid(sid, ki, t.id, { abrirVagaExtra: true });
+    const confirmFull = async () => {
+      const res = await allocateKid(sid, ki, t.id, { abrirVagaExtra: true });
       if (!res.ok) {
         toast(res.error);
         return;

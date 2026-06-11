@@ -12,13 +12,21 @@
 
 import { useSyncExternalStore } from 'react';
 import type { ContractStatus } from './status';
+import { ApiError } from './api';
+import { reloadData } from './dataApi';
+import {
+  deactivateStudentApi,
+  deleteEnrollmentApi,
+  moveKidApi,
+  reactivateStudentApi,
+  setContractStatusApi,
+} from './studentsApi';
 import {
   ACTIVITY,
   type Addr,
   EXIT_REASONS,
   type ExitKey,
   type Kid,
-  kidTurma,
   NOTIFS,
   type Par,
   type Resp,
@@ -70,9 +78,15 @@ export function useDash(): number {
 
 /* ====================== RESULTADO DAS AÇÕES ====================== */
 
-export type ActionResult = { ok: true } | { ok: false; error: string };
+export type ActionResult = { ok: true } | { ok: false; error: string; code?: string };
 const OK: ActionResult = { ok: true };
 const fail = (error: string): ActionResult => ({ ok: false, error });
+
+/* erro da API → ActionResult (preserva o code p/ a UI decidir, ex.: CLASS_FULL) */
+function apiFail(err: unknown): ActionResult {
+  if (err instanceof ApiError) return { ok: false, error: err.message, code: err.code };
+  return { ok: false, error: 'Algo deu errado. Tente de novo.' };
+}
 
 /* ====================== REGISTRO DE ATIVIDADES ====================== */
 
@@ -89,29 +103,26 @@ export function logAct(who: string, html: string): void {
    tid null = tira da turma (volta para a fila "aguardando turma").
    abrirVagaExtra: turma cheia ganha +1 de cap (8–9) antes de alocar — o
    fluxo "Abrir vaga e alocar" do preview. */
-export function allocateKid(
+export async function allocateKid(
   sid: number,
   ki: number,
   tid: number | null,
   opts?: { abrirVagaExtra?: boolean }
-): ActionResult {
+): Promise<ActionResult> {
   const s = STUDENTS.find((x) => x.id === sid);
   if (!s) return fail('Matrícula não encontrada.');
   const k = s.kids[ki];
   if (!k) return fail('Aluno não encontrado.');
-  if (tid !== null) {
-    const t = turmaById(tid);
-    if (!t) return fail('Turma não encontrada.');
-    if (turmaFull(t)) {
-      if (!opts?.abrirVagaExtra) return fail('Essa turma lotou agorinha — escolha outra.');
-      t.cap += 1; // vaga extra (l.2990) — cap pode passar de 7 só por aqui
-    }
-    k.tid = t.id;
-  } else {
-    k.tid = null;
+  if (k.id == null) return fail('Aluno sem id — recarregue a página.');
+  try {
+    // capacidade e mudança de nível são validadas no servidor (CLASS_FULL/
+    // ROOM_OVERFLOW); a vaga extra vem do fluxo "abrir vaga e alocar".
+    await moveKidApi(k.id, tid, { extraSeat: opts?.abrirVagaExtra });
+    await reloadData();
+    return OK;
+  } catch (err) {
+    return apiFail(err);
   }
-  bump();
-  return OK;
 }
 
 /* ====================== CRUD DE TURMA ====================== */
@@ -353,49 +364,66 @@ export function updateStudent(sid: number, patch: StudentPatch): ActionResult {
 
 /* port de confirmDelete (l.4308) — excluir de vez (cadastro errado/teste);
    diferente de desligar: não tem volta. */
-export function removeStudent(sid: number): ActionResult {
-  const i = STUDENTS.findIndex((x) => x.id === sid);
-  if (i < 0) return fail('Matrícula não encontrada.');
-  STUDENTS.splice(i, 1);
-  bump();
-  return OK;
+export async function removeStudent(sid: number): Promise<ActionResult> {
+  try {
+    await deleteEnrollmentApi(sid);
+    await reloadData();
+    return OK;
+  } catch (err) {
+    return apiFail(err);
+  }
 }
 
 /* ====================== DESLIGAR / REATIVAR ====================== */
 
 /* port de confirmExit (l.5579): motivo obrigatório; nota obrigatória quando
    o motivo é "other" (regra do modal, l.5576); data = "hoje" do preview. */
-export function setStudentExit(sid: number, reasonK: ExitKey, note: string): ActionResult {
+export async function setStudentExit(sid: number, reasonK: ExitKey, note: string): Promise<ActionResult> {
   const s = STUDENTS.find((x) => x.id === sid);
   if (!s) return fail('Matrícula não encontrada.');
   const r = EXIT_REASONS.find((x) => x.k === reasonK);
   if (!r) return fail('Escolha o motivo do desligamento.');
   note = note.trim();
   if (reasonK === 'other' && !note) return fail('Descreva o motivo do desligamento.');
-  s.active = false;
-  s.exit = { k: r.k, label: r.l, note, date: '03/06/2026' };
-  bump();
-  return OK;
+  try {
+    // desligamento é por aluno no backend; aqui desliga todos os kids da família.
+    for (const k of s.kids) {
+      if (k.id == null) continue;
+      try {
+        await deactivateStudentApi(k.id, reasonK, note);
+      } catch (e) {
+        if (!(e instanceof ApiError && e.code === 'ALREADY_INACTIVE')) throw e;
+      }
+    }
+    await reloadData();
+    return OK;
+  } catch (err) {
+    return apiFail(err);
+  }
 }
 
 /* port de reactivateStudent (l.5590): a vaga NÃO fica reservada — se a turma
    lotou nesse meio tempo, o kid volta com tid:null (fila de alocação).
    `bumped` lista quem voltou pela fila, para a tela montar o toast. */
-export function reactivateStudent(sid: number): (ActionResult & { bumped?: string[] }) {
+export async function reactivateStudent(sid: number): Promise<ActionResult & { bumped?: string[] }> {
   const s = STUDENTS.find((x) => x.id === sid);
   if (!s) return fail('Matrícula não encontrada.');
-  s.active = true;
-  delete s.exit;
   const bumped: string[] = [];
-  s.kids.forEach((k) => {
-    const t = kidTurma(k);
-    if (t && activeKidsIn(t.id) > t.cap) {
-      bumped.push(`${k.n.split(' ')[0]} (a ${salaById(t.sala)!.n.replace(' Room', '')} · ${schLabel(t.par)} ${t.hora} lotou)`);
-      k.tid = null;
+  try {
+    for (const k of s.kids) {
+      if (k.id == null) continue;
+      try {
+        const r = await reactivateStudentApi(k.id);
+        if (r.droppedToQueue) bumped.push(k.n.split(' ')[0]); // a turma lotou no meantime
+      } catch (e) {
+        if (!(e instanceof ApiError && e.code === 'ALREADY_ACTIVE')) throw e;
+      }
     }
-  });
-  bump();
-  return { ok: true, bumped };
+    await reloadData();
+    return { ok: true, bumped };
+  } catch (err) {
+    return apiFail(err);
+  }
 }
 
 /* ====================== STATUS DO CONTRATO ====================== */
@@ -404,12 +432,17 @@ export function reactivateStudent(sid: number): (ActionResult & { bumped?: strin
    visualizado/assinado chega sozinho pelo webhook do Autentique — o marcar
    manual é backup. O timestamp da mudança é o logAct('agora'/'Hoje') que a
    tela registra junto; o mock não guarda histórico próprio (nem o preview). */
-export function setContractStatus(sid: number, status: ContractStatus): ActionResult {
+export async function setContractStatus(sid: number, status: ContractStatus): Promise<ActionResult> {
   const s = STUDENTS.find((x) => x.id === sid);
   if (!s) return fail('Matrícula não encontrada.');
-  s.status = status;
-  bump();
-  return OK;
+  if (s.contractId == null) return fail('Esta matrícula ainda não tem contrato.');
+  try {
+    await setContractStatusApi(s.contractId, status);
+    await reloadData();
+    return OK;
+  } catch (err) {
+    return apiFail(err);
+  }
 }
 
 /* ====================== NOTIFICAÇÕES ====================== */

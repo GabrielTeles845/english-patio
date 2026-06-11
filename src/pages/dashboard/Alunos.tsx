@@ -226,13 +226,15 @@ export default function Alunos() {
       ];
     /* ações dependem do status atual do contrato (sem transições redundantes).
        Visualizado/assinado chegam sozinhos pelo Autentique — o "marcar" manual é só backup. */
-    const markSent = () => {
-      setContractStatus(s.id, 'sent');
+    const markSent = async () => {
+      const res = await setContractStatus(s.id, 'sent');
+      if (!res.ok) return toast(res.error);
       logAct(who, `Marcou o contrato de <b>${s.kids[0].n}</b> como enviado`);
       toast('Contrato marcado como enviado!');
     };
-    const markSigned = () => {
-      setContractStatus(s.id, 'signed');
+    const markSigned = async () => {
+      const res = await setContractStatus(s.id, 'signed');
+      if (!res.ok) return toast(res.error);
       logAct(who, `Marcou o contrato de <b>${s.kids[0].n}</b> como assinado`);
       toast('Contrato marcado como assinado!');
     };

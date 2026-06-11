@@ -54,11 +54,13 @@ interface ApiEnrollment {
   financialResponsibleType: 'legal' | 'second' | 'other';
   authorizationMedia: boolean;
   submittedAt: string;
+  updatedAt: string;
   kids: ApiKid[];
   responsibles: ApiResp[];
   address: ApiAddr | null;
   neighborhood: string | null;
   contractStatus: ContractStatus | null;
+  contractId: number | null;
 }
 interface ApiRoom { id: number; name: string; color: string; teacherName: string | null; isActive: boolean }
 interface ApiClass { id: number; roomId: number; dayPair: 'seg-qua' | 'ter-qui'; startTime: string; levelId: number; capacity: number; period: string; isActive: boolean }
@@ -124,6 +126,8 @@ function toStudent(e: ApiEnrollment): Student {
     exit: exitKid
       ? { k: exitKid.exitReason as ExitKey, label: exitLabel(exitKid.exitReason), note: exitKid.exitNote ?? '', date: isoToBr(exitKid.exitDate) }
       : undefined,
+    contractId: e.contractId ?? undefined,
+    _updatedAt: e.updatedAt,
   };
 }
 function toSala(r: ApiRoom): Sala {

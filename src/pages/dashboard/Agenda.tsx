@@ -153,7 +153,7 @@ export default function Agenda() {
   };
 
   /* port de dropMoveKid (l.2637): cheia → vaga extra · nível diferente → confirmação */
-  const dropMoveKid = (sid: number, ki: number, tid: number) => {
+  const dropMoveKid = async (sid: number, ki: number, tid: number) => {
     const s = STUDENTS.find((x) => x.id === sid);
     const k = s?.kids[ki];
     if (!s || !k) return;
@@ -171,7 +171,7 @@ export default function Agenda() {
       setModal({ kind: 'mover', sid, ki, presel: t.id });
       return;
     }
-    const res = allocateKid(sid, ki, tid);
+    const res = await allocateKid(sid, ki, tid);
     if (!res.ok) {
       toastErr(res.error);
       return;

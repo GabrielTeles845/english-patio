@@ -33,11 +33,11 @@ export function ExitModal({ sid, onClose }: { sid: number; onClose: () => void }
 
   const disabled = !reasonK || (reasonK === 'other' && !note.trim());
 
-  const confirm = () => {
+  const confirm = async () => {
     if (!reasonK) return;
     const r = EXIT_REASONS.find((x) => x.k === reasonK)!;
-    const res = setStudentExit(sid, reasonK, note);
-    if (!res.ok) return;
+    const res = await setStudentExit(sid, reasonK, note);
+    if (!res.ok) return toast(res.error);
     onClose();
     logAct(effectiveUser?.name ?? 'Equipe', `Desligou <b>${s.kids[0].n}</b> — motivo: ${r.l.toLowerCase()}`);
     toast(`${s.kids[0].n.split(' ')[0]} foi desligado da escola — motivo registrado.`);
@@ -135,11 +135,11 @@ export function ExitModal({ sid, onClose }: { sid: number; onClose: () => void }
 
 /* Reativar (port reactivateStudent l.5590) — usado pelo menu ⋮ e pela ficha.
    A vaga NÃO fica reservada: se a turma lotou, o aluno volta pela fila. */
-export function reactivateWithFeedback(sid: number, who: string, toast: (m: string) => void): void {
+export async function reactivateWithFeedback(sid: number, who: string, toast: (m: string) => void): Promise<void> {
   const s = STUDENTS.find((x) => x.id === sid);
   if (!s) return;
-  const res = reactivateStudent(sid);
-  if (!res.ok) return;
+  const res = await reactivateStudent(sid);
+  if (!res.ok) return toast(res.error);
   const bumped = res.bumped ?? [];
   logAct(
     who,
