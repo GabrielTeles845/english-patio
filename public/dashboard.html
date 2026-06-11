@@ -645,7 +645,6 @@
               <input id="alunoSearch" oninput="tableChanged()" placeholder="Buscar por nome, responsável ou bairro…" class="flex-1 bg-transparent outline-none text-sm">
             </div>
             <button id="fClear" onclick="clearFilters()" class="hidden h-10 px-3 rounded-xl text-sm font-semibold transition items-center gap-1.5 shrink-0" style="background:rgba(245,183,0,.14);color:#B5860B"><i data-lucide="filter-x" class="w-4 h-4"></i>Limpar <span id="fClearN"></span></button>
-            <button id="fFamBtn" onclick="toggleFamGroup()" class="tip h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium flex items-center gap-1.5 shrink-0 transition" data-tip="Matrículas da mesma família (mesmo responsável) aparecem uma embaixo da outra, mesmo na ordem alfabética"><i data-lucide="users" class="w-4 h-4"></i><span class="hidden sm:inline">Famílias juntas</span></button>
             <button onclick="toggleFilters('fRow','fChev')" class="md:hidden h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium flex items-center gap-1.5 shrink-0"><i data-lucide="sliders-horizontal" class="w-4 h-4"></i>Filtros<i id="fChev" data-lucide="chevron-down" class="w-4 h-4 transition-transform"></i></button>
           </div>
           <div id="fRow" class="collapsed md:!flex flex flex-wrap items-center gap-2 pt-2.5 border-t" style="border-color:var(--border)">
@@ -671,6 +670,9 @@
             </span>
           </div>
         </div>
+
+        <!-- banner "família em foco" (preenchido por renderTable quando famView ativo) -->
+        <div id="famBanner"></div>
 
         <!-- tabela com design próprio (cabeçalho ordenável renderizado via JS; cards no mobile) -->
         <div class="surface rounded-2xl overflow-hidden table-shell">
@@ -1961,24 +1963,36 @@ function turmaCellHTML(s){
       <p class="text-[10px] mt-0.5 font-semibold whitespace-nowrap" style="color:${famC(t.nivel)}">${nivelLabel(t.nivel)} · ${schLabel(t.par)}</p>
     </div>`;
   }
-  /* irmãos na mesma matrícula: uma linha por aluno, com o nome — sem "+1" escondido */
-  return `<div class="min-w-0 space-y-1">${infos.map(({k,t})=>{
-    if(!t) return `<p class="text-[11px] flex items-center gap-1.5 whitespace-nowrap"><span class="font-semibold shrink-0">${esc(k.n.split(' ')[0])}</span>${semTurmaChip()}</p>`;
+  /* irmãos na mesma matrícula: um bloco de turma por aluno (2 linhas, igual ao
+     aluno único), alinhado com os alunos empilhados na coluna "Aluno" — sem
+     espremer tudo numa linha só. */
+  return `<div class="min-w-0 space-y-1.5">${infos.map(({t})=>{
+    if(!t) return `<div class="min-h-[42px] flex items-center">${semTurmaChip()}</div>`;
     const sala=salaById(t.sala);
-    return `<p class="text-[11px] flex items-center gap-1.5 whitespace-nowrap min-w-0"><span class="w-2 h-2 rounded-full shrink-0" style="background:${sala.c}"></span><span class="font-semibold shrink-0">${esc(k.n.split(' ')[0])}</span><span class="text-[var(--muted)] truncate">${sala.n.replace(' Room','')} ${t.hora} ·</span><span class="font-semibold shrink-0" style="color:${famC(t.nivel)}">${nivelLabel(t.nivel)}</span></p>`;
+    return `<div class="min-w-0 min-h-[42px] flex flex-col justify-center">
+      <p class="text-xs font-medium flex items-center gap-1.5 whitespace-nowrap"><span class="w-2 h-2 rounded-full shrink-0" style="background:${sala.c}"></span><span class="truncate">${sala.n.replace(' Room','')} · ${t.hora}</span></p>
+      <p class="text-[10px] mt-0.5 font-semibold whitespace-nowrap" style="color:${famC(t.nivel)}">${nivelLabel(t.nivel)} · ${schLabel(t.par)}</p>
+    </div>`;
   }).join('')}</div>`;
 }
 function rowHTML(s){
-  const nSib=s.kids.length-1;
-  const more = nSib>0 ? `<span class="text-[11px] px-1.5 py-0.5 rounded-md font-medium whitespace-nowrap" style="background:var(--hover);color:var(--muted)">+${nSib} irmã${nSib>1?'os':'o'}</span>` : '';
   const st=STATUS[s.status];
   const inactive=s.active===false;
   const mediaIcon = s.media===false
     ? '<span class="tip inline-grid place-content-center w-5 h-5 rounded-md shrink-0" data-tip="Não autorizou uso de imagem" style="background:rgba(220,38,38,.10);color:#dc2626"><i data-lucide="camera-off" class="w-3 h-3"></i></span>'
     : '<span class="tip inline-grid place-content-center w-5 h-5 rounded-md shrink-0" data-tip="Autorizou uso de imagem" style="background:rgba(22,163,74,.10);color:#16a34a"><i data-lucide="camera" class="w-3 h-3"></i></span>';
   const fam=STUDENTS.filter(x=>x.resp.cpf===s.resp.cpf).length;
-  const famBadge=fam>1?`<span class="tip inline-grid place-content-center w-5 h-5 rounded-md shrink-0" data-tip="Mesma família: este responsável tem ${fam} matrículas" style="background:rgba(47,83,154,.12);color:#2F539A"><i data-lucide="users" class="w-3 h-3"></i></span>`:'';
-  const avatar=`<div class="w-10 h-10 rounded-xl grid place-content-center text-white font-semibold text-sm shrink-0" style="background:linear-gradient(135deg,${palette[s.id%palette.length]},#2F539A);${inactive?'filter:grayscale(.7)':''}">${initials(s.kids[0].n)}</div>`;
+  const famBadge=fam>1?`<button onclick="openFamily(event,${s.id})" class="tip inline-grid place-content-center w-5 h-5 rounded-md shrink-0 hover:brightness-95 transition cursor-pointer" data-tip="Ver as ${fam} matrículas desta família" style="background:rgba(47,83,154,.12);color:#2F539A"><i data-lucide="users" class="w-3 h-3"></i></button>`:'';
+  const multi=s.kids.length>1;
+  const grad=`linear-gradient(135deg,${palette[s.id%palette.length]},#2F539A)`;
+  /* avatar por aluno (iniciais do próprio); a cor da família é a mesma nos irmãos */
+  const avatarFor=(name,sm)=>`<div class="${sm?'w-9 h-9':'w-10 h-10'} rounded-xl grid place-content-center text-white font-semibold ${sm?'text-xs':'text-sm'} shrink-0" style="background:${grad};${inactive?'filter:grayscale(.7)':''}">${initials(name)}</div>`;
+  const avatar=avatarFor(s.kids[0].n);
+  /* célula "Aluno": 1 aluno = formato normal; irmãos no mesmo contrato = um bloco
+     por aluno (avatar + nome + idade), alinhado com os blocos de turma. Sem "+1". */
+  const alunoCell=(sm)=>multi
+    ? `<div class="min-w-0 space-y-1.5">${s.kids.map((k,i)=>`<div class="flex items-center gap-2.5 min-w-0 min-h-[42px]">${avatarFor(k.n,true)}<div class="min-w-0"><p class="font-medium text-sm truncate flex items-center gap-1.5">${esc(k.n)}${i===0?mediaIcon:''}</p><p class="text-[11px] text-[var(--muted)] truncate">${k.age} anos · ${esc(s.addr.bairro)}</p></div></div>`).join('')}</div>`
+    : `<div class="flex items-${sm?'start':'center'} gap-3 min-w-0">${avatar}<div class="min-w-0"><p class="font-medium ${sm?'flex-wrap leading-snug':'truncate'} flex items-center gap-${sm?'1.5':'2'}">${esc(s.kids[0].n)}${mediaIcon}</p><p class="text-xs text-[var(--muted)] ${sm?'mt-0.5':''}">${s.kids[0].age} anos · ${esc(s.addr.bairro)}</p></div></div>`;
   const mobChips=[...new Map(s.kids.map(k=>[(k.tid||0),k])).values()].map(k=>kidTurmaChip(k)).join('');
   const stPill=`<span class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap" style="color:${st.c};background:${st.bg}"><span class="w-1.5 h-1.5 rounded-full" style="background:${st.c}"></span>${st.t}</span>`;
   const exitTip = inactive&&s.exit ? ` title="Desligado em ${s.exit.date} — ${s.exit.label}"` : '';
@@ -1992,15 +2006,11 @@ function rowHTML(s){
   const sinceCell = s.since
     ? `<span class="tip text-xs whitespace-nowrap" data-tip="Aluno da escola desde ${s.since}">Desde ${s.since}</span>`
     : `<span class="tip text-xs text-[var(--muted)]" data-tip="Sem registro — use ⋮ → Editar dados para preencher">—</span>`;
-  return `<div onclick="openDetail(${s.id})" class="cursor-pointer transition md:border-b md:last:border-0 hover:bg-[var(--hover)] ${inactive?'opacity-60':''}" style="border-color:var(--border)${famGroup&&fam>1?';box-shadow:inset 3px 0 0 #2F539A':''}">
+  return `<div onclick="openDetail(${s.id})" class="cursor-pointer transition md:border-b md:last:border-0 hover:bg-[var(--hover)] ${inactive?'opacity-60':''}" style="border-color:var(--border)">
     <!-- desktop: linha da tabela -->
-    <div class="hidden md:grid md:grid-cols-[1.45fr_1.1fr_1fr_.8fr_.7fr_.85fr_.8fr_52px] gap-3 px-5 py-3.5 items-center">
-      <div class="flex items-center gap-3 min-w-0">
-        ${avatar}
-        <div class="min-w-0"><p class="font-medium truncate flex items-center gap-2">${s.kids[0].n} ${more}${mediaIcon}</p>
-          <p class="text-xs text-[var(--muted)]">${s.kids[0].age} anos · ${s.addr.bairro}</p></div>
-      </div>
-      <div class="min-w-0"><p class="text-sm truncate flex items-center gap-1.5">${s.resp.n}${famBadge}</p><p class="text-xs text-[var(--muted)]">${s.resp.rel} · ${s.resp.phone}</p></div>
+    <div class="hidden md:grid md:grid-cols-[1.45fr_1.1fr_1fr_.8fr_.7fr_.85fr_.8fr_52px] gap-3 px-5 py-3.5 ${multi?'items-start':'items-center'}">
+      ${alunoCell(false)}
+      <div class="min-w-0 ${multi?'pt-1':''}"><p class="text-sm truncate flex items-center gap-1.5">${s.resp.n}${famBadge}</p><p class="text-xs text-[var(--muted)]">${s.resp.rel} · ${s.resp.phone}</p></div>
       <div class="min-w-0">${turmaCellHTML(s)}</div>
       <div>${stPill}</div>
       <div>${actPill}</div>
@@ -2013,8 +2023,9 @@ function rowHTML(s){
       <div class="flex items-start gap-3">
         ${avatar}
         <div class="min-w-0 flex-1">
-          <p class="font-medium flex items-center gap-1.5 flex-wrap leading-snug">${s.kids[0].n} ${more}${mediaIcon}</p>
-          <p class="text-xs text-[var(--muted)] mt-0.5">${s.kids[0].age} anos · ${s.addr.bairro}</p>
+          ${multi
+            ? s.kids.map((k,i)=>`<p class="font-medium text-sm flex items-center gap-1.5 leading-snug ${i>0?'mt-1':''}">${esc(k.n)} <span class="text-[var(--muted)] font-normal">${k.age}a</span>${i===0?mediaIcon:''}</p>`).join('')+`<p class="text-xs text-[var(--muted)] mt-0.5">${esc(s.addr.bairro)}</p>`
+            : `<p class="font-medium flex items-center gap-1.5 flex-wrap leading-snug">${esc(s.kids[0].n)}${mediaIcon}</p><p class="text-xs text-[var(--muted)] mt-0.5">${s.kids[0].age} anos · ${esc(s.addr.bairro)}</p>`}
         </div>
         ${kebab()}
       </div>
@@ -2130,29 +2141,33 @@ function pagerHTML(page,pages,fn){
     + (end<pages?(end<pages-1?'<span class="px-0.5">…</span>':'')+btn(pages,pages,false,false):'')
     + btn('<i data-lucide="chevron-right" class="w-4 h-4"></i>',page+1,false,page===pages);
 }
-/* "Famílias juntas": matrículas do mesmo responsável aparecem adjacentes,
-   na posição da primeira que apareceria na ordenação atual */
-let famGroup=false;
-function famGroupRows(rows){
-  const seen=new Set(), out=[];
-  rows.forEach(r=>{ if(seen.has(r.resp.cpf)) return; seen.add(r.resp.cpf);
-    out.push(...rows.filter(x=>x.resp.cpf===r.resp.cpf)); });
-  return out;
+/* Família em foco: clicar no badge de família (ícone de pessoas no responsável)
+   mostra só as matrículas daquele responsável, com banner + "Ver todos". */
+let famView=null;
+function openFamily(ev,sid){
+  ev.stopPropagation();
+  const s=STUDENTS.find(x=>x.id===sid);
+  if(!s) return;
+  famView={cpf:s.resp.cpf,name:s.resp.n};
+  tablePage=1;
+  renderTable();
+  document.querySelector('.table-shell')?.scrollIntoView({behavior:'smooth',block:'start'});
 }
-function toggleFamGroup(){
-  famGroup=!famGroup;
-  const b=document.getElementById('fFamBtn');
-  if(b){ b.style.background=famGroup?'rgba(47,83,154,.10)':''; b.style.color=famGroup?'#2F539A':''; b.style.borderColor=famGroup?'rgba(47,83,154,.45)':''; }
-  tableChanged();
-  toast(famGroup?'Matrículas da mesma família agora aparecem juntas.':'Agrupamento por família desligado.');
-}
+function closeFamily(){ famView=null; tablePage=1; renderTable(); }
 function renderTable(){
   updateClearBtn();
   let rows=(QA_EMPTY?[]:filteredStudents()).slice().sort((a,b)=>{
     const va=SORT_VAL[sortKey](a), vb=SORT_VAL[sortKey](b);
     return (va<vb?-1:va>vb?1:0)*sortDir;
   });
-  if(famGroup) rows=famGroupRows(rows);
+  if(famView) rows=rows.filter(s=>s.resp.cpf===famView.cpf);
+  const fb=document.getElementById('famBanner');
+  if(fb) fb.innerHTML = famView
+    ? `<div class="flex items-center justify-between gap-3 mb-3 px-4 py-2.5 rounded-xl text-sm" style="background:rgba(47,83,154,.08);border:1px solid rgba(47,83,154,.25)">
+        <span class="flex items-center gap-2 min-w-0" style="color:#2F539A"><i data-lucide="users" class="w-4 h-4 shrink-0"></i><span class="truncate">Família de <b>${esc(famView.name)}</b> · ${STUDENTS.filter(s=>s.resp.cpf===famView.cpf).length} matrículas</span></span>
+        <button onclick="closeFamily()" class="flex items-center gap-1.5 font-medium shrink-0 hover:underline" style="color:#2F539A"><i data-lucide="arrow-left" class="w-4 h-4"></i> Ver todos</button>
+      </div>`
+    : '';
   const pages=Math.max(1,Math.ceil(rows.length/PAGE_SIZE));
   tablePage=Math.min(tablePage,pages);
   const pageRows=rows.slice((tablePage-1)*PAGE_SIZE, tablePage*PAGE_SIZE);
