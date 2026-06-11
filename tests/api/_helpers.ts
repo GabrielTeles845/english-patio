@@ -17,6 +17,7 @@ export function mkRes(): any {
     _headers: {} as Record<string, unknown>,
     status(c: number) { r._status = c; return r; },
     json(b: unknown) { r._body = b; return r; },
+    send(b: unknown) { r._body = b; return r; }, // respostas não-JSON (ex.: CSV)
     setHeader(k: string, v: unknown) { r._headers[k] = v; return r; },
   };
   return r;
