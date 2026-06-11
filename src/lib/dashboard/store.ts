@@ -13,7 +13,7 @@
 import { useSyncExternalStore } from 'react';
 import type { ContractStatus } from './status';
 import { ApiError } from './api';
-import { reloadData } from './dataApi';
+import { reloadData, currentPeriod, levelIdForKey } from './dataApi';
 import {
   deactivateStudentApi,
   deleteEnrollmentApi,
@@ -21,6 +21,14 @@ import {
   reactivateStudentApi,
   setContractStatusApi,
 } from './studentsApi';
+import {
+  createClassApi,
+  updateClassApi,
+  deleteClassApi,
+  createRoomApi,
+  updateRoomApi,
+  deactivateRoomApi,
+} from './agendaApi';
 import {
   ACTIVITY,
   type Addr,
@@ -33,11 +41,8 @@ import {
   SALA_COLORS,
   SALAS,
   type Second,
-  slugify,
   STUDENTS,
   TEACHERS,
-  TURMAS,
-  turmaAt,
   turmaById,
   turmaFull,
   type User,
@@ -48,7 +53,6 @@ import {
   nrmName,
   salaById,
   schLabel,
-  takeTurmaId,
 } from './data';
 
 /* ====================== ASSINATURA / VERSÃO ====================== */
@@ -135,90 +139,87 @@ export interface TurmaInput {
   cap: number;
 }
 
-/* port de agSaveTurma (l.3055): cap 1..7 na criação, slot (sala+par+hora) único */
-export function addTurma(input: TurmaInput): ActionResult & { id?: number } {
+/* POST /api/classes — slot único (409 SLOT_TAKEN) e capacidade validados no servidor */
+export async function addTurma(input: TurmaInput): Promise<ActionResult & { id?: number }> {
   const { sala, par, hora, nivel, cap } = input;
   if (!(cap >= 1 && cap <= 7)) return fail('Vagas entre 1 e 7 — o padrão da escola é 7.');
-  if (turmaAt(sala, par, hora))
-    return fail(`A ${salaById(sala)!.n} já tem turma ${schLabel(par)} às ${hora} — escolha outro horário ou outra sala.`);
-  const id = takeTurmaId();
-  TURMAS.push({ id, sala, par, hora, nivel, cap });
-  bump();
-  return { ok: true, id };
+  const levelId = levelIdForKey(nivel);
+  if (!levelId) return fail('Nível inválido — recarregue a página.');
+  try {
+    const r = await createClassApi({ roomId: Number(sala), dayPair: par, startTime: hora, levelId, capacity: cap, period: currentPeriod() });
+    await reloadData();
+    return { ok: true, id: r.id };
+  } catch (err) {
+    return apiFail(err);
+  }
 }
 
-/* port de agUpdateTurma (l.3110): teto = max(7, cap atual — turma com vaga extra),
-   cap nunca menor que a ocupação, slot continua único. (O aviso de mudar o nível
-   de turma com alunos é o 2º clique da UI.) */
-export function updateTurma(tid: number, input: TurmaInput): ActionResult {
-  const t = turmaById(tid);
-  if (!t) return fail('Turma não encontrada.');
-  const occ = activeKidsIn(tid);
+/* PATCH /api/classes/:id — slot único + capacidade >= ocupação validados no servidor */
+export async function updateTurma(tid: number, input: TurmaInput): Promise<ActionResult> {
   const { sala, par, hora, nivel, cap } = input;
-  const maxCap = Math.max(7, t.cap);
-  if (!(cap >= 1 && cap <= maxCap))
-    return fail(`Vagas entre 1 e ${maxCap}${maxCap > 7 ? ' (esta turma tem vaga extra aberta)' : ''} — o padrão da escola é 7.`);
-  if (cap < occ)
-    return fail(`A turma tem ${occ} aluno${occ > 1 ? 's' : ''} — a capacidade não pode ficar menor que isso.`);
-  const clash = turmaAt(sala, par, hora);
-  if (clash && clash.id !== tid) return fail(`A ${salaById(sala)!.n} já tem turma ${schLabel(par)} às ${hora}.`);
-  Object.assign(t, { sala, par, hora, nivel, cap });
-  bump();
-  return OK;
+  const levelId = levelIdForKey(nivel);
+  if (!levelId) return fail('Nível inválido — recarregue a página.');
+  try {
+    await updateClassApi(tid, { roomId: Number(sala), dayPair: par, startTime: hora, levelId, capacity: cap });
+    await reloadData();
+    return OK;
+  } catch (err) {
+    return apiFail(err);
+  }
 }
 
-/* port de agDeleteTurma/confirmAgDeleteTurma (l.3130/3145): só turma vazia */
-export function deleteTurma(tid: number): ActionResult {
-  const i = TURMAS.findIndex((t) => t.id === tid);
-  if (i < 0) return fail('Turma não encontrada.');
-  if (activeKidsIn(tid) > 0) return fail('Só turmas vazias podem ser excluídas — mova os alunos antes.');
-  TURMAS.splice(i, 1);
-  bump();
-  return OK;
+/* DELETE /api/classes/:id — só vazia (422 CLASS_NOT_EMPTY no servidor) */
+export async function deleteTurma(tid: number): Promise<ActionResult> {
+  try {
+    await deleteClassApi(tid);
+    await reloadData();
+    return OK;
+  } catch (err) {
+    return apiFail(err);
+  }
 }
 
 /* ====================== CRUD DE SALA ====================== */
 
-/* port de smAddSala (l.3231): nome único, sem badChars, cor livre da paleta */
-export function addSala(n: string): ActionResult & { id?: string } {
+/* POST /api/rooms — nome único (409 no servidor); cor livre da paleta */
+export async function addSala(n: string): Promise<ActionResult & { id?: string }> {
   if (!n.trim()) return fail('A sala precisa de um nome.');
   n = n.trim();
   if (badChars(n)) return fail('O nome da sala não pode ter sinais de maior/menor, aspas ou & — use só letras e números.');
-  if (SALAS.some((s) => s.n.toLowerCase() === n.toLowerCase())) return fail('Já existe uma sala com esse nome.');
-  let id = slugify(n);
-  while (SALAS.some((s) => s.id === id)) id += '-2';
   const usadas = new Set(SALAS.map((s) => s.c));
   const cor = SALA_COLORS.find((c) => !usadas.has(c)) || SALA_COLORS[SALAS.length % SALA_COLORS.length];
-  SALAS.push({ id, n, c: cor, prof: null });
-  bump();
-  return { ok: true, id };
+  try {
+    const r = await createRoomApi({ name: n, color: cor });
+    await reloadData();
+    return { ok: true, id: String(r.id) };
+  } catch (err) {
+    return apiFail(err);
+  }
 }
 
-/* port de saveSala (l.3326): nome obrigatório/único, sem badChars; cor opcional */
-export function updateSala(id: string, input: { n: string; c?: string }): ActionResult {
-  const s = salaById(id);
-  if (!s) return fail('Sala não encontrada.');
+/* PATCH /api/rooms/:id — nome obrigatório/único, sem badChars; cor opcional */
+export async function updateSala(id: string, input: { n: string; c?: string }): Promise<ActionResult> {
   const n = input.n.trim();
   if (!n) return fail('A sala precisa de um nome.');
   if (badChars(n)) return fail('O nome da sala não pode ter sinais de maior/menor, aspas ou & — use só letras e números.');
-  if (SALAS.some((x) => x.id !== id && x.n.toLowerCase() === n.toLowerCase()))
-    return fail(`Já existe uma sala chamada <b>${n}</b>.`);
-  s.n = n;
-  if (input.c) s.c = input.c;
-  bump();
-  return OK;
+  try {
+    await updateRoomApi(Number(id), { name: n, ...(input.c ? { color: input.c } : {}) });
+    await reloadData();
+    return OK;
+  } catch (err) {
+    return apiFail(err);
+  }
 }
 
-/* port de smRemoveSala/confirmSmRemoveSala (l.3245/3262): só sala sem turmas;
-   o teacher da sala (se tiver) volta para o cadastro como "sem sala" */
-export function deleteSala(id: string): ActionResult {
-  const s = salaById(id);
-  if (!s) return fail('Sala não encontrada.');
-  if (TURMAS.some((t) => t.sala === id)) return fail('Essa sala tem turmas — mova ou exclua as turmas antes.');
-  if (s.prof && !TEACHERS.includes(s.prof)) TEACHERS.push(s.prof);
-  SALAS.splice(SALAS.findIndex((x) => x.id === id), 1);
-  bump();
-  return OK;
+/* POST /api/rooms/:id/deactivate — só sala sem turmas (422 ROOM_HAS_CLASSES no servidor) */
+export async function deleteSala(id: string): Promise<ActionResult> {
+  try {
+    await deactivateRoomApi(Number(id));
+    await reloadData();
+    return OK;
+  } catch (err) {
+    return apiFail(err);
+  }
 }
 
 /* ====================== TEACHERS (aba do modal "Salas & teachers") ====================== */
@@ -235,31 +236,30 @@ export function addTeacher(n: string): ActionResult {
   return OK;
 }
 
-/* port de smAssignTeacher (l.3218): cada teacher tem no máx. 1 sala; quem é
-   deslocado da sala vira "sem sala". salaId '' = tirar da sala. */
-export function assignTeacher(name: string, salaId: string | ''): ActionResult {
-  if (!TEACHERS.includes(name)) return fail('Teacher não encontrado.');
-  const old = SALAS.find((s) => s.prof === name);
-  if (old) old.prof = null;
-  if (salaId) {
-    const sala = salaById(salaId);
-    if (!sala) return fail('Sala não encontrada.');
-    if (sala.prof && sala.prof !== name && !TEACHERS.includes(sala.prof)) TEACHERS.push(sala.prof); // quem sai vira "sem sala"
-    sala.prof = name;
+/* PATCH /api/rooms/:id { teacherName }. O professor é da SALA (1 por sala);
+   salaId '' = tirar o teacher da sala atual. */
+export async function assignTeacher(name: string, salaId: string | ''): Promise<ActionResult> {
+  try {
+    const old = SALAS.find((s) => s.prof === name);
+    if (old && old.id !== salaId) await updateRoomApi(Number(old.id), { teacherName: null });
+    if (salaId) await updateRoomApi(Number(salaId), { teacherName: name });
+    await reloadData();
+    return OK;
+  } catch (err) {
+    return apiFail(err);
   }
-  bump();
-  return OK;
 }
 
-/* port de confirmSmRemoveTeacher (l.3298): a sala dele (se tiver) fica sem teacher */
-export function removeTeacher(name: string): ActionResult {
-  const i = TEACHERS.indexOf(name);
-  if (i < 0) return fail('Teacher não encontrado.');
-  const sala = SALAS.find((s) => s.prof === name);
-  if (sala) sala.prof = null;
-  TEACHERS.splice(i, 1);
-  bump();
-  return OK;
+/* tira o teacher da sala que ele ocupa (não há cadastro de teacher fora da sala). */
+export async function removeTeacher(name: string): Promise<ActionResult> {
+  try {
+    const sala = SALAS.find((s) => s.prof === name);
+    if (sala) await updateRoomApi(Number(sala.id), { teacherName: null });
+    await reloadData();
+    return OK;
+  } catch (err) {
+    return apiFail(err);
+  }
 }
 
 /* ====================== MATRÍCULAS — CRUD ====================== */

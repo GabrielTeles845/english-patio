@@ -87,9 +87,9 @@ export function NewTurmaModal({ sala, par, hora, nivel, defaultPar, onClose }: N
   const [cap, setCap] = useState('7');
   const [err, setErr] = useState('');
 
-  const save = () => {
+  const save = async () => {
     const capN = parseInt(cap, 10);
-    const res = addTurma({ sala: vSala, par: vPar, hora: vHora, nivel: vNivel, cap: capN });
+    const res = await addTurma({ sala: vSala, par: vPar, hora: vHora, nivel: vNivel, cap: capN });
     if (!res.ok) {
       setErr(res.error);
       return;
@@ -212,7 +212,7 @@ export function TurmaModal({ tid, onClose, onMoveKid, onOpenDelete }: TurmaModal
   const list = kidsOfTurma(tid);
   const occ = list.length;
 
-  const save = () => {
+  const save = async () => {
     const capN = parseInt(cap, 10);
     /* mesma precedência do preview: erros de capacidade/slot vêm antes do aviso de nível */
     const maxCap = Math.max(7, t.cap);
@@ -232,7 +232,7 @@ export function TurmaModal({ tid, onClose, onMoveKid, onOpenDelete }: TurmaModal
       });
       return;
     }
-    const res = updateTurma(tid, { sala: vSala, par: vPar, hora: vHora, nivel: vNivel, cap: capN });
+    const res = await updateTurma(tid, { sala: vSala, par: vPar, hora: vHora, nivel: vNivel, cap: capN });
     if (!res.ok) {
       setWarnOk(false);
       setErr({ kind: 'err', msg: res.error });
@@ -379,9 +379,9 @@ export function DeleteTurmaModal({ tid, onClose }: DeleteTurmaModalProps) {
   if (!t || activeKidsIn(tid) > 0) return null;
   const short = turmaShort(t);
 
-  const confirm = () => {
-    const res = deleteTurma(tid);
-    if (!res.ok) return;
+  const confirm = async () => {
+    const res = await deleteTurma(tid);
+    if (!res.ok) return toast(res.error);
     onClose();
     logAct(effectiveUser?.name ?? 'Painel', `Excluiu a turma vazia <b>${short}</b>`);
     toast('Turma excluída.');

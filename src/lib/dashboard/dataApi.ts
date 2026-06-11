@@ -152,6 +152,18 @@ async function fetchAllEnrollments(): Promise<ApiEnrollment[]> {
   return out;
 }
 
+/* período "atual" da agenda (último das turmas) e mapa nível-chave → id —
+   usados pelas escritas de turma (que precisam de period/levelId reais). */
+const DEFAULT_PERIOD = '2026.2';
+let currentPeriodValue = DEFAULT_PERIOD;
+let levelIdByKey = new Map<string, number>();
+export function currentPeriod(): string {
+  return currentPeriodValue;
+}
+export function levelIdForKey(key: string): number | undefined {
+  return levelIdByKey.get(key);
+}
+
 export async function loadDashboardData(): Promise<void> {
   const [enr, rooms, classes, levels] = await Promise.all([
     fetchAllEnrollments(),
@@ -160,11 +172,13 @@ export async function loadDashboardData(): Promise<void> {
     apiFetch<ApiLevel[]>('/levels'),
   ]);
   const levelKey = new Map(levels.map((l) => [l.id, l.key]));
+  levelIdByKey = new Map(levels.map((l) => [l.key, l.id]));
   // turmas: usa só o período mais recente (a grade da Agenda é de um semestre)
   const latest = classes.reduce((mx, c) => (c.period > mx ? c.period : mx), '');
+  currentPeriodValue = latest || DEFAULT_PERIOD;
   const curClasses = latest ? classes.filter((c) => c.period === latest) : classes;
 
-  replace(SALAS, rooms.map(toSala));
+  replace(SALAS, rooms.filter((r) => r.isActive).map(toSala));
   replace(TURMAS, curClasses.map((c) => toTurma(c, levelKey)));
   replace(STUDENTS, enr.map(toStudent));
   replace(TEACHERS, [...new Set(rooms.map((r) => r.teacherName).filter((p): p is string => !!p))].sort());

@@ -48,10 +48,10 @@ export function SalasTeachersModal({ tab, onTab, onClose, onEditSala, onRemoveSa
   const [newProf, setNewProf] = useState('');
   const who = effectiveUser?.name ?? 'Painel';
 
-  const doAddSala = () => {
+  const doAddSala = async () => {
     const n = newSala.trim();
     if (!n) return;
-    const res = addSala(n);
+    const res = await addSala(n);
     if (!res.ok) {
       toastErr(res.error);
       return;
@@ -74,9 +74,9 @@ export function SalasTeachersModal({ tab, onTab, onClose, onEditSala, onRemoveSa
     toast(`${n.split(' ')[0]} cadastrado — atribua uma sala quando quiser.`);
   };
 
-  const doAssign = (p: string, salaId: string) => {
+  const doAssign = async (p: string, salaId: string) => {
     const old = SALAS.find((s) => s.prof === p);
-    const res = assignTeacher(p, salaId);
+    const res = await assignTeacher(p, salaId);
     if (!res.ok) {
       toastErr(res.error);
       return;
@@ -253,8 +253,8 @@ export function SalaEditModal({ id, onClose }: { id: string; onClose: () => void
   const [err, setErr] = useState('');
   if (!s) return null;
 
-  const save = () => {
-    const res = updateSala(id, { n: nome, c: cor });
+  const save = async () => {
+    const res = await updateSala(id, { n: nome, c: cor });
     if (!res.ok) {
       setErr(res.error);
       return;
@@ -339,10 +339,10 @@ export function RemoveSalaModal({ id, onCancel, onDone }: { id: string; onCancel
   const s = salaById(id);
   if (!s) return null;
 
-  const confirm = () => {
+  const confirm = async () => {
     const n = s.n;
-    const res = deleteSala(id);
-    if (!res.ok) return;
+    const res = await deleteSala(id);
+    if (!res.ok) return toast(res.error);
     logAct(effectiveUser?.name ?? 'Painel', `Excluiu a sala <b>${esc(n)}</b> (estava vazia)`);
     toast('Sala excluída.');
     onDone();
@@ -393,9 +393,9 @@ export function RemoveTeacherModal({ name, onCancel, onDone }: { name: string; o
   const { toast } = useToast();
   const sala = SALAS.find((s) => s.prof === name);
 
-  const confirm = () => {
-    const res = removeTeacher(name);
-    if (!res.ok) return;
+  const confirm = async () => {
+    const res = await removeTeacher(name);
+    if (!res.ok) return toast(res.error);
     logAct(
       effectiveUser?.name ?? 'Painel',
       `Removeu o teacher <b>${esc(name)}</b> do cadastro${sala ? ` (a ${esc(sala.n)} ficou sem teacher)` : ''}`,

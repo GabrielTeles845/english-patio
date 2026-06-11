@@ -128,7 +128,7 @@ export default function Agenda() {
   };
 
   /* ---- drag-and-drop: turma → slot vazio · aluno → turma com vaga ---- */
-  const onDropEmpty = (sala: string, dPar: Par, hora: string) => {
+  const onDropEmpty = async (sala: string, dPar: Par, hora: string) => {
     const d = getAgDrag();
     agDragEnd();
     if (!d || d.type !== 'turma') return;
@@ -140,7 +140,7 @@ export default function Agenda() {
       return;
     }
     const from = `${salaById(t.sala)!.n} · ${schLabel(t.par)} ${t.hora}`;
-    const res = updateTurma(t.id, { sala, par: dPar, hora, nivel: t.nivel, cap: t.cap });
+    const res = await updateTurma(t.id, { sala, par: dPar, hora, nivel: t.nivel, cap: t.cap });
     if (!res.ok) {
       toastErr(res.error);
       return;
