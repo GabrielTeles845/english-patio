@@ -6,6 +6,7 @@ import assert from 'node:assert/strict';
 import { eq, inArray } from 'drizzle-orm';
 import listHandler from '../../api/contracts/index';
 import detailHandler from '../../api/contracts/[id]';
+import pdfHandler from '../../api/contracts/[id]/pdf';
 import { db } from '../../server/db/client';
 import { enrollments, students, responsibles, contracts, contractEvents } from '../../server/db/schema';
 import { mkReq, mkRes, seedUser, removeUser, clearAttempts, loginAs } from './_helpers';
@@ -140,5 +141,28 @@ describe('GET /api/contracts/:id', () => {
     assert.equal(res._body.data.timeline.length, 2);
     assert.equal(res._body.data.timeline[0].type, 'signature.viewed');
     assert.equal(res._body.data.timeline[1].type, 'document.finished');
+  });
+});
+
+describe('GET /api/contracts/:id/pdf', () => {
+  it('contrato sem PDF → 404 NO_PDF', async () => {
+    const res = mkRes();
+    await pdfHandler(mkReq('GET', undefined, { cookie: dir.cookies, query: { id: String(cStale) } }), res);
+    assert.equal(res._status, 404);
+    assert.equal(res._body.error.code, 'NO_PDF');
+  });
+
+  it('contrato com PDF → 200 com a URL', async () => {
+    await db.update(contracts).set({ pdfUrl: 'https://x/contrato.pdf' }).where(eq(contracts.id, cSigned));
+    const res = mkRes();
+    await pdfHandler(mkReq('GET', undefined, { cookie: dir.cookies, query: { id: String(cSigned) } }), res);
+    assert.equal(res._status, 200);
+    assert.equal(res._body.data.url, 'https://x/contrato.pdf');
+  });
+
+  it('Supervisor → 403', async () => {
+    const res = mkRes();
+    await pdfHandler(mkReq('GET', undefined, { cookie: sup.cookies, query: { id: String(cSigned) } }), res);
+    assert.equal(res._status, 403);
   });
 });
