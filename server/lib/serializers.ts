@@ -9,6 +9,7 @@ import type {
   responsibles,
   addresses,
   contracts,
+  contractEvents,
 } from '../db/schema';
 
 export function notificationDTO(n: typeof notifications.$inferSelect) {
@@ -163,5 +164,14 @@ export function contractDTO(c: typeof contracts.$inferSelect) {
     rejectedAt: c.rejectedAt,
     failedAt: c.failedAt,
     createdAt: c.createdAt,
+  };
+}
+
+export function contractEventDTO(e: typeof contractEvents.$inferSelect) {
+  return {
+    id: e.id,
+    type: e.type,
+    payload: e.payload,
+    receivedAt: e.receivedAt,
   };
 }
