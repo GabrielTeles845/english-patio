@@ -1,4 +1,4 @@
-import { useState, type MouseEvent } from 'react';
+import { useCallback, useEffect, useState, type MouseEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Ban,
@@ -15,12 +15,18 @@ import {
 } from 'lucide-react';
 import { ROLE_HOME, initials, useAuth, type Role } from '../../lib/dashboard/auth';
 import { viewToPath } from '../../lib/dashboard/nav';
-import { addUser, logAct, removeUser, setUserActive, updateUser, useDash } from '../../lib/dashboard/store';
+import { ApiError } from '../../lib/dashboard/api';
+import {
+  createUser,
+  deactivateUser,
+  deleteUser,
+  editUser,
+  listUsers,
+  reactivateUser,
+} from '../../lib/dashboard/usersApi';
 import {
   BAD_CHARS_MSG,
-  USERS,
   badChars,
-  esc,
   validEmail,
   validFullName,
   validNewPass,
@@ -35,13 +41,10 @@ import { useToast } from '../../components/dashboard/ui/Toast';
 import { PasswordInput, inputCls } from '../../components/dashboard/ui/inputs';
 import { NtBox } from './alunos/common';
 
-/* Tela USUÁRIOS — port 1:1 da seção data-view="usuarios" do dashboard.html
-   (markup l.930–948, JS l.2352–2410 e l.4320–4440: renderUsers, openInvite/
-   submitInvite, openUserMenu, openEditUser/saveUser, openRemoveUser/
-   confirmRemoveUser, setViewAs). Novo usuário entra com senha provisória
-   (decidido 08/Jun — sem convite-link); a guarda do último Diretor vive no
-   store (LAST_DIRECTOR, API §10) e a UI mostra o motivo, como no preview.
-   Ativar/desativar e "Ver painel como…" por linha entram no ⋮. */
+/* Tela USUÁRIOS — ligada ao backend (DASHBOARD_API §10): GET/POST /api/users,
+   PATCH /api/users/:id, deactivate/reactivate e DELETE. A guarda do último
+   Diretor é do servidor (422 LAST_DIRECTOR); a UI ainda pré-checa para mostrar
+   o motivo antes de chamar. Novo usuário entra com senha provisória. */
 
 const ROLE_ITEMS: CSelectItem[] = [
   { v: 'diretor', l: 'Diretor' },
@@ -51,11 +54,16 @@ const ROLE_ITEMS: CSelectItem[] = [
 const ROLE_BY_KEY: Record<string, UserRole> = { diretor: 'Diretor', supervisor: 'Supervisor', secretaria: 'Secretaria' };
 const KEY_BY_ROLE: Record<UserRole, string> = { Diretor: 'diretor', Supervisor: 'supervisor', Secretaria: 'secretaria' };
 
-/* guarda espelhada do store (preview checa ANTES de abrir o modal — l.4414) */
-const lastActiveDirector = (u: User): boolean =>
-  u.r === 'Diretor' && u.active !== false && USERS.filter((x) => x.r === 'Diretor' && x.active !== false).length === 1;
-
 const gradNavy = { background: 'linear-gradient(135deg,#1E3765,#2F539A)' };
+
+/* mensagem amigável de um erro da API (junta os erros de campo, se houver) */
+function apiMsg(err: unknown, fallback: string): string {
+  if (err instanceof ApiError) {
+    const fields = err.fields ? Object.values(err.fields).join(' ') : '';
+    return fields || err.message || fallback;
+  }
+  return fallback;
+}
 
 type ModalState =
   | { kind: 'invite' }
@@ -66,16 +74,48 @@ type ModalState =
   | null;
 
 export default function Usuarios() {
-  useDash();
-  const { effectiveUser, setViewAs } = useAuth();
-  const { toast } = useToast();
+  const { setViewAs } = useAuth();
+  const { toast, toastErr } = useToast();
   const navigate = useNavigate();
-  const who = effectiveUser?.name ?? 'Equipe';
 
+  const [list, setList] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState(false);
   const [menu, setMenu] = useState<{ anchor: DOMRect; id: number } | null>(null);
   const [modal, setModal] = useState<ModalState>(null);
 
-  /* "ver painel como…" (port setViewAs l.2406): faixa âmbar + home do papel + toast verbatim */
+  const reload = useCallback(async () => {
+    try {
+      setList(await listUsers());
+    } catch (err) {
+      toastErr(apiMsg(err, 'Não foi possível carregar os usuários.'));
+    } finally {
+      setLoading(false);
+    }
+  }, [toastErr]);
+  useEffect(() => {
+    void reload();
+  }, [reload]);
+
+  /* pré-checagem só para UX (o servidor é a autoridade — 422 LAST_DIRECTOR) */
+  const lastActiveDirector = (u: User): boolean =>
+    u.r === 'Diretor' && u.active !== false && list.filter((x) => x.r === 'Diretor' && x.active !== false).length === 1;
+
+  /* executa uma ação na API, recarrega a lista e dá o toast de sucesso */
+  const run = async (fn: () => Promise<void>, okMsg: string) => {
+    setBusy(true);
+    try {
+      await fn();
+      await reload();
+      setModal(null);
+      toast(okMsg);
+    } catch (err) {
+      toastErr(apiMsg(err, 'Algo deu errado. Tente de novo.'));
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const seeAs = (role: Role) => {
     setViewAs(role);
     navigate(viewToPath(ROLE_HOME[role]));
@@ -102,11 +142,7 @@ export default function Usuarios() {
         icon: <UserRoundCheck className="w-4 h-4" />,
         label: 'Reativar acesso',
         color: '#16a34a',
-        onClick: () => {
-          setUserActive(u.id, true);
-          logAct(who, `Reativou o acesso de <b>${esc(u.n)}</b> ao painel`);
-          toast(`Acesso de ${u.n.split(' ')[0]} reativado.`);
-        },
+        onClick: () => run(() => reactivateUser(u.id), `Acesso de ${u.n.split(' ')[0]} reativado.`),
       });
     else
       items.push({
@@ -142,39 +178,33 @@ export default function Usuarios() {
         </button>
       </div>
 
-      {/* lista da equipe (port renderUsers l.2352) */}
       <div className="surface rounded-2xl divide-y" style={{ borderColor: 'var(--border)' }}>
-        {USERS.length === 0 ? (
+        {loading ? (
+          <div className="p-10 grid place-content-center">
+            <div className="w-7 h-7 rounded-full border-2 border-[var(--border)] border-t-brand-light animate-spin" />
+          </div>
+        ) : list.length === 0 ? (
           <EmptyState
             icon={UsersRound}
             title="Nenhum usuário ainda"
             sub="Cadastre a equipe para acessar a dashboard — cada pessoa entra com o próprio papel."
           />
         ) : (
-          USERS.map((u) => (
+          list.map((u) => (
             <div key={u.id} className={`flex items-center gap-3 p-4 ${u.active === false ? 'opacity-60' : ''}`}>
-              <div
-                className="w-10 h-10 rounded-full grid place-content-center text-white font-semibold"
-                style={{ background: u.c }}
-              >
+              <div className="w-10 h-10 rounded-full grid place-content-center text-white font-semibold" style={{ background: u.c }}>
                 {initials(u.n)}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-medium truncate">
                   {u.n}{' '}
                   {u.pending && (
-                    <span
-                      className="text-[10px] font-semibold px-1.5 py-0.5 rounded-md align-middle"
-                      style={{ background: 'rgba(245,183,0,.16)', color: '#B5860B' }}
-                    >
+                    <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-md align-middle" style={{ background: 'rgba(245,183,0,.16)', color: '#B5860B' }}>
                       senha provisória
                     </span>
                   )}
                   {u.active === false && (
-                    <span
-                      className="text-[10px] font-semibold px-1.5 py-0.5 rounded-md align-middle"
-                      style={{ background: 'rgba(220,38,38,.10)', color: '#DC2626' }}
-                    >
+                    <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-md align-middle" style={{ background: 'rgba(220,38,38,.10)', color: '#DC2626' }}>
                       desativado
                     </span>
                   )}
@@ -194,7 +224,7 @@ export default function Usuarios() {
         )}
       </div>
 
-      {/* cartões dos 3 papéis (port l.937–947) */}
+      {/* cartões dos 3 papéis */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4" data-tour="papeis">
         <div className="surface rounded-2xl p-5 flex flex-col">
           <div className="flex items-center gap-2 mb-2">
@@ -245,7 +275,7 @@ export default function Usuarios() {
 
       {menu &&
         (() => {
-          const u = USERS.find((x) => x.id === menu.id);
+          const u = list.find((x) => x.id === menu.id);
           if (!u) return null;
           return <RowMenu anchor={menu.anchor} items={menuItems(u)} onClose={() => setMenu(null)} />;
         })()}
@@ -253,52 +283,44 @@ export default function Usuarios() {
       {modal?.kind === 'invite' && (
         <InviteModal
           onClose={() => setModal(null)}
-          onCreated={(n, papel) => {
-            logAct(who, `Cadastrou <b>${esc(n)}</b> (${papel}) no painel`);
-            toast('Usuário criado! Repasse a senha provisória — a troca é obrigatória no 1º acesso.');
+          onCreated={async () => {
             setModal(null);
+            await reload();
+            toast('Usuário criado! Repasse a senha provisória — a troca é obrigatória no 1º acesso.');
           }}
         />
       )}
 
       {modal?.kind === 'edit' &&
         (() => {
-          const u = USERS.find((x) => x.id === modal.id);
+          const u = list.find((x) => x.id === modal.id);
           if (!u) return null;
           return (
             <EditModal
               u={u}
               onClose={() => setModal(null)}
-              onSaved={() => {
-                toast('Usuário atualizado!');
+              onSaved={async () => {
                 setModal(null);
+                await reload();
+                toast('Usuário atualizado!');
               }}
             />
           );
         })()}
 
-      {/* port openRemoveUser (l.4412): card vermelho com avatar + consequência */}
       {modal?.kind === 'remove' &&
         (() => {
-          const u = USERS.find((x) => x.id === modal.id);
+          const u = list.find((x) => x.id === modal.id);
           if (!u) return null;
           return (
             <ConfirmModal
               title="Remover acesso"
-              confirmLabel="Remover acesso"
+              confirmLabel={busy ? 'Removendo…' : 'Remover acesso'}
               onClose={() => setModal(null)}
-              onConfirm={() => {
-                const res = removeUser(u.id);
-                setModal(null);
-                if (!res.ok) return toast(res.error.replace(/<[^>]+>/g, ''));
-                toast(`Acesso de ${u.n.split(' ')[0]} removido.`);
-              }}
+              onConfirm={() => run(() => deleteUser(u.id), `Acesso de ${u.n.split(' ')[0]} removido.`)}
             >
               <div className="flex items-start gap-3 p-3 rounded-xl" style={{ background: 'rgba(220,38,38,.06)' }}>
-                <div
-                  className="w-10 h-10 rounded-full grid place-content-center text-white font-semibold shrink-0"
-                  style={{ background: u.c }}
-                >
+                <div className="w-10 h-10 rounded-full grid place-content-center text-white font-semibold shrink-0" style={{ background: u.c }}>
                   {initials(u.n)}
                 </div>
                 <div className="min-w-0">
@@ -314,21 +336,15 @@ export default function Usuarios() {
 
       {modal?.kind === 'deactivate' &&
         (() => {
-          const u = USERS.find((x) => x.id === modal.id);
+          const u = list.find((x) => x.id === modal.id);
           if (!u) return null;
           return (
             <ConfirmModal
               title="Desativar acesso"
               icon={Ban}
-              confirmLabel="Desativar acesso"
+              confirmLabel={busy ? 'Desativando…' : 'Desativar acesso'}
               onClose={() => setModal(null)}
-              onConfirm={() => {
-                const res = setUserActive(u.id, false);
-                setModal(null);
-                if (!res.ok) return toast(res.error.replace(/<[^>]+>/g, ''));
-                logAct(who, `Desativou o acesso de <b>${esc(u.n)}</b> ao painel`);
-                toast(`Acesso de ${u.n.split(' ')[0]} desativado.`);
-              }}
+              onConfirm={() => run(() => deactivateUser(u.id), `Acesso de ${u.n.split(' ')[0]} desativado.`)}
             >
               <p>
                 <b className="text-[var(--text)]">{u.n}</b> não consegue mais entrar no painel enquanto o acesso estiver
@@ -338,10 +354,9 @@ export default function Usuarios() {
           );
         })()}
 
-      {/* port do modal "Não dá para remover" (l.4414): a regra do último Diretor */}
       {modal?.kind === 'blocked' &&
         (() => {
-          const u = USERS.find((x) => x.id === modal.id);
+          const u = list.find((x) => x.id === modal.id);
           if (!u) return null;
           return (
             <Modal title={modal.action === 'remover' ? 'Não dá para remover' : 'Não dá para desativar'} onClose={() => setModal(null)}>
@@ -350,10 +365,7 @@ export default function Usuarios() {
                   <b>{u.n}</b> é a única pessoa com papel Diretor no painel — promova outra pessoa a Diretor antes de{' '}
                   {modal.action} este acesso.
                 </p>
-                <button
-                  onClick={() => setModal(null)}
-                  className="w-full h-11 rounded-xl border border-[var(--border)] font-medium text-sm"
-                >
+                <button onClick={() => setModal(null)} className="w-full h-11 rounded-xl border border-[var(--border)] font-medium text-sm">
                   Entendi
                 </button>
               </div>
@@ -364,29 +376,34 @@ export default function Usuarios() {
   );
 }
 
-/* --- novo usuário (port openInvite/submitInvite l.4320–4356) --- */
-function InviteModal({ onClose, onCreated }: { onClose: () => void; onCreated: (n: string, papel: UserRole) => void }) {
+/* --- novo usuário --- */
+function InviteModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void | Promise<void> }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [roleKey, setRoleKey] = useState('diretor');
   const [pass, setPass] = useState('');
   const [err, setErr] = useState('');
+  const [busy, setBusy] = useState(false);
 
-  const submit = () => {
+  const submit = async () => {
     const n = name.trim();
     const e = email.trim();
     const errs: string[] = [];
     if (!validFullName(n)) errs.push('Informe nome e sobrenome.');
     if (badChars(n)) errs.push(BAD_CHARS_MSG);
     if (!validEmail(e)) errs.push('E-mail inválido.');
-    else if (USERS.some((u) => u.e.toLowerCase() === e.toLowerCase()))
-      errs.push(`Já existe um usuário com o e-mail <b>${esc(e)}</b> — cada acesso tem o seu.`);
     if (!validNewPass(pass)) errs.push('A senha provisória precisa de pelo menos 10 caracteres, com letras e números.');
     if (errs.length) return setErr(errs.join('<br>'));
     const papel = ROLE_BY_KEY[roleKey] ?? 'Diretor';
-    const res = addUser({ n, e, r: papel });
-    if (!res.ok) return setErr(res.error);
-    onCreated(n, papel);
+    setBusy(true);
+    try {
+      await createUser({ n, e, r: papel, tempPassword: pass });
+      await onCreated();
+    } catch (e2) {
+      setErr(apiMsg(e2, 'Não foi possível criar o usuário.'));
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -398,12 +415,8 @@ function InviteModal({ onClose, onCreated }: { onClose: () => void; onCreated: (
           <button onClick={onClose} className="flex-1 h-11 rounded-xl border border-[var(--border)] font-medium text-sm">
             Cancelar
           </button>
-          <button
-            onClick={submit}
-            className="flex-1 h-11 rounded-xl text-white font-semibold text-sm flex items-center justify-center gap-2"
-            style={gradNavy}
-          >
-            <UserPlus className="w-4 h-4" /> Criar usuário
+          <button onClick={submit} disabled={busy} className="flex-1 h-11 rounded-xl text-white font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-70" style={gradNavy}>
+            <UserPlus className="w-4 h-4" /> {busy ? 'Criando…' : 'Criar usuário'}
           </button>
         </>
       }
@@ -415,13 +428,7 @@ function InviteModal({ onClose, onCreated }: { onClose: () => void; onCreated: (
         </label>
         <label className="block">
           <span className="text-sm font-medium">E-mail</span>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="email@exemplo.com"
-            className={inputCls}
-          />
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@exemplo.com" className={inputCls} />
         </label>
         <div>
           <span className="text-sm font-medium">Papel</span>
@@ -441,23 +448,29 @@ function InviteModal({ onClose, onCreated }: { onClose: () => void; onCreated: (
   );
 }
 
-/* --- editar usuário (port openEditUser/saveUser l.4376–4410) --- */
-function EditModal({ u, onClose, onSaved }: { u: User; onClose: () => void; onSaved: () => void }) {
+/* --- editar usuário --- */
+function EditModal({ u, onClose, onSaved }: { u: User; onClose: () => void; onSaved: () => void | Promise<void> }) {
   const [name, setName] = useState(u.n);
   const [email, setEmail] = useState(u.e);
   const [roleKey, setRoleKey] = useState(KEY_BY_ROLE[u.r] ?? 'diretor');
   const [err, setErr] = useState('');
+  const [busy, setBusy] = useState(false);
 
-  const save = () => {
+  const save = async () => {
     const n = name.trim();
     const e = email.trim();
     if (!validFullName(n)) return setErr('Informe nome e sobrenome.');
     if (badChars(n)) return setErr(BAD_CHARS_MSG);
     if (!validEmail(e)) return setErr('E-mail inválido.');
-    /* e-mail único + guarda do último Diretor moram no store */
-    const res = updateUser(u.id, { n, e, r: ROLE_BY_KEY[roleKey] ?? 'Diretor' });
-    if (!res.ok) return setErr(res.error);
-    onSaved();
+    setBusy(true);
+    try {
+      await editUser(u.id, { n, e, r: ROLE_BY_KEY[roleKey] ?? 'Diretor' });
+      await onSaved();
+    } catch (e2) {
+      setErr(apiMsg(e2, 'Não foi possível salvar.'));
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -469,8 +482,8 @@ function EditModal({ u, onClose, onSaved }: { u: User; onClose: () => void; onSa
           <button onClick={onClose} className="flex-1 h-11 rounded-xl border border-[var(--border)] font-medium text-sm">
             Cancelar
           </button>
-          <button onClick={save} className="flex-1 h-11 rounded-xl text-white font-semibold text-sm" style={gradNavy}>
-            Salvar alterações
+          <button onClick={save} disabled={busy} className="flex-1 h-11 rounded-xl text-white font-semibold text-sm disabled:opacity-70" style={gradNavy}>
+            {busy ? 'Salvando…' : 'Salvar alterações'}
           </button>
         </>
       }

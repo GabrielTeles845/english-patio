@@ -1,5 +1,7 @@
-// PATCH /api/users/:id — edita nome/e-mail/papel (RBAC: director). DASHBOARD_API §10.
-// E-mail único (409 EMAIL_TAKEN); não rebaixa o último Diretor ativo (422 LAST_DIRECTOR).
+// PATCH  /api/users/:id — edita nome/e-mail/papel (RBAC: director). DASHBOARD_API §10.
+//          E-mail único (409 EMAIL_TAKEN); não rebaixa o último Diretor (422 LAST_DIRECTOR).
+// DELETE /api/users/:id — remove o acesso de vez (hard delete; cadastro errado/teste).
+//          Mesma guarda do último Diretor ativo.
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { eq, ne, and, sql } from 'drizzle-orm';
 import { z } from 'zod';
@@ -23,7 +25,7 @@ const PatchBody = z
   });
 
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
-  if (req.method !== 'PATCH') return fail(res, 405, 'METHOD_NOT_ALLOWED', 'Método não permitido.');
+  if (req.method !== 'PATCH' && req.method !== 'DELETE') return fail(res, 405, 'METHOD_NOT_ALLOWED', 'Método não permitido.');
 
   const session = await getSession(req);
   if (!session) return fail(res, 401, 'UNAUTHENTICATED', 'Sessão expirada ou inválida.');
@@ -33,13 +35,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
   const id = Number(req.query.id);
   if (!Number.isInteger(id) || id <= 0) return fail(res, 404, 'USER_NOT_FOUND', 'Usuário não encontrado.');
 
-  const parsed = PatchBody.safeParse(req.body ?? {});
-  if (!parsed.success) return fail(res, 400, 'VALIDATION', 'Dados inválidos.', zodFields(parsed.error));
-  const { name, role } = parsed.data;
-
   const rows = await db.select().from(users).where(eq(users.id, id)).limit(1);
   if (!rows.length) return fail(res, 404, 'USER_NOT_FOUND', 'Usuário não encontrado.');
   const target = rows[0];
+
+  if (req.method === 'DELETE') {
+    if (blocksLastDirector(target, await activeDirectorCount())) {
+      return fail(res, 422, 'LAST_DIRECTOR', 'Não é possível remover o último Diretor ativo.');
+    }
+    await db.delete(users).where(eq(users.id, id));
+    await db.insert(activityLog).values({
+      actorType: 'user', actorId: session.user.id, action: 'user_removed',
+      targetType: 'user', targetId: id, ip: clientIp(req),
+    });
+    return ok(res, { id });
+  }
+
+  const parsed = PatchBody.safeParse(req.body ?? {});
+  if (!parsed.success) return fail(res, 400, 'VALIDATION', 'Dados inválidos.', zodFields(parsed.error));
+  const { name, role } = parsed.data;
 
   const updates: Partial<typeof users.$inferInsert> = { updatedAt: new Date() };
 
