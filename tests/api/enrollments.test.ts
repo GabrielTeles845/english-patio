@@ -225,7 +225,7 @@ describe('GET /api/enrollments/:id', () => {
 });
 
 describe('PATCH /api/enrollments/:id', () => {
-  let kidId = 0, respId = 0;
+  let kidId = 0;
   async function token(): Promise<string> {
     const r = await db.select({ u: enrollments.updatedAt }).from(enrollments).where(eq(enrollments.id, activeId)).limit(1);
     return r[0].u.toISOString();
@@ -233,8 +233,6 @@ describe('PATCH /api/enrollments/:id', () => {
   before(async () => {
     const k = await db.select({ id: students.id }).from(students).where(eq(students.enrollmentId, activeId)).limit(1);
     kidId = k[0].id;
-    const r = await db.select({ id: responsibles.id }).from(responsibles).where(eq(responsibles.enrollmentId, activeId)).limit(1);
-    respId = r[0].id;
   });
 
   it('sem CSRF → 403', async () => {
@@ -269,13 +267,13 @@ describe('PATCH /api/enrollments/:id', () => {
     assert.equal(res._status, 404);
   });
 
-  it('edição válida → 200, persiste e gera novo token', async () => {
+  it('edição válida (aluno + legal + endereço) → 200, persiste e gera novo token', async () => {
     const before = await token();
     const res = mkRes();
     await detailHandler(mkReq('PATCH', {
       expectedUpdatedAt: before,
       students: [{ id: kidId, name: 'Helena Ativa Editada' }],
-      responsibles: [{ id: respId, phone: '(62) 98888-7777' }],
+      legalResponsible: { phone: '(62) 98888-7777' },
       address: { neighborhood: 'Setor Oeste' },
       authorizationMedia: false,
     }, { cookie: dir.cookies, csrf: dir.csrf, query: { id: String(activeId) } }), res);
@@ -284,9 +282,88 @@ describe('PATCH /api/enrollments/:id', () => {
 
     const k = await db.select().from(students).where(eq(students.id, kidId)).limit(1);
     assert.equal(k[0].name, 'Helena Ativa Editada');
-    const r = await db.select().from(responsibles).where(eq(responsibles.id, respId)).limit(1);
+    const r = await db.select().from(responsibles).where(and(eq(responsibles.enrollmentId, activeId), eq(responsibles.type, 'legal'))).limit(1);
     assert.equal(r[0].phone, '62988887777'); // só dígitos
     const after = await token();
     assert.notEqual(after, before); // token mudou
+  });
+});
+
+// 2º responsável (criar/editar/remover) e troca de responsável financeiro.
+// Matrícula dedicada (não acopla com os testes acima); os casos rodam em sequência.
+describe('PATCH /api/enrollments/:id — 2º responsável e financeiro', () => {
+  let famId = 0;
+  const tok = async (): Promise<string> => {
+    const r = await db.select({ u: enrollments.updatedAt }).from(enrollments).where(eq(enrollments.id, famId)).limit(1);
+    return r[0].u.toISOString();
+  };
+  const resps = async () => db.select().from(responsibles).where(eq(responsibles.enrollmentId, famId));
+  const patch = async (body: Record<string, unknown>) => {
+    const res = mkRes();
+    await detailHandler(mkReq('PATCH', { expectedUpdatedAt: await tok(), ...body }, { cookie: dir.cookies, csrf: dir.csrf, query: { id: String(famId) } }), res);
+    return res;
+  };
+
+  before(async () => {
+    famId = await seedFamily({
+      sub: `${SUB_PREFIX}resp`, kidName: 'Théo Família', respName: 'Paula Família',
+      cpf: '11144477735', kidActive: true, contractStatus: 'pending', media: true, neighborhood: 'Setor Bueno',
+    });
+  });
+
+  it('criar 2º responsável com telefone inválido → 400', async () => {
+    const res = await patch({ secondResponsible: { name: 'Carlos Família', phone: '(62) 8888-7777', relationship: 'Pai' } });
+    assert.equal(res._status, 400);
+    assert.ok(res._body.error.fields['secondResponsible.phone']);
+  });
+
+  it('criar 2º responsável → 200 e grava type=second', async () => {
+    const res = await patch({ secondResponsible: { name: 'Carlos Família', cpf: '529.982.247-25', phone: '(62) 98112-4471', relationship: 'Pai' } });
+    assert.equal(res._status, 200);
+    const second = (await resps()).find((r) => r.type === 'second');
+    assert.ok(second);
+    assert.equal(second!.name, 'Carlos Família');
+    assert.equal(second!.cpf, '52998224725'); // só dígitos
+  });
+
+  it('financeiro = segundo responsável → 200 e enrollment.type=second', async () => {
+    const res = await patch({ financialResponsibleType: 'second' });
+    assert.equal(res._status, 200);
+    const e = await db.select().from(enrollments).where(eq(enrollments.id, famId)).limit(1);
+    assert.equal(e[0].financialResponsibleType, 'second');
+  });
+
+  it('financeiro = outra pessoa sem dados → 400', async () => {
+    const res = await patch({ financialResponsibleType: 'other' });
+    assert.equal(res._status, 400);
+    assert.ok(res._body.error.fields['financialResponsible']);
+  });
+
+  it('financeiro = outra pessoa com dados → 200, cria entidade financial', async () => {
+    const res = await patch({ financialResponsibleType: 'other', financialResponsible: { name: 'Bruno Pagador', cpf: '111.444.777-35' } });
+    assert.equal(res._status, 200);
+    const fin = (await resps()).find((r) => r.type === 'financial');
+    assert.ok(fin);
+    assert.equal(fin!.name, 'Bruno Pagador');
+    const e = await db.select().from(enrollments).where(eq(enrollments.id, famId)).limit(1);
+    assert.equal(e[0].financialResponsibleType, 'other');
+  });
+
+  it('financeiro volta para legal → 200, remove a entidade financial', async () => {
+    const res = await patch({ financialResponsibleType: 'legal' });
+    assert.equal(res._status, 200);
+    assert.ok(!(await resps()).find((r) => r.type === 'financial'));
+  });
+
+  it('remover 2º responsável (null) → 200 e some o type=second', async () => {
+    const res = await patch({ secondResponsible: null });
+    assert.equal(res._status, 200);
+    assert.ok(!(await resps()).find((r) => r.type === 'second'));
+  });
+
+  it('financeiro = segundo sem 2º responsável → 400', async () => {
+    const res = await patch({ financialResponsibleType: 'second' });
+    assert.equal(res._status, 400);
+    assert.ok(res._body.error.fields['financialResponsibleType']);
   });
 });

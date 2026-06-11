@@ -119,6 +119,11 @@ async function deleteEnrollment(
   return ok(res, { id });
 }
 
+// Edição declarativa por papel (há no máx. 1 responsável de cada tipo):
+//  - legalResponsible: edita o responsável legal (sempre existe).
+//  - secondResponsible: objeto = cria/atualiza o 2º responsável; null = remove.
+//  - financialResponsibleType + financialResponsible: troca quem é o financeiro;
+//    a entidade type='financial' existe só quando o tipo é 'other'.
 const EditBody = z.object({
   expectedUpdatedAt: z.string().min(1),
   students: z.array(z.object({
@@ -127,15 +132,25 @@ const EditBody = z.object({
     birthDate: z.string().optional(),
     atSchoolSince: z.string().nullable().optional(),
   })).optional(),
-  responsibles: z.array(z.object({
-    id: z.number().int().positive(),
+  legalResponsible: z.object({
     name: z.string().optional(),
     cpf: z.string().nullable().optional(),
     phone: z.string().nullable().optional(),
     email: z.string().nullable().optional(),
     relationship: z.string().nullable().optional(),
     birthDate: z.string().nullable().optional(),
-  })).optional(),
+  }).optional(),
+  secondResponsible: z.object({
+    name: z.string(),
+    cpf: z.string().nullable().optional(),
+    phone: z.string(),
+    relationship: z.string(),
+  }).nullable().optional(),
+  financialResponsibleType: z.enum(['legal', 'second', 'other']).optional(),
+  financialResponsible: z.object({
+    name: z.string(),
+    cpf: z.string(),
+  }).nullable().optional(),
   address: z.object({
     cep: z.string().optional(),
     street: z.string().optional(),
@@ -169,6 +184,12 @@ async function editEnrollment(
     return fail(res, 409, 'STALE_WRITE', 'A matrícula foi alterada por outra pessoa. Recarregue e tente de novo.');
   }
 
+  // responsáveis atuais (no máx. 1 de cada tipo)
+  const curResps = await db.select().from(responsibles).where(eq(responsibles.enrollmentId, id));
+  const legalCur = curResps.find((r) => r.type === 'legal');
+  const secondCur = curResps.find((r) => r.type === 'second');
+  const financialCur = curResps.find((r) => r.type === 'financial');
+
   // valida só os campos enviados; acumula tudo num mapa de erros.
   const fields: Record<string, string> = {};
   (body.students ?? []).forEach((s, i) => {
@@ -176,14 +197,33 @@ async function editEnrollment(
     if (s.birthDate !== undefined && !isValidStudentISODate(s.birthDate)) fields[`students.${i}.birthDate`] = 'Data inválida (aluno ≤ 20 anos).';
     if (s.atSchoolSince != null && s.atSchoolSince !== '' && !parseISODate(s.atSchoolSince)) fields[`students.${i}.atSchoolSince`] = 'Data inválida.';
   });
-  (body.responsibles ?? []).forEach((r, i) => {
-    if (r.name !== undefined && !isFullName(r.name)) fields[`responsibles.${i}.name`] = NAME_MSG;
-    if (r.cpf != null && r.cpf !== '' && !isValidCPF(r.cpf)) fields[`responsibles.${i}.cpf`] = CPF_MSG;
-    if (r.phone != null && r.phone !== '' && !isValidPhone(r.phone)) fields[`responsibles.${i}.phone`] = PHONE_MSG;
-    if (r.email != null && r.email !== '' && !isValidEmail(r.email)) fields[`responsibles.${i}.email`] = 'E-mail inválido.';
-    if (r.relationship !== undefined && !(r.relationship ?? '').trim()) fields[`responsibles.${i}.relationship`] = 'Campo obrigatório.';
-    if (r.birthDate != null && r.birthDate !== '' && !isValidResponsibleISODate(r.birthDate)) fields[`responsibles.${i}.birthDate`] = 'Responsável deve ter ≥ 18 anos.';
-  });
+  if (body.legalResponsible) {
+    const l = body.legalResponsible;
+    if (l.name !== undefined && !isFullName(l.name)) fields['legalResponsible.name'] = NAME_MSG;
+    if (l.cpf != null && l.cpf !== '' && !isValidCPF(l.cpf)) fields['legalResponsible.cpf'] = CPF_MSG;
+    if (l.phone != null && l.phone !== '' && !isValidPhone(l.phone)) fields['legalResponsible.phone'] = PHONE_MSG;
+    if (l.email != null && l.email !== '' && !isValidEmail(l.email)) fields['legalResponsible.email'] = 'E-mail inválido.';
+    if (l.relationship !== undefined && !(l.relationship ?? '').trim()) fields['legalResponsible.relationship'] = 'Campo obrigatório.';
+    if (l.birthDate != null && l.birthDate !== '' && !isValidResponsibleISODate(l.birthDate)) fields['legalResponsible.birthDate'] = 'Responsável deve ter ≥ 18 anos.';
+  }
+  if (body.secondResponsible) {
+    const s = body.secondResponsible;
+    if (!isFullName(s.name)) fields['secondResponsible.name'] = NAME_MSG;
+    if (!isValidPhone(s.phone)) fields['secondResponsible.phone'] = PHONE_MSG;
+    if (!s.relationship.trim()) fields['secondResponsible.relationship'] = 'Campo obrigatório.';
+    if (s.cpf != null && s.cpf !== '' && !isValidCPF(s.cpf)) fields['secondResponsible.cpf'] = CPF_MSG;
+  }
+  // financeiro: tipo final + coerência (precisa existir o papel escolhido).
+  const finalType = body.financialResponsibleType ?? found[0].financialResponsibleType;
+  const willHaveSecond = body.secondResponsible === null ? false : body.secondResponsible !== undefined ? true : !!secondCur;
+  if (body.financialResponsible) {
+    if (!isFullName(body.financialResponsible.name)) fields['financialResponsible.name'] = NAME_MSG;
+    if (!isValidCPF(body.financialResponsible.cpf)) fields['financialResponsible.cpf'] = CPF_MSG;
+  }
+  if (finalType === 'other' && !body.financialResponsible && !financialCur)
+    fields['financialResponsible'] = 'Informe o nome e o CPF do responsável financeiro.';
+  if (finalType === 'second' && !willHaveSecond)
+    fields['financialResponsibleType'] = 'Não há segundo responsável para ser o financeiro.';
   if (body.address) {
     const a = body.address;
     if (a.cep !== undefined && !isValidCEP(a.cep)) fields['address.cep'] = 'CEP inválido.';
@@ -194,11 +234,9 @@ async function editEnrollment(
   }
   if (Object.keys(fields).length) return fail(res, 400, 'VALIDATION', 'Dados inválidos.', fields);
 
-  // checa que os ids enviados pertencem mesmo a esta matrícula (não vaza/edita alheio).
+  // checa que os alunos enviados pertencem mesmo a esta matrícula (não edita alheio).
   const famKids = new Set((await db.select({ id: students.id }).from(students).where(eq(students.enrollmentId, id))).map((s) => s.id));
   for (const s of body.students ?? []) if (!famKids.has(s.id)) return fail(res, 404, 'NOT_FOUND', 'Aluno não pertence a esta matrícula.');
-  const famResps = new Set((await db.select({ id: responsibles.id }).from(responsibles).where(eq(responsibles.enrollmentId, id))).map((r) => r.id));
-  for (const r of body.responsibles ?? []) if (!famResps.has(r.id)) return fail(res, 404, 'NOT_FOUND', 'Responsável não pertence a esta matrícula.');
 
   const now = new Date();
   for (const s of body.students ?? []) {
@@ -208,15 +246,38 @@ async function editEnrollment(
     if (s.atSchoolSince !== undefined) set.atSchoolSince = s.atSchoolSince || null;
     await db.update(students).set(set).where(eq(students.id, s.id));
   }
-  for (const r of body.responsibles ?? []) {
+  // responsável legal (sempre existe): edita os campos enviados
+  if (body.legalResponsible && legalCur) {
+    const l = body.legalResponsible;
     const set: Record<string, unknown> = { updatedAt: now };
-    if (r.name !== undefined) set.name = r.name.trim();
-    if (r.cpf !== undefined) set.cpf = r.cpf ? onlyDigits(r.cpf) : null;
-    if (r.phone !== undefined) set.phone = r.phone ? onlyDigits(r.phone) : null;
-    if (r.email !== undefined) set.email = r.email?.trim() || null;
-    if (r.relationship !== undefined) set.relationship = r.relationship?.trim() || null;
-    if (r.birthDate !== undefined) set.birthDate = r.birthDate || null;
-    await db.update(responsibles).set(set).where(eq(responsibles.id, r.id));
+    if (l.name !== undefined) set.name = l.name.trim();
+    if (l.cpf !== undefined) set.cpf = l.cpf ? onlyDigits(l.cpf) : null;
+    if (l.phone !== undefined) set.phone = l.phone ? onlyDigits(l.phone) : null;
+    if (l.email !== undefined) set.email = l.email?.trim() || null;
+    if (l.relationship !== undefined) set.relationship = l.relationship?.trim() || null;
+    if (l.birthDate !== undefined) set.birthDate = l.birthDate || null;
+    await db.update(responsibles).set(set).where(eq(responsibles.id, legalCur.id));
+  }
+  // 2º responsável: null = remove; objeto = cria ou atualiza (uq por tipo garante 1 só)
+  if (body.secondResponsible === null) {
+    if (secondCur) await db.delete(responsibles).where(eq(responsibles.id, secondCur.id));
+  } else if (body.secondResponsible) {
+    const s = body.secondResponsible;
+    const vals = { name: s.name.trim(), cpf: s.cpf ? onlyDigits(s.cpf) : null, phone: onlyDigits(s.phone), relationship: s.relationship.trim(), updatedAt: now };
+    if (secondCur) await db.update(responsibles).set(vals).where(eq(responsibles.id, secondCur.id));
+    else await db.insert(responsibles).values({ enrollmentId: id, type: 'second', ...vals });
+  }
+  // financeiro: a entidade type='financial' existe só quando o tipo é 'other'
+  if (finalType === 'other') {
+    const f = body.financialResponsible;
+    if (f) {
+      const vals = { name: f.name.trim(), cpf: onlyDigits(f.cpf), updatedAt: now };
+      if (financialCur) await db.update(responsibles).set(vals).where(eq(responsibles.id, financialCur.id));
+      else await db.insert(responsibles).values({ enrollmentId: id, type: 'financial', ...vals });
+    }
+    // sem dados novos mas com financeiro já existente → mantém
+  } else if (financialCur) {
+    await db.delete(responsibles).where(eq(responsibles.id, financialCur.id)); // virou legal/segundo → remove a entidade
   }
   if (body.address) {
     const a = body.address;
@@ -233,6 +294,7 @@ async function editEnrollment(
   // bump do updatedAt da matrícula = novo token de concorrência da família.
   const enrSet: Record<string, unknown> = { updatedAt: now };
   if (body.authorizationMedia !== undefined) enrSet.authorizationMedia = body.authorizationMedia;
+  if (body.financialResponsibleType !== undefined) enrSet.financialResponsibleType = body.financialResponsibleType;
   if (body.notes !== undefined) enrSet.notes = body.notes || null;
   await db.update(enrollments).set(enrSet).where(eq(enrollments.id, id));
 
@@ -241,7 +303,9 @@ async function editEnrollment(
     targetType: 'enrollment', targetId: id,
     detail: {
       students: (body.students ?? []).length,
-      responsibles: (body.responsibles ?? []).length,
+      legal: !!body.legalResponsible,
+      second: body.secondResponsible === null ? 'removed' : body.secondResponsible ? 'upserted' : 'untouched',
+      financialType: body.financialResponsibleType ?? null,
       address: !!body.address,
     },
     ip: clientIp(req),

@@ -181,11 +181,26 @@ Sem `pdfBase64` (PDF é gerado depois, na tela Contratos). Mesmas validações.
 
 ### 4.3 Editar matrícula — `replaces`: `saveEditEnrollment`
 **`PATCH /api/enrollments/:id`** · RBAC: **director, secretary**.
-- Body: campos editáveis de kids/responsáveis/endereço/"na escola desde". Validação por
-  campo (VALIDACOES). **Conflito de edição concorrente** (DASHBOARD_PLAN §11): o cliente
-  envia o `updatedAt` que leu (coluna `updated_at` das tabelas editáveis, decidido 09/Jun);
-  se o registro mudou desde então ⇒ `409 STALE_WRITE` (a UI reabre o form preservando o
-  que foi digitado — DASHBOARD_PLAN §11 "Salvar"). **→ log** (diff dos campos).
+- Body **declarativo por papel** (só os campos enviados mudam; há no máx. 1 responsável de
+  cada tipo):
+  - `expectedUpdatedAt` (obrigatório) — token de concorrência (ver abaixo).
+  - `students[]`: `{ id, name?, birthDate?(ISO), atSchoolSince?(ISO|null) }` — edita kids
+    **existentes** por id (404 se o id não é da matrícula). Turma **não** vai aqui — é o
+    §4.6 (`moveKid`), por causa das regras de capacidade.
+  - `legalResponsible?`: `{ name?, cpf?, phone?, email?, relationship?, birthDate? }` — edita
+    o responsável legal (sempre existe).
+  - `secondResponsible?`: **objeto** `{ name, phone, relationship, cpf? }` = cria **ou**
+    atualiza o 2º responsável; **`null`** = remove; **ausente** = não mexe.
+  - `financialResponsibleType?`: `'legal'|'second'|'other'` — troca quem é o financeiro.
+    Com `financialResponsible?: { name, cpf }` quando vira `'other'` (cria/atualiza a entidade
+    `type='financial'`); ao sair de `'other'`, a entidade é **removida**. `'second'` exige
+    que exista 2º responsável (senão `400`).
+  - `address?`, `authorizationMedia?`, `notes?`.
+- Validação por campo acumulada (`400 { fields }`, VALIDACOES). **Conflito de edição
+  concorrente** (DASHBOARD_PLAN §11): o cliente envia o `updatedAt` que leu (do detalhe §3);
+  se a matrícula mudou desde então ⇒ `409 STALE_WRITE` (a UI reabre o form preservando o que
+  foi digitado). Resposta: o detalhe completo atualizado (novo token). **→ log** (resumo do
+  diff: nº de kids, legal, second `removed|upserted|untouched`, financialType, address).
 
 ### 4.4 Desligar aluno — `replaces`: `confirmExit`
 **`POST /api/students/:id/deactivate`** · RBAC: **director, secretary**.
