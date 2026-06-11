@@ -4,7 +4,7 @@
 //         (director/secretary). Escrita otimista: o cliente manda o updatedAt que
 //         leu; se a matrícula mudou desde então ⇒ 409 STALE_WRITE. DASHBOARD_API §3/§4.3.
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { asc, desc, eq } from 'drizzle-orm';
+import { asc, desc, eq, inArray } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../../server/db/client';
 import {
@@ -13,6 +13,8 @@ import {
   responsibles,
   addresses,
   contracts,
+  contractEvents,
+  notifications,
   activityLog,
 } from '../../server/db/schema';
 import { ok, fail, clientIp } from '../../server/lib/http';
@@ -80,8 +82,41 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
   }
 
   if (req.method === 'PATCH') return editEnrollment(req, res, session, id);
+  if (req.method === 'DELETE') return deleteEnrollment(req, res, session, id);
 
   return fail(res, 405, 'METHOD_NOT_ALLOWED', 'Método não permitido.');
+}
+
+// DELETE — exclui a matrícula de vez (cadastro errado/teste). RBAC director/
+// secretary. Sem transação (driver HTTP) → apaga os filhos em ordem de FK.
+async function deleteEnrollment(
+  req: VercelRequest,
+  res: VercelResponse,
+  session: NonNullable<Awaited<ReturnType<typeof getSession>>>,
+  id: number,
+): Promise<void> {
+  if (!hasRole(session, ['director', 'secretary'])) return fail(res, 403, 'FORBIDDEN', 'Sem permissão.');
+  if (!csrfValid(req)) return fail(res, 403, 'CSRF', 'Requisição não autorizada (CSRF).');
+
+  const found = await db.select({ id: enrollments.id }).from(enrollments).where(eq(enrollments.id, id)).limit(1);
+  if (!found.length) return fail(res, 404, 'NOT_FOUND', 'Matrícula não encontrada.');
+
+  const kidIds = (await db.select({ id: students.id }).from(students).where(eq(students.enrollmentId, id))).map((s) => s.id);
+  const ctrIds = (await db.select({ id: contracts.id }).from(contracts).where(eq(contracts.enrollmentId, id))).map((c) => c.id);
+  if (kidIds.length) await db.delete(notifications).where(inArray(notifications.studentId, kidIds));
+  if (ctrIds.length) await db.delete(contractEvents).where(inArray(contractEvents.contractId, ctrIds));
+  await db.delete(contracts).where(eq(contracts.enrollmentId, id));
+  await db.delete(students).where(eq(students.enrollmentId, id));
+  await db.delete(responsibles).where(eq(responsibles.enrollmentId, id));
+  await db.delete(addresses).where(eq(addresses.enrollmentId, id));
+  await db.delete(enrollments).where(eq(enrollments.id, id));
+
+  await db.insert(activityLog).values({
+    actorType: 'user', actorId: session.user.id, action: 'enrollment_removed',
+    targetType: 'enrollment', targetId: id, ip: clientIp(req),
+  });
+
+  return ok(res, { id });
 }
 
 const EditBody = z.object({

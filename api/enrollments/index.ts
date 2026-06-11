@@ -91,6 +91,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
       address: addr ? addressDTO(addr) : null,
       neighborhood: addr?.neighborhood ?? null,
       contractStatus: contract?.status ?? null,
+      contractId: contract?.id ?? null,
     };
   });
 
