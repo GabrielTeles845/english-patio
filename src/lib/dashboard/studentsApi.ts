@@ -13,6 +13,39 @@ export async function createEnrollmentApi(formData: FormData, period: string): P
   });
 }
 
+/* ----- detalhe da matrícula (GET /enrollments/:id) — CPF revelado + ids reais
+   + updatedAt fresco (token de concorrência). Loga view_student_pii no backend. */
+export interface DetailStudent { id: number; name: string; birthDate: string; classId: number | null; atSchoolSince: string | null; isActive: boolean }
+export interface DetailResp { id: number; type: 'legal' | 'second' | 'financial'; name: string; cpf: string | null; phone: string | null; email: string | null; relationship: string | null; birthDate: string | null }
+export interface DetailAddress { cep: string; street: string; number: string; complement: string | null; neighborhood: string; city: string; state: string }
+export interface EnrollmentDetail {
+  id: number;
+  financialResponsibleType: 'legal' | 'second' | 'other';
+  authorizationMedia: boolean;
+  updatedAt: string;
+  students: DetailStudent[];
+  responsibles: DetailResp[];
+  address: DetailAddress | null;
+}
+export async function getEnrollmentDetailApi(id: number): Promise<EnrollmentDetail> {
+  return apiFetch(`/enrollments/${id}`);
+}
+
+/* ----- edição (PATCH /enrollments/:id) — corpo declarativo por papel (§4.3). */
+export interface EnrollmentPatch {
+  expectedUpdatedAt: string;
+  students?: { id: number; name?: string; birthDate?: string; atSchoolSince?: string | null }[];
+  legalResponsible?: { name?: string; cpf?: string | null; phone?: string | null; email?: string | null; relationship?: string | null; birthDate?: string | null };
+  secondResponsible?: { name: string; cpf?: string | null; phone: string; relationship: string } | null;
+  financialResponsibleType?: 'legal' | 'second' | 'other';
+  financialResponsible?: { name: string; cpf: string } | null;
+  address?: { cep?: string; street?: string; number?: string; complement?: string | null; neighborhood?: string; city?: string };
+  authorizationMedia?: boolean;
+}
+export async function updateEnrollmentApi(id: number, body: EnrollmentPatch): Promise<void> {
+  await apiFetch(`/enrollments/${id}`, { method: 'PATCH', body: JSON.stringify(body) });
+}
+
 export async function moveKidApi(
   studentId: number,
   classId: number | null,

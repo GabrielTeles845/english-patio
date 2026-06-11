@@ -21,6 +21,8 @@ import {
   moveKidApi,
   reactivateStudentApi,
   setContractStatusApi,
+  updateEnrollmentApi,
+  type EnrollmentPatch,
 } from './studentsApi';
 import type { FormData } from '../../types/enrollment';
 import {
@@ -33,26 +35,18 @@ import {
 } from './agendaApi';
 import {
   ACTIVITY,
-  type Addr,
   EXIT_REASONS,
   type ExitKey,
-  type Kid,
   NOTIFS,
   type Par,
-  type Resp,
   SALA_COLORS,
   SALAS,
-  type Second,
   STUDENTS,
   TEACHERS,
-  turmaById,
   type User,
   type UserRole,
   USERS,
-  activeKidsIn,
   badChars,
-  salaById,
-  schLabel,
 } from './data';
 
 /* ====================== ASSINATURA / VERSÃO ====================== */
@@ -279,54 +273,25 @@ export async function createEnrollment(formData: FormData): Promise<ActionResult
   }
 }
 
-export interface StudentPatch {
-  kids?: Kid[];
-  resp?: Resp;
-  second?: Second | null;
-  fin?: string;
-  media?: boolean;
-  addr?: Addr;
-  since?: string; // '' ou undefined com a chave presente = remover (l.4266)
-}
-
-/* port de saveEditEnrollment (l.4194, só a parte de dados): aplica o patch e
-   guarda a regra de vagas — dois irmãos não ocupam a mesma última vaga nem
-   entram em turma cheia (delta por turma, l.4236–4242). */
-export function updateStudent(sid: number, patch: StudentPatch): ActionResult {
-  const s = STUDENTS.find((x) => x.id === sid);
-  if (!s) return fail('Matrícula não encontrada.');
-  if (patch.kids && s.active !== false) {
-    const delta: Record<number, number> = {};
-    patch.kids.forEach((kv, i) => {
-      const prev = s.kids[i]?.tid ?? null;
-      if (prev !== kv.tid) {
-        if (kv.tid) delta[kv.tid] = (delta[kv.tid] || 0) + 1;
-        if (prev) delta[prev] = (delta[prev] || 0) - 1;
-      }
-    });
-    for (const [ts, n] of Object.entries(delta)) {
-      if (n <= 0) continue;
-      const t = turmaById(+ts);
-      if (!t) continue;
-      const livre = t.cap - activeKidsIn(t.id);
-      if (n > livre)
-        return fail(
-          `A turma ${salaById(t.sala)!.n.replace(' Room', '')} · ${schLabel(t.par)} ${t.hora} não tem vaga suficiente (${livre > 0 ? `só ${livre} livre${livre > 1 ? 's' : ''}` : 'está cheia'}) para ${n > 1 ? 'os ' + n + ' alunos' : 'este aluno'} — escolha outra ou abra vaga extra pela Agenda.`
-        );
-    }
+/* PATCH /api/enrollments/:id (corpo declarativo, §4.3) + moveKid para as
+   mudanças de turma (o PATCH não mexe em turma — regras de capacidade ficam no
+   §4.6). O `body.expectedUpdatedAt` vem do detalhe lido (escrita otimista: 409
+   STALE_WRITE se outra pessoa editou). `moves` = kids cuja turma mudou. */
+export async function updateEnrollment(
+  sid: number,
+  body: EnrollmentPatch,
+  moves: { kidId: number; classId: number | null }[],
+): Promise<ActionResult & { fields?: Record<string, string> }> {
+  try {
+    await updateEnrollmentApi(sid, body);
+    // os dados já persistiram; agora aplica as mudanças de turma (capacidade no servidor).
+    for (const m of moves) await moveKidApi(m.kidId, m.classId, { allowLevelChange: true });
+    await reloadData();
+    return { ok: true };
+  } catch (err) {
+    if (err instanceof ApiError) return { ok: false, error: err.message, code: err.code, fields: err.fields };
+    return { ok: false, error: 'Algo deu errado ao salvar. Tente de novo.' };
   }
-  if (patch.kids) s.kids = patch.kids;
-  if (patch.resp) s.resp = patch.resp;
-  if ('second' in patch) s.second = patch.second ?? null;
-  if (patch.fin !== undefined) s.fin = patch.fin;
-  if (patch.media !== undefined) s.media = patch.media;
-  if (patch.addr) s.addr = patch.addr;
-  if ('since' in patch) {
-    if (!patch.since) delete s.since;
-    else s.since = patch.since;
-  }
-  bump();
-  return OK;
 }
 
 /* port de confirmDelete (l.4308) — excluir de vez (cadastro errado/teste);
