@@ -1,12 +1,19 @@
 // Seed das 13 salas e 19 níveis fixos (AGENDA_PLAN.md, espelhando o preview).
 // Idempotente (ON CONFLICT DO NOTHING). Rodar com: npm run db:seed:agenda
+// (Neon) ou via `npm run test:db:up` (Postgres local de teste). O driver é
+// escolhido pelo host — postgres-js no localhost, neon-http em produção —
+// porque o neon-http só fala o protocolo HTTP do Neon.
 import { neon } from '@neondatabase/serverless';
+import postgres from 'postgres';
 
 if (!process.env.DATABASE_URL) {
   console.error('DATABASE_URL não definida. Use: node --env-file=.env scripts/seed-agenda.mjs');
   process.exit(1);
 }
-const sql = neon(process.env.DATABASE_URL);
+const url = process.env.DATABASE_URL;
+const isLocal = /(?:localhost|127\.0\.0\.1)/.test(url);
+// ambos expõem a mesma tag `sql`...`` e retornam array no RETURNING.
+const sql = isLocal ? postgres(url, { max: 1 }) : neon(url);
 
 const ROOMS = [
   ['Green Room', '#7CB342', 'Mariana Rios'],
@@ -70,3 +77,6 @@ for (let i = 0; i < LEVELS.length; i++) {
 
 console.log(`Salas inseridas: ${rooms}/${ROOMS.length} | Níveis inseridos: ${lvls}/${LEVELS.length}`);
 console.log('(linhas já existentes foram ignoradas)');
+
+// postgres-js mantém a conexão aberta (segura o event loop) — encerra ao fim.
+if (isLocal) await sql.end();

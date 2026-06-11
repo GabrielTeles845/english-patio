@@ -1,0 +1,23 @@
+# Postgres local para a suíte de testes (npm run test:api). 100% local e offline,
+# sem credencial nenhuma. O banco vive em tmpfs (RAM): é efêmero — some quando o
+# container para — e rápido. Nunca toca o Neon de dev/prod.
+#
+#   npm run test:db:up     sobe o container, espera ficar pronto e aplica o schema
+#   npm run test:db:down   derruba (e descarta o banco)
+services:
+  postgres-test:
+    image: postgres:16
+    container_name: ep-postgres-test
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: english_patio_test
+    ports:
+      - '5433:5432'
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d english_patio_test']
+      interval: 2s
+      timeout: 3s
+      retries: 30
