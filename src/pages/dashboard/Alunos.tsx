@@ -552,14 +552,8 @@ function Row({
   onMenu: (e: MouseEvent, sid: number) => void;
   onOpen: () => void;
 }) {
-  const nSib = s.kids.length - 1;
-  const more =
-    nSib > 0 ? (
-      <span className="text-[11px] px-1.5 py-0.5 rounded-md font-medium whitespace-nowrap" style={{ background: 'var(--hover)', color: 'var(--muted)' }}>
-        +{nSib} irmã{nSib > 1 ? 'os' : 'o'}
-      </span>
-    ) : null;
   const inactive = s.active === false;
+  const multi = s.kids.length > 1;
   const fam = STUDENTS.filter((x) => x.resp.cpf === s.resp.cpf).length;
   const fut = !inactive && isFuture(s);
   const pillStyle = inactive
@@ -584,14 +578,50 @@ function Row({
       {inactive ? 'Inativa' : fut ? 'Começa em Jul' : 'Estudando'}
     </span>
   );
-  const avatar = (
+  /* avatar por aluno (iniciais do próprio); a cor da família é a mesma nos irmãos */
+  const avatarFor = (name: string, sm?: boolean) => (
     <div
-      className="w-10 h-10 rounded-xl grid place-content-center text-white font-semibold text-sm shrink-0"
+      className={`${sm ? 'w-9 h-9 text-xs' : 'w-10 h-10 text-sm'} rounded-xl grid place-content-center text-white font-semibold shrink-0`}
       style={{ background: avatarGrad(s.id), ...(inactive ? { filter: 'grayscale(.7)' } : {}) }}
     >
-      {initials(s.kids[0].n)}
+      {initials(name)}
     </div>
   );
+  const avatar = avatarFor(s.kids[0].n);
+  /* célula "Aluno": 1 aluno = formato normal; irmãos no mesmo contrato = um bloco
+     por aluno (avatar + nome + idade), alinhado com os blocos de turma. Sem "+1". */
+  const alunoCell = (sm: boolean) =>
+    multi ? (
+      <div className="min-w-0 space-y-1.5">
+        {s.kids.map((k, i) => (
+          <div key={i} className="flex items-center gap-2.5 min-w-0 min-h-[42px]">
+            {avatarFor(k.n, true)}
+            <div className="min-w-0">
+              <p className="font-medium text-sm truncate flex items-center gap-1.5">
+                {k.n}
+                {i === 0 && <MediaIcon media={s.media} />}
+              </p>
+              <p className="text-[11px] text-[var(--muted)] truncate">
+                {k.age} anos · {s.addr.bairro}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+    ) : (
+      <div className={sm ? 'flex items-start gap-3 min-w-0' : 'flex items-center gap-3 min-w-0'}>
+        {avatar}
+        <div className="min-w-0">
+          <p className={sm ? 'font-medium flex items-center gap-1.5 flex-wrap leading-snug' : 'font-medium flex items-center gap-2 truncate'}>
+            {s.kids[0].n}
+            <MediaIcon media={s.media} />
+          </p>
+          <p className={`text-xs text-[var(--muted)] ${sm ? 'mt-0.5' : ''}`}>
+            {s.kids[0].age} anos · {s.addr.bairro}
+          </p>
+        </div>
+      </div>
+    );
   const kebab = (
     <button
       onClick={(e) => onMenu(e, s.id)}
@@ -619,20 +649,9 @@ function Row({
       style={{ borderColor: 'var(--border)', ...(famGroup && fam > 1 ? { boxShadow: 'inset 3px 0 0 #2F539A' } : {}) }}
     >
       {/* desktop: linha da tabela */}
-      <div className="hidden md:grid md:grid-cols-[1.45fr_1.1fr_1fr_.8fr_.7fr_.85fr_.8fr_52px] gap-3 px-5 py-3.5 items-center">
-        <div className="flex items-center gap-3 min-w-0">
-          {avatar}
-          <div className="min-w-0">
-            <p className="font-medium truncate flex items-center gap-2">
-              {s.kids[0].n} {more}
-              <MediaIcon media={s.media} />
-            </p>
-            <p className="text-xs text-[var(--muted)]">
-              {s.kids[0].age} anos · {s.addr.bairro}
-            </p>
-          </div>
-        </div>
-        <div className="min-w-0">
+      <div className={`hidden md:grid md:grid-cols-[1.45fr_1.1fr_1fr_.8fr_.7fr_.85fr_.8fr_52px] gap-3 px-5 py-3.5 ${multi ? 'items-start' : 'items-center'}`}>
+        {alunoCell(false)}
+        <div className={`min-w-0 ${multi ? 'pt-1' : ''}`}>
           <p className="text-sm truncate flex items-center gap-1.5">
             {s.resp.n}
             <FamBadge s={s} />
@@ -660,13 +679,27 @@ function Row({
         <div className="flex items-start gap-3">
           {avatar}
           <div className="min-w-0 flex-1">
-            <p className="font-medium flex items-center gap-1.5 flex-wrap leading-snug">
-              {s.kids[0].n} {more}
-              <MediaIcon media={s.media} />
-            </p>
-            <p className="text-xs text-[var(--muted)] mt-0.5">
-              {s.kids[0].age} anos · {s.addr.bairro}
-            </p>
+            {multi ? (
+              <>
+                {s.kids.map((k, i) => (
+                  <p key={i} className={`font-medium text-sm flex items-center gap-1.5 leading-snug ${i > 0 ? 'mt-1' : ''}`}>
+                    {k.n} <span className="text-[var(--muted)] font-normal">{k.age}a</span>
+                    {i === 0 && <MediaIcon media={s.media} />}
+                  </p>
+                ))}
+                <p className="text-xs text-[var(--muted)] mt-0.5">{s.addr.bairro}</p>
+              </>
+            ) : (
+              <>
+                <p className="font-medium flex items-center gap-1.5 flex-wrap leading-snug">
+                  {s.kids[0].n}
+                  <MediaIcon media={s.media} />
+                </p>
+                <p className="text-xs text-[var(--muted)] mt-0.5">
+                  {s.kids[0].age} anos · {s.addr.bairro}
+                </p>
+              </>
+            )}
           </div>
           {kebab}
         </div>

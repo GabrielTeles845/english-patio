@@ -82,29 +82,31 @@ export function TurmaCell({ s }: { s: Student }) {
       </div>
     );
   }
-  /* irmãos na mesma matrícula: uma linha por aluno, com o nome — sem "+1" escondido */
+  /* irmãos na mesma matrícula: um bloco de turma por aluno (2 linhas, igual ao
+     aluno único), alinhado com os alunos empilhados na coluna "Aluno" — sem
+     espremer tudo numa linha só. */
   return (
-    <div className="min-w-0 space-y-1">
-      {infos.map(({ k, t }, i) => {
+    <div className="min-w-0 space-y-1.5">
+      {infos.map(({ t }, i) => {
         if (!t)
           return (
-            <p key={i} className="text-[11px] flex items-center gap-1.5 whitespace-nowrap">
-              <span className="font-semibold shrink-0">{k.n.split(' ')[0]}</span>
+            <div key={i} className="min-h-[42px] flex items-center">
               <SemTurmaChip />
-            </p>
+            </div>
           );
         const sala = salaById(t.sala)!;
         return (
-          <p key={i} className="text-[11px] flex items-center gap-1.5 whitespace-nowrap min-w-0">
-            <span className="w-2 h-2 rounded-full shrink-0" style={{ background: sala.c }} />
-            <span className="font-semibold shrink-0">{k.n.split(' ')[0]}</span>
-            <span className="text-[var(--muted)] truncate">
-              {sala.n.replace(' Room', '')} {t.hora} ·
-            </span>
-            <span className="font-semibold shrink-0" style={{ color: famC(t.nivel) }}>
-              {nivelLabel(t.nivel)}
-            </span>
-          </p>
+          <div key={i} className="min-w-0 min-h-[42px] flex flex-col justify-center">
+            <p className="text-xs font-medium flex items-center gap-1.5 whitespace-nowrap">
+              <span className="w-2 h-2 rounded-full shrink-0" style={{ background: sala.c }} />
+              <span className="truncate">
+                {sala.n.replace(' Room', '')} · {t.hora}
+              </span>
+            </p>
+            <p className="text-[10px] mt-0.5 font-semibold whitespace-nowrap" style={{ color: famC(t.nivel) }}>
+              {nivelLabel(t.nivel)} · {schLabel(t.par)}
+            </p>
+          </div>
         );
       })}
     </div>
