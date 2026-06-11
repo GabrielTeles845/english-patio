@@ -1,10 +1,12 @@
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { History, PenLine, Search, SearchX, ShieldCheck, UserRound, Zap } from 'lucide-react';
 import { initials } from '../../lib/dashboard/auth';
-import { useDash } from '../../lib/dashboard/store';
-import { ACT_ACTORS, ACTIVITY, type ActEntry } from '../../lib/dashboard/data';
+import { fetchActivity } from '../../lib/dashboard/activityApi';
+import { ApiError } from '../../lib/dashboard/api';
+import { ACT_ACTORS, type ActEntry } from '../../lib/dashboard/data';
 import { CSelect, type CSelectItem } from '../../components/dashboard/ui/CSelect';
 import { EmptyState } from '../../components/dashboard/ui/EmptyState';
+import { useToast } from '../../components/dashboard/ui/Toast';
 
 /* Tela REGISTRO DE ATIVIDADES — port 1:1 da seção data-view="atividade" do
    dashboard.html (markup l.951–965, JS renderActivity l.2436–2470). Somente
@@ -17,15 +19,38 @@ import { EmptyState } from '../../components/dashboard/ui/EmptyState';
 const ACTOR_ICON: Record<string, typeof Zap> = { zap: Zap, 'pen-line': PenLine };
 
 export default function Atividade() {
-  useDash();
+  const { toastErr } = useToast();
   const [q, setQ] = useState('');
   const [fw, setFw] = useState('');
+  const [all, setAll] = useState<ActEntry[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const whoItems: CSelectItem[] = [{ v: '', l: 'Todos' }, ...Object.keys(ACT_ACTORS).map((w) => ({ v: w, l: w }))];
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const data = await fetchActivity();
+        if (alive) setAll(data);
+      } catch (err) {
+        if (alive) toastErr(err instanceof ApiError ? err.message : 'Não foi possível carregar o registro.');
+      } finally {
+        if (alive) setLoading(false);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [toastErr]);
+
+  /* opções de ator a partir do que veio (mais "Todos") */
+  const whoItems: CSelectItem[] = [
+    { v: '', l: 'Todos' },
+    ...Array.from(new Set(all.map((x) => x.who))).map((w) => ({ v: w, l: w })),
+  ];
 
   /* port do filtro (l.2438–2443): busca no texto sem as tags + filtro por ator */
   const needle = q.toLowerCase();
-  const rows = ACTIVITY.filter((x) => {
+  const rows = all.filter((x) => {
     const hay = (x.who + ' ' + x.a.replace(/<[^>]+>/g, '')).toLowerCase();
     return hay.includes(needle) && (!fw || x.who === fw);
   });
@@ -76,8 +101,12 @@ export default function Atividade() {
       </div>
 
       <div className="surface rounded-2xl overflow-hidden" data-tour="act-list">
-        {rows.length === 0 ? (
-          ACTIVITY.length === 0 ? (
+        {loading ? (
+          <div className="p-10 grid place-content-center">
+            <div className="w-7 h-7 rounded-full border-2 border-[var(--border)] border-t-brand-light animate-spin" />
+          </div>
+        ) : rows.length === 0 ? (
+          all.length === 0 ? (
             <EmptyState
               icon={History}
               title="Nenhuma atividade ainda"
