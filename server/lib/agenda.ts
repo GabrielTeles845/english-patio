@@ -1,5 +1,5 @@
 // Regras de Agenda compartilhadas pelas rotas de turma.
-import { and, eq, sql } from 'drizzle-orm';
+import { and, eq, ne, sql } from 'drizzle-orm';
 import { db } from '../db/client';
 import { students } from '../db/schema';
 
@@ -12,10 +12,14 @@ export const DAY_PAIRS = ['seg-qua', 'ter-qui'] as const;
 
 // Ocupação de uma turma = nº de alunos ATIVOS com class_id = X. Alimenta as
 // regras CAPACITY_BELOW_OCCUPANCY (editar capacidade) e CLASS_NOT_EMPTY (excluir).
-export async function classOccupancy(classId: number): Promise<number> {
+// `excludeStudentId` ignora um aluno na contagem — usado ao MOVER um aluno pra
+// turma onde ele talvez já esteja (não conta ele mesmo contra a vaga).
+export async function classOccupancy(classId: number, excludeStudentId?: number): Promise<number> {
+  const conds = [eq(students.classId, classId), eq(students.isActive, true)];
+  if (excludeStudentId) conds.push(ne(students.id, excludeStudentId));
   const r = await db
     .select({ c: sql<number>`count(*)::int` })
     .from(students)
-    .where(and(eq(students.classId, classId), eq(students.isActive, true)));
+    .where(and(...conds));
   return r[0]?.c ?? 0;
 }
