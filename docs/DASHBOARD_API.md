@@ -308,7 +308,8 @@ Devolve CSV (mesmos filtros da lista). **→ log** (`export_students` — LGPD, 
   sem `}}` bloqueia** (`400`). Variáveis: `{{nome_responsavel}}`, `{{nome_aluno}}`.
 - Cria `announcements` + `announcement_recipients` (WhatsApp = "preparado por família",
   API oficial é fase futura). **Automáticos** (confirmação de matrícula, eventos
-  Autentique, contrato parado) nascem do servidor/cron, não desta rota. **→ log**.
+  Autentique) nascem do servidor, não desta rota. (O automático de contrato parado saiu
+  do escopo — sem cron, §14.) **→ log**.
 
 ---
 
@@ -328,8 +329,8 @@ Devolve CSV (mesmos filtros da lista). **→ log** (`export_students` — LGPD, 
   `contract_event_type`; decidido 09/Jun).
 - Cada transição: atualiza timeline, **→ log** (ator **`Autentique`**, não editável),
   **→ notif** (`viewed`/`signed`/**`rejected`**/**`failed`** — os dois últimos alimentam o
-  balde "precisa de ação"; `stale` vem do cron §14, não do webhook), alimenta o funil da
-  Visão geral.
+  balde "precisa de ação"; o tipo `stale` saiu do escopo junto com o cron §14 — "parado"
+  vira badge derivado na tela, sem notificação), alimenta o funil da Visão geral.
 
 ---
 
@@ -395,9 +396,17 @@ Devolve CSV (mesmos filtros da lista). **→ log** (`export_students` — LGPD, 
 
 ## 14. Cron / jobs internos (sem rota pública)
 
-- **Contrato parado:** diariamente marca `sent`/`viewed` há ≥7 dias → **→ notif** `stale`
-  + comunicado automático de lembrete (DASHBOARD_PLAN §7.4).
-- **Backup lógico:** `pg_dump` agendado p/ object storage (DASHBOARD_PLAN §13).
+> **FORA DE ESCOPO (decidido 10/Jun/2026).** Os dois jobs agendados abaixo foram
+> **cortados** — nada de Vercel Cron no MVP. Os substitutos não precisam de agendador:
+
+- ~~**Contrato parado:** diariamente marca `sent`/`viewed` há ≥7 dias → notif `stale`
+  + comunicado automático de lembrete.~~ **Substituído por:** "parado há N dias" é
+  **derivado on-demand** na tela de Contratos (badge calculado ao carregar, a partir de
+  `sent_at`/`viewed_at`); a cobrança é **manual** (botão WhatsApp). Some o empurrão
+  proativo; o badge permanece.
+- ~~**Backup lógico:** `pg_dump` agendado p/ object storage.~~ **Coberto por:** o
+  **PITR nativo do Neon** + a **planilha redundante** (DASHBOARD_PLAN §13). Um dump
+  próprio com retenção longa fica como evolução futura, não MVP.
 
 ---
 

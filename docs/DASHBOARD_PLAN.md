@@ -247,7 +247,8 @@ controle de concorrência otimista (`409 STALE_WRITE`, DASHBOARD_API §4.3).
    (no preview é **sub-tela**, não item de menu top-level — não criar rota de nav própria)
 7. **Comunicados** — escrever 1x, entregar por e-mail e/ou WhatsApp (preparado por
    família), variáveis ({{nome_responsavel}}…), filtro de público, histórico,
-   automáticos (confirmação de matrícula, eventos Autentique, contrato parado)
+   automáticos (confirmação de matrícula, eventos Autentique) — o lembrete de
+   contrato parado saiu do escopo (sem cron; ver §14)
 8. **Notificações** — central de eventos com não-lidos, filtros, atalho pro aluno
    (no preview é o **painel do sininho** (`notifPanel`), não uma tela com rota própria)
 9. **Editor de site** — todos os textos de todas as páginas (inclui matrícula), hover
@@ -285,8 +286,10 @@ anti-erro) em `docs/AUTENTIQUE_INTEGRACAO.md`** — conferido contra a doc ofici
    HMAC + dedup por event id + idempotência (§3).
 3. Cada transição: atualiza timeline do contrato, loga em `activity_log`
    (ator `Autentique`), gera notificação e alimenta o funil da Visão geral.
-4. Contrato `sent`/`viewed` há ≥7 dias → badge "parado", notificação `stale`,
-   comunicado automático de lembrete.
+4. Contrato `sent`/`viewed` há ≥7 dias → badge **"parado"** (derivado on-demand ao
+   carregar a tela; **sem cron**). ~~notificação `stale` + comunicado automático de
+   lembrete~~ — **fora de escopo no MVP** (decidido 10/Jun/2026, ver §14); a cobrança é
+   manual (botão WhatsApp).
 5. **Sandbox** do Autentique para todos os testes (não consome créditos).
 
 ## 8. Testes
@@ -380,7 +383,7 @@ rodando** — não basta passar no CI silenciosamente. Dois acréscimos ao §8.1
   alocação + filtros + importação de planilha (dados de teste); gravação nova de
   matrícula no Neon com `submission_id` idempotente, testada **isolada**.
 - **Fase 3 — Contratos & Autentique:** modelos de contrato, geração do PDF, envio via
-  Autentique (sandbox), webhooks, timeline, alertas de parado.
+  Autentique (sandbox), webhooks, timeline, badge "parado" (derivado, sem cron — §14).
 - **Fase 4 — Visão geral & notificações:** KPIs, gráficos, funil, central de eventos.
 - **Fase 5 — Comunicados (Resend + WhatsApp preparado):** transacional + manuais +
   automáticos.
@@ -501,9 +504,10 @@ Dados de menores não podem se perder. Camadas redundantes e independentes entre
 1. **PITR do Neon (point-in-time recovery)** — nativo do Postgres gerenciado: dá pra
    restaurar o banco a qualquer minuto recente, e **branches** permitem clonar o estado pra
    investigar sem mexer em produção. É a primeira linha contra "apaguei sem querer".
-2. **Dump lógico agendado** — `pg_dump` diário (cron, §14) pra object storage (Vercel
-   Blob/R2), com retenção (ex. 30 diários + 12 mensais). Backup que **não depende** do
-   provedor estar de pé; restaurável em qualquer Postgres.
+2. ~~**Dump lógico agendado** — `pg_dump` diário (cron, §14) pra object storage~~
+   **FORA DE ESCOPO no MVP (decidido 10/Jun/2026):** sem cron. O PITR do Neon (item 1) +
+   a planilha (item 3) cobrem o MVP; um dump próprio com retenção longa (ex. 30 diários +
+   12 mensais), restaurável em qualquer Postgres, fica como **evolução futura**.
 3. **A planilha do Google continua viva** durante e após o cutover — **não se apaga no dia
    da virada** (Fase 7). Como a importação é **idempotente** (`submission_id`), reimportar a
    planilha quantas vezes for preciso é seguro e não duplica. Ela é um backup redundante e
@@ -528,10 +532,10 @@ atual; só pra o backend novo). Cada item vira passo-a-passo no estilo do
 | Serviço | Pra quê | Conta | Custo inicial |
 |---|---|---|---|
 | **Neon (Postgres)** | banco principal + **branch de teste** | nova | free tier; paga ao crescer |
-| **Vercel** | já existe — ligar Serverless Functions + env vars + cron | atual | incluso |
+| **Vercel** | já existe — ligar Serverless Functions + env vars (cron fora de escopo, §14) | atual | incluso |
 | **Resend** | e-mail transacional + comunicados; **verificar domínio** (SPF/DKIM) | nova | free tier generoso |
 | **Autentique** | assinatura digital (API GraphQL + webhook); usar **sandbox** nos testes | nova | por documento; WhatsApp extra (a dona aprovou) |
-| **Object storage** | dumps de backup e (opcional) PDFs — Vercel Blob ou Cloudflare R2 | nova/atual | baixo (pode adiar: PDF segue no Drive) |
+| **Object storage** | (opcional) PDFs — Vercel Blob ou Cloudflare R2; dumps de backup saíram do escopo (§14) | nova/atual | baixo (pode adiar: PDF segue no Drive) |
 
 **Variáveis de ambiente (Vercel, prefixo conforme o uso):**
 
@@ -543,12 +547,12 @@ CSRF_SECRET                  # token CSRF das mutações
 RESEND_API_KEY               # envio de e-mail
 AUTENTIQUE_TOKEN             # API GraphQL
 AUTENTIQUE_WEBHOOK_SECRET    # validar HMAC do webhook (§3, §7)
-BLOB_READ_WRITE_TOKEN        # object storage (backup/PDF), se Vercel Blob
+BLOB_READ_WRITE_TOKEN        # object storage (PDF), se Vercel Blob
 SEED_ADMIN_EMAIL             # 1º Diretor semeado no deploy (default admin@email.com)
 SEED_ADMIN_PASSWORD          # senha provisória do seed (troca obrigatória no 1º login)
 # as VITE_GOOGLE_APPS_SCRIPT_URL / VITE_EMAILJS_* atuais seguem como estão até o cutover
 ```
 
 **Ordem sugerida de setup:** Neon (banco + branch teste) → env vars no Vercel → Resend
-(domínio verificado) → Autentique (sandbox) → cron de backup/`stale`. Custos recorrentes
-são da escola (decisão §10).
+(domínio verificado) → Autentique (sandbox). (Cron de backup/`stale` saiu do escopo — §14.)
+Custos recorrentes são da escola (decisão §10).
