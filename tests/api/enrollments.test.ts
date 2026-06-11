@@ -223,3 +223,70 @@ describe('GET /api/enrollments/:id', () => {
     assert.ok(logs.length >= 1);
   });
 });
+
+describe('PATCH /api/enrollments/:id', () => {
+  let kidId = 0, respId = 0;
+  async function token(): Promise<string> {
+    const r = await db.select({ u: enrollments.updatedAt }).from(enrollments).where(eq(enrollments.id, activeId)).limit(1);
+    return r[0].u.toISOString();
+  }
+  before(async () => {
+    const k = await db.select({ id: students.id }).from(students).where(eq(students.enrollmentId, activeId)).limit(1);
+    kidId = k[0].id;
+    const r = await db.select({ id: responsibles.id }).from(responsibles).where(eq(responsibles.enrollmentId, activeId)).limit(1);
+    respId = r[0].id;
+  });
+
+  it('sem CSRF → 403', async () => {
+    const res = mkRes();
+    await detailHandler(mkReq('PATCH', { expectedUpdatedAt: await token() }, { cookie: dir.cookies, query: { id: String(activeId) } }), res);
+    assert.equal(res._status, 403);
+  });
+
+  it('Supervisor → 403 (só director/secretary editam)', async () => {
+    const res = mkRes();
+    await detailHandler(mkReq('PATCH', { expectedUpdatedAt: await token() }, { cookie: sup.cookies, csrf: sup.csrf, query: { id: String(activeId) } }), res);
+    assert.equal(res._status, 403);
+  });
+
+  it('token desatualizado → 409 STALE_WRITE', async () => {
+    const res = mkRes();
+    await detailHandler(mkReq('PATCH', { expectedUpdatedAt: '2000-01-01T00:00:00.000Z', students: [{ id: kidId, name: 'Novo Nome' }] }, { cookie: dir.cookies, csrf: dir.csrf, query: { id: String(activeId) } }), res);
+    assert.equal(res._status, 409);
+    assert.equal(res._body.error.code, 'STALE_WRITE');
+  });
+
+  it('nome de aluno inválido → 400 com fields', async () => {
+    const res = mkRes();
+    await detailHandler(mkReq('PATCH', { expectedUpdatedAt: await token(), students: [{ id: kidId, name: 'X' }] }, { cookie: dir.cookies, csrf: dir.csrf, query: { id: String(activeId) } }), res);
+    assert.equal(res._status, 400);
+    assert.ok(res._body.error.fields['students.0.name']);
+  });
+
+  it('aluno de outra matrícula → 404', async () => {
+    const res = mkRes();
+    await detailHandler(mkReq('PATCH', { expectedUpdatedAt: await token(), students: [{ id: 99999999, name: 'Fulano da Silva' }] }, { cookie: dir.cookies, csrf: dir.csrf, query: { id: String(activeId) } }), res);
+    assert.equal(res._status, 404);
+  });
+
+  it('edição válida → 200, persiste e gera novo token', async () => {
+    const before = await token();
+    const res = mkRes();
+    await detailHandler(mkReq('PATCH', {
+      expectedUpdatedAt: before,
+      students: [{ id: kidId, name: 'Helena Ativa Editada' }],
+      responsibles: [{ id: respId, phone: '(62) 98888-7777' }],
+      address: { neighborhood: 'Setor Oeste' },
+      authorizationMedia: false,
+    }, { cookie: dir.cookies, csrf: dir.csrf, query: { id: String(activeId) } }), res);
+    assert.equal(res._status, 200);
+    assert.equal(res._body.data.authorizationMedia, false);
+
+    const k = await db.select().from(students).where(eq(students.id, kidId)).limit(1);
+    assert.equal(k[0].name, 'Helena Ativa Editada');
+    const r = await db.select().from(responsibles).where(eq(responsibles.id, respId)).limit(1);
+    assert.equal(r[0].phone, '62988887777'); // só dígitos
+    const after = await token();
+    assert.notEqual(after, before); // token mudou
+  });
+});

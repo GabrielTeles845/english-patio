@@ -94,3 +94,31 @@ export function isValidResponsibleBirthDate(dateStr: string): boolean {
   const age = ageFromBrDate(dateStr);
   return age !== null && age >= 18;
 }
+
+// ── Versões ISO ('aaaa-mm-dd') — usadas na edição (o detalhe devolve ISO). ──────
+export function parseISODate(dateStr: string): Date | null {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateStr);
+  if (!m) return null;
+  const year = Number(m[1]), month = Number(m[2]) - 1, day = Number(m[3]);
+  const d = new Date(year, month, day);
+  if (d.getDate() !== day || d.getMonth() !== month || d.getFullYear() !== year) return null;
+  return d;
+}
+
+function ageOf(d: Date): number {
+  const today = new Date();
+  let age = today.getFullYear() - d.getFullYear();
+  const mm = today.getMonth() - d.getMonth();
+  if (mm < 0 || (mm === 0 && today.getDate() < d.getDate())) age--;
+  return age;
+}
+
+export function isValidStudentISODate(dateStr: string): boolean {
+  const d = parseISODate(dateStr);
+  return !!d && d <= new Date() && ageOf(d) <= 20;
+}
+
+export function isValidResponsibleISODate(dateStr: string): boolean {
+  const d = parseISODate(dateStr);
+  return !!d && d <= new Date() && ageOf(d) >= 18;
+}
