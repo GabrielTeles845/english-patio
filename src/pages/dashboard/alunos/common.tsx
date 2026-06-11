@@ -135,15 +135,29 @@ export function MediaIcon({ media }: { media: boolean }) {
 }
 
 /* badge de família (mesmo responsável em mais de uma matrícula — port l.1979) */
-export function FamBadge({ s }: { s: Student }) {
+export function FamBadge({ s, onClick }: { s: Student; onClick?: (s: Student) => void }) {
   const fam = STUDENTS.filter((x) => x.resp.cpf === s.resp.cpf).length;
   if (fam <= 1) return null;
+  const cls = 'inline-grid place-content-center w-5 h-5 rounded-md shrink-0';
+  const style = { background: 'rgba(47,83,154,.12)', color: '#2F539A' };
+  /* clicável: filtra a lista para mostrar só as matrículas desta família */
+  if (onClick)
+    return (
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          onClick(s);
+        }}
+        className={`${cls} hover:brightness-95 transition cursor-pointer`}
+        data-tip={`Ver as ${fam} matrículas desta família`}
+        style={style}
+      >
+        <Users className="w-3 h-3" />
+      </button>
+    );
   return (
-    <span
-      className="inline-grid place-content-center w-5 h-5 rounded-md shrink-0"
-      data-tip={`Mesma família: este responsável tem ${fam} matrículas`}
-      style={{ background: 'rgba(47,83,154,.12)', color: '#2F539A' }}
-    >
+    <span className={cls} data-tip={`Mesma família: este responsável tem ${fam} matrículas`} style={style}>
       <Users className="w-3 h-3" />
     </span>
   );

@@ -126,15 +126,3 @@ export const SORT_VAL: Record<SortKey, (s: Student) => string | number> = {
   since: (s) => (s.since ? s.since.split('/').reverse().join('') : '99999999'), // sem registro vai pro fim
   date: (s) => s.date.split('/').reverse().join('') + (s.hora || ''),
 };
-
-/* "Famílias juntas": matrículas do mesmo responsável aparecem adjacentes,
-   na posição da primeira que apareceria na ordenação atual (port l.2136) */
-export function famGroupRows(rows: Student[]): Student[] {
-  const seen = new Set<string>(), out: Student[] = [];
-  rows.forEach((r) => {
-    if (seen.has(r.resp.cpf)) return;
-    seen.add(r.resp.cpf);
-    out.push(...rows.filter((x) => x.resp.cpf === r.resp.cpf));
-  });
-  return out;
-}

@@ -1,6 +1,7 @@
 import { useMemo, useState, type MouseEvent, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
+  ArrowLeft,
   CheckCircle2,
   ChevronDown,
   ChevronLeft,
@@ -47,7 +48,6 @@ import { WAIcon } from '../../components/dashboard/ui/icons';
 import {
   activeFilterCount,
   emptyFilters,
-  famGroupRows,
   filteredStudents,
   SORT_VAL,
   TABLE_COLS,
@@ -77,7 +77,6 @@ const cache = {
   sortKey: 'name' as SortKey,
   sortDir: 1,
   page: 1,
-  famGroup: false,
 };
 
 /* deep-link da Visão geral (goPendentes do preview, l.3550: csSet('fStatus',…)) —
@@ -108,7 +107,8 @@ export default function Alunos() {
   const [sortKey, setSortKeyState] = useState<SortKey>(cache.sortKey);
   const [sortDir, setSortDirState] = useState(cache.sortDir);
   const [page, setPageState] = useState(cache.page);
-  const [famGroup, setFamGroupState] = useState(cache.famGroup);
+  /* família em foco: clicar no badge de família mostra só as matrículas daquele responsável */
+  const [famView, setFamView] = useState<{ cpf: string; name: string } | null>(null);
   const [fRowOpen, setFRowOpen] = useState(false);
   const [menu, setMenu] = useState<{ anchor: DOMRect; sid: number } | null>(null);
   const [modal, setModal] = useState<ModalState>(null);
@@ -138,13 +138,17 @@ export default function Alunos() {
     cache.page = 1;
     setPageState(1);
   };
-  const toggleFamGroup = () => {
-    const v = !famGroup;
-    cache.famGroup = v;
+  /* foca/desfoca uma família (port do antigo "Famílias juntas", agora sob demanda) */
+  const openFamily = (st: Student) => {
+    setFamView({ cpf: st.resp.cpf, name: st.resp.n });
     cache.page = 1;
-    setFamGroupState(v);
     setPageState(1);
-    toast(v ? 'Matrículas da mesma família agora aparecem juntas.' : 'Agrupamento por família desligado.');
+    document.querySelector('.table-shell')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+  const closeFamily = () => {
+    setFamView(null);
+    cache.page = 1;
+    setPageState(1);
   };
   const clearFilters = () => {
     cache.filters = emptyFilters();
@@ -186,12 +190,12 @@ export default function Alunos() {
     );
   }
 
-  /* linhas: filtra → ordena → (famílias juntas) → pagina (port renderTable l.2149) */
+  /* linhas: filtra → (família em foco) → ordena → pagina (port renderTable l.2149) */
   let rows = filteredStudents(f).slice().sort((a, b) => {
     const va = SORT_VAL[sortKey](a), vb = SORT_VAL[sortKey](b);
     return (va < vb ? -1 : va > vb ? 1 : 0) * sortDir;
   });
-  if (famGroup) rows = famGroupRows(rows);
+  if (famView) rows = rows.filter((s) => s.resp.cpf === famView.cpf);
   const pages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
   const curPage = Math.min(page, pages);
   const pageRows = rows.slice((curPage - 1) * PAGE_SIZE, curPage * PAGE_SIZE);
@@ -355,19 +359,6 @@ export default function Alunos() {
             </button>
           )}
           <button
-            onClick={toggleFamGroup}
-            data-tip="Matrículas da mesma família (mesmo responsável) aparecem uma embaixo da outra, mesmo na ordem alfabética"
-            className="h-10 px-3 rounded-xl border text-sm font-medium flex items-center gap-1.5 shrink-0 transition"
-            style={
-              famGroup
-                ? { background: 'rgba(47,83,154,.10)', color: '#2F539A', borderColor: 'rgba(47,83,154,.45)' }
-                : { borderColor: 'var(--border)' }
-            }
-          >
-            <Users className="w-4 h-4" />
-            <span className="hidden sm:inline">Famílias juntas</span>
-          </button>
-          <button
             onClick={() => setFRowOpen((o) => !o)}
             className="md:hidden h-10 px-3 rounded-xl border border-[var(--border)] text-sm font-medium flex items-center gap-1.5 shrink-0"
           >
@@ -468,6 +459,24 @@ export default function Alunos() {
         </div>
       </div>
 
+      {/* família em foco: banner com nome do responsável + voltar (substitui o antigo toggle "Famílias juntas") */}
+      {famView && (
+        <div
+          className="flex items-center justify-between gap-3 mb-3 px-4 py-2.5 rounded-xl text-sm"
+          style={{ background: 'rgba(47,83,154,.08)', border: '1px solid rgba(47,83,154,.25)' }}
+        >
+          <span className="flex items-center gap-2 min-w-0" style={{ color: '#2F539A' }}>
+            <Users className="w-4 h-4 shrink-0" />
+            <span className="truncate">
+              Família de <b>{famView.name}</b> · {STUDENTS.filter((s) => s.resp.cpf === famView.cpf).length} matrículas
+            </span>
+          </span>
+          <button onClick={closeFamily} className="flex items-center gap-1.5 font-medium shrink-0 hover:underline" style={{ color: '#2F539A' }}>
+            <ArrowLeft className="w-4 h-4" /> Ver todos
+          </button>
+        </div>
+      )}
+
       {/* tabela com design próprio (cabeçalho ordenável; cards no mobile) */}
       <div className="surface rounded-2xl overflow-hidden table-shell">
         <div
@@ -508,7 +517,7 @@ export default function Alunos() {
               />
             )
           ) : (
-            pageRows.map((s) => <Row key={s.id} s={s} famGroup={famGroup} onMenu={openRowMenu} onOpen={() => navigate(`/dashboard/alunos/${s.id}`)} />)
+            pageRows.map((s) => <Row key={s.id} s={s} onFamily={openFamily} onMenu={openRowMenu} onOpen={() => navigate(`/dashboard/alunos/${s.id}`)} />)
           )}
         </div>
         <div
@@ -543,18 +552,17 @@ export default function Alunos() {
    formatos, como no preview; o CSS mobile (#tableBody > div) faz o resto */
 function Row({
   s,
-  famGroup,
+  onFamily,
   onMenu,
   onOpen,
 }: {
   s: Student;
-  famGroup: boolean;
+  onFamily: (s: Student) => void;
   onMenu: (e: MouseEvent, sid: number) => void;
   onOpen: () => void;
 }) {
   const inactive = s.active === false;
   const multi = s.kids.length > 1;
-  const fam = STUDENTS.filter((x) => x.resp.cpf === s.resp.cpf).length;
   const fut = !inactive && isFuture(s);
   const pillStyle = inactive
     ? { color: '#64748B', background: 'rgba(100,116,139,.14)' }
@@ -646,7 +654,7 @@ function Row({
     <div
       onClick={onOpen}
       className={`cursor-pointer transition md:border-b md:last:border-0 hover:bg-[var(--hover)] ${inactive ? 'opacity-60' : ''}`}
-      style={{ borderColor: 'var(--border)', ...(famGroup && fam > 1 ? { boxShadow: 'inset 3px 0 0 #2F539A' } : {}) }}
+      style={{ borderColor: 'var(--border)' }}
     >
       {/* desktop: linha da tabela */}
       <div className={`hidden md:grid md:grid-cols-[1.45fr_1.1fr_1fr_.8fr_.7fr_.85fr_.8fr_52px] gap-3 px-5 py-3.5 ${multi ? 'items-start' : 'items-center'}`}>
@@ -654,7 +662,7 @@ function Row({
         <div className={`min-w-0 ${multi ? 'pt-1' : ''}`}>
           <p className="text-sm truncate flex items-center gap-1.5">
             {s.resp.n}
-            <FamBadge s={s} />
+            <FamBadge s={s} onClick={onFamily} />
           </p>
           <p className="text-xs text-[var(--muted)]">
             {s.resp.rel} · {s.resp.phone}
@@ -721,7 +729,7 @@ function Row({
         >
           <span className="truncate flex items-center gap-1.5 min-w-0">
             {s.resp.n}
-            <FamBadge s={s} />
+            <FamBadge s={s} onClick={onFamily} />
           </span>
           <span className="whitespace-nowrap shrink-0">
             {s.date}
