@@ -78,6 +78,8 @@ interface AuthCtx {
   effectiveUser: SessionUser | null;
   login: (email: string, password: string) => Promise<SessionUser>;
   logout: () => Promise<void>;
+  /* recarrega o usuário do /api/auth/me (após editar conta/senha) */
+  refresh: () => Promise<void>;
   setViewAs: (role: Role | null) => void;
 }
 
@@ -142,6 +144,14 @@ export function DashboardAuthProvider({ children }: { children: ReactNode }) {
         }
         setUser(null);
         setViewAs(null);
+      },
+      refresh: async () => {
+        try {
+          const data = await apiFetch<{ user: ApiUser }>('/auth/me');
+          setUser(mapUser(data.user));
+        } catch {
+          setUser(null);
+        }
       },
       setViewAs: (role) => setViewAs(role && role !== user?.role ? role : null),
     };

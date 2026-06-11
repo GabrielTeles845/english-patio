@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Bell,
@@ -14,8 +14,8 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { roleHasBell, useAuth } from '../../../lib/dashboard/auth';
-import { markAllRead, markNotifRead, useDash } from '../../../lib/dashboard/store';
-import { NOTIFS, type NotifType } from '../../../lib/dashboard/data';
+import { fetchNotifications, markAllReadApi, markNotifReadApi, type PanelNotif } from '../../../lib/dashboard/notificationsApi';
+import { type NotifType } from '../../../lib/dashboard/data';
 import { EmptyState } from '../ui/EmptyState';
 
 /* Topbar — port do header do preview: título da tela + data por extenso,
@@ -42,29 +42,56 @@ const NOTIF_ICON: Record<NotifType, [LucideIcon, string, string]> = {
 };
 
 export function Topbar({ title, onOpenSidebar }: { title: string; onOpenSidebar: () => void }) {
-  useDash();
   const { effectiveRole } = useAuth();
   const navigate = useNavigate();
   const [notifOpen, setNotifOpen] = useState(false);
+  const [notifs, setNotifs] = useState<PanelNotif[]>([]);
   const bellRef = useRef<HTMLDivElement>(null);
+
+  const hasBell = !!effectiveRole && roleHasBell(effectiveRole);
+  const load = useCallback(async () => {
+    if (!hasBell) return;
+    try {
+      setNotifs(await fetchNotifications());
+    } catch {
+      /* sino é best-effort: falha silenciosa não atrapalha o resto do painel */
+    }
+  }, [hasBell]);
+  useEffect(() => {
+    void load();
+  }, [load]);
 
   useEffect(() => {
     if (!notifOpen) return;
+    void load(); // recarrega ao abrir o painel
     const close = (ev: MouseEvent) => {
       if (!bellRef.current?.contains(ev.target as Node)) setNotifOpen(false);
     };
     document.addEventListener('mousedown', close);
     return () => document.removeEventListener('mousedown', close);
-  }, [notifOpen]);
+  }, [notifOpen, load]);
 
-  const unread = NOTIFS.filter((n) => n.unread).length;
+  const unread = notifs.filter((n) => n.unread).length;
 
-  /* port notifClick (l.1745): marca lida, fecha e abre a ficha do aluno */
-  const notifClick = (i: number) => {
-    const n = NOTIFS[i];
-    markNotifRead(i);
+  /* marca lida (otimista), fecha e abre a ficha do aluno se houver */
+  const notifClick = async (n: PanelNotif) => {
+    setNotifs((prev) => prev.map((x) => (x.id === n.id ? { ...x, unread: false } : x)));
     setNotifOpen(false);
+    try {
+      await markNotifReadApi(n.id);
+    } catch {
+      /* ignora */
+    }
     if (n.sid) navigate(`/dashboard/alunos/${n.sid}`);
+  };
+
+  const markAll = async () => {
+    setNotifs((prev) => prev.map((x) => ({ ...x, unread: false })));
+    try {
+      await markAllReadApi();
+    } catch {
+      /* ignora */
+    }
   };
 
   return (
@@ -99,24 +126,24 @@ export function Topbar({ title, onOpenSidebar }: { title: string; onOpenSidebar:
                 <div className="absolute right-0 top-[calc(100%+8px)] w-[340px] max-w-[88vw] surface rounded-2xl shadow-2xl z-50 overflow-hidden fade-in">
                   <div className="flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: 'var(--border)' }}>
                     <p className="font-heading font-semibold">Notificações</p>
-                    <button onClick={() => markAllRead()} className="text-xs font-medium text-brand-light hover:underline">
+                    <button onClick={markAll} className="text-xs font-medium text-brand-light hover:underline">
                       Marcar como lidas
                     </button>
                   </div>
                   <div className="max-h-[360px] overflow-y-auto">
-                    {NOTIFS.length === 0 ? (
+                    {notifs.length === 0 ? (
                       <EmptyState
                         icon={BellOff}
                         title="Nada por aqui ainda"
                         sub="Os eventos de matrícula e contrato aparecem aqui assim que acontecem."
                       />
                     ) : (
-                      NOTIFS.map((n, i) => {
+                      notifs.map((n) => {
                         const [Icon, c, bg] = NOTIF_ICON[n.type];
                         return (
                           <div
-                            key={i}
-                            onClick={() => notifClick(i)}
+                            key={n.id}
+                            onClick={() => notifClick(n)}
                             className="flex items-start gap-3 px-4 py-3 cursor-pointer hover:bg-[var(--hover)] transition border-b last:border-0"
                             style={{ borderColor: 'var(--border)' }}
                           >

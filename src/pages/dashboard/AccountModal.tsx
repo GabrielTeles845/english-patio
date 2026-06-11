@@ -1,37 +1,61 @@
 import { useState } from 'react';
 import { ShieldCheck } from 'lucide-react';
 import { initials, useAuth } from '../../lib/dashboard/auth';
+import { apiFetch, ApiError } from '../../lib/dashboard/api';
 import { validEmail, validNewPass } from '../../lib/dashboard/data';
 import { Modal } from '../../components/dashboard/ui/Modal';
 import { inputCls, PasswordInput } from '../../components/dashboard/ui/inputs';
 import { NtBox } from './alunos/common';
 import { useToast } from '../../components/dashboard/ui/Toast';
 
-/* Modal "Minha conta" — port 1:1 de openAccountModal/saveAccount (dashboard.html
-   l.5325–5361). E-mail de acesso + trocar senha (validada só se a pessoa começar
-   a trocar). Mensagens verbatim do preview. No backend real vira
-   PATCH /api/account (e-mail único → 409 EMAIL_TAKEN). */
+/* Modal "Minha conta" — ligado ao backend (DASHBOARD_API §1): PATCH /api/account
+   (e-mail único → 409 EMAIL_TAKEN) e POST /api/account/password (confere a atual
+   fora do 1º acesso). Edita SEMPRE a conta real (não a persona do "ver como"). */
+
+function apiMsg(err: unknown, fallback: string): string {
+  if (err instanceof ApiError) {
+    const fields = err.fields ? Object.values(err.fields).join(' ') : '';
+    return fields || err.message || fallback;
+  }
+  return fallback;
+}
 
 export function AccountModal({ onClose }: { onClose: () => void }) {
-  const { effectiveUser } = useAuth();
+  const { user, refresh } = useAuth();
   const { toast } = useToast();
-  const u = effectiveUser;
-  const [email, setEmail] = useState(u?.email ?? '');
+  const [email, setEmail] = useState(user?.email ?? '');
   const [cur, setCur] = useState('');
   const [nw, setNw] = useState('');
   const [conf, setConf] = useState('');
   const [err, setErr] = useState('');
+  const [busy, setBusy] = useState(false);
 
-  const save = () => {
-    if (!validEmail(email.trim())) return setErr('E-mail de acesso inválido.');
-    /* senha só é validada se a pessoa começou a trocar (algum campo preenchido) */
-    if (cur || nw || conf) {
+  const save = async () => {
+    const e = email.trim();
+    if (!validEmail(e)) return setErr('E-mail de acesso inválido.');
+    const changingPass = !!(cur || nw || conf);
+    if (changingPass) {
       if (!cur) return setErr('Digite a senha atual para trocar a senha.');
       if (!validNewPass(nw)) return setErr('A nova senha precisa de pelo menos 10 caracteres, com letras e números.');
       if (nw !== conf) return setErr('A confirmação não bate com a nova senha — digite igual nos dois campos.');
     }
-    onClose();
-    toast('Dados da conta atualizados!');
+    const emailChanged = e.toLowerCase() !== (user?.email ?? '').toLowerCase();
+    if (!emailChanged && !changingPass) {
+      onClose();
+      return;
+    }
+    setBusy(true);
+    try {
+      if (emailChanged) await apiFetch('/account', { method: 'PATCH', body: JSON.stringify({ email: e }) });
+      if (changingPass) await apiFetch('/account/password', { method: 'POST', body: JSON.stringify({ currentPassword: cur, newPassword: nw }) });
+      await refresh();
+      onClose();
+      toast('Dados da conta atualizados!');
+    } catch (e2) {
+      setErr(apiMsg(e2, 'Não foi possível salvar.'));
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -43,8 +67,8 @@ export function AccountModal({ onClose }: { onClose: () => void }) {
           <button onClick={onClose} className="flex-1 h-11 rounded-xl border border-[var(--border)] font-medium text-sm">
             Cancelar
           </button>
-          <button onClick={save} className="flex-1 h-11 rounded-xl text-white font-semibold text-sm" style={{ background: '#1E3765' }}>
-            Salvar alterações
+          <button onClick={save} disabled={busy} className="flex-1 h-11 rounded-xl text-white font-semibold text-sm disabled:opacity-70" style={{ background: '#1E3765' }}>
+            {busy ? 'Salvando…' : 'Salvar alterações'}
           </button>
         </>
       }
@@ -52,11 +76,11 @@ export function AccountModal({ onClose }: { onClose: () => void }) {
       <div className="p-5 space-y-3">
         <div className="flex items-center gap-3 mb-1">
           <div className="w-12 h-12 rounded-full grid place-content-center font-semibold text-[#15294d]" style={{ background: '#FFE17A' }}>
-            {u ? initials(u.name) : ''}
+            {user ? initials(user.name) : ''}
           </div>
           <div>
-            <p className="font-medium">{u?.name}</p>
-            <p className="text-xs text-[var(--muted)]">{u?.role}</p>
+            <p className="font-medium">{user?.name}</p>
+            <p className="text-xs text-[var(--muted)]">{user?.role}</p>
           </div>
         </div>
         <label className="block">
@@ -72,7 +96,7 @@ export function AccountModal({ onClose }: { onClose: () => void }) {
           <PasswordInput label="Confirmar nova senha" value={conf} onChange={setConf} autoComplete="new-password" />
         </div>
         <p className="text-xs text-[var(--muted)] flex items-center gap-1.5">
-          <ShieldCheck className="w-3.5 h-3.5 shrink-0" /> Ao trocar e-mail ou senha, você recebe uma confirmação no e-mail antigo.
+          <ShieldCheck className="w-3.5 h-3.5 shrink-0" /> Ao trocar a senha, as outras sessões são encerradas por segurança.
         </p>
         {err && <NtBox msg={err} kind="err" />}
       </div>
