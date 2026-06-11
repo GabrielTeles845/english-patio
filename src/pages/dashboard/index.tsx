@@ -33,14 +33,25 @@ import Atividade from './Atividade';
    Chunk separado do site público (lazy no router) — fontes e CSS daqui não
    pesam nas páginas institucionais. */
 
+/* enquanto o GET /api/auth/me não respondeu, não decide rota (evita piscar login) */
+function AuthLoading() {
+  return (
+    <div className="min-h-screen grid place-content-center">
+      <div className="w-8 h-8 rounded-full border-2 border-[var(--border)] border-t-brand-light animate-spin" />
+    </div>
+  );
+}
+
 function RequireAuth() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  if (loading) return <AuthLoading />;
   if (!user) return <Navigate to="/dashboard/entrar" replace />;
   return <Outlet />;
 }
 
 function HomeRedirect() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  if (loading) return <AuthLoading />;
   if (!user) return <Navigate to="/dashboard/entrar" replace />;
   return <Navigate to={viewToPath(ROLE_HOME[user.role])} replace />;
 }

@@ -1,9 +1,11 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { apiFetch, ApiError } from './api';
 
-/* Auth da dashboard — STUB em memória (DASHBOARD_PLAN.md §8.1, "fallback stub").
-   Na Fase 1 real isto vira POST /api/auth/login (cookie JWT httpOnly + CSRF,
-   DASHBOARD_API.md §1); a interface do contexto já é a final para o front.
-   Papéis e matriz de acesso: DASHBOARD_PLAN.md §4. */
+/* Auth da dashboard — ligado ao backend real (DASHBOARD_API §1): POST /api/auth/login
+   (cookie JWT httpOnly + CSRF), GET /api/auth/me (restaura sessão) e
+   POST /api/auth/logout. Papéis e matriz de acesso: DASHBOARD_PLAN.md §4.
+   Os papéis no servidor são em inglês (director/supervisor/secretary); a UI usa
+   os rótulos em português — o mapa abaixo converte. */
 
 export type Role = 'Diretor' | 'Supervisor' | 'Secretaria';
 
@@ -14,13 +16,28 @@ export interface SessionUser {
   role: Role;
 }
 
-/* mesmas pessoas do mock do preview (USERS) */
+interface ApiUser {
+  id: number;
+  name: string;
+  email: string;
+  role: 'director' | 'supervisor' | 'secretary';
+}
+
+const ROLE_FROM_API: Record<ApiUser['role'], Role> = {
+  director: 'Diretor',
+  supervisor: 'Supervisor',
+  secretary: 'Secretaria',
+};
+
+function mapUser(u: ApiUser): SessionUser {
+  return { id: u.id, name: u.name, email: u.email, role: ROLE_FROM_API[u.role] ?? 'Secretaria' };
+}
+
+/* personas de exemplo para o "Ver painel como…" (Diretor, PLAN §6.10) — cosmético */
 export const DEMO_USERS: SessionUser[] = [
   { id: 1, name: 'Priscylla Martins', email: 'priscylla@englishpatio.com.br', role: 'Diretor' },
-  { id: 2, name: 'Gabriel Teles', email: 'gabriel@englishpatio.com.br', role: 'Diretor' },
   { id: 3, name: 'Camila Nogueira', email: 'camila@englishpatio.com.br', role: 'Supervisor' },
   { id: 4, name: 'Stefany Oliveira', email: 'stefany@englishpatio.com.br', role: 'Secretaria' },
-  { id: 5, name: 'Beatriz Souza', email: 'beatriz@englishpatio.com.br', role: 'Secretaria' },
 ];
 
 /* telas (chaves do preview) liberadas por papel — Diretor acessa tudo */
@@ -52,13 +69,15 @@ export function initials(name: string): string {
 
 interface AuthCtx {
   user: SessionUser | null;
+  /* true enquanto o GET /api/auth/me da carga inicial não respondeu */
+  loading: boolean;
   /* "Ver painel como…" — recurso do Diretor (PLAN §6.10); null = papel real */
   viewAs: Role | null;
   /* papel efetivo para o gating visual (o servidor é sempre a autoridade real) */
   effectiveRole: Role | null;
   effectiveUser: SessionUser | null;
   login: (email: string, password: string) => Promise<SessionUser>;
-  logout: () => void;
+  logout: () => Promise<void>;
   setViewAs: (role: Role | null) => void;
 }
 
@@ -70,25 +89,30 @@ export function useAuth(): AuthCtx {
   return ctx;
 }
 
-const SESSION_KEY = 'ep-dash-session';
-
-function readSession(): SessionUser | null {
-  try {
-    const raw = sessionStorage.getItem(SESSION_KEY);
-    if (!raw) return null;
-    const id = JSON.parse(raw) as number;
-    return DEMO_USERS.find((u) => u.id === id) ?? null;
-  } catch {
-    return null;
-  }
-}
-
-/* pessoa de exemplo por papel no "ver painel como…" (ROLE_DEMO do preview) */
 const ROLE_DEMO: Record<Role, number> = { Diretor: 1, Supervisor: 3, Secretaria: 4 };
 
 export function DashboardAuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<SessionUser | null>(readSession);
+  const [user, setUser] = useState<SessionUser | null>(null);
+  const [loading, setLoading] = useState(true);
   const [viewAs, setViewAs] = useState<Role | null>(null);
+
+  /* restaura a sessão na carga (cookie httpOnly → GET /api/auth/me) */
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const data = await apiFetch<{ user: ApiUser }>('/auth/me');
+        if (alive) setUser(mapUser(data.user));
+      } catch {
+        if (alive) setUser(null); // 401 = sem sessão
+      } finally {
+        if (alive) setLoading(false);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const value = useMemo<AuthCtx>(() => {
     const effectiveRole = viewAs ?? user?.role ?? null;
@@ -96,26 +120,32 @@ export function DashboardAuthProvider({ children }: { children: ReactNode }) {
       viewAs && viewAs !== user?.role ? DEMO_USERS.find((u) => u.id === ROLE_DEMO[viewAs]) ?? user : user;
     return {
       user,
+      loading,
       viewAs,
       effectiveRole,
       effectiveUser,
-      login: async (email: string, _password: string) => {
-        void _password; // o stub não valida senha — o backend real fará (bcrypt, rate-limit)
-        const found = DEMO_USERS.find((u) => u.email.toLowerCase() === email.trim().toLowerCase());
-        if (!found) throw new Error('E-mail ou senha incorretos. Confira e tente de novo.');
-        sessionStorage.setItem(SESSION_KEY, JSON.stringify(found.id));
-        setUser(found);
+      login: async (email: string, password: string) => {
+        const data = await apiFetch<{ user: ApiUser }>('/auth/login', {
+          method: 'POST',
+          body: JSON.stringify({ email: email.trim(), password }),
+        });
+        const mapped = mapUser(data.user);
+        setUser(mapped);
         setViewAs(null);
-        return found;
+        return mapped;
       },
-      logout: () => {
-        sessionStorage.removeItem(SESSION_KEY);
+      logout: async () => {
+        try {
+          await apiFetch('/auth/logout', { method: 'POST' });
+        } catch (err) {
+          if (!(err instanceof ApiError)) throw err; // erro de rede real propaga
+        }
         setUser(null);
         setViewAs(null);
       },
       setViewAs: (role) => setViewAs(role && role !== user?.role ? role : null),
     };
-  }, [user, viewAs]);
+  }, [user, loading, viewAs]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

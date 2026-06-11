@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { ArrowRight, Eye, EyeOff, KeyRound, Lock, Mail } from 'lucide-react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { ROLE_HOME, useAuth } from '../../lib/dashboard/auth';
+import { apiFetch } from '../../lib/dashboard/api';
 import { LOGOS } from '../../lib/dashboard/theme';
 import { viewToPath } from '../../lib/dashboard/nav';
 import { Checkbox } from '../../components/dashboard/ui/Checkbox';
@@ -10,20 +11,21 @@ import { isValidEmail } from '../../utils/validators';
 
 /* Login — port 1:1 da tela do preview (faixa navy de identidade, pattern de
    bolinhas, senha com olhinho, checkbox .ck, modal "Esqueci a senha").
-   Auth ainda é o stub (lib/dashboard/auth); o backend real é a Fase 1 do plano. */
+   Ligado ao backend real: POST /api/auth/login e /api/auth/forgot (§1). */
 
 export default function Login() {
   const { user, login } = useAuth();
   const { toast, toastErr } = useToast();
   const navigate = useNavigate();
-  const [email, setEmail] = useState('priscylla@englishpatio.com.br');
-  const [password, setPassword] = useState('senha-demo-123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPass, setShowPass] = useState(false);
   const [remember, setRemember] = useState(true);
   const [sending, setSending] = useState(false);
   const [forgotOpen, setForgotOpen] = useState(false);
   const [forgotEmail, setForgotEmail] = useState('');
   const [forgotErr, setForgotErr] = useState('');
+  const [forgotSending, setForgotSending] = useState(false);
 
   if (user) return <Navigate to={viewToPath(ROLE_HOME[user.role])} replace />;
 
@@ -40,14 +42,23 @@ export default function Login() {
     }
   };
 
-  const sendForgot = () => {
+  const sendForgot = async () => {
     if (!isValidEmail(forgotEmail.trim())) {
       setForgotErr('Digite um e-mail válido para receber o link.');
       return;
     }
-    setForgotOpen(false);
-    setForgotErr('');
-    toast('Link de redefinição enviado!');
+    setForgotSending(true);
+    try {
+      // resposta é sempre 200 (anti-enumeração); a mensagem é a mesma exista ou não.
+      await apiFetch('/auth/forgot', { method: 'POST', body: JSON.stringify({ email: forgotEmail.trim() }) });
+      setForgotOpen(false);
+      setForgotErr('');
+      toast('Se o e-mail estiver cadastrado, o link de redefinição foi enviado.');
+    } catch {
+      toastErr('Não foi possível enviar agora. Tente de novo em instantes.');
+    } finally {
+      setForgotSending(false);
+    }
   };
 
   return (
@@ -168,8 +179,8 @@ export default function Login() {
               >
                 Cancelar
               </button>
-              <button onClick={sendForgot} className="flex-1 h-10 rounded-xl text-white font-semibold text-sm" style={{ background: '#1E3765' }}>
-                Enviar link
+              <button onClick={sendForgot} disabled={forgotSending} className="flex-1 h-10 rounded-xl text-white font-semibold text-sm disabled:opacity-70" style={{ background: '#1E3765' }}>
+                {forgotSending ? 'Enviando…' : 'Enviar link'}
               </button>
             </div>
           </div>
