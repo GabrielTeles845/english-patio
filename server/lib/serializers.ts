@@ -10,6 +10,7 @@ import type {
   addresses,
   contracts,
   contractEvents,
+  contractTemplates,
 } from '../db/schema';
 
 export function notificationDTO(n: typeof notifications.$inferSelect) {
@@ -173,5 +174,18 @@ export function contractEventDTO(e: typeof contractEvents.$inferSelect) {
     type: e.type,
     payload: e.payload,
     receivedAt: e.receivedAt,
+  };
+}
+
+export function templateDTO(t: typeof contractTemplates.$inferSelect) {
+  return {
+    id: t.id,
+    name: t.name,
+    pdfUrl: t.pdfUrl,
+    fieldMap: t.fieldMap,
+    version: t.version,
+    isActive: t.isActive,
+    archivedAt: t.archivedAt,
+    updatedAt: t.updatedAt,
   };
 }
