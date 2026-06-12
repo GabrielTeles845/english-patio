@@ -1,24 +1,13 @@
 import { ArrowRightIcon, CheckIcon } from '@heroicons/react/24/outline';
 import img from '../config/cloudinary';
 import OptimizedImage from './OptimizedImage';
+import { c } from '../content/site';
 
 const features = [
-  {
-    title: 'Aulas 100% em inglês',
-    description: 'Imersão total no idioma desde a primeira aula'
-  },
-  {
-    title: 'Turmas reduzidas',
-    description: 'Até 6 alunos por turma para atendimento personalizado'
-  },
-  {
-    title: 'Metodologia ativa',
-    description: 'Práticas interativas que priorizam a conversação.'
-  },
-  {
-    title: 'Espaço que Inspira',
-    description: 'Infraestrutura que integra conforto, funcionalidade e foco no aprendizado.'
-  },
+  { title: c('home', 'hero-feature-1-titulo'), description: c('home', 'hero-feature-1-descricao') },
+  { title: c('home', 'hero-feature-2-titulo'), description: c('home', 'hero-feature-2-descricao') },
+  { title: c('home', 'hero-feature-3-titulo'), description: c('home', 'hero-feature-3-descricao') },
+  { title: c('home', 'hero-feature-4-titulo'), description: c('home', 'hero-feature-4-descricao') },
 ];
 
 const HeroSection = () => {
@@ -35,6 +24,9 @@ const HeroSection = () => {
         <div className="relative grid lg:grid-cols-2 gap-8 lg:gap-20 items-start lg:items-center py-2 lg:py-4">
           {/* Conteúdo à esquerda */}
           <div className="text-center lg:text-left order-1">
+            {/* TODO(editor-site): o título tem palavras destacadas inline (cor
+                secondary). Migrar para o catálogo numa fatia de refino que
+                decida como o Editor edita texto + highlight sem quebrar a marca. */}
             <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold tracking-tight leading-tight">
               <span className="block text-primary">
                 Inglês para <span className="text-secondary">crianças</span>
@@ -46,13 +38,13 @@ const HeroSection = () => {
             </h1>
 
             <p className="mt-6 lg:mt-8 text-base sm:text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-              Somos a English Patio, uma escola de inglês dedicada a construir a fluência com leveza e propósito.
+              {c('home', 'hero-paragrafo-1')}
             </p>
             <p className="mt-3 lg:mt-4 text-base sm:text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-              Adotamos uma abordagem lúdica, dinâmica e contextualizada, voltada ao ensino de crianças e adolescentes organizados em pequenas turmas de até seis alunos.
+              {c('home', 'hero-paragrafo-2')}
             </p>
             <p className="mt-3 lg:mt-4 text-base sm:text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-              Nossa unidade foi cuidadosamente planejada para proporcionar um ambiente acolhedor, inspirador e propício ao desenvolvimento linguístico, cognitivo e pessoal.
+              {c('home', 'hero-paragrafo-3')}
             </p>
 
             <div className="mt-8 lg:mt-12 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
@@ -60,7 +52,7 @@ const HeroSection = () => {
                 href="/matriculas"
                 className="btn-primary btn-hover group text-center inline-flex items-center justify-center"
               >
-                Faça Sua Matrícula
+                {c('home', 'hero-cta-matricula')}
                 <ArrowRightIcon className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
               </a>
               <a
@@ -82,7 +74,7 @@ const HeroSection = () => {
                   }
                 }}
               >
-                Conheça Nosso Curso
+                {c('home', 'hero-cta-curso')}
               </a>
             </div>
 
@@ -166,12 +158,12 @@ const HeroSection = () => {
 
             {/* Badge flutuante - ajustado para mobile */}
             <div className="hidden lg:block absolute -right-4 top-32 bg-white rounded-2xl shadow-xl p-4 max-w-[200px] z-10">
-              <p className="text-sm font-semibold text-primary">Matrículas Abertas!</p>
+              <p className="text-sm font-semibold text-primary">{c('home', 'hero-badge')}</p>
             </div>
 
             {/* Badge embaixo no mobile */}
             <div className="lg:hidden mt-4 bg-white rounded-xl shadow-lg p-4 text-center">
-              <p className="text-sm font-semibold text-primary">Matrículas Abertas!</p>
+              <p className="text-sm font-semibold text-primary">{c('home', 'hero-badge')}</p>
             </div>
           </div>
         </div>
