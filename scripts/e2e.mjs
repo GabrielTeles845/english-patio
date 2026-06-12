@@ -31,7 +31,9 @@ async function main() {
   try {
     await run('node', ['scripts/e2e-smoke.mjs']); // abre cada tela (render)
     await run('node', [...ENV_TSX, 'scripts/seed-e2e.ts']); // base limpa p/ os fluxos
-    await run('node', ['scripts/e2e-flows.mjs']); // dirige os modais (preencher/enviar)
+    await run('node', ['scripts/e2e-flows.mjs']); // modais básicos (criar/editar/contrato/import/comunicados/reset)
+    await run('node', [...ENV_TSX, 'scripts/seed-e2e.ts']); // base limpa de novo
+    await run('node', ['scripts/e2e-flows-2.mjs']); // Agenda CRUD, mover, desligar/reativar/excluir, negativo
   } catch {
     code = 1;
   } finally {

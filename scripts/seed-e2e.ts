@@ -4,7 +4,7 @@
    Uso: node --env-file=.env.test --import tsx scripts/seed-e2e.ts */
 import { eq } from 'drizzle-orm';
 import { db } from '../server/db/client';
-import { users, enrollments, students, responsibles, addresses, contracts, contractEvents, announcements, announcementRecipients } from '../server/db/schema';
+import { users, enrollments, students, responsibles, addresses, contracts, contractEvents, announcements, announcementRecipients, classes } from '../server/db/schema';
 import { hashPassword } from '../server/lib/password';
 
 // trava: este seed APAGA/insere dados — só roda em banco local.
@@ -33,6 +33,7 @@ async function main() {
   await db.delete(contractEvents);
   await db.delete(contracts);
   await db.delete(students);
+  await db.delete(classes); // turmas criadas em runs anteriores (E2E determinístico)
   await db.delete(responsibles);
   await db.delete(addresses);
   await db.delete(enrollments);
