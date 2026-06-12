@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { initials, useAuth } from '../../../lib/dashboard/auth';
 import { useDash } from '../../../lib/dashboard/store';
+import { useDashboardData } from '../../../lib/dashboard/dataApi';
 import {
   esc,
   famC,
@@ -82,17 +83,27 @@ export default function Detalhe() {
   const who = effectiveUser?.name ?? 'Equipe';
   const [modal, setModal] = useState<ModalState>(null);
 
+  const { ready } = useDashboardData();
   const sid = Number(id);
   const s = STUDENTS.find((x) => x.id === sid);
 
-  /* a matrícula pode ter sido excluída depois (ex.: clique numa notificação antiga) */
+  /* a matrícula pode ter sido excluída depois (ex.: clique numa notificação antiga).
+     SÓ decide isso depois que a base carregou (ready) — senão, abrir a ficha por
+     link direto / refresh redirecionaria com um aviso falso de "excluído". */
   useEffect(() => {
-    if (!s) {
+    if (ready && !s) {
       toast('Esta matrícula não existe mais — o cadastro foi excluído.');
       navigate('/dashboard/alunos', { replace: true });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [s]);
+  }, [s, ready]);
+  if (!ready) {
+    return (
+      <div className="grid place-content-center py-32">
+        <div className="w-8 h-8 rounded-full border-2 border-[var(--border)] border-t-brand-light animate-spin" />
+      </div>
+    );
+  }
   if (!s) return null;
 
   const st = STATUS[s.status];
