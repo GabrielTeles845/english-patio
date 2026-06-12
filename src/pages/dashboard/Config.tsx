@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { ChevronRight, LifeBuoy, Palette, Pencil, PlayCircle, RotateCcw, ShieldCheck, UserRound } from 'lucide-react';
+import { Bell, ChevronRight, LifeBuoy, Palette, Pencil, PlayCircle, RotateCcw, ShieldCheck, UserRound } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { initials, useAuth } from '../../lib/dashboard/auth';
 import { useTheme, type SidebarTheme } from '../../lib/dashboard/theme';
 import { useToast } from '../../components/dashboard/ui/Toast';
 import { useTour } from '../../components/dashboard/ui/Tour';
+import { enablePush, pushState, type PushState } from '../../lib/dashboard/pushApi';
 import { AccountModal } from './AccountModal';
 
 /* Configurações — port da tela do preview: Aparência (modo escuro com animação
@@ -25,6 +26,22 @@ export default function Config() {
   const { startTour } = useTour();
   const navigate = useNavigate();
   const [accountOpen, setAccountOpen] = useState(false);
+  const [notifState, setNotifState] = useState<PushState>(() => pushState());
+  const [enabling, setEnabling] = useState(false);
+
+  async function enableNotifs() {
+    setEnabling(true);
+    try {
+      const s = await enablePush();
+      setNotifState(s);
+      if (s === 'granted') toast('Notificações no computador ativadas!');
+      else if (s === 'denied') toast('Permissão negada — reative nas configurações do navegador.');
+    } catch (e) {
+      toast(e instanceof Error ? e.message : 'Não foi possível ativar as notificações.');
+    } finally {
+      setEnabling(false);
+    }
+  }
 
   return (
     <section className="fade-in">
@@ -155,6 +172,53 @@ export default function Config() {
               </div>
               <span className="text-xs px-2.5 py-1 rounded-full bg-[var(--hover)] text-[var(--muted)]">Em breve</span>
             </div>
+          </div>
+        </div>
+
+        {/* notificações */}
+        <div className="surface rounded-2xl overflow-hidden">
+          <div className="flex items-center gap-3 px-5 py-4 border-b" style={{ borderColor: 'var(--border)' }}>
+            <div className="w-10 h-10 rounded-xl grid place-content-center" style={{ background: 'rgba(245,183,0,.14)' }}>
+              <Bell className="w-5 h-5" style={{ color: '#B5860B' }} />
+            </div>
+            <div>
+              <h3 className="font-heading font-semibold">Notificações</h3>
+              <p className="text-xs text-[var(--muted)]">Avisos no computador, mesmo com o painel fechado</p>
+            </div>
+          </div>
+          <div className="p-5">
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <p className="font-medium text-sm">Notificações no computador</p>
+                <p className="text-xs text-[var(--muted)]">Um aviso do sistema a cada matrícula nova ou contrato assinado</p>
+              </div>
+              {notifState === 'granted' ? (
+                <span
+                  className="text-xs font-semibold px-2.5 py-1 rounded-full whitespace-nowrap"
+                  style={{ background: 'rgba(22,163,74,.10)', color: '#16a34a' }}
+                >
+                  Ativadas
+                </span>
+              ) : notifState === 'unsupported' ? (
+                <span className="text-xs px-2.5 py-1 rounded-full bg-[var(--hover)] text-[var(--muted)] whitespace-nowrap">
+                  Indisponível
+                </span>
+              ) : (
+                <button
+                  onClick={enableNotifs}
+                  disabled={enabling}
+                  className="h-9 px-4 rounded-xl text-sm font-semibold text-[#15294d] disabled:opacity-60 transition whitespace-nowrap"
+                  style={{ background: '#F5B700' }}
+                >
+                  {enabling ? 'Ativando…' : 'Ativar'}
+                </button>
+              )}
+            </div>
+            {notifState === 'denied' && (
+              <p className="text-xs mt-3 text-[var(--muted)]">
+                As notificações estão bloqueadas neste navegador. Reative no cadeado da barra de endereço.
+              </p>
+            )}
           </div>
         </div>
 
