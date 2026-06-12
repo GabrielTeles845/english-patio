@@ -99,11 +99,20 @@ export default function Detalhe() {
   const ink = STATUS_INK[s.status];
   const inactive = s.active === false;
 
+  /* abre o WhatsApp do responsável (telefone real da ficha). Sem número válido,
+     avisa em vez de abrir uma conversa quebrada. */
+  const openWhats = (phone: string, firstName: string) => {
+    const digits = (phone || '').replace(/\D/g, '');
+    if (digits.length < 10) return toast('Telefone do responsável inválido ou não cadastrado.');
+    const msg = `Olá, ${firstName}! Aqui é da English Patio.`;
+    window.open(`https://wa.me/55${digits}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer');
+  };
+
   const phoneVal = (phone: string, name: string) => (
     <>
       {phone}{' '}
       <button
-        onClick={() => toast(`Abrindo WhatsApp de ${name}…`)}
+        onClick={() => openWhats(phone, name.split(' ')[0])}
         className="inline-grid place-content-center w-6 h-6 rounded-md transition hover:scale-110"
         style={{ background: 'rgba(37,211,102,.14)', color: '#1faa53' }}
         data-tip="WhatsApp"
@@ -184,7 +193,7 @@ export default function Detalhe() {
               </button>
             )}
             <button
-              onClick={() => toast(`Abrindo WhatsApp de ${s.resp.n.split(' ')[0]}…`)}
+              onClick={() => openWhats(s.resp.phone, s.resp.n.split(' ')[0])}
               className="h-10 px-3.5 rounded-xl text-white text-sm font-semibold flex items-center gap-2 transition hover:brightness-105"
               style={{ background: '#25D366' }}
             >

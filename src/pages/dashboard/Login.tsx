@@ -145,7 +145,7 @@ export default function Login() {
           </form>
         </div>
         <p className="text-xs text-[var(--muted)] text-center mt-5 flex items-center justify-center gap-1.5">
-          <Lock className="w-3.5 h-3.5" /> Acesso restrito à equipe da English Patio · versão em construção com dados fictícios
+          <Lock className="w-3.5 h-3.5" /> Acesso restrito à equipe da English Patio · versão em construção
         </p>
       </div>
 

@@ -525,7 +525,7 @@ export default function Alunos() {
           className="table-foot flex flex-wrap items-center justify-between gap-2 px-5 py-3 md:border-t text-sm text-[var(--muted)]"
           style={{ borderColor: 'var(--border)' }}
         >
-          <span>{`Mostrando ${from}–${to} de ${rows.length} matrículas · dados fictícios`}</span>
+          <span>{`Mostrando ${from}–${to} de ${rows.length} matrículas`}</span>
           <div className="flex items-center gap-1">
             <Pager page={curPage} pages={pages} onPage={setPage} />
           </div>

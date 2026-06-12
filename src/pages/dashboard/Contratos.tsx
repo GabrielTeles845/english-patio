@@ -414,7 +414,7 @@ export default function Contratos() {
       )}
 
       <div className="surface rounded-2xl flex flex-wrap items-center justify-between gap-2 px-5 py-3 mt-3 text-sm text-[var(--muted)]">
-        <span>{`Mostrando ${from}–${to} de ${all.length} contratos · dados fictícios`}</span>
+        <span>{`Mostrando ${from}–${to} de ${all.length} contratos`}</span>
         <div className="flex items-center gap-1">
           <Pager page={curPage} pages={pages} onPage={setPage} />
         </div>
