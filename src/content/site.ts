@@ -99,6 +99,12 @@ export const siteDefaults = {
   // compartilhado entre seções). Átomos de contato ficam aqui para serem fonte
   // única — editar o telefone uma vez reflete onde quer que seja exibido.
   global: {
+    // Navbar — banner topo + rótulos de navegação (compartilhados com o Footer)
+    'nav-banner': 'Matrículas abertas para o segundo semestre de 2026!',
+    'nav-inicio': 'Início',
+    'nav-metodologia': 'Metodologia',
+    'nav-vacation': 'Vacation Classes',
+    'nav-matriculas': 'Matrículas',
     'contato-telefone': '(62) 3636-7775',
     'contato-email': 'englishpatio@yahoo.com',
     'contato-instagram-handle': '@englishpatio',

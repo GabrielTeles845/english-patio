@@ -29,7 +29,7 @@ const Footer = () => {
             <ul className="space-y-3">
               <li>
                 <a href={`${basePath}/`} className="text-gray-600 hover:text-secondary transition-colors font-medium">
-                  Início
+                  {c('global', 'nav-inicio')}
                 </a>
               </li>
               
@@ -38,7 +38,7 @@ const Footer = () => {
                   href={`${basePath}/metodologia`}
                   className="text-gray-600 hover:text-secondary transition-colors font-medium"
                 >
-                  Metodologia
+                  {c('global', 'nav-metodologia')}
                 </a>
               </li>
 
@@ -47,7 +47,7 @@ const Footer = () => {
                   href={`${basePath}/vacation-classes`}
                   className="text-gray-600 hover:text-secondary transition-colors font-medium"
                 >
-                  Vacation Classes
+                  {c('global', 'nav-vacation')}
                 </a>
               </li>
 
@@ -65,7 +65,7 @@ const Footer = () => {
                   href={`${basePath}/matriculas`}
                   className="text-gray-600 hover:text-secondary transition-colors font-medium"
                 >
-                  Matrículas
+                  {c('global', 'nav-matriculas')}
                 </a>
               </li>
             </ul>

@@ -3,6 +3,7 @@ import { Bars3Icon, XMarkIcon, ExclamationTriangleIcon, AcademicCapIcon } from '
 import { Link, useLocation } from 'react-router-dom';
 import Logo from './Logo';
 import Modal from './Modal';
+import { c } from '../content/site';
 
 // Tipos para o modal
 type ModalData = {
@@ -92,7 +93,7 @@ const Navbar = () => {
         <div className="bg-primary/5 border-b border-primary/10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="py-1 text-xs sm:text-sm text-center text-primary font-medium">
-              Matrículas abertas para o segundo semestre de 2026!
+              {c('global', 'nav-banner')}
             </div>
           </div>
         </div>
@@ -115,21 +116,21 @@ const Navbar = () => {
                   to="/"
                   className={`nav-item-hover ${isActive('/') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors font-medium`}
                 >
-                  Início
+                  {c('global', 'nav-inicio')}
                 </Link>
                 
                 <Link
                   to="/metodologia"
                   className={`nav-item-hover ${isActive('/metodologia') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors font-medium`}
                 >
-                  Metodologia
+                  {c('global', 'nav-metodologia')}
                 </Link>
 
                 <Link
                   to="/vacation-classes"
                   className={`nav-item-hover ${isActive('/vacation-classes') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors font-medium`}
                 >
-                  Vacation Classes
+                  {c('global', 'nav-vacation')}
                 </Link>
 
                 {/* <Link
@@ -143,7 +144,7 @@ const Navbar = () => {
                   to="/matriculas"
                   className={`inline-flex items-center px-4 py-2 rounded-xl bg-primary text-white hover:bg-primary-light transition-all duration-300 transform hover:scale-105 hover:shadow-lg font-medium ${isActive('/matriculas') ? 'ring-2 ring-secondary' : ''}`}
                 >
-                  Matrículas
+                  {c('global', 'nav-matriculas')}
                 </Link>
               </div>
 
@@ -195,7 +196,7 @@ const Navbar = () => {
                   className={`${isActive('/') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors py-2 font-medium`}
                   onClick={() => toggleMenu()}
                 >
-                  Início
+                  {c('global', 'nav-inicio')}
                 </Link>
                 
                 <Link
@@ -203,7 +204,7 @@ const Navbar = () => {
                   className={`${isActive('/metodologia') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors py-2 font-medium`}
                   onClick={() => toggleMenu()}
                 >
-                  Metodologia
+                  {c('global', 'nav-metodologia')}
                 </Link>
 
                 <Link
@@ -211,7 +212,7 @@ const Navbar = () => {
                   className={`${isActive('/vacation-classes') ? 'text-secondary' : 'text-primary'} hover:text-secondary transition-colors py-2 font-medium`}
                   onClick={() => toggleMenu()}
                 >
-                  Vacation Classes
+                  {c('global', 'nav-vacation')}
                 </Link>
 
                 {/* <Link
@@ -227,7 +228,7 @@ const Navbar = () => {
                   className={`inline-flex items-center px-4 py-2 rounded-xl bg-primary text-white hover:bg-primary-light transition-colors font-medium transform hover:scale-105 transition-transform duration-300 ${isActive('/matriculas') ? 'ring-2 ring-secondary' : ''}`}
                   onClick={toggleMenu}
                 >
-                  Matrículas
+                  {c('global', 'nav-matriculas')}
                 </Link>
               </div>
             </div>
