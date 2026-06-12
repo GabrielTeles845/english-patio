@@ -56,6 +56,28 @@ export const siteDefaults = {
     'contato-endereco-linha1': 'Av. F, 1541 - Quadra 01 Lote 12',
     'contato-endereco-linha2': 'Água Branca, Goiânia - GO',
     'contato-whatsapp-cta': 'Fale conosco no WhatsApp',
+    // Seção "Nossos Níveis" (CoursesSection). Nomes de nível e exames (KET/PET/
+    // FCE) ficam no componente — são labels estruturais acoplados à cor.
+    'cursos-titulo': 'Nossos Níveis',
+    'cursos-paragrafo':
+      'Programa estruturado em níveis progressivos para o desenvolvimento contínuo do aluno',
+    'cursos-grupo-1-titulo': 'FUN CONVERSATION',
+    'cursos-grupo-1-descricao':
+      'Primeiros contatos com o inglês, em uma abordagem totalmente lúdica, com jogos, músicas e atividades interativas. Para crianças de 4 e 5 anos de idade.',
+    'cursos-grupo-2-titulo': 'CONVERSATION SERIES',
+    'cursos-grupo-2-descricao':
+      'Desenvolvimento da escuta e da fala, com introdução gradual à leitura em inglês. Ideal para alunos que estão começando a formar frases e reconhecer palavras no idioma.',
+    'cursos-grupo-3-titulo': 'POWER TRACK',
+    'cursos-grupo-3-descricao':
+      'Módulos que desenvolvem as quatro habilidades essenciais — listening, speaking, reading e writing — com início das avaliações orais e escritas.',
+    'cursos-grupo-4-titulo': 'SPRINT FLUENCY',
+    'cursos-grupo-4-descricao':
+      'Desafios práticos com foco em fluência, interpretação de texto, produção escrita e expressão espontânea. Aprofunda estruturas gramaticais e dá início à preparação para os exames Cambridge.',
+    'cursos-cambridge-titulo': 'CAMBRIDGE PREPARATION',
+    'cursos-cambridge-descricao': 'Prepare-se para certificações internacionalmente reconhecidas',
+    'cursos-cambridge-rodape':
+      'Alunos dos níveis Sprint iniciam a preparação para exames Cambridge em encontros mensais, realizados como atividade complementar ao curso regular.',
+    'cursos-cta': 'Agende um teste de nível',
   },
   // Conteúdo site-wide (aparece em todas as páginas via RootLayout/Footer ou é
   // compartilhado entre seções). Átomos de contato ficam aqui para serem fonte

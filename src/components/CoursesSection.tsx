@@ -1,5 +1,6 @@
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
 import React from 'react';
+import { c } from '../content/site';
 
 // Tipos para os níveis
 type BaseLevel = {
@@ -75,9 +76,9 @@ const LevelButton: React.FC<{
 const levelGroups: LevelGroup[] = [
   {
     id: 'iniciantes',
-    title: 'FUN CONVERSATION',
+    title: c('home', 'cursos-grupo-1-titulo'),
     icon: '',
-    description: 'Primeiros contatos com o inglês, em uma abordagem totalmente lúdica, com jogos, músicas e atividades interativas. Para crianças de 4 e 5 anos de idade.',
+    description: c('home', 'cursos-grupo-1-descricao'),
     levels: [
       { name: 'Fun Conversation 1', color: 'bg-green-500 text-white' },
       { name: 'Fun Conversation 2', color: 'bg-green-500 text-white' }
@@ -85,9 +86,9 @@ const levelGroups: LevelGroup[] = [
   },
   {
     id: 'iniciantes-plus',
-    title: 'CONVERSATION SERIES',
+    title: c('home', 'cursos-grupo-2-titulo'),
     icon: '',
-    description: 'Desenvolvimento da escuta e da fala, com introdução gradual à leitura em inglês. Ideal para alunos que estão começando a formar frases e reconhecer palavras no idioma.',
+    description: c('home', 'cursos-grupo-2-descricao'),
     levels: [
       { name: 'Conversation 1', color: 'bg-green-700 text-white' },
       { name: 'Conversation 2', color: 'bg-orange-500 text-white' },
@@ -96,9 +97,9 @@ const levelGroups: LevelGroup[] = [
   },
   {
     id: 'intermediario',
-    title: 'POWER TRACK',
+    title: c('home', 'cursos-grupo-3-titulo'),
     icon: '',
-    description: 'Módulos que desenvolvem as quatro habilidades essenciais — listening, speaking, reading e writing — com início das avaliações orais e escritas.',
+    description: c('home', 'cursos-grupo-3-descricao'),
     levels: [
       { name: 'POWER 1', color: 'bg-orange-500 text-white' },
       { name: 'POWER 2', color: 'bg-green-500 text-white' },
@@ -110,9 +111,9 @@ const levelGroups: LevelGroup[] = [
   },
   {
     id: 'avancado',
-    title: 'SPRINT FLUENCY',
+    title: c('home', 'cursos-grupo-4-titulo'),
     icon: '',
-    description: 'Desafios práticos com foco em fluência, interpretação de texto, produção escrita e expressão espontânea. Aprofunda estruturas gramaticais e dá início à preparação para os exames Cambridge.',
+    description: c('home', 'cursos-grupo-4-descricao'),
     levels: [
       { name: 'SPRINT 1', color: 'bg-orange-500 text-white' },
       { name: 'SPRINT 2', color: 'bg-green-500 text-white' },
@@ -142,10 +143,10 @@ const CoursesSection = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-bold text-primary mb-4">
-            Nossos Níveis
+            {c('home', 'cursos-titulo')}
           </h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Programa estruturado em níveis progressivos para o desenvolvimento contínuo do aluno
+            {c('home', 'cursos-paragrafo')}
           </p>
         </div>
 
@@ -174,9 +175,9 @@ const CoursesSection = () => {
         {/* Cambridge Preparation */}
         <div className="max-w-4xl mx-auto">
           <CourseCard
-            title="CAMBRIDGE PREPARATION"
+            title={c('home', 'cursos-cambridge-titulo')}
             icon=""
-            description="Prepare-se para certificações internacionalmente reconhecidas"
+            description={c('home', 'cursos-cambridge-descricao')}
             isRed={true}
           >
             <div className="flex flex-wrap gap-2 mb-4">
@@ -190,7 +191,7 @@ const CoursesSection = () => {
               ))}
             </div>
             <p className="text-sm text-gray-600 mt-4 text-center italic">
-              Alunos dos níveis Sprint iniciam a preparação para exames Cambridge em encontros mensais, realizados como atividade complementar ao curso regular.
+              {c('home', 'cursos-cambridge-rodape')}
             </p>
           </CourseCard>
         </div>
@@ -200,7 +201,7 @@ const CoursesSection = () => {
             href="#contact"
             className="inline-flex items-center px-6 py-3 bg-secondary hover:bg-secondary/90 text-primary font-bold rounded-xl transition-all shadow-md hover:shadow-lg"
           >
-            Agende um teste de nível
+            {c('home', 'cursos-cta')}
             <ChevronRightIcon className="h-5 w-5 ml-2" />
           </a>
         </div>
