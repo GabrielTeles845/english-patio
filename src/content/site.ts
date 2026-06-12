@@ -48,6 +48,35 @@ export const siteDefaults = {
     'about-destaque-4-titulo': 'Pátio Amplo',
     'about-destaque-4-descricao':
       'Espaço acolhedor com bancos, música ambiente, cesta de basquete e pergolado',
+    // Seção "Fale Conosco" (ContactSection, #contact da Home)
+    'contato-titulo': 'Fale Conosco',
+    'contato-card-telefone-titulo': 'Telefone',
+    'contato-horario': 'Seg a Sex: 8:00 - 18:30',
+    'contato-card-endereco-titulo': 'Endereço',
+    'contato-endereco-linha1': 'Av. F, 1541 - Quadra 01 Lote 12',
+    'contato-endereco-linha2': 'Água Branca, Goiânia - GO',
+    'contato-whatsapp-cta': 'Fale conosco no WhatsApp',
+  },
+  // Conteúdo site-wide (aparece em todas as páginas via RootLayout/Footer ou é
+  // compartilhado entre seções). Átomos de contato ficam aqui para serem fonte
+  // única — editar o telefone uma vez reflete onde quer que seja exibido.
+  global: {
+    'contato-telefone': '(62) 3636-7775',
+    'contato-email': 'englishpatio@yahoo.com',
+    'contato-instagram-handle': '@englishpatio',
+    'footer-descricao-1':
+      'Somos a English Patio, uma escola de inglês dedicada a construir a fluência com leveza e propósito.',
+    'footer-descricao-2':
+      'Adotamos uma abordagem lúdica, dinâmica e contextualizada, voltada ao ensino de crianças e adolescentes organizados em pequenas turmas de até seis alunos.',
+    'footer-descricao-3':
+      'Nossa unidade foi cuidadosamente planejada para proporcionar um ambiente acolhedor, inspirador e propício ao desenvolvimento linguístico, cognitivo e pessoal.',
+    'footer-links-titulo': 'Links Rápidos',
+    'footer-contato-titulo': 'Entre em Contato',
+    'footer-redes-titulo': 'Redes Sociais',
+    'footer-endereco-linha1': 'Av. F, 1541 - Quadra 01 Lote 12',
+    'footer-endereco-linha2': 'Água Branca, Goiânia - GO, 74723-100',
+    'footer-horario-linha1': 'Segunda a Sexta',
+    'footer-horario-linha2': '8:00 às 18:30',
   },
 } as const;
 
