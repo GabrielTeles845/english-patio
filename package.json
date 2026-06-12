@@ -15,6 +15,10 @@
     "test:api": "node --env-file=.env.test --import tsx --test --test-force-exit \"tests/api/*.test.ts\"",
     "test:content": "node --import tsx --test \"tests/content/*.test.ts\"",
     "test:e2e:app": "node scripts/e2e.mjs",
+    "test:regression": "npm run test:db:up && playwright test",
+    "test:regression:watch": "npm run test:db:up && SLOWMO=350 playwright test --headed",
+    "test:regression:ui": "npm run test:db:up && playwright test --ui",
+    "test:regression:report": "playwright show-report",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "node --env-file=.env scripts/seed-admin.mjs",
@@ -48,6 +52,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20.19.42",
     "@types/react": "^18.2.64",

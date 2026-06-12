@@ -41,3 +41,9 @@ dist-ssr
 *.ods
 # exceto o modelo de colunas versionado:
 !docs/planilha-modelo-matriculas.csv 
+# Playwright (regressão E2E)
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+.last-run.json
