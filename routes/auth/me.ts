@@ -16,5 +16,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
   const token = await signSession(session.claims);
   res.setHeader('Set-Cookie', sessionCookie(token));
 
-  return ok(res, { user: session.user, mustChangePassword: session.mustChangePassword });
+  // Chave VAPID pública (Web Push): o front precisa dela para se inscrever.
+  // null quando o push não está configurado no ambiente — o front degrada.
+  return ok(res, {
+    user: session.user,
+    mustChangePassword: session.mustChangePassword,
+    vapidPublicKey: process.env.VAPID_PUBLIC_KEY ?? null,
+  });
 }

@@ -34,6 +34,7 @@ import levels from '../routes/levels';
 import notificationRead from '../routes/notifications/[id]/read';
 import notifications from '../routes/notifications/index';
 import notificationsReadAll from '../routes/notifications/read-all';
+import notificationsSubscribe from '../routes/notifications/subscribe';
 import overview from '../routes/overview';
 import roomDeactivate from '../routes/rooms/[id]/deactivate';
 import roomPatch from '../routes/rooms/[id]/index';
@@ -84,6 +85,7 @@ const routes: Record<string, Handler> = {
   '/api/notifications': notifications,
   '/api/notifications/:id/read': notificationRead,
   '/api/notifications/read-all': notificationsReadAll,
+  '/api/notifications/subscribe': notificationsSubscribe,
   '/api/overview': overview,
   '/api/rooms': rooms,
   '/api/rooms/:id': roomPatch,
