@@ -1,7 +1,8 @@
 /* Servidor local full-stack para testes E2E (NÃO é produção).
-   Serve o build do front (dist/) e roteia /api/* para os handlers em api/*.ts,
-   replicando o roteamento file-based da Vercel ([id], index) e injetando
-   req.query/req.body como a Vercel faz. Roda contra o banco LOCAL (.env.test,
+   Serve o build do front (dist/) e delega TODO /api/* ao MESMO roteador de
+   produção (api/[...path].ts), montando req/res no formato Vercel. Assim os
+   fluxos E2E exercitam o roteador real (uma fonte de verdade só — nada de
+   roteamento paralelo que possa divergir). Roda contra o banco LOCAL (.env.test,
    via server/db/client que escolhe postgres-js no localhost).
 
    Uso: node --env-file=.env.test --import tsx scripts/dev-server.ts
@@ -19,51 +20,18 @@ if (!/@(localhost|127\.0\.0\.1)[:/]/.test(DBURL)) {
 }
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const API_DIR = path.join(ROOT, 'api');
 const DIST = path.join(ROOT, 'dist');
 const PORT = Number(process.env.PORT) || 4321;
 
-/* ---- roteamento file-based: lista de padrões {parts, file, dynamicAt} ---- */
-interface Route { parts: string[]; file: string; nParams: number }
-function collectRoutes(dir: string, prefix: string[] = []): Route[] {
-  const out: Route[] = [];
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    if (entry.isDirectory()) {
-      out.push(...collectRoutes(path.join(dir, entry.name), [...prefix, entry.name]));
-    } else if (entry.name.endsWith('.ts')) {
-      const base = entry.name.replace(/\.ts$/, '');
-      const parts = base === 'index' ? prefix : [...prefix, base];
-      const nParams = parts.filter((p) => p.startsWith('[')).length;
-      out.push({ parts, file: path.join(dir, entry.name), nParams });
-    }
+// Carrega uma vez o catch-all de produção (default export = handler Vercel).
+type VercelHandler = (req: unknown, res: unknown) => unknown;
+let apiHandler: VercelHandler | null = null;
+async function getApiHandler(): Promise<VercelHandler> {
+  if (!apiHandler) {
+    const mod = await import(path.join(ROOT, 'api', '[...path].ts'));
+    apiHandler = mod.default as VercelHandler;
   }
-  return out;
-}
-const ROUTES = collectRoutes(API_DIR);
-
-/* casa os segmentos do request contra os padrões; estático vence dinâmico
-   (menos params primeiro). Devolve {file, params} ou null. */
-function matchRoute(segments: string[]): { file: string; params: Record<string, string> } | null {
-  const candidates = ROUTES
-    .filter((r) => r.parts.length === segments.length)
-    .filter((r) => r.parts.every((p, i) => p.startsWith('[') || p === segments[i]))
-    .sort((a, b) => a.nParams - b.nParams);
-  if (!candidates.length) return null;
-  const r = candidates[0];
-  const params: Record<string, string> = {};
-  r.parts.forEach((p, i) => {
-    if (p.startsWith('[')) params[p.replace(/^\[\.{0,3}|\]$/g, '')] = decodeURIComponent(segments[i]);
-  });
-  return { file: r.file, params };
-}
-
-const handlerCache = new Map<string, (req: unknown, res: unknown) => unknown>();
-async function loadHandler(file: string) {
-  if (!handlerCache.has(file)) {
-    const mod = await import(file);
-    handlerCache.set(file, mod.default);
-  }
-  return handlerCache.get(file)!;
+  return apiHandler;
 }
 
 const MIME: Record<string, string> = {
@@ -74,7 +42,7 @@ const MIME: Record<string, string> = {
 
 function serveStatic(urlPath: string, res: http.ServerResponse) {
   // /dashboard EXATO = preview estático; resto = SPA (index.html)
-  let rel = urlPath === '/dashboard' ? '/dashboard.html' : urlPath;
+  const rel = urlPath === '/dashboard' ? '/dashboard.html' : urlPath;
   let file = path.join(DIST, rel);
   if (!file.startsWith(DIST)) return res.writeHead(403).end('forbidden');
   if (!fs.existsSync(file) || fs.statSync(file).isDirectory()) file = path.join(DIST, 'index.html');
@@ -87,14 +55,8 @@ const server = http.createServer(async (req, res) => {
   const url = new URL(req.url || '/', `http://localhost:${PORT}`);
   if (!url.pathname.startsWith('/api/')) return serveStatic(url.pathname, res);
 
-  const segments = url.pathname.replace(/^\/api\//, '').replace(/\/$/, '').split('/');
-  const matched = matchRoute(segments);
-  if (!matched) {
-    res.writeHead(404, { 'content-type': 'application/json' });
-    return res.end(JSON.stringify({ ok: false, error: { code: 'NOT_FOUND', message: `sem rota para /api/${segments.join('/')}` } }));
-  }
-
-  // body (JSON) + query como a Vercel injeta
+  // body (JSON) + query como a Vercel injeta. Os params de URL (:id) NÃO entram
+  // aqui — o próprio catch-all os extrai do req.url e mescla no req.query.
   let body: unknown = undefined;
   if (req.method && !['GET', 'HEAD'].includes(req.method)) {
     const chunks: Buffer[] = [];
@@ -102,10 +64,10 @@ const server = http.createServer(async (req, res) => {
     const raw = Buffer.concat(chunks).toString('utf8');
     if (raw) { try { body = JSON.parse(raw); } catch { body = raw; } }
   }
-  const query: Record<string, string> = { ...matched.params };
+  const query: Record<string, string> = {};
   url.searchParams.forEach((v, k) => { query[k] = v; });
 
-  // augmenta req/res no formato Vercel
+  // augmenta req/res no formato Vercel (req.url é preservado — o roteador lê dele)
   const vreq = req as http.IncomingMessage & { query: unknown; body: unknown };
   vreq.query = query;
   vreq.body = body;
@@ -115,7 +77,7 @@ const server = http.createServer(async (req, res) => {
   vres.send = (b: unknown) => { res.end(typeof b === 'string' || Buffer.isBuffer(b) ? b : JSON.stringify(b)); };
 
   try {
-    const handler = await loadHandler(matched.file);
+    const handler = await getApiHandler();
     await handler(vreq, vres);
     if (!res.writableEnded) res.end();
   } catch (err) {
@@ -125,4 +87,4 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-server.listen(PORT, () => console.log(`dev-server (E2E) em http://localhost:${PORT} · ${ROUTES.length} rotas /api · DB=${(process.env.DATABASE_URL || '').replace(/:[^:@]*@/, ':***@')}`));
+server.listen(PORT, () => console.log(`dev-server (E2E) em http://localhost:${PORT} · roteador único /api · DB=${(process.env.DATABASE_URL || '').replace(/:[^:@]*@/, ':***@')}`));
