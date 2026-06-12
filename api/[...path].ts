@@ -12,6 +12,8 @@ import accountPassword from '../routes/account/password';
 import activity from '../routes/activity';
 import announcements from '../routes/announcements/index';
 import announcementsPreview from '../routes/announcements/preview';
+import announcementTemplates from '../routes/announcement-templates/index';
+import announcementTemplateById from '../routes/announcement-templates/[id]';
 import authForgot from '../routes/auth/forgot';
 import authLogin from '../routes/auth/login';
 import authLogout from '../routes/auth/logout';
@@ -63,6 +65,8 @@ const routes: Record<string, Handler> = {
   '/api/activity': activity,
   '/api/announcements': announcements,
   '/api/announcements/preview': announcementsPreview,
+  '/api/announcement-templates': announcementTemplates,
+  '/api/announcement-templates/:id': announcementTemplateById,
   '/api/auth/forgot': authForgot,
   '/api/auth/login': authLogin,
   '/api/auth/logout': authLogout,

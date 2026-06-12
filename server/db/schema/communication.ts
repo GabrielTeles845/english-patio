@@ -64,3 +64,17 @@ export const siteContent = pgTable(
   },
   (t) => [uniqueIndex('uq_site_content_page_field').on(t.pageKey, t.fieldKey)],
 );
+
+// ── announcement_templates ──────────────────────────────────────────────────
+// Modelos de comunicado (texto pronto que a Diretora reusa). name = rótulo do
+// botão; icon/color guardam a aparência (nome lucide + hex). Os 3 modelos
+// iniciais são semeados na migration.
+export const announcementTemplates = pgTable('announcement_templates', {
+  id: bigint('id', { mode: 'number' }).generatedAlwaysAsIdentity().primaryKey(),
+  name: text('name').notNull(),
+  subject: text('subject').notNull(),
+  body: text('body').notNull(), // variáveis {{nome_responsavel}}/{{nome_aluno}}
+  icon: text('icon').notNull().default('file-text'),
+  color: text('color').notNull().default('#2F539A'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
