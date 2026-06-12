@@ -129,7 +129,7 @@ export function Sidebar({ open, onClose, onOpenAccount }: { open: boolean; onClo
         </div>
         <div className="p-3 border-t" style={{ borderColor: 'var(--sb-border)' }}>
           {/* clicar no usuário abre "Minha conta" (openAccountModal do preview) */}
-          <div className="sb-item flex items-center gap-3 px-2 py-2 rounded-xl cursor-pointer" onClick={onOpenAccount}>
+          <div className="sb-item flex items-center gap-3 px-2 py-2 rounded-xl cursor-pointer" role="button" aria-label="Minha conta" onClick={onOpenAccount}>
             <div
               className="w-9 h-9 rounded-full grid place-content-center font-semibold"
               style={{ background: 'var(--sb-accent)', color: 'var(--sb-accent-text)' }}

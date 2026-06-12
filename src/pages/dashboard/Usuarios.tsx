@@ -216,7 +216,7 @@ export default function Usuarios() {
               <span className="text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap" style={{ background: 'var(--hover)' }}>
                 {u.r}
               </span>
-              <button onClick={(e) => openMenu(e, u.id)} data-tip="Ações do usuário" className="p-2 rounded-lg hover:bg-[var(--hover)]">
+              <button onClick={(e) => openMenu(e, u.id)} data-tip="Ações do usuário" aria-label="Ações do usuário" className="p-2 rounded-lg hover:bg-[var(--hover)]">
                 <MoreVertical className="w-4 h-4 text-[var(--muted)]" />
               </button>
             </div>

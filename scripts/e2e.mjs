@@ -34,6 +34,8 @@ async function main() {
     await run('node', ['scripts/e2e-flows.mjs']); // modais básicos (criar/editar/contrato/import/comunicados/reset)
     await run('node', [...ENV_TSX, 'scripts/seed-e2e.ts']); // base limpa de novo
     await run('node', ['scripts/e2e-flows-2.mjs']); // Agenda CRUD, mover, desligar/reativar/excluir, negativo
+    await run('node', [...ENV_TSX, 'scripts/seed-e2e.ts']); // base limpa de novo
+    await run('node', ['scripts/e2e-flows-3.mjs']); // Usuários CRUD + guards + Conta (senha errada)
   } catch {
     code = 1;
   } finally {

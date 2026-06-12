@@ -2,7 +2,7 @@
    1 matrícula completa (aluno + responsável + endereço + contrato) para as
    telas renderizarem com conteúdo. Idempotente.
    Uso: node --env-file=.env.test --import tsx scripts/seed-e2e.ts */
-import { eq } from 'drizzle-orm';
+import { eq, like } from 'drizzle-orm';
 import { db } from '../server/db/client';
 import { users, enrollments, students, responsibles, addresses, contracts, contractEvents, announcements, announcementRecipients, classes } from '../server/db/schema';
 import { hashPassword } from '../server/lib/password';
@@ -19,7 +19,8 @@ const ADMIN_PASS = 'Senh@12345';
 const SUB = 'e2e-seed-familia';
 
 async function main() {
-  // admin (Diretor)
+  // admin (Diretor) + limpa usuários de teste de runs anteriores
+  await db.delete(users).where(like(users.email, 'e2e-%@example.com'));
   await db.delete(users).where(eq(users.email, ADMIN_EMAIL));
   await db.insert(users).values({
     name: 'Admin E2E', email: ADMIN_EMAIL, passwordHash: await hashPassword(ADMIN_PASS),
