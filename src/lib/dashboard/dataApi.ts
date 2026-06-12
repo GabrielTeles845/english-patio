@@ -133,8 +133,18 @@ function toStudent(e: ApiEnrollment): Student {
 function toSala(r: ApiRoom): Sala {
   return { id: String(r.id), n: r.name, c: r.color, prof: r.teacherName ?? null };
 }
+/* O backend guarda o horário SEM zero à esquerda ('8:30'); a dashboard usa o
+   formato com zero ('08:30') no display, em HORAS e no horaPeriodo. Convertemos
+   só na fronteira: padHora ao receber, startTimeToApi ao enviar. */
+function padHora(h: string): string {
+  const [hh, mm] = h.split(':');
+  return `${hh.padStart(2, '0')}:${mm}`;
+}
+export function startTimeToApi(h: string): string {
+  return h.replace(/^0/, '');
+}
 function toTurma(c: ApiClass, levelKey: Map<number, string>): Turma {
-  return { id: c.id, sala: String(c.roomId), par: c.dayPair, hora: c.startTime, nivel: levelKey.get(c.levelId) ?? '', cap: c.capacity };
+  return { id: c.id, sala: String(c.roomId), par: c.dayPair, hora: padHora(c.startTime), nivel: levelKey.get(c.levelId) ?? '', cap: c.capacity };
 }
 
 function replace<T>(arr: T[], next: T[]): void {

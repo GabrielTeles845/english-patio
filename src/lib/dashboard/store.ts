@@ -13,7 +13,7 @@
 import { useSyncExternalStore } from 'react';
 import type { ContractStatus } from './status';
 import { ApiError } from './api';
-import { reloadData, currentPeriod, levelIdForKey } from './dataApi';
+import { reloadData, currentPeriod, levelIdForKey, startTimeToApi } from './dataApi';
 import {
   createEnrollmentApi,
   deactivateStudentApi,
@@ -145,7 +145,7 @@ export async function addTurma(input: TurmaInput): Promise<ActionResult & { id?:
   const levelId = levelIdForKey(nivel);
   if (!levelId) return fail('Nível inválido — recarregue a página.');
   try {
-    const r = await createClassApi({ roomId: Number(sala), dayPair: par, startTime: hora, levelId, capacity: cap, period: currentPeriod() });
+    const r = await createClassApi({ roomId: Number(sala), dayPair: par, startTime: startTimeToApi(hora), levelId, capacity: cap, period: currentPeriod() });
     await reloadData();
     return { ok: true, id: r.id };
   } catch (err) {
@@ -159,7 +159,7 @@ export async function updateTurma(tid: number, input: TurmaInput): Promise<Actio
   const levelId = levelIdForKey(nivel);
   if (!levelId) return fail('Nível inválido — recarregue a página.');
   try {
-    await updateClassApi(tid, { roomId: Number(sala), dayPair: par, startTime: hora, levelId, capacity: cap });
+    await updateClassApi(tid, { roomId: Number(sala), dayPair: par, startTime: startTimeToApi(hora), levelId, capacity: cap });
     await reloadData();
     return OK;
   } catch (err) {
