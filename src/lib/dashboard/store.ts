@@ -28,6 +28,7 @@ import {
   type EnrollmentPatch,
 } from './studentsApi';
 import { analyzeImportApi, commitImportApi, type ImportDryRun, type ImportCommitResult } from './importApi';
+import { sendAnnouncementApi, type AnnChannel, type AudienceFilter, type SendAnnouncementResult } from './announcementsApi';
 import type { FormData } from '../../types/enrollment';
 import {
   createClassApi,
@@ -466,6 +467,28 @@ export async function downloadContract(sid: number): Promise<ActionResult & { ur
     return { ok: true, url: r.url };
   } catch (err) {
     return apiFail(err);
+  }
+}
+
+/* ====================== COMUNICADOS ====================== */
+
+/* POST /api/announcements — envia o comunicado (e-mail via Resend e/ou WhatsApp
+   preparado) para a audiência resolvida no servidor. O backend valida assunto/
+   texto (400 VALIDATION com fields) e variável aberta sem fechar. Devolve as
+   contagens reais (recipients/sent/prepared/failed) para a tela montar o toast e
+   recarregar o histórico. Só Diretor (403 nos demais papéis). */
+export async function sendAnnouncement(input: {
+  subject: string;
+  body: string;
+  channels: AnnChannel[];
+  audienceFilter?: AudienceFilter;
+}): Promise<ActionResult & { result?: SendAnnouncementResult; fields?: Record<string, string> }> {
+  try {
+    const result = await sendAnnouncementApi(input);
+    return { ok: true, result };
+  } catch (err) {
+    if (err instanceof ApiError) return { ok: false, error: err.message, code: err.code, fields: err.fields };
+    return { ok: false, error: 'Algo deu errado ao enviar o comunicado. Tente de novo.' };
   }
 }
 

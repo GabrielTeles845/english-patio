@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   CheckCircle2,
   Eye,
@@ -18,8 +18,8 @@ import {
   Zap,
   type LucideIcon,
 } from 'lucide-react';
-import { useAuth } from '../../lib/dashboard/auth';
-import { logAct, useDash } from '../../lib/dashboard/store';
+import { sendAnnouncement, useDash } from '../../lib/dashboard/store';
+import { listAnnouncementsApi, type AnnChannel, type AnnouncementItem, type AudienceFilter } from '../../lib/dashboard/announcementsApi';
 import {
   EMAIL_TPLS,
   emailTplBy,
@@ -61,19 +61,24 @@ const TplIcon = ({ t, className = 'w-4 h-4' }: { t: EmailTpl; className?: string
   return <Icon className={className} style={{ color: t.col }} />;
 };
 
-/* histórico de envios (port renderEmails l.2339 — mock estático; envios novos
-   entram no topo, em memória, como tudo no preview) */
-interface HistEntry {
-  s: string;
-  n: number;
-  d: string;
-  ch: Channel;
+/* canais do servidor (AnnChannel[]) → ícone da tela ('email'|'wa'|'both') */
+const chanOf = (channels: AnnChannel[]): Channel => {
+  const email = channels.includes('email'), wa = channels.includes('whatsapp');
+  return email && wa ? 'both' : wa ? 'wa' : 'email';
+};
+/* tempo relativo do envio (agora / há N min / há N h / há N dias / data) */
+function relTime(iso: string | null): string {
+  if (!iso) return '—';
+  const then = new Date(iso).getTime();
+  if (Number.isNaN(then)) return '—';
+  const diff = Date.now() - then;
+  const min = Math.round(diff / 60000), h = Math.round(diff / 3600000), d = Math.round(diff / 86400000);
+  if (min < 1) return 'agora';
+  if (min < 60) return `há ${min} min`;
+  if (h < 24) return `há ${h} h`;
+  if (d < 30) return `há ${d} ${d === 1 ? 'dia' : 'dias'}`;
+  return new Date(iso).toLocaleDateString('pt-BR');
 }
-const EMAIL_HIST: HistEntry[] = [
-  { s: 'Boas-vindas — turma de junho', n: 21, d: 'há 2 dias', ch: 'email' },
-  { s: 'Lembrete: contrato pendente', n: 7, d: 'há 5 dias', ch: 'wa' },
-  { s: 'Festa junina da escola 🎉', n: 96, d: 'há 12 dias', ch: 'both' },
-];
 
 /* estado da composição sobrevive à ida e volta de tela — cache de módulo,
    mesmo papel do estado global do preview (defaults l.817/825) */
@@ -120,9 +125,7 @@ type ModalState =
 
 export default function Comunicados() {
   useDash();
-  const { effectiveUser } = useAuth();
   const { toast } = useToast();
-  const who = effectiveUser?.name ?? 'Equipe';
 
   const [subject, setSubjectState] = useState(cache.subject);
   const [body, setBodyState] = useState(cache.body);
@@ -131,7 +134,24 @@ export default function Comunicados() {
   const [sending, setSending] = useState(false);
   const [modal, setModal] = useState<ModalState>(null);
   const [, setTick] = useState(0);
+  const [hist, setHist] = useState<AnnouncementItem[]>([]);
+  const [histLoading, setHistLoading] = useState(true);
   const bodyRef = useRef<HTMLTextAreaElement>(null);
+
+  /* histórico real (GET /api/announcements). 403 (papel sem acesso) = sem itens. */
+  const loadHist = async () => {
+    try {
+      const r = await listAnnouncementsApi(1, 20);
+      setHist(r.items);
+    } catch {
+      setHist([]);
+    } finally {
+      setHistLoading(false);
+    }
+  };
+  useEffect(() => {
+    loadHist();
+  }, []);
 
   const setSubject = (v: string) => {
     cache.subject = v;
@@ -150,17 +170,23 @@ export default function Comunicados() {
     setToState(v);
   };
 
-  /* público (port l.3937): contagens derivadas da base, como no preview */
+  /* público (port l.3937): contagens por FAMÍLIA (= unidade do envio no servidor)
+     derivadas da base já carregada; o servidor resolve a mesma audiência. */
   const actE = STUDENTS.filter((s) => s.active !== false);
-  const kidsOf = (par: Par) => actE.reduce((a, s) => a + s.kids.filter((k) => kidTurma(k)?.par === par).length, 0);
+  const famDay = (par: Par) => actE.filter((s) => s.kids.some((k) => kidTurma(k)?.par === par)).length;
   const nPend = actE.filter(needsSignature).length;
   const toItems: CSelectItem[] = [
     { v: 'all', l: `Todos os responsáveis (${actE.length})` },
-    { v: 'sq', l: `Apenas turmas de Seg/Qua (${kidsOf('seg-qua')} alunos)` },
-    { v: 'tq', l: `Apenas turmas de Ter/Qui (${kidsOf('ter-qui')} alunos)` },
+    { v: 'sq', l: `Apenas turmas de Seg/Qua (${famDay('seg-qua')})` },
+    { v: 'tq', l: `Apenas turmas de Ter/Qui (${famDay('ter-qui')})` },
     { v: 'pend', l: `Contratos pendentes (${nPend})` },
   ];
-  const audienceN = to === 'sq' ? kidsOf('seg-qua') : to === 'tq' ? kidsOf('ter-qui') : to === 'pend' ? nPend : actE.length;
+  const audienceN = to === 'sq' ? famDay('seg-qua') : to === 'tq' ? famDay('ter-qui') : to === 'pend' ? nPend : actE.length;
+
+  /* mapeia a escolha da tela para o que o backend espera */
+  const channelsOf = (ch: Channel): AnnChannel[] => (ch === 'email' ? ['email'] : ch === 'wa' ? ['whatsapp'] : ['email', 'whatsapp']);
+  const audienceOf = (v: string): AudienceFilter =>
+    v === 'sq' ? { dayPair: 'seg-qua' } : v === 'tq' ? { dayPair: 'ter-qui' } : v === 'pend' ? { pendingContract: true } : { status: 'active' };
 
   /* port applyEmailTpl (l.4455) */
   const applyTpl = (k: string) => {
@@ -184,24 +210,30 @@ export default function Comunicados() {
     });
   };
 
-  /* port sendComm (l.4561) + trava de duplo-clique ("Enviando…") */
-  const sendComm = () => {
+  /* envio real (POST /api/announcements) + trava de duplo-clique ("Enviando…") */
+  const sendComm = async () => {
     if (sending) return;
+    const subj = subject.trim(), msg = body.trim();
+    if (!subj) return toast('Escreva um assunto para o comunicado.');
+    if (!msg) return toast('Escreva a mensagem do comunicado.');
+    if (!audienceN) return toast('Ninguém nessa audiência ainda — escolha outro público.');
     setSending(true);
-    const subj = subject.trim();
-    const ch = channel;
-    setTimeout(() => {
-      const msg =
-        ch === 'email'
-          ? 'Comunicado enviado por e-mail para 96 responsáveis!'
-          : ch === 'wa'
-            ? 'Mensagens preparadas — 96 conversas de WhatsApp na fila!'
-            : 'E-mails enviados e 96 conversas de WhatsApp preparadas!';
-      EMAIL_HIST.unshift({ s: subj || '(sem assunto)', n: audienceN, d: 'agora', ch });
-      logAct(who, `Enviou o comunicado <b>"${esc(subj || '(sem assunto)')}"</b>`);
-      toast(msg);
-      setSending(false);
-    }, 900);
+    const res = await sendAnnouncement({ subject: subj, body: msg, channels: channelsOf(channel), audienceFilter: audienceOf(to) });
+    setSending(false);
+    if (!res.ok || !res.result) return toast(res.ok ? 'Não foi possível enviar o comunicado.' : res.error);
+    const { sent, prepared, failed, recipients } = res.result;
+    await loadHist();
+    if (!recipients) return toast('Ninguém nessa audiência — nada foi enviado.');
+    if (failed && !sent && !prepared) return toast('Não foi possível entregar — confira os contatos das famílias.');
+    const fam = (n: number) => `${n} ${n === 1 ? 'responsável' : 'responsáveis'}`;
+    const conv = (n: number) => `${n} ${n === 1 ? 'conversa' : 'conversas'} de WhatsApp`;
+    toast(
+      channel === 'email'
+        ? `Comunicado enviado por e-mail para ${fam(sent)}!`
+        : channel === 'wa'
+          ? `${conv(prepared)} na fila!`
+          : `E-mails enviados (${sent}) e ${conv(prepared)} preparadas!`,
+    );
   };
 
   /* port commTexts (l.4569): variáveis viram dados de exemplo no preview */
@@ -367,25 +399,33 @@ export default function Comunicados() {
               </div>
             </div>
             <div className="p-3 space-y-2">
-              {!EMAIL_HIST.length ? (
+              {histLoading ? (
+                <div className="grid place-content-center py-10">
+                  <div className="w-6 h-6 rounded-full border-2 border-[var(--border)] border-t-brand-light animate-spin" />
+                </div>
+              ) : !hist.length ? (
                 <EmptyState
                   icon={Megaphone}
                   title="Nenhum comunicado enviado"
                   sub="O histórico de e-mails e mensagens enviados à comunidade vai ficar aqui."
                 />
               ) : (
-                EMAIL_HIST.map((e, i) => (
-                  <div key={i} className="flex items-center gap-3 p-3 rounded-xl" style={{ background: 'var(--hover)' }}>
+                hist.map((e) => (
+                  <div key={e.id} className="flex items-center gap-3 p-3 rounded-xl" style={{ background: 'var(--hover)' }}>
                     <div className="w-9 h-9 rounded-lg grid place-content-center bg-[var(--card)]">
-                      <ChIcon ch={e.ch} />
+                      <ChIcon ch={chanOf(e.channels)} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{e.s}</p>
+                      <p className="text-sm font-medium truncate">{e.subject}</p>
                       <p className="text-xs text-[var(--muted)]">
-                        {e.n} famílias · {e.d}
+                        {e.recipientCount} {e.recipientCount === 1 ? 'família' : 'famílias'} · {relTime(e.sentAt)}
                       </p>
                     </div>
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                    {e.status === 'failed' ? (
+                      <Info className="w-4 h-4" style={{ color: '#DC2626' }} />
+                    ) : (
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                    )}
                   </div>
                 ))
               )}
