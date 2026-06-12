@@ -4,6 +4,12 @@ import FlippingCards from './FlippingCards';
 import MasonryGrid from './MasonryGrid';
 import img from '../config/cloudinary';
 import OptimizedImage from './OptimizedImage';
+import { c } from '../content/site';
+
+// TODO(editor-site): os parágrafos desta página têm <strong> no meio da frase.
+// Migrá-los para o catálogo como string plana perderia o negrito; eles ficam
+// chumbados aqui até o Editor ganhar suporte a marcação (rich text). Os títulos
+// bicolores são migrados partidos em -a (primary) / -b (secondary).
 
 // Imagens para carrossel "Imersão e Aprendizado"
 const immersionImages = [
@@ -28,8 +34,8 @@ const VacationContent = () => {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold mb-6">
-                <span className="text-primary">Imersão e Aprendizado</span>{' '}
-                <span className="text-secondary">Além da Sala de Aula</span>
+                <span className="text-primary">{c('vacation', 'imersao-titulo-a')}</span>{' '}
+                <span className="text-secondary">{c('vacation', 'imersao-titulo-b')}</span>
               </h2>
               <p className="text-lg text-gray-700 leading-relaxed mb-6">
                 Ao longo do ano, a English Patio realiza as <strong>Vacation Classes</strong>: experiências externas que
@@ -70,8 +76,8 @@ const VacationContent = () => {
             </div>
             <div className="order-1 md:order-2">
               <h2 className="text-3xl md:text-4xl font-bold mb-6">
-                <span className="text-primary">Vivências</span>{' '}
-                <span className="text-secondary">Práticas</span>
+                <span className="text-primary">{c('vacation', 'vivencias-titulo-a')}</span>{' '}
+                <span className="text-secondary">{c('vacation', 'vivencias-titulo-b')}</span>
               </h2>
               <p className="text-lg text-gray-700 leading-relaxed">
                 Levamos as turmas para vivências práticas em locais como <strong>parques, supermercados, floriculturas, shoppings,
@@ -88,8 +94,8 @@ const VacationContent = () => {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold mb-6">
-                <span className="text-primary">Atividades</span>{' '}
-                <span className="text-secondary">Criativas</span>
+                <span className="text-primary">{c('vacation', 'atividades-titulo-a')}</span>{' '}
+                <span className="text-secondary">{c('vacation', 'atividades-titulo-b')}</span>
               </h2>
               <p className="text-lg text-gray-700 leading-relaxed">
                 A proposta é criar oportunidades significativas de uso do idioma por meio de atividades como <strong>culinária,
@@ -126,8 +132,8 @@ const VacationContent = () => {
             </div>
             <div className="order-1 md:order-2">
               <h2 className="text-3xl md:text-4xl font-bold mb-6">
-                <span className="text-primary">Valorização do</span>{' '}
-                <span className="text-secondary">Investimento</span>
+                <span className="text-primary">{c('vacation', 'investimento-titulo-a')}</span>{' '}
+                <span className="text-secondary">{c('vacation', 'investimento-titulo-b')}</span>
               </h2>
               <p className="text-lg text-gray-700 leading-relaxed mb-6">
                 Além de ampliar a exposição ao inglês e fortalecer a imersão linguística, as Vacation Classes também refletem o
@@ -153,11 +159,11 @@ const VacationContent = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              <span className="text-primary">Momentos das</span>{' '}
-              <span className="text-secondary">Nossas Atividades</span>
+              <span className="text-primary">{c('vacation', 'galeria-titulo-a')}</span>{' '}
+              <span className="text-secondary">{c('vacation', 'galeria-titulo-b')}</span>
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Veja algumas das experiências que nossos alunos vivenciam nas Vacation Classes
+              {c('vacation', 'galeria-paragrafo')}
             </p>
           </div>
 
@@ -172,8 +178,7 @@ const VacationContent = () => {
             <div className="bg-white rounded-2xl p-10 md:p-12 shadow-xl">
               <SparklesIcon className="h-16 w-16 text-secondary mx-auto mb-6" />
               <p className="text-2xl md:text-3xl text-primary font-bold leading-relaxed">
-                "Na English Patio, formar crianças fluentes em inglês vai muito além da sala de aula — é um compromisso que
-                levamos para cada detalhe da jornada do aluno."
+                {c('vacation', 'quote')}
               </p>
             </div>
           </div>
@@ -184,17 +189,17 @@ const VacationContent = () => {
       <section className="py-16 md:py-20 bg-blue-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            <span className="text-primary">Faça Parte das</span>{' '}
-            <span className="text-secondary">Vacation Classes!</span>
+            <span className="text-primary">{c('vacation', 'cta-titulo-a')}</span>{' '}
+            <span className="text-secondary">{c('vacation', 'cta-titulo-b')}</span>
           </h2>
           <p className="text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
-            As Vacation Classes são exclusivas para alunos matriculados. Entre em contato para conhecer nossa escola!
+            {c('vacation', 'cta-paragrafo')}
           </p>
           <a
             href="/#contact"
             className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold rounded-xl text-white bg-primary hover:bg-primary/90 transition-all shadow-lg hover:shadow-xl"
           >
-            Fale Conosco
+            {c('vacation', 'cta-botao')}
           </a>
         </div>
       </section>

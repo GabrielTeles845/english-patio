@@ -139,6 +139,32 @@ export const siteDefaults = {
     'cta-titulo': 'Agende uma Aula Experimental',
     'cta-whatsapp': 'Agendar pelo WhatsApp',
   },
+  vacation: {
+    // Títulos bicolores são partidos em -a (primary) e -b (secondary) para
+    // preservar o visual de duas cores mantendo cada parte editável. Os
+    // parágrafos com <strong> embutido ficam no componente (precisam de suporte
+    // a marcação no Editor) — ver TODO em VacationContent.
+    'hero-titulo': 'Vacation Classes',
+    'imersao-titulo-a': 'Imersão e Aprendizado',
+    'imersao-titulo-b': 'Além da Sala de Aula',
+    'vivencias-titulo-a': 'Vivências',
+    'vivencias-titulo-b': 'Práticas',
+    'atividades-titulo-a': 'Atividades',
+    'atividades-titulo-b': 'Criativas',
+    'investimento-titulo-a': 'Valorização do',
+    'investimento-titulo-b': 'Investimento',
+    'galeria-titulo-a': 'Momentos das',
+    'galeria-titulo-b': 'Nossas Atividades',
+    'galeria-paragrafo':
+      'Veja algumas das experiências que nossos alunos vivenciam nas Vacation Classes',
+    'quote':
+      '"Na English Patio, formar crianças fluentes em inglês vai muito além da sala de aula — é um compromisso que levamos para cada detalhe da jornada do aluno."',
+    'cta-titulo-a': 'Faça Parte das',
+    'cta-titulo-b': 'Vacation Classes!',
+    'cta-paragrafo':
+      'As Vacation Classes são exclusivas para alunos matriculados. Entre em contato para conhecer nossa escola!',
+    'cta-botao': 'Fale Conosco',
+  },
   // Conteúdo site-wide (aparece em todas as páginas via RootLayout/Footer ou é
   // compartilhado entre seções). Átomos de contato ficam aqui para serem fonte
   // única — editar o telefone uma vez reflete onde quer que seja exibido.
