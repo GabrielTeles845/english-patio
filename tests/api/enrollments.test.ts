@@ -4,8 +4,8 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { and, eq, inArray, like } from 'drizzle-orm';
-import listHandler from '../../api/enrollments/index';
-import detailHandler from '../../api/enrollments/[id]';
+import listHandler from '../../routes/enrollments/index';
+import detailHandler from '../../routes/enrollments/[id]';
 import { db } from '../../server/db/client';
 import {
   enrollments,

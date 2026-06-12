@@ -3,8 +3,8 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { eq, inArray } from 'drizzle-orm';
-import delById from '../../api/enrollments/[id]';
-import statusOverride from '../../api/contracts/[id]/status';
+import delById from '../../routes/enrollments/[id]';
+import statusOverride from '../../routes/contracts/[id]/status';
 import { db } from '../../server/db/client';
 import { enrollments, students, responsibles, addresses, contracts } from '../../server/db/schema';
 import { mkReq, mkRes, seedUser, removeUser, clearAttempts, loginAs } from './_helpers';

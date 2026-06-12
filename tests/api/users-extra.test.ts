@@ -3,9 +3,9 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { eq } from 'drizzle-orm';
-import reactivate from '../../api/users/[id]/reactivate';
-import deactivate from '../../api/users/[id]/deactivate';
-import byId from '../../api/users/[id]/index';
+import reactivate from '../../routes/users/[id]/reactivate';
+import deactivate from '../../routes/users/[id]/deactivate';
+import byId from '../../routes/users/[id]/index';
 import { db } from '../../server/db/client';
 import { users } from '../../server/db/schema';
 import { mkReq, mkRes, seedUser, removeUser, clearAttempts, loginAs } from './_helpers';

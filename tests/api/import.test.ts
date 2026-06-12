@@ -3,8 +3,8 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { eq, inArray } from 'drizzle-orm';
-import dryRun from '../../api/enrollments/import/index';
-import commit from '../../api/enrollments/import/commit';
+import dryRun from '../../routes/enrollments/import/index';
+import commit from '../../routes/enrollments/import/commit';
 import { db } from '../../server/db/client';
 import { enrollments, students, responsibles, addresses, contracts, activityLog } from '../../server/db/schema';
 import { mkReq, mkRes, seedUser, removeUser, clearAttempts, loginAs } from './_helpers';

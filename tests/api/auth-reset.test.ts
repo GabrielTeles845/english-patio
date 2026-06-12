@@ -3,8 +3,8 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { eq } from 'drizzle-orm';
-import forgot from '../../api/auth/forgot';
-import reset from '../../api/auth/reset';
+import forgot from '../../routes/auth/forgot';
+import reset from '../../routes/auth/reset';
 import { db } from '../../server/db/client';
 import { passwordResetTokens } from '../../server/db/schema';
 import { hashToken } from '../../server/lib/resetToken';

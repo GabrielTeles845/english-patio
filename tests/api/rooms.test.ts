@@ -3,10 +3,10 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { eq, like } from 'drizzle-orm';
-import roomsHandler from '../../api/rooms/index';
-import roomPatch from '../../api/rooms/[id]/index';
-import roomDeactivate from '../../api/rooms/[id]/deactivate';
-import levelsHandler from '../../api/levels';
+import roomsHandler from '../../routes/rooms/index';
+import roomPatch from '../../routes/rooms/[id]/index';
+import roomDeactivate from '../../routes/rooms/[id]/deactivate';
+import levelsHandler from '../../routes/levels';
 import { db } from '../../server/db/client';
 import { rooms, classes, levels } from '../../server/db/schema';
 import { mkReq, mkRes, seedUser, removeUser, clearAttempts, loginAs } from './_helpers';

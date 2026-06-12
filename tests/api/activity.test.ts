@@ -3,7 +3,7 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { eq } from 'drizzle-orm';
-import activityHandler from '../../api/activity';
+import activityHandler from '../../routes/activity';
 import { db } from '../../server/db/client';
 import { activityLog } from '../../server/db/schema';
 import { mkReq, mkRes, seedUser, removeUser, clearAttempts, loginAs } from './_helpers';

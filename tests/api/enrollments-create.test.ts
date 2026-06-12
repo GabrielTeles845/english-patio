@@ -4,7 +4,7 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { and, eq, inArray } from 'drizzle-orm';
-import createList from '../../api/enrollments/index';
+import createList from '../../routes/enrollments/index';
 import { db } from '../../server/db/client';
 import {
   enrollments, students, responsibles, addresses, contracts, notifications, activityLog,

@@ -4,7 +4,7 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { asc, eq, inArray, like } from 'drizzle-orm';
-import overview from '../../api/overview';
+import overview from '../../routes/overview';
 import { db } from '../../server/db/client';
 import { enrollments, students, responsibles, addresses, contracts, classes, rooms, levels } from '../../server/db/schema';
 import { mkReq, mkRes, seedUser, removeUser, clearAttempts, loginAs } from './_helpers';

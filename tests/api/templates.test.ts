@@ -5,9 +5,9 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { eq, inArray, like } from 'drizzle-orm';
-import listCreate from '../../api/templates/index';
-import byId from '../../api/templates/[id]/index';
-import activate from '../../api/templates/[id]/activate';
+import listCreate from '../../routes/templates/index';
+import byId from '../../routes/templates/[id]/index';
+import activate from '../../routes/templates/[id]/activate';
 import { db } from '../../server/db/client';
 import { contractTemplates, contracts } from '../../server/db/schema';
 import { mkReq, mkRes, seedUser, removeUser, clearAttempts, loginAs } from './_helpers';

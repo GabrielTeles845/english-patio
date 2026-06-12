@@ -4,9 +4,9 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { asc, eq, inArray, like } from 'drizzle-orm';
-import deactivate from '../../api/students/[id]/deactivate';
-import reactivate from '../../api/students/[id]/reactivate';
-import moveClass from '../../api/students/[id]/class';
+import deactivate from '../../routes/students/[id]/deactivate';
+import reactivate from '../../routes/students/[id]/reactivate';
+import moveClass from '../../routes/students/[id]/class';
 import { db } from '../../server/db/client';
 import { enrollments, students, classes, rooms, levels, activityLog } from '../../server/db/schema';
 import { mkReq, mkRes, seedUser, removeUser, clearAttempts, loginAs } from './_helpers';

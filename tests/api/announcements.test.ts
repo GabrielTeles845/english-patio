@@ -4,8 +4,8 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { eq, inArray } from 'drizzle-orm';
-import listSend from '../../api/announcements/index';
-import preview from '../../api/announcements/preview';
+import listSend from '../../routes/announcements/index';
+import preview from '../../routes/announcements/preview';
 import { db } from '../../server/db/client';
 import { enrollments, students, responsibles, announcements, announcementRecipients, classes, contracts, rooms, levels } from '../../server/db/schema';
 import { mkReq, mkRes, seedUser, removeUser, clearAttempts, loginAs } from './_helpers';

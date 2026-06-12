@@ -3,9 +3,9 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { inArray } from 'drizzle-orm';
-import notifList from '../../api/notifications/index';
-import notifRead from '../../api/notifications/[id]/read';
-import notifReadAll from '../../api/notifications/read-all';
+import notifList from '../../routes/notifications/index';
+import notifRead from '../../routes/notifications/[id]/read';
+import notifReadAll from '../../routes/notifications/read-all';
 import { db } from '../../server/db/client';
 import { notifications } from '../../server/db/schema';
 import { mkReq, mkRes, seedUser, removeUser, clearAttempts, loginAs } from './_helpers';

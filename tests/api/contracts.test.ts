@@ -4,9 +4,9 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { eq, inArray } from 'drizzle-orm';
-import listHandler from '../../api/contracts/index';
-import detailHandler from '../../api/contracts/[id]';
-import pdfHandler from '../../api/contracts/[id]/pdf';
+import listHandler from '../../routes/contracts/index';
+import detailHandler from '../../routes/contracts/[id]';
+import pdfHandler from '../../routes/contracts/[id]/pdf';
 import { db } from '../../server/db/client';
 import { enrollments, students, responsibles, contracts, contractEvents } from '../../server/db/schema';
 import { mkReq, mkRes, seedUser, removeUser, clearAttempts, loginAs } from './_helpers';

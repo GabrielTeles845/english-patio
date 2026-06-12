@@ -4,11 +4,11 @@
 // — nunca toca no Diretor semeado.
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import login from '../../api/auth/login';
-import me from '../../api/auth/me';
-import logout from '../../api/auth/logout';
-import changePassword from '../../api/account/password';
-import patchAccount from '../../api/account/index';
+import login from '../../routes/auth/login';
+import me from '../../routes/auth/me';
+import logout from '../../routes/auth/logout';
+import changePassword from '../../routes/account/password';
+import patchAccount from '../../routes/account/index';
 import {
   mkReq, mkRes, getCookie, cookieValue, seedUser, removeUser, clearAttempts, clearAttemptsByIp,
 } from './_helpers';

@@ -4,7 +4,7 @@ import { eq } from 'drizzle-orm';
 import { db } from '../../server/db/client';
 import { users, loginAttempts } from '../../server/db/schema';
 import { hashPassword } from '../../server/lib/password';
-import login from '../../api/auth/login';
+import login from '../../routes/auth/login';
 
 export const TEST_IP = '198.51.100.5';
 

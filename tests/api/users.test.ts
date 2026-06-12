@@ -3,9 +3,9 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { inArray } from 'drizzle-orm';
-import usersHandler from '../../api/users/index';
-import userPatch from '../../api/users/[id]/index';
-import userDeactivate from '../../api/users/[id]/deactivate';
+import usersHandler from '../../routes/users/index';
+import userPatch from '../../routes/users/[id]/index';
+import userDeactivate from '../../routes/users/[id]/deactivate';
 import { db } from '../../server/db/client';
 import { activityLog } from '../../server/db/schema';
 import { blocksLastDirector } from '../../server/lib/users';
