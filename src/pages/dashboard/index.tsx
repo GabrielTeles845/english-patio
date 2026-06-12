@@ -15,6 +15,7 @@ import { ToastProvider } from '../../components/dashboard/ui/Toast';
 import { GlobalTooltip } from '../../components/dashboard/ui/Tooltip';
 import { DashboardLayout } from '../../components/dashboard/layout/DashboardLayout';
 import Login from './Login';
+import ResetPassword from './ResetPassword';
 import Config from './Config';
 import Comunicados from './Comunicados';
 import Editor from './Editor';
@@ -65,6 +66,7 @@ export default function DashboardApp() {
           <div className="dash-root min-h-screen antialiased">
             <Routes>
               <Route path="entrar" element={<Login />} />
+              <Route path="redefinir" element={<ResetPassword />} />
               <Route element={<RequireAuth />}>
                 <Route element={<DashboardLayout />}>
                   <Route path="visao-geral" element={<Overview />} />
