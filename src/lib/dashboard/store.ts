@@ -27,6 +27,7 @@ import {
   updateEnrollmentApi,
   type EnrollmentPatch,
 } from './studentsApi';
+import { analyzeImportApi, commitImportApi, type ImportDryRun, type ImportCommitResult } from './importApi';
 import type { FormData } from '../../types/enrollment';
 import {
   createClassApi,
@@ -305,6 +306,46 @@ export async function removeStudent(sid: number): Promise<ActionResult> {
     await reloadData();
     return OK;
   } catch (err) {
+    return apiFail(err);
+  }
+}
+
+/* ====================== IMPORTAÇÃO DE PLANILHA ====================== */
+
+/* Dry-run: manda o CSV cru pro servidor analisar (parse + validação + dedup) e
+   devolve o relatório, sem gravar nada. O período vem do contexto (currentPeriod). */
+export async function importDryRun(csv: string): Promise<ActionResult & { report?: ImportDryRun }> {
+  try {
+    const report = await analyzeImportApi(csv, currentPeriod());
+    return { ok: true, report };
+  } catch (err) {
+    return apiFail(err);
+  }
+}
+
+/* Commit: grava as famílias novas e válidas (o servidor reanalisa o mesmo CSV) e
+   recarrega a base. Idempotente — reenviar o mesmo arquivo não duplica. */
+export async function importCommit(csv: string): Promise<ActionResult & { result?: ImportCommitResult }> {
+  try {
+    const result = await commitImportApi(csv, currentPeriod());
+    await reloadData();
+    return { ok: true, result };
+  } catch (err) {
+    return apiFail(err);
+  }
+}
+
+/* "Zerar a base" do modal de importação (testar do zero): exclui cada matrícula
+   pela API (DELETE /enrollments/:id) e recarrega. Turmas e salas não são tocadas.
+   Destrutivo — a tela só chama atrás da confirmação. */
+export async function deleteAllEnrollments(): Promise<ActionResult & { n?: number }> {
+  const ids = STUDENTS.map((s) => s.id);
+  try {
+    for (const id of ids) await deleteEnrollmentApi(id);
+    await reloadData();
+    return { ok: true, n: ids.length };
+  } catch (err) {
+    await reloadData(); // pode ter apagado parte — sincroniza o que sobrou
     return apiFail(err);
   }
 }

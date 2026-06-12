@@ -1,42 +1,40 @@
 import { useState, type DragEvent } from 'react';
-import { AlertCircle, AlertTriangle, CalendarOff, FileUp, Info, SearchCheck, ShieldCheck, Sparkle, Trash2, UserRoundPlus } from 'lucide-react';
+import { AlertCircle, AlertTriangle, CalendarOff, FileUp, Info, Layers, SearchCheck, ShieldCheck, Sparkle, Trash2, UserRoundPlus } from 'lucide-react';
 import { Modal } from '../../../components/dashboard/ui/Modal';
 import { useToast } from '../../../components/dashboard/ui/Toast';
-import { useAuth } from '../../../lib/dashboard/auth';
-import { bump, logAct } from '../../../lib/dashboard/store';
-import { esc, IMPORT_SAMPLE, STUDENTS, type Student } from '../../../lib/dashboard/data';
-import { analyzeImport, type ImportAnalysis } from './importCsv';
+import { deleteAllEnrollments, importCommit, importDryRun } from '../../../lib/dashboard/store';
+import { esc, IMPORT_SAMPLE, STUDENTS } from '../../../lib/dashboard/data';
+import type { ImportDryRun } from '../../../lib/dashboard/importApi';
 
-/* Importar planilha (CSV/XLSX) com deduplicação de verdade — port de
-   openImportModal/importReadFile/runImport/impToggle/applyImport e do reset
-   confirmWipeData/wipeAllData (dashboard.html l.4779–5010). XLSX entra pelo
-   pacote `xlsx` (no preview era o CDN) e reusa todo o pipeline de CSV. */
+/* Importar planilha (CSV/XLSX) — agora LIGADA ao backend (DASHBOARD_API §4.7).
+   O SERVIDOR é a fonte de verdade da análise: dry-run (POST /enrollments/import)
+   valida + deduplica sem gravar; o commit (POST /enrollments/import/commit) grava
+   só as famílias novas e válidas, idempotente por submission_id. A planilha é
+   gerada pelo site (que valida tudo no envio), então dado inválido praticamente
+   não aparece — mas se aparecer (planilha editada à mão), a linha cai em "precisa
+   de conferência" e fica de fora, igual o site recusa dado inválido.
+   XLSX é convertido para CSV no navegador e reusa o mesmo pipeline. */
 
-const ckSvg = (
-  <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3">
-    <polyline points="20 6 9 17 4 12" />
-  </svg>
-);
-
-type Phase = { k: 'pick' } | { k: 'wipe' } | { k: 'result'; data: ImportAnalysis };
+type Phase = { k: 'pick' } | { k: 'wipe' } | { k: 'result'; report: ImportDryRun; csv: string; sourceName: string };
 
 export function ImportModal({ onClose }: { onClose: () => void }) {
   const { toast } = useToast();
-  const { effectiveUser } = useAuth();
-  const who = effectiveUser?.name ?? 'Equipe';
   const [phase, setPhase] = useState<Phase>({ k: 'pick' });
   const [error, setError] = useState('');
   const [dragOver, setDragOver] = useState(false);
-  const [, setTick] = useState(0); // re-render dos toggles da lista de conferência
+  const [loading, setLoading] = useState(false);
 
-  const runImport = (text: string, sourceName: string) => {
-    const res = analyzeImport(text, sourceName);
-    if (!res.ok) {
-      setError(res.error);
+  /* manda o CSV pro servidor analisar (dry-run) e mostra o relatório */
+  const analyze = async (csv: string, sourceName: string) => {
+    setError('');
+    setLoading(true);
+    const res = await importDryRun(csv);
+    setLoading(false);
+    if (!res.ok || !res.report) {
+      setError(res.ok ? 'Não foi possível ler a planilha. Confira o arquivo.' : res.error);
       return;
     }
-    setError('');
-    setPhase({ k: 'result', data: res.data });
+    setPhase({ k: 'result', report: res.report, csv, sourceName });
   };
 
   const readFile = (f: File) => {
@@ -57,14 +55,14 @@ export function ImportModal({ onClose }: { onClose: () => void }) {
           const XLSX = await import('xlsx');
           const wb = XLSX.read(new Uint8Array(r.result as ArrayBuffer), { type: 'array' });
           const ws = wb.Sheets[wb.SheetNames[0]];
-          runImport(XLSX.utils.sheet_to_csv(ws), f.name); /* reusa todo o pipeline de CSV (dedup + validação) */
+          analyze(XLSX.utils.sheet_to_csv(ws), f.name); /* reusa todo o pipeline de CSV (dedup + validação no servidor) */
         } catch {
           setError('Não foi possível ler este Excel. Salve como .xlsx novo ou exporte em CSV.');
         }
       };
       r.readAsArrayBuffer(f);
     } else {
-      r.onload = () => runImport(String(r.result || ''), f.name);
+      r.onload = () => analyze(String(r.result || ''), f.name);
       r.readAsText(f, 'utf-8');
     }
   };
@@ -76,28 +74,31 @@ export function ImportModal({ onClose }: { onClose: () => void }) {
     if (f) readFile(f);
   };
 
-  const applyImport = (data: ImportAnalysis) => {
-    const add: Student[] = data.pending.filter((p) => !p._skip).map(({ _warn, _skip, ...s }) => {
-      void _warn; void _skip;
-      return s;
-    });
-    if (!add.length) return;
-    STUDENTS.push(...add);
-    const dv = (s: Student) => s.date.split('/').reverse().join('') + (s.hora || '');
-    STUDENTS.sort((a, b) => (dv(a) < dv(b) ? 1 : dv(a) > dv(b) ? -1 : 0));
-    bump();
-    const skipped = data.pending.length - add.length;
+  /* grava de verdade as famílias novas (o servidor reanalisa o mesmo CSV) */
+  const confirmImport = async (csv: string) => {
+    setLoading(true);
+    const res = await importCommit(csv);
+    setLoading(false);
+    if (!res.ok || !res.result) {
+      toast(res.ok ? 'Algo deu errado ao importar. Tente de novo.' : res.error);
+      return;
+    }
+    const { imported, skipped } = res.result;
     onClose();
-    logAct(who, `Importou a planilha de matrículas — ${add.length} nova${add.length > 1 ? 's' : ''}${skipped ? `, ${skipped} deixada${skipped > 1 ? 's' : ''} de fora` : ''}`);
-    toast(`${add.length} matrícula${add.length > 1 ? 's importadas' : ' importada'} da planilha!${skipped ? ` ${skipped > 1 ? skipped + ' ficaram' : '1 ficou'} de fora, como você pediu.` : ''}`);
+    if (!imported) {
+      toast(skipped ? 'Nada novo — essas matrículas já estavam na dashboard.' : 'Nada para importar nesta planilha.');
+      return;
+    }
+    toast(`${imported} matrícula${imported > 1 ? 's importadas' : ' importada'} da planilha!${skipped ? ` ${skipped > 1 ? skipped + ' já estavam' : '1 já estava'} aqui.` : ''}`);
   };
 
-  const wipeAll = () => {
-    const n = STUDENTS.length;
-    STUDENTS.length = 0;
-    bump();
+  const wipeAll = async () => {
+    setLoading(true);
+    const res = await deleteAllEnrollments();
+    setLoading(false);
     onClose();
-    logAct(who, `Excluiu todos os dados — ${n} matrícula${n === 1 ? '' : 's'} removida${n === 1 ? '' : 's'}`);
+    if (!res.ok) return toast(res.error);
+    const n = res.n ?? 0;
     toast(`${n} matrícula${n === 1 ? '' : 's'} excluída${n === 1 ? '' : 's'} — base zerada.`);
   };
 
@@ -113,15 +114,15 @@ export function ImportModal({ onClose }: { onClose: () => void }) {
             </div>
             <div className="min-w-0">
               <p className="text-sm font-semibold">Apagar {n} matrícula{n === 1 ? '' : 's'}?</p>
-              <p className="text-xs text-[var(--muted)]">Remove todos os alunos e responsáveis. Turmas e salas continuam. No preview não dá para desfazer.</p>
+              <p className="text-xs text-[var(--muted)]">Remove todos os alunos e responsáveis do banco. Turmas e salas continuam. Não dá para desfazer.</p>
             </div>
           </div>
           <div className="flex gap-2">
-            <button onClick={onClose} className="flex-1 h-11 rounded-xl border border-[var(--border)] text-sm font-semibold hover:bg-[var(--hover)] transition">
+            <button onClick={onClose} disabled={loading} className="flex-1 h-11 rounded-xl border border-[var(--border)] text-sm font-semibold hover:bg-[var(--hover)] transition disabled:opacity-50">
               Cancelar
             </button>
-            <button onClick={wipeAll} className="flex-1 h-11 rounded-xl text-white text-sm font-semibold flex items-center justify-center gap-2" style={{ background: '#DC2626' }}>
-              <Trash2 className="w-4 h-4" /> Excluir tudo
+            <button onClick={wipeAll} disabled={loading} className="flex-1 h-11 rounded-xl text-white text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-50" style={{ background: '#DC2626' }}>
+              <Trash2 className="w-4 h-4" /> {loading ? 'Excluindo…' : 'Excluir tudo'}
             </button>
           </div>
         </div>
@@ -129,12 +130,10 @@ export function ImportModal({ onClose }: { onClose: () => void }) {
     );
   }
 
-  /* --- resultado: números + lista de conferência (desmarcar = não importar) --- */
+  /* --- resultado: números do servidor + lista de conferência + conferência das pendentes --- */
   if (phase.k === 'result') {
-    const data = phase.data;
-    const flagged = data.pending.map((p, i) => ({ p, i })).filter((x) => x.p._warn.length);
-    const clean = data.pending.filter((p) => !p._warn.length);
-    const nSel = data.pending.filter((x) => !x._skip).length;
+    const { report, csv, sourceName } = phase;
+    const linhas = report.toImportCount + report.alreadyInDb + report.needsReview.length + report.duplicatesRemoved;
     const stat = (n: number, label: string, c: string) => (
       <div className="rounded-xl p-3 text-center" style={{ background: 'var(--hover)' }}>
         <p className="font-heading text-2xl font-semibold" style={{ color: c }}>{n}</p>
@@ -145,91 +144,74 @@ export function ImportModal({ onClose }: { onClose: () => void }) {
       <Modal title="Importar planilha de matrículas" size="max-w-lg" onClose={onClose}>
         <div className="p-5 space-y-4">
           <p className="text-sm">
-            <b>{data.sourceName}</b> lida — confira antes de confirmar:
+            <b>{sourceName}</b> lida — confira antes de confirmar:
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            {stat(data.linhas, 'linhas lidas', 'var(--text)')}
-            {stat(data.dups, 'repetidas removidas', '#B5860B')}
-            {stat(data.jaExiste, 'já estavam aqui', '#2F539A')}
-            {stat(data.pending.length, 'novas matrículas', '#16a34a')}
+            {stat(linhas, 'linhas lidas', 'var(--text)')}
+            {stat(report.duplicatesRemoved, 'repetidas removidas', '#B5860B')}
+            {stat(report.alreadyInDb, 'já estavam aqui', '#2F539A')}
+            {stat(report.toImportCount, 'novas matrículas', '#16a34a')}
           </div>
-          {data.incompletas > 0 && (
-            <p className="text-xs text-[var(--muted)]">
-              <Info className="w-3.5 h-3.5 inline" /> {data.incompletas} linha{data.incompletas > 1 ? 's' : ''} sem aluno ou responsável{' '}
-              {data.incompletas > 1 ? 'foram ignoradas' : 'foi ignorada'}.
-            </p>
-          )}
-          {flagged.length > 0 && (
-            <div className="rounded-xl p-3 space-y-1" style={{ background: 'rgba(245,183,0,.10)' }}>
-              <p className="text-xs font-semibold flex items-center gap-1.5 mb-1.5" style={{ color: '#B5860B' }}>
+
+          {report.needsReview.length > 0 && (
+            <div className="rounded-xl p-3 space-y-1.5" style={{ background: 'rgba(245,183,0,.10)' }}>
+              <p className="text-xs font-semibold flex items-center gap-1.5" style={{ color: '#B5860B' }}>
                 <SearchCheck className="w-4 h-4 shrink-0" />
-                {flagged.length === 1 ? '1 matrícula' : flagged.length + ' matrículas'} para conferir — desmarque o que não deve entrar:
+                {report.needsReview.length === 1 ? '1 linha precisa' : report.needsReview.length + ' linhas precisam'} de correção na planilha — ficaram de fora:
               </p>
-              {flagged.map(({ p, i }) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => {
-                    p._skip = !p._skip;
-                    setTick((t) => t + 1);
-                  }}
-                  className="w-full flex items-start gap-2.5 text-left p-2 rounded-lg hover:bg-[var(--hover)] transition"
-                >
-                  <span className={`ck ${p._skip ? '' : 'on'} mt-0.5 shrink-0`}>{ckSvg}</span>
-                  <span className="min-w-0">
-                    <span className="text-sm font-medium block">
-                      {p.kids.map((k) => k.n).join(' e ')}{' '}
-                      <span className="text-xs text-[var(--muted)] font-normal">· resp. {p.resp.n}</span>
-                    </span>
-                    {p._warn.map((w, j) => (
-                      <span key={j} className="text-xs text-[var(--muted)] block mt-0.5">
-                        • {w}
-                      </span>
-                    ))}
-                  </span>
-                </button>
+              {report.needsReview.slice(0, 6).map((nr) => (
+                <p key={nr.submissionId} className="text-xs text-[var(--muted)]">
+                  • Linha {nr.rowIndex + 1}: {nr.reasons.join('; ')}
+                </p>
               ))}
+              {report.needsReview.length > 6 && <p className="text-xs text-[var(--muted)]">… e mais {report.needsReview.length - 6}</p>}
             </div>
           )}
-          {clean.length > 0 && (
+
+          {report.toImport.length > 0 && (
             <ul className="text-sm space-y-1.5 rounded-xl p-3" style={{ background: 'var(--hover)' }}>
-              {clean.slice(0, 6).map((p, i) => (
-                <li key={i} className="flex items-center gap-2">
+              {report.toImport.slice(0, 6).map((t) => (
+                <li key={t.submissionId} className="flex items-center gap-2">
                   <UserRoundPlus className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                  {p.kids.map((k) => k.n).join(' e ')}
+                  {t.studentNames.join(' e ')}
+                  <span className="text-xs text-[var(--muted)]">· resp. {t.responsible}</span>
                 </li>
               ))}
-              {clean.length > 6 && <li className="text-xs text-[var(--muted)]">… e mais {clean.length - 6}</li>}
+              {report.toImport.length > 6 && <li className="text-xs text-[var(--muted)]">… e mais {report.toImport.length - 6}</li>}
             </ul>
           )}
-          {data.pending.length ? (
-            !data.hasSinceCol && (
+
+          {report.toImportCount > 0 ? (
+            <>
+              <p className="text-xs text-[var(--muted)] flex items-start gap-1.5">
+                <Layers className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                <span>Alunos importados chegam <b>sem turma</b> (a planilha não traz dia nem horário) — entram na fila "aguardando turma" para alocar pela Agenda.</span>
+              </p>
               <p className="text-xs text-[var(--muted)] flex items-start gap-1.5">
                 <CalendarOff className="w-3.5 h-3.5 shrink-0 mt-0.5" />
-                <span>
-                  A planilha não tem a coluna <b>“Na escola desde”</b> — as matrículas chegam com esse campo em branco. Preencha depois em
-                  ⋮ → Editar dados.
-                </span>
+                <span>O campo <b>“Na escola desde”</b> não vem na planilha — chega em branco, para preencher depois em ⋮ → Editar dados.</span>
               </p>
-            )
+            </>
           ) : (
-            <p className="text-sm text-[var(--muted)]">Nada novo para importar — todas as linhas já estão na dashboard ou eram repetidas.</p>
+            <p className="text-sm text-[var(--muted)]">Nada novo para importar — todas as linhas já estão na dashboard, eram repetidas ou precisam de correção.</p>
           )}
+
           <div className="flex gap-2">
             <button
               onClick={() => setPhase({ k: 'pick' })}
-              className="flex-1 h-11 rounded-xl border border-[var(--border)] text-sm font-semibold hover:bg-[var(--hover)] transition"
+              disabled={loading}
+              className="flex-1 h-11 rounded-xl border border-[var(--border)] text-sm font-semibold hover:bg-[var(--hover)] transition disabled:opacity-50"
             >
               Voltar
             </button>
-            {data.pending.length > 0 && (
+            {report.toImportCount > 0 && (
               <button
-                onClick={() => applyImport(data)}
-                disabled={!nSel}
-                className="flex-1 h-11 rounded-xl text-white text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed"
+                onClick={() => confirmImport(csv)}
+                disabled={loading}
+                className="flex-1 h-11 rounded-xl text-white text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ background: 'linear-gradient(135deg,#1E3765,#2F539A)' }}
               >
-                {nSel ? `Importar ${nSel} matrícula${nSel > 1 ? 's' : ''}` : 'Nada selecionado'}
+                {loading ? 'Importando…' : `Importar ${report.toImportCount} matrícula${report.toImportCount > 1 ? 's' : ''}`}
               </button>
             )}
           </div>
@@ -243,7 +225,7 @@ export function ImportModal({ onClose }: { onClose: () => void }) {
     <Modal title="Importar planilha de matrículas" size="max-w-lg" onClose={onClose}>
       <div className="p-5 space-y-4">
         <p className="text-sm text-[var(--muted)]">
-          Use a planilha de matrículas em <b>CSV</b> ou <b>Excel (.xlsx)</b> — com as colunas da planilha atual.
+          Use a planilha de matrículas em <b>CSV</b> ou <b>Excel (.xlsx)</b> — a mesma que o site preenche, com todas as colunas.
         </p>
         <div
           onDragOver={(e) => {
@@ -252,13 +234,15 @@ export function ImportModal({ onClose }: { onClose: () => void }) {
           }}
           onDragLeave={() => setDragOver(false)}
           onDrop={onDrop}
-          onClick={() => document.getElementById('importFile')?.click()}
-          className="rounded-2xl border-2 border-dashed p-8 text-center cursor-pointer transition hover:bg-[var(--hover)]"
+          onClick={() => !loading && document.getElementById('importFile')?.click()}
+          className={`rounded-2xl border-2 border-dashed p-8 text-center transition ${loading ? 'opacity-60' : 'cursor-pointer hover:bg-[var(--hover)]'}`}
           style={{ borderColor: dragOver ? '#2F539A' : 'var(--border)' }}
         >
           <FileUp className="w-8 h-8 mx-auto text-brand-light mb-2" />
           <p className="text-sm font-medium">
-            Arraste o arquivo aqui ou <span className="text-brand-light">clique para escolher</span>
+            {loading ? 'Analisando a planilha…' : (
+              <>Arraste o arquivo aqui ou <span className="text-brand-light">clique para escolher</span></>
+            )}
           </p>
           <p className="text-xs text-[var(--muted)] mt-1">.csv ou .xlsx — a planilha de matrículas</p>
           <input
@@ -275,16 +259,12 @@ export function ImportModal({ onClose }: { onClose: () => void }) {
         </div>
         <div className="rounded-xl p-3 text-xs space-y-1.5" style={{ background: 'rgba(245,183,0,.10)', color: '#B5860B' }}>
           <p className="font-semibold flex items-center gap-1.5">
-            <ShieldCheck className="w-4 h-4 shrink-0" /> O que é conferido sozinho antes de entrar:
+            <ShieldCheck className="w-4 h-4 shrink-0" /> O que o servidor confere sozinho antes de gravar:
           </p>
           <p>• <b>Linhas repetidas</b> (a mesma matrícula enviada duas vezes) são removidas — só a primeira conta.</p>
-          <p>• <b>Quem já está na dashboard</b> não duplica.</p>
-          <p>
-            • <b>Nomes iguais</b>, versões diferentes da mesma matrícula e <b>dados estranhos</b> (CPF — formato e dígitos —, telefone,
-            datas, e-mail, endereço fora de GO) entram numa lista para você conferir antes de confirmar.
-          </p>
-          <p>• O campo <b>“Na escola desde”</b> não existe na planilha — as matrículas importadas chegam com ele em branco, para preencher depois.</p>
-          <p>• Alunos importados chegam <b>sem turma</b> (a planilha não diz dia nem horário) — eles entram na fila "aguardando turma" para alocar pela Agenda.</p>
+          <p>• <b>Quem já está na dashboard</b> não duplica (idempotente: reenviar o mesmo arquivo não cria cópias).</p>
+          <p>• <b>Dados inválidos</b> (CPF, telefone, e-mail, datas, endereço fora de GO) ficam de fora — a planilha vem do site, que já valida, então isso quase nunca acontece.</p>
+          <p>• Alunos importados chegam <b>sem turma</b> — entram na fila "aguardando turma" para alocar pela Agenda.</p>
         </div>
         {error && (
           <div className="rounded-xl p-3 text-sm flex items-start gap-2" style={{ background: 'rgba(220,38,38,.08)', color: '#DC2626' }}>
@@ -293,15 +273,21 @@ export function ImportModal({ onClose }: { onClose: () => void }) {
           </div>
         )}
         <button
-          onClick={() => runImport(IMPORT_SAMPLE, 'planilha de exemplo')}
-          className="w-full h-10 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)] transition flex items-center justify-center gap-2"
+          onClick={() => analyze(IMPORT_SAMPLE, 'planilha de exemplo')}
+          disabled={loading}
+          className="w-full h-10 rounded-xl border border-[var(--border)] text-sm font-medium hover:bg-[var(--hover)] transition flex items-center justify-center gap-2 disabled:opacity-50"
         >
           <Sparkle className="w-4 h-4 text-brand-light" /> Testar com uma planilha de exemplo
         </button>
+        <div className="rounded-xl p-3 text-xs text-[var(--muted)] flex items-start gap-1.5" style={{ background: 'var(--hover)' }}>
+          <Info className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+          <span>O campo <b>“Na escola desde”</b> não existe na planilha — as matrículas importadas chegam com ele em branco, para preencher depois.</span>
+        </div>
         <div className="pt-3 mt-1 border-t" style={{ borderColor: 'var(--border)' }}>
           <button
             onClick={() => setPhase({ k: 'wipe' })}
-            className="w-full h-10 rounded-xl border text-sm font-semibold flex items-center justify-center gap-2 transition"
+            disabled={loading}
+            className="w-full h-10 rounded-xl border text-sm font-semibold flex items-center justify-center gap-2 transition disabled:opacity-50"
             style={{ borderColor: 'rgba(220,38,38,.4)', color: '#DC2626' }}
           >
             <Trash2 className="w-4 h-4" /> Excluir todas as matrículas ({STUDENTS.length})
