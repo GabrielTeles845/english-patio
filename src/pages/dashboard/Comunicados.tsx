@@ -21,8 +21,13 @@ import {
 import { sendAnnouncement, useDash } from '../../lib/dashboard/store';
 import { listAnnouncementsApi, type AnnChannel, type AnnouncementItem, type AudienceFilter } from '../../lib/dashboard/announcementsApi';
 import {
-  EMAIL_TPLS,
-  emailTplBy,
+  listTemplatesApi,
+  createTemplateApi,
+  updateTemplateApi,
+  deleteTemplateApi,
+} from '../../lib/dashboard/announcementTemplatesApi';
+import { ApiError } from '../../lib/dashboard/api';
+import {
   esc,
   kidTurma,
   needsSignature,
@@ -133,7 +138,7 @@ export default function Comunicados() {
   const [to, setToState] = useState(cache.to);
   const [sending, setSending] = useState(false);
   const [modal, setModal] = useState<ModalState>(null);
-  const [, setTick] = useState(0);
+  const [tpls, setTpls] = useState<EmailTpl[]>([]);
   const [hist, setHist] = useState<AnnouncementItem[]>([]);
   const [histLoading, setHistLoading] = useState(true);
   const bodyRef = useRef<HTMLTextAreaElement>(null);
@@ -149,8 +154,17 @@ export default function Comunicados() {
       setHistLoading(false);
     }
   };
+  /* modelos reais (GET /api/announcement-templates). */
+  const reloadTpls = async () => {
+    try {
+      setTpls(await listTemplatesApi());
+    } catch {
+      setTpls([]);
+    }
+  };
   useEffect(() => {
     loadHist();
+    reloadTpls();
   }, []);
 
   const setSubject = (v: string) => {
@@ -190,7 +204,7 @@ export default function Comunicados() {
 
   /* port applyEmailTpl (l.4455) */
   const applyTpl = (k: string) => {
-    const t = emailTplBy(k);
+    const t = tpls.find((x) => x.k === k);
     if (!t) return;
     setSubject(t.s);
     setBody(t.b);
@@ -242,8 +256,6 @@ export default function Comunicados() {
     body: body.replace(/\{\{nome_responsavel\}\}/g, 'Mariana').replace(/\{\{nome_aluno\}\}/g, 'Helena'),
   });
 
-  const bump = () => setTick((t) => t + 1);
-
   return (
     <section className="fade-in">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
@@ -272,7 +284,7 @@ export default function Comunicados() {
                 Comece por um modelo <span className="font-normal text-xs text-[var(--muted)]">(opcional — já vem escrito)</span>
               </span>
               <div className="flex flex-wrap gap-2 mt-2">
-                {EMAIL_TPLS.map((t) => (
+                {tpls.map((t) => (
                   <button
                     key={t.k}
                     onClick={() => applyTpl(t.k)}
@@ -472,6 +484,7 @@ export default function Comunicados() {
       {modal?.t === 'preview' && <PreviewModal channel={channel} {...previewTexts()} onClose={() => setModal(null)} />}
       {modal?.t === 'manage' && (
         <ManageModal
+          tpls={tpls}
           onClose={() => setModal(null)}
           onEdit={(k) => setModal({ t: 'edit', k })}
           onDelete={(k) => setModal({ t: 'del', k })}
@@ -480,11 +493,12 @@ export default function Comunicados() {
       {modal?.t === 'edit' && (
         <TplEditModal
           k={modal.k}
+          tpls={tpls}
           draftSubject={subject}
           draftBody={body}
           onBack={() => setModal({ t: 'manage' })}
-          onSaved={(msg) => {
-            bump();
+          onSaved={async (msg) => {
+            await reloadTpls();
             setModal({ t: 'manage' });
             toast(msg);
           }}
@@ -494,9 +508,10 @@ export default function Comunicados() {
       {modal?.t === 'del' && (
         <TplDeleteModal
           k={modal.k}
+          tpls={tpls}
           onBack={() => setModal({ t: 'manage' })}
-          onDeleted={(msg) => {
-            bump();
+          onDeleted={async (msg) => {
+            await reloadTpls();
             setModal({ t: 'manage' });
             toast(msg);
           }}
@@ -610,7 +625,17 @@ function PreviewModal({ channel, subj, body, onClose }: { channel: Channel; subj
 
 /* ====================== GERENCIAR MODELOS (port openTplManage l.4462) ====================== */
 
-function ManageModal({ onClose, onEdit, onDelete }: { onClose: () => void; onEdit: (k: string | null) => void; onDelete: (k: string) => void }) {
+function ManageModal({
+  tpls,
+  onClose,
+  onEdit,
+  onDelete,
+}: {
+  tpls: EmailTpl[];
+  onClose: () => void;
+  onEdit: (k: string | null) => void;
+  onDelete: (k: string) => void;
+}) {
   return (
     <Modal
       title="Modelos de comunicado"
@@ -623,8 +648,8 @@ function ManageModal({ onClose, onEdit, onDelete }: { onClose: () => void; onEdi
       }
     >
       <div className="p-5 pb-2 space-y-3">
-        {EMAIL_TPLS.length ? (
-          EMAIL_TPLS.map((t) => (
+        {tpls.length ? (
+          tpls.map((t) => (
             <div key={t.k} className="flex items-center gap-3 p-3 rounded-xl" style={{ background: 'var(--hover)' }}>
               <div className="w-9 h-9 rounded-lg grid place-content-center shrink-0 bg-[var(--card)]">
                 <TplIcon t={t} />
@@ -674,6 +699,7 @@ function ManageModal({ onClose, onEdit, onDelete }: { onClose: () => void; onEdi
 
 function TplEditModal({
   k,
+  tpls,
   draftSubject,
   draftBody,
   onBack,
@@ -681,33 +707,36 @@ function TplEditModal({
   onClose,
 }: {
   k: string | null;
+  tpls: EmailTpl[];
   draftSubject: string;
   draftBody: string;
   onBack: () => void;
-  onSaved: (msg: string) => void;
+  onSaved: (msg: string) => void | Promise<void>;
   onClose: () => void;
 }) {
-  const t = k ? emailTplBy(k) : null;
+  const t = k ? tpls.find((x) => x.k === k) ?? null : null;
   /* novo modelo herda o que já está escrito no comunicado (l.4480) */
   const [nome, setNome] = useState(t ? t.l : '');
   const [s, setS] = useState(t ? t.s : draftSubject.trim());
   const [b, setB] = useState(t ? t.b : draftBody.trim());
   const [err, setErr] = useState('');
+  const [busy, setBusy] = useState(false);
 
-  const save = () => {
+  const save = async () => {
     const l = nome.trim(), sv = s.trim(), bv = b.trim();
     if (!l) return setErr('Dê um nome ao modelo — é ele que aparece no botão.');
     if (!sv || !bv) return setErr('Preencha o assunto e o texto do modelo.');
-    if (EMAIL_TPLS.some((x) => x.l.toLowerCase() === l.toLowerCase() && x.k !== k))
+    if (tpls.some((x) => x.l.toLowerCase() === l.toLowerCase() && x.k !== k))
       return setErr(`Já existe um modelo chamado <b>${esc(l)}</b> — escolha outro nome.`);
-    if (t) {
-      t.l = l;
-      t.s = sv;
-      t.b = bv;
-    } else {
-      EMAIL_TPLS.push({ k: 'tpl' + Date.now(), l, s: sv, b: bv, ic: 'file-text', col: '#2F539A' });
+    setBusy(true);
+    try {
+      if (k) await updateTemplateApi(k, { name: l, subject: sv, body: bv });
+      else await createTemplateApi({ name: l, subject: sv, body: bv });
+      await onSaved(k ? 'Modelo atualizado!' : 'Modelo criado — já aparece nos botões.');
+    } catch (e) {
+      setErr(e instanceof ApiError ? e.message : 'Não foi possível salvar o modelo.');
+      setBusy(false);
     }
-    onSaved(t ? 'Modelo atualizado!' : 'Modelo criado — já aparece nos botões.');
   };
 
   return (
@@ -722,10 +751,11 @@ function TplEditModal({
           </button>
           <button
             onClick={save}
-            className="flex-1 h-11 rounded-xl text-white font-semibold text-sm"
+            disabled={busy}
+            className="flex-1 h-11 rounded-xl text-white font-semibold text-sm disabled:opacity-60"
             style={{ background: 'linear-gradient(135deg,#1E3765,#2F539A)' }}
           >
-            {t ? 'Salvar alterações' : 'Criar modelo'}
+            {busy ? 'Salvando…' : t ? 'Salvar alterações' : 'Criar modelo'}
           </button>
         </>
       }
@@ -764,23 +794,28 @@ function TplEditModal({
 
 function TplDeleteModal({
   k,
+  tpls,
   onBack,
   onDeleted,
   onClose,
 }: {
   k: string;
+  tpls: EmailTpl[];
   onBack: () => void;
-  onDeleted: (msg: string) => void;
+  onDeleted: (msg: string) => void | Promise<void>;
   onClose: () => void;
 }) {
-  const t = emailTplBy(k);
+  const t = tpls.find((x) => x.k === k);
+  const [busy, setBusy] = useState(false);
   if (!t) return null;
-  const confirm = () => {
-    const i = EMAIL_TPLS.findIndex((x) => x.k === k);
-    if (i < 0) return;
-    const nome = EMAIL_TPLS[i].l;
-    EMAIL_TPLS.splice(i, 1);
-    onDeleted(`Modelo “${nome}” excluído.`);
+  const confirm = async () => {
+    setBusy(true);
+    try {
+      await deleteTemplateApi(k);
+      await onDeleted(`Modelo “${t.l}” excluído.`);
+    } catch {
+      setBusy(false);
+    }
   };
   return (
     <Modal
@@ -796,10 +831,11 @@ function TplDeleteModal({
           </button>
           <button
             onClick={confirm}
-            className="flex-1 h-11 rounded-xl text-white text-sm font-semibold transition hover:brightness-110"
+            disabled={busy}
+            className="flex-1 h-11 rounded-xl text-white text-sm font-semibold transition hover:brightness-110 disabled:opacity-60"
             style={{ background: '#DC2626' }}
           >
-            Excluir modelo
+            {busy ? 'Excluindo…' : 'Excluir modelo'}
           </button>
         </>
       }
