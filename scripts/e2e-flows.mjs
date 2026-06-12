@@ -39,11 +39,30 @@ async function jclick(loc) {
   await l.evaluate((el) => el.click());
 }
 
+/* intercepta as 4 APIs de CEP (ViaCEP responde na hora; as outras abortam) —
+   remove a dependência de rede que causava flake no autocomplete de endereço.
+   74230-110 → GO (válido); 01001-000 → SP (fora de Goiás, p/ o teste negativo). */
+async function routeCep(page) {
+  await page.route('**viacep.com.br/**', (route) => {
+    const sp = route.request().url().includes('01001');
+    route.fulfill({
+      status: 200, contentType: 'application/json',
+      body: JSON.stringify(sp
+        ? { cep: '01001-000', logradouro: 'Praça da Sé', bairro: 'Sé', localidade: 'São Paulo', uf: 'SP' }
+        : { cep: '74230-110', logradouro: 'Rua T-55', bairro: 'Setor Bueno', localidade: 'Goiânia', uf: 'GO' }),
+    });
+  });
+  for (const d of ['brasilapi.com.br', 'opencep.com', 'apicep.com']) {
+    await page.route(`**${d}/**`, (route) => route.abort());
+  }
+}
+
 async function main() {
   // HEADED=1 abre o Chrome visível (com slowMo) pra assistir; senão, headless.
   const headed = !!process.env.HEADED;
   const browser = await chromium.launch({ headless: !headed, slowMo: headed ? 400 : 0 });
   const page = await browser.newPage();
+  await routeCep(page);
   page.on('pageerror', (e) => process.stdout.write(`     [pageerror] ${e.message}\n`));
 
   // login
@@ -127,7 +146,7 @@ async function main() {
     await page.waitForTimeout(350);
     await jclick(page.getByRole('option', { name: 'Mãe', exact: true }));
     await dlg.getByPlaceholder('00000-000').fill('74230110'); // CEP GO → dispara autocomplete
-    await page.waitForTimeout(3500); // deixa o CEP assentar (ou cair em "APIs fora", que não bloqueia)
+    await page.waitForTimeout(800); // CEP interceptado responde na hora
     await dlg.getByLabel('Rua / avenida').fill('Rua T-55');
     await dlg.getByPlaceholder('123 ou s/n').fill('180');
     await dlg.getByLabel('Bairro').fill('Setor Bueno');

@@ -15,6 +15,17 @@ async function step(label, fn) {
 function assert(c, m) { if (!c) throw new Error(m); }
 async function jclick(loc) { const l = loc.first(); await l.waitFor({ state: 'attached', timeout: 10000 }); await l.evaluate((el) => el.click()); }
 
+/* intercepta as APIs de CEP (sem rede): 74230-110→GO, 01001-000→SP (fora de GO). */
+async function routeCep(page) {
+  await page.route('**viacep.com.br/**', (route) => {
+    const sp = route.request().url().includes('01001');
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(sp
+      ? { cep: '01001-000', logradouro: 'Praça da Sé', bairro: 'Sé', localidade: 'São Paulo', uf: 'SP' }
+      : { cep: '74230-110', logradouro: 'Rua T-55', bairro: 'Setor Bueno', localidade: 'Goiânia', uf: 'GO' }) });
+  });
+  for (const d of ['brasilapi.com.br', 'opencep.com', 'apicep.com']) await page.route(`**${d}/**`, (route) => route.abort());
+}
+
 const api = (page, path) => page.evaluate((p) => fetch(p).then((r) => r.json()).then((j) => j.data), path);
 const classCount = async (page) => (await api(page, '/api/classes'))?.length ?? 0;
 const roomCount = async (page) => (await api(page, '/api/rooms'))?.length ?? 0;
@@ -43,6 +54,7 @@ async function main() {
   const headed = !!process.env.HEADED;
   const browser = await chromium.launch({ headless: !headed, slowMo: headed ? 400 : 0 });
   const page = await browser.newPage();
+  await routeCep(page);
   page.on('pageerror', (e) => process.stdout.write(`     [pageerror] ${e.message}\n`));
   await login(page);
   console.log('login ok');
@@ -152,8 +164,8 @@ async function main() {
     await jclick(dlg.getByRole('button', { name: 'Parentesco', exact: true }));
     await page.waitForTimeout(300);
     await jclick(page.getByRole('option', { name: 'Mãe', exact: true }));
-    await dlg.getByPlaceholder('00000-000').fill('01001000'); // CEP de SP → fora de GO
-    await page.waitForTimeout(3500);
+    await dlg.getByPlaceholder('00000-000').fill('01001000'); // CEP de SP → fora de GO (interceptado)
+    await page.waitForTimeout(800);
     await jclick(dlg.getByRole('button', { name: /adicionar matrícula/i }));
     await page.waitForTimeout(600);
     assert(await dlg.isVisible(), 'modal fechou com dados inválidos (deveria barrar)');
