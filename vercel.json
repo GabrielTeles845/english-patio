@@ -1,4 +1,9 @@
 {
+  "git": {
+    "deploymentEnabled": {
+      "feat/dashboard-react": false
+    }
+  },
   "rewrites": [
     {
       "source": "/dashboard",
