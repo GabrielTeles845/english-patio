@@ -80,3 +80,9 @@ export async function sendContractApi(contractId: number, channels: ('email' | '
 export async function remindContractApi(contractId: number): Promise<{ phone: string; message: string; waLink: string }> {
   return apiFetch(`/contracts/${contractId}/remind`, { method: 'POST' });
 }
+
+/* GET /api/contracts/:id/pdf — devolve a URL do PDF (404 NO_PDF se ainda não
+   gerado). Grava log de acesso (LGPD) no backend. */
+export async function downloadContractPdfApi(contractId: number): Promise<{ url: string }> {
+  return apiFetch(`/contracts/${contractId}/pdf`);
+}

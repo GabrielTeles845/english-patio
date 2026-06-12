@@ -60,6 +60,7 @@ import { NewEnrollmentModal } from './alunos/NewEnrollmentModal';
 import { EditEnrollmentModal } from './alunos/EditEnrollmentModal';
 import { ImportModal } from './alunos/ImportModal';
 import { ContractModal } from './alunos/ContractModal';
+import { contractDownload, contractWhatsApp } from './alunos/contractActions';
 import { ExitModal, reactivateWithFeedback } from './alunos/ExitModal';
 import { DeleteModal } from './alunos/DeleteModal';
 
@@ -213,14 +214,14 @@ export default function Alunos() {
   };
   const menuItems = (s: Student): RowMenuEntry[] => {
     const item = (icon: ReactNode, label: string, onClick: () => void, color?: string): RowMenuEntry => ({ icon, label, onClick, color });
-    const wa = (label: string, msg = 'Contrato pronto para envio no WhatsApp!'): RowMenuEntry => ({
+    const wa = (label: string): RowMenuEntry => ({
       icon: (
         <span style={{ color: '#1faa53' }}>
           <WAIcon className="w-4 h-4" />
         </span>
       ),
       label,
-      onClick: () => toast(msg),
+      onClick: () => contractWhatsApp(s, toast),
     });
     /* Supervisor vê os alunos só para consulta — menu reduzido (sem editar/contrato/desligar) */
     if (!canWrite)
@@ -252,14 +253,14 @@ export default function Alunos() {
           ]
         : s.status === 'sent' || s.status === 'viewed'
           ? [
-              wa('Cobrar assinatura no WhatsApp', 'Cobrança preparada no WhatsApp — link de assinatura incluído!'),
+              wa('Cobrar assinatura no WhatsApp'),
               'divider',
               item(<CheckCircle2 className="w-4 h-4 text-[var(--muted)]" />, 'Marcar como assinado', markSigned),
             ]
           : s.status === 'failed'
             ? [
                 /* falha na entrega: a ação válida é reenviar (volta pro caminho feliz como "enviado") */
-                wa('Reenviar link no WhatsApp', 'Reenvio preparado no WhatsApp — link de assinatura incluído!'),
+                wa('Reenviar link no WhatsApp'),
                 'divider',
                 item(<RotateCcw className="w-4 h-4 text-[var(--muted)]" />, 'Reenviar contrato (marcar como enviado)', markSent),
               ]
@@ -278,7 +279,7 @@ export default function Alunos() {
       item(<UserRound className="w-4 h-4 text-[var(--muted)]" />, 'Ver ficha completa', () => navigate(`/dashboard/alunos/${s.id}`)),
       item(<Pencil className="w-4 h-4 text-[var(--muted)]" />, 'Editar dados', () => setModal({ kind: 'edit', sid: s.id })),
       item(<FileText className="w-4 h-4 text-[var(--muted)]" />, 'Ver contrato', () => setModal({ kind: 'contract', sid: s.id })),
-      item(<Download className="w-4 h-4 text-[var(--muted)]" />, 'Baixar contrato', () => toast('Download iniciado (demo)')),
+      item(<Download className="w-4 h-4 text-[var(--muted)]" />, 'Baixar contrato', () => contractDownload(s, toast)),
       item(<Copy className="w-4 h-4 text-[var(--muted)]" />, 'Copiar telefone do responsável', () => copyPhone(s, toast)),
       ...statusActions,
       ...exitActions,

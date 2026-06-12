@@ -18,8 +18,11 @@ import {
   createEnrollmentApi,
   deactivateStudentApi,
   deleteEnrollmentApi,
+  downloadContractPdfApi,
   moveKidApi,
   reactivateStudentApi,
+  remindContractApi,
+  sendContractApi,
   setContractStatusApi,
   updateEnrollmentApi,
   type EnrollmentPatch,
@@ -372,6 +375,54 @@ export async function setContractStatus(sid: number, status: ContractStatus): Pr
     await setContractStatusApi(s.contractId, status);
     await reloadData();
     return OK;
+  } catch (err) {
+    return apiFail(err);
+  }
+}
+
+/* ====================== ENVIO / COBRANÇA / DOWNLOAD DO CONTRATO ====================== */
+
+/* POST /api/contracts/:id/send — envia (ou reenvia) o contrato pelo Autentique.
+   O backend grava autentique_doc_id e move o status para "sent"; os status
+   seguintes (visualizado/assinado/recusado) chegam sozinhos pelo webhook (§9).
+   422 ALREADY_SIGNED se já assinado. */
+export async function sendContract(sid: number, channels: ('email' | 'whatsapp')[] = ['email', 'whatsapp']): Promise<ActionResult> {
+  const s = STUDENTS.find((x) => x.id === sid);
+  if (!s) return fail('Matrícula não encontrada.');
+  if (s.contractId == null) return fail('Esta matrícula ainda não tem contrato.');
+  try {
+    await sendContractApi(s.contractId, channels);
+    await reloadData();
+    return OK;
+  } catch (err) {
+    return apiFail(err);
+  }
+}
+
+/* POST /api/contracts/:id/remind — prepara a cobrança por WhatsApp. NÃO envia
+   (API oficial é fase futura): devolve a mensagem pronta + link wa.me pra abrir.
+   422 NO_PHONE se o responsável legal não tem telefone; 422 ALREADY_SIGNED. */
+export async function remindContract(sid: number): Promise<ActionResult & { waLink?: string }> {
+  const s = STUDENTS.find((x) => x.id === sid);
+  if (!s) return fail('Matrícula não encontrada.');
+  if (s.contractId == null) return fail('Esta matrícula ainda não tem contrato.');
+  try {
+    const r = await remindContractApi(s.contractId);
+    return { ok: true, waLink: r.waLink };
+  } catch (err) {
+    return apiFail(err);
+  }
+}
+
+/* GET /api/contracts/:id/pdf — devolve a URL do PDF (404 NO_PDF quando ainda não
+   foi gerado, o caso comum hoje). Sem mock: se não há PDF, o erro é honesto. */
+export async function downloadContract(sid: number): Promise<ActionResult & { url?: string }> {
+  const s = STUDENTS.find((x) => x.id === sid);
+  if (!s) return fail('Matrícula não encontrada.');
+  if (s.contractId == null) return fail('Esta matrícula ainda não tem contrato.');
+  try {
+    const r = await downloadContractPdfApi(s.contractId);
+    return { ok: true, url: r.url };
   } catch (err) {
     return apiFail(err);
   }

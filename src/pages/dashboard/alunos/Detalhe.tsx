@@ -41,6 +41,7 @@ import { WAIcon } from '../../../components/dashboard/ui/icons';
 import { avatarGrad, KidTurmaChip, STATUS_INK } from './common';
 import { EditEnrollmentModal } from './EditEnrollmentModal';
 import { ContractModal } from './ContractModal';
+import { contractDownload, contractWhatsApp } from './contractActions';
 import { MoverKidModal } from './MoverKidModal';
 import { reactivateWithFeedback } from './ExitModal';
 
@@ -354,19 +355,13 @@ export default function Detalhe() {
               )}
               <div className="flex gap-2">
                 <button
-                  onClick={() => toast('Download iniciado (demo)')}
+                  onClick={() => contractDownload(s, toast)}
                   className="flex-1 h-9 rounded-lg border border-[var(--border)] text-sm font-medium flex items-center justify-center gap-2"
                 >
                   <Download className="w-4 h-4" /> Baixar
                 </button>
                 <button
-                  onClick={() =>
-                    toast(
-                      s.status === 'pending'
-                        ? 'Contrato pronto para envio no WhatsApp!'
-                        : 'Cobrança preparada no WhatsApp — link de assinatura incluído!',
-                    )
-                  }
+                  onClick={() => contractWhatsApp(s, toast)}
                   className="w-9 h-9 rounded-lg grid place-content-center text-white"
                   style={{ background: '#25D366' }}
                 >

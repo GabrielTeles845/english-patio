@@ -29,6 +29,7 @@ import { WAIcon } from '../../components/dashboard/ui/icons';
 import { EmptyGhost, STATUS_INK } from './alunos/common';
 import { SORT_VAL } from './alunos/filters';
 import { ContractModal } from './alunos/ContractModal';
+import { contractDownload, contractWhatsApp } from './alunos/contractActions';
 
 /* Tela CONTRATOS — port 1:1 da seção data-view="contratos" do dashboard.html
    (markup l.733–777, JS l.2246–2336: setContractView, filteredContracts,
@@ -73,17 +74,12 @@ function filteredContracts(f: ContractFilters): Student[] {
   }).slice().sort((a, b) => (SORT_VAL.date(b) < SORT_VAL.date(a) ? -1 : 1));
 }
 
-/* título/toast do botão verde por status (port waTitle/waToast l.2298) */
+/* título do botão verde por status (port waTitle l.2298) */
 const waTitle = (s: Student): string =>
   s.status === 'pending' ? 'Enviar contrato no WhatsApp'
     : s.status === 'failed' ? 'Reenviar link no WhatsApp'
     : s.status === 'rejected' ? 'Falar com a família no WhatsApp'
     : 'Cobrar assinatura no WhatsApp';
-const waToast = (s: Student): string =>
-  s.status === 'pending' ? 'Contrato pronto para envio no WhatsApp!'
-    : s.status === 'failed' ? 'Reenvio preparado no WhatsApp — link de assinatura incluído!'
-    : s.status === 'rejected' ? 'Mensagem preparada no WhatsApp para falar com a família.'
-    : 'Cobrança preparada no WhatsApp — link de assinatura incluído!';
 
 const contractFile = (s: Student): string => `Contrato_${s.kids[0].n.split(' ')[0]}.pdf`;
 
@@ -337,14 +333,14 @@ export default function Contratos() {
                     Abrir
                   </button>
                   <button
-                    onClick={() => toast('Download iniciado (demo)')}
+                    onClick={() => contractDownload(s, toast)}
                     data-tip="Baixar"
                     className="w-9 h-9 rounded-lg border border-[var(--border)] grid place-content-center hover:bg-[var(--hover)] transition"
                   >
                     <Download className="w-4 h-4" />
                   </button>
                   <button
-                    onClick={() => toast(waToast(s))}
+                    onClick={() => contractWhatsApp(s, toast)}
                     data-tip={waTitle(s)}
                     className="w-9 h-9 rounded-lg grid place-content-center text-white transition hover:brightness-105"
                     style={{ background: '#25D366' }}
@@ -396,14 +392,14 @@ export default function Contratos() {
                     <ExternalLink className="w-4 h-4" />
                   </button>
                   <button
-                    onClick={() => toast('Download iniciado (demo)')}
+                    onClick={() => contractDownload(s, toast)}
                     data-tip="Baixar"
                     className="w-8 h-8 rounded-lg border border-[var(--border)] grid place-content-center hover:bg-[var(--hover)] transition"
                   >
                     <Download className="w-4 h-4" />
                   </button>
                   <button
-                    onClick={() => toast(waToast(s))}
+                    onClick={() => contractWhatsApp(s, toast)}
                     data-tip={waTitle(s)}
                     className="w-8 h-8 rounded-lg grid place-content-center text-white transition hover:brightness-105"
                     style={{ background: '#25D366' }}

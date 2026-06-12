@@ -3,6 +3,7 @@ import { Modal } from '../../../components/dashboard/ui/Modal';
 import { useToast } from '../../../components/dashboard/ui/Toast';
 import { WAIcon } from '../../../components/dashboard/ui/icons';
 import { isStale, maskCPF, staleDays, STUDENTS, type Student } from '../../../lib/dashboard/data';
+import { contractDownload, contractWhatsApp } from './contractActions';
 
 /* Contrato + linha do tempo do Autentique — port de autentiqueTimeline (l.4635)
    e openContractModal (l.4671). Recusado/falha saem do caminho feliz: o passo
@@ -68,7 +69,7 @@ function AutentiqueTimeline({ s }: { s: Student }) {
             <b>Parado há {staleDays(s)} dias</b> — vale lembrar a família.
           </p>
           <button
-            onClick={() => toast('Cobrança preparada no WhatsApp — link de assinatura incluído!')}
+            onClick={() => contractWhatsApp(s, toast)}
             className="h-8 px-3 rounded-lg text-white text-xs font-semibold flex items-center gap-1.5 shrink-0 transition hover:brightness-105"
             style={{ background: '#25D366' }}
           >
@@ -143,17 +144,17 @@ export function ContractModal({ sid, onClose, onOpenDetail }: { sid: number; onC
       </div>
       <div className="p-5 flex flex-wrap gap-2">
         <button
-          onClick={() => toast('Download iniciado (demo)')}
+          onClick={() => contractDownload(s, toast)}
           className="flex-1 h-11 rounded-xl border border-[var(--border)] font-medium text-sm flex items-center justify-center gap-2"
         >
           <Download className="w-4 h-4" /> Baixar PDF
         </button>
         <button
-          onClick={() => toast('Contrato pronto para envio no WhatsApp!')}
+          onClick={() => contractWhatsApp(s, toast)}
           className="h-11 px-4 rounded-xl text-white font-semibold text-sm flex items-center justify-center gap-2"
           style={{ background: '#25D366' }}
         >
-          <WAIcon className="w-4 h-4" /> Enviar
+          <WAIcon className="w-4 h-4" /> {s.status === 'pending' || s.status === 'failed' ? 'Enviar' : 'Cobrar'}
         </button>
         {onOpenDetail && (
           <button
