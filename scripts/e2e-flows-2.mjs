@@ -106,7 +106,12 @@ async function main() {
   await step('Aluno: mover/alocar em turma (na ficha)', async () => {
     const items = await enrollItems(page);
     const sid = items[0].id;
-    await page.goto(`${BASE}/dashboard/alunos/${sid}`, { waitUntil: 'networkidle' });
+    // navega pela UI (SPA) p/ a ficha — page.goto recarregaria e zeraria os dados
+    // em memória (Detalhe redireciona se STUDENTS ainda não carregou).
+    await page.goto(`${BASE}/dashboard/alunos`, { waitUntil: 'networkidle' });
+    await page.getByRole('button', { name: 'Todas as ações' }).first().click();
+    await page.getByRole('menuitem', { name: /ver ficha completa/i }).click();
+    await page.waitForURL(/\/dashboard\/alunos\/\d+/, { timeout: 8000 });
     await page.getByRole('button', { name: /^(Alocar|Mover)$/ }).first().click();
     const dlg = page.getByRole('dialog');
     // escolhe a 1ª turma da lista (botão de turma) e confirma

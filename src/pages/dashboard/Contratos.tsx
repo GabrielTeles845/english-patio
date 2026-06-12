@@ -387,6 +387,7 @@ export default function Contratos() {
                   <button
                     onClick={() => setModalSid(s.id)}
                     data-tip="Abrir"
+                    aria-label="Abrir"
                     className="w-8 h-8 rounded-lg border border-[var(--border)] grid place-content-center hover:bg-[var(--hover)] transition"
                   >
                     <ExternalLink className="w-4 h-4" />
@@ -394,6 +395,7 @@ export default function Contratos() {
                   <button
                     onClick={() => contractDownload(s, toast)}
                     data-tip="Baixar"
+                    aria-label="Baixar"
                     className="w-8 h-8 rounded-lg border border-[var(--border)] grid place-content-center hover:bg-[var(--hover)] transition"
                   >
                     <Download className="w-4 h-4" />
@@ -401,6 +403,7 @@ export default function Contratos() {
                   <button
                     onClick={() => contractWhatsApp(s, toast)}
                     data-tip={waTitle(s)}
+                    aria-label={waTitle(s)}
                     className="w-8 h-8 rounded-lg grid place-content-center text-white transition hover:brightness-105"
                     style={{ background: '#25D366' }}
                   >
