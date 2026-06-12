@@ -23,6 +23,7 @@ import { enrollmentDTO, studentDTO, responsibleDTO, addressDTO } from '../../ser
 import { EnrollmentEnvelope, EnrollmentFormSchema } from '../../server/lib/enrollmentInput';
 import { buildEnrollmentConds } from '../../server/lib/enrollmentFilters';
 import { onlyDigits, brDateToISO } from '../../server/lib/validators';
+import { sendPushToRoles } from '../../server/lib/webpush';
 
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
   const session = await getSession(req);
@@ -204,6 +205,14 @@ async function createEnrollment(
   } catch (err) {
     console.error('enrollment_created: falha ao gerar notificações', err);
   }
+
+  // Web Push (notificação no computador) — mesmo público do sino, best-effort.
+  await sendPushToRoles(['director', 'secretary'], {
+    title: 'Nova matrícula',
+    body: f.student1Name.trim(),
+    url: '/dashboard/alunos',
+    tag: 'enroll',
+  });
 
   return ok(res, { enrollmentId, students: insertedStudents.map(studentDTO), contractId: ctr[0].id }, 201);
 }

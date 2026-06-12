@@ -11,6 +11,7 @@ import { db } from '../../server/db/client';
 import { contracts, contractEvents, activityLog } from '../../server/db/schema';
 import { ok, fail } from '../../server/lib/http';
 import { verifyWebhookSignature, EVENT_TRANSITIONS } from '../../server/lib/autentique';
+import { sendPushToRoles } from '../../server/lib/webpush';
 
 const STATUS_LABEL: Record<string, string> = {
   viewed: 'Contrato visualizado', signed: 'Contrato assinado',
@@ -61,6 +62,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
   } catch (err) {
     console.error('webhook autentique: falha ao notificar', err);
   }
+
+  // Web Push (notificação no computador) — mesmo público do sino, best-effort.
+  await sendPushToRoles(['director', 'secretary'], {
+    title: STATUS_LABEL[tr.status] ?? 'Contrato',
+    url: '/dashboard/contratos',
+    tag: 'contract',
+  });
 
   return ok(res, { processed: true, status: tr.status });
 }
