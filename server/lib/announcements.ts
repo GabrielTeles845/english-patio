@@ -25,6 +25,8 @@ import { enrollments, responsibles, students } from '../db/schema';
 export interface AudienceFilter {
   period?: string;
   status?: 'active' | 'inactive' | 'all';
+  dayPair?: 'seg-qua' | 'ter-qui'; // famílias com ≥1 aluno ativo em turma desse dia-par
+  pendingContract?: boolean; // famílias com contrato aguardando assinatura (pending/sent/viewed)
 }
 
 export interface CommRecipient {
@@ -44,6 +46,14 @@ export async function resolveAudience(filter: AudienceFilter): Promise<CommRecip
     conds.push(sql`EXISTS (SELECT 1 FROM students s WHERE s.enrollment_id = ${enrollments.id} AND s.is_active = true)`);
   } else if (status === 'inactive') {
     conds.push(sql`NOT EXISTS (SELECT 1 FROM students s WHERE s.enrollment_id = ${enrollments.id} AND s.is_active = true)`);
+  }
+  // segmentos da tela: por dia-par da turma e por contrato pendente (sempre sobre
+  // alunos/famílias ativas, como a tela calcula). Casa com kidsOf()/needsSignature.
+  if (filter.dayPair) {
+    conds.push(sql`EXISTS (SELECT 1 FROM students s JOIN classes c ON c.id = s.class_id WHERE s.enrollment_id = ${enrollments.id} AND s.is_active = true AND c.day_pair = ${filter.dayPair})`);
+  }
+  if (filter.pendingContract) {
+    conds.push(sql`EXISTS (SELECT 1 FROM contracts ct WHERE ct.enrollment_id = ${enrollments.id} AND ct.status IN ('pending', 'sent', 'viewed'))`);
   }
   const enrs = await db.select({ id: enrollments.id }).from(enrollments).where(conds.length ? and(...conds) : undefined);
   const ids = enrs.map((e) => e.id);

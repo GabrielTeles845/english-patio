@@ -7,7 +7,7 @@ import { eq, inArray } from 'drizzle-orm';
 import listSend from '../../api/announcements/index';
 import preview from '../../api/announcements/preview';
 import { db } from '../../server/db/client';
-import { enrollments, students, responsibles, announcements, announcementRecipients } from '../../server/db/schema';
+import { enrollments, students, responsibles, announcements, announcementRecipients, classes, contracts, rooms, levels } from '../../server/db/schema';
 import { mkReq, mkRes, seedUser, removeUser, clearAttempts, loginAs } from './_helpers';
 
 const DIR = 'apitest-ann-dir@example.com';
@@ -123,5 +123,56 @@ describe('GET /api/announcements', () => {
     assert.equal(res._status, 200);
     assert.ok(res._body.data.items.length >= 1);
     assert.ok('recipientCount' in res._body.data.items[0]);
+  });
+});
+
+/* audiência segmentada (filtros da tela: dia-par da turma e contrato pendente).
+   Aloca o aluno da família de teste numa turma Seg/Qua e cria um contrato pendente,
+   tudo escopado ao período PERIOD (1 família) para isolar a contagem. */
+describe('resolveAudience — segmentos da tela (via preview)', () => {
+  let enrollmentId = 0;
+  let studentId = 0;
+  let classId = 0;
+  let contractId = 0;
+
+  before(async () => {
+    const e = await db.select({ id: enrollments.id }).from(enrollments).where(eq(enrollments.submissionId, SUB)).limit(1);
+    enrollmentId = e[0].id;
+    const st = await db.select({ id: students.id }).from(students).where(eq(students.enrollmentId, enrollmentId)).limit(1);
+    studentId = st[0].id;
+    const room = await db.select({ id: rooms.id }).from(rooms).limit(1);
+    const level = await db.select({ id: levels.id }).from(levels).limit(1);
+    const c = await db.insert(classes).values({
+      roomId: room[0].id, dayPair: 'seg-qua', startTime: '8:30', levelId: level[0].id, capacity: 7, period: PERIOD,
+    }).returning();
+    classId = c[0].id;
+    await db.update(students).set({ classId }).where(eq(students.id, studentId));
+    const ct = await db.insert(contracts).values({ enrollmentId, status: 'pending' }).returning();
+    contractId = ct[0].id;
+  });
+
+  after(async () => {
+    if (contractId) await db.delete(contracts).where(eq(contracts.id, contractId));
+    if (studentId) await db.update(students).set({ classId: null }).where(eq(students.id, studentId));
+    if (classId) await db.delete(classes).where(eq(classes.id, classId));
+  });
+
+  const previewCount = async (audienceFilter: Record<string, unknown>): Promise<number> => {
+    const res = mkRes();
+    await preview(mkReq('POST', { subject: 'Oi', body: 'Olá', audienceFilter }, { cookie: dir.cookies, csrf: dir.csrf }), res);
+    assert.equal(res._status, 200);
+    return res._body.data.audienceCount;
+  };
+
+  it('dayPair seg-qua inclui a família; ter-qui exclui', async () => {
+    assert.equal(await previewCount({ period: PERIOD, dayPair: 'seg-qua' }), 1);
+    assert.equal(await previewCount({ period: PERIOD, dayPair: 'ter-qui' }), 0);
+  });
+
+  it('pendingContract inclui contrato pending/sent/viewed e exclui assinado', async () => {
+    assert.equal(await previewCount({ period: PERIOD, pendingContract: true }), 1);
+    await db.update(contracts).set({ status: 'signed' }).where(eq(contracts.id, contractId));
+    assert.equal(await previewCount({ period: PERIOD, pendingContract: true }), 0);
+    await db.update(contracts).set({ status: 'pending' }).where(eq(contracts.id, contractId));
   });
 });

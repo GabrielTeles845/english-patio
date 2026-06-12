@@ -19,6 +19,8 @@ const Body = z.object({
   audienceFilter: z.object({
     period: z.string().optional(),
     status: z.enum(['active', 'inactive', 'all']).optional(),
+    dayPair: z.enum(['seg-qua', 'ter-qui']).optional(),
+    pendingContract: z.boolean().optional(),
   }).optional(),
 });
 
