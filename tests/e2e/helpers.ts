@@ -82,6 +82,29 @@ export const classCount = async (page: Page): Promise<number> =>
 export const roomCount = async (page: Page): Promise<number> =>
   ((await api(page, '/api/rooms')) as unknown[])?.length ?? 0;
 
+// Preenche a Nova matrícula com dados TODOS válidos (GO). Os testes de validação
+// quebram UM campo depois para isolar cada regra. routeCep deve estar ativo.
+export async function fillValidEnrollment(page: Page, dlg: Locator): Promise<void> {
+  await dlg.getByPlaceholder('Nome completo').first().fill('Joao Pedro Da Silva');
+  await dlg.getByPlaceholder('dd/mm/aaaa').nth(0).fill('10/05/2016');
+  await dlg.getByPlaceholder('Quem assina o contrato').fill('Maria Aparecida Souza');
+  await dlg.getByPlaceholder('000.000.000-00').first().fill('52998224725');
+  await dlg.getByPlaceholder('dd/mm/aaaa').nth(1).fill('15/03/1988');
+  await dlg.getByPlaceholder('email@exemplo.com').fill('maria.souza@example.com');
+  await dlg.getByPlaceholder('(62) 9xxxx-xxxx').fill('62998887766');
+  await jclick(dlg.getByRole('button', { name: 'Parentesco', exact: true }));
+  await page.waitForTimeout(300);
+  await jclick(page.getByRole('option', { name: 'Mãe', exact: true }));
+  await dlg.getByPlaceholder('00000-000').fill('74230110'); // CEP GO
+  await page.waitForTimeout(800);
+  await dlg.getByLabel('Rua / avenida').fill('Rua T-55');
+  await dlg.getByPlaceholder('123 ou s/n').fill('180');
+  await dlg.getByLabel('Bairro').fill('Setor Bueno');
+  await dlg.getByLabel('Cidade').fill('Goiânia');
+  await jclick(dlg.getByText('A família leu e aceitou os termos do contrato'));
+  await jclick(dlg.getByText('O horário das aulas foi confirmado com a família'));
+}
+
 // Escolhe a i-ésima opção de um CSelect (sem aria-label): abre o gatilho .cs e
 // clica a opção (renderizada em portal, no escopo da página).
 export async function pickCs(page: Page, dlg: Locator, index: number, optionName?: string | RegExp): Promise<void> {
