@@ -1,28 +1,13 @@
 import { SparklesIcon, MapPinIcon, PaintBrushIcon, CurrencyDollarIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 import FadeCarousel from './FadeCarousel';
+import { c } from '../content/site';
 
 const highlights = [
-  {
-    icon: MapPinIcon,
-    title: 'Vivências Práticas',
-    description: 'Parques, supermercados, floriculturas e outros espaços reais',
-  },
-  {
-    icon: PaintBrushIcon,
-    title: 'Atividades Criativas',
-    description: 'Culinária, teatro, artesanato, pintura e muito mais',
-  },
-  {
-    icon: SparklesIcon,
-    title: '100% em Inglês',
-    description: 'Imersão total no idioma em contextos práticos',
-  },
-  {
-    icon: CurrencyDollarIcon,
-    title: 'Valorização do Investimento',
-    description: 'Mensalidades de Janeiro e Julho convertidas em vivências',
-  },
+  { icon: MapPinIcon, title: c('home', 'vacation-card-1-titulo'), description: c('home', 'vacation-card-1-descricao') },
+  { icon: PaintBrushIcon, title: c('home', 'vacation-card-2-titulo'), description: c('home', 'vacation-card-2-descricao') },
+  { icon: SparklesIcon, title: c('home', 'vacation-card-3-titulo'), description: c('home', 'vacation-card-3-descricao') },
+  { icon: CurrencyDollarIcon, title: c('home', 'vacation-card-4-titulo'), description: c('home', 'vacation-card-4-descricao') },
 ];
 
 // Imagens do carrossel
@@ -46,20 +31,20 @@ const VacationClassesPreview = () => {
         {/* Header centralizado */}
         <div className="text-center mb-8">
           <h2 className="text-4xl md:text-5xl font-bold text-primary mb-4">
-            Vacation Classes
+            {c('home', 'vacation-titulo')}
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-6">
-            Experiências externas que proporcionam aos alunos o uso real e prático do inglês em ambientes do cotidiano
+            {c('home', 'vacation-paragrafo')}
           </p>
 
           {/* Badge destacado */}
           <div className="inline-flex items-center gap-3 bg-secondary/10 border-2 border-secondary/30 rounded-full px-6 py-3">
             <div className="flex items-center justify-center w-12 h-12 bg-secondary rounded-full">
-              <span className="text-2xl font-bold text-white">8</span>
+              <span className="text-2xl font-bold text-white">{c('home', 'vacation-badge-numero')}</span>
             </div>
             <div className="text-left">
-              <p className="text-sm font-semibold text-primary">Encontros por Ano</p>
-              <p className="text-xs text-gray-600">2 horas cada</p>
+              <p className="text-sm font-semibold text-primary">{c('home', 'vacation-badge-titulo')}</p>
+              <p className="text-xs text-gray-600">{c('home', 'vacation-badge-subtitulo')}</p>
             </div>
           </div>
         </div>
@@ -109,7 +94,7 @@ const VacationClassesPreview = () => {
                 to="/vacation-classes"
                 className="inline-flex items-center justify-center w-full px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 group"
               >
-                Conheça as Vacation Classes
+                {c('home', 'vacation-cta')}
                 <ArrowRightIcon className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>

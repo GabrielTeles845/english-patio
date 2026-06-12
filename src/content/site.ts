@@ -78,6 +78,22 @@ export const siteDefaults = {
     'cursos-cambridge-rodape':
       'Alunos dos níveis Sprint iniciam a preparação para exames Cambridge em encontros mensais, realizados como atividade complementar ao curso regular.',
     'cursos-cta': 'Agende um teste de nível',
+    // Prévia das Vacation Classes na Home (VacationClassesPreview)
+    'vacation-titulo': 'Vacation Classes',
+    'vacation-paragrafo':
+      'Experiências externas que proporcionam aos alunos o uso real e prático do inglês em ambientes do cotidiano',
+    'vacation-badge-numero': '8',
+    'vacation-badge-titulo': 'Encontros por Ano',
+    'vacation-badge-subtitulo': '2 horas cada',
+    'vacation-card-1-titulo': 'Vivências Práticas',
+    'vacation-card-1-descricao': 'Parques, supermercados, floriculturas e outros espaços reais',
+    'vacation-card-2-titulo': 'Atividades Criativas',
+    'vacation-card-2-descricao': 'Culinária, teatro, artesanato, pintura e muito mais',
+    'vacation-card-3-titulo': '100% em Inglês',
+    'vacation-card-3-descricao': 'Imersão total no idioma em contextos práticos',
+    'vacation-card-4-titulo': 'Valorização do Investimento',
+    'vacation-card-4-descricao': 'Mensalidades de Janeiro e Julho convertidas em vivências',
+    'vacation-cta': 'Conheça as Vacation Classes',
   },
   // Conteúdo site-wide (aparece em todas as páginas via RootLayout/Footer ou é
   // compartilhado entre seções). Átomos de contato ficam aqui para serem fonte
