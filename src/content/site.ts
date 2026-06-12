@@ -95,6 +95,50 @@ export const siteDefaults = {
     'vacation-card-4-descricao': 'Mensalidades de Janeiro e Julho convertidas em vivências',
     'vacation-cta': 'Conheça as Vacation Classes',
   },
+  metodologia: {
+    // h1 "Nossa Metodologia" fica no componente (highlight inline, ver TODO).
+    'metodologias-ativas-titulo': 'Metodologias Ativas de Aprendizagem',
+    'metodologias-ativas-paragrafo':
+      'Na English Patio, adotamos estratégias pedagógicas fundamentadas nas metodologias ativas de ensino, que promovem a participação efetiva e o engajamento dos estudantes em seu processo de aprendizagem. Por meio de experiências práticas, contextualizadas e significativas, favorecemos o desenvolvimento das competências linguísticas de maneira natural, consistente e eficaz.',
+    'aprendizagem-significativa-titulo': 'Aprendizagem Significativa',
+    'aprendizagem-significativa-paragrafo':
+      'Fundamentamos nossa prática pedagógica na teoria da aprendizagem significativa, onde o conhecimento prévio do aluno é ativado e conectado a novos conteúdos. Através de atividades contextualizadas e relevantes, o idioma deixa de ser abstrato e passa a fazer sentido real na vida dos alunos.',
+    'ferramentas-titulo': 'Ferramentas de Ensino',
+    'ferramentas-paragrafo':
+      'Selecionamos cuidadosamente materiais didáticos e recursos pedagógicos, além de desenvolvermos ferramentas próprias de aprendizagem, fundamentando todo o nosso planejamento em evidências científicas sobre os processos cognitivos envolvidos na aquisição e consolidação da linguagem.',
+    'ferramentas-card1-paragrafo':
+      'Cada atividade possui objetivos de aprendizagem claramente definidos, alinhados ao desenvolvimento progressivo das quatro habilidades linguísticas:',
+    'habilidade-1-titulo': 'Listening',
+    'habilidade-1-descricao': 'Compreensão oral',
+    'habilidade-2-titulo': 'Speaking',
+    'habilidade-2-descricao': 'Produção oral',
+    'habilidade-3-titulo': 'Reading',
+    'habilidade-3-descricao': 'Leitura e interpretação',
+    'habilidade-4-titulo': 'Writing',
+    'habilidade-4-descricao': 'Escrita',
+    'ferramentas-card2-paragrafo':
+      'Promovemos a análise crítica, o raciocínio lógico, a interpretação contextual e a resolução criativa de problemas. Embora reconheçamos a memorização como uma etapa inicial e necessária do processo de aprendizagem — atuando como ponte para a formação de frases e o desenvolvimento da conversação —, valorizamos dinâmicas interativas e repetição criativa como meios de consolidar o conhecimento. Assim, rejeitamos a memorização mecânica em favor de práticas pedagógicas que estimulam a autonomia, o pensamento crítico e a competência comunicativa genuína.',
+    'piramide-titulo': 'Por Que as Metodologias Ativas Funcionam?',
+    'piramide-paragrafo':
+      'A Pirâmide de Glasser é um modelo que ilustra como diferentes formas de aprendizagem impactam na retenção do conhecimento. Segundo essa teoria, os alunos aprendem de maneira mais significativa quando participam ativamente do processo, especialmente ao praticar, discutir, ensinar e aplicar o que aprendem.',
+    'estrategias-titulo': 'Estratégias Pedagógicas Utilizadas',
+    'estrategias-paragrafo':
+      'Implementamos diversas metodologias ativas em nossas práticas pedagógicas diárias',
+    'estrategia-1-titulo': 'Aprendizagem Baseada em Projetos (PBL)',
+    'estrategia-1-paragrafo':
+      'Desenvolvimento projetos temáticos que estimulam os alunos a investigar, planejar e executar atividades significativas, utilizando o inglês como ferramenta de comunicação autêntica e aplicada a contextos reais.',
+    'estrategia-2-titulo': 'Aprendizagem Colaborativa',
+    'estrategia-2-paragrafo':
+      'Valorização do trabalho em grupos heterogêneos, que favorece a interação constante, a negociação de significados e o desenvolvimento de competências socioemocionais, tendo o inglês como meio de expressão e colaboração.',
+    'estrategia-3-titulo': 'Gamificação',
+    'estrategia-3-paragrafo':
+      'Incorporação de elementos lúdicos e desafios significativos que potencializam o engajamento, a motivação intrínseca e a persistência dos alunos ao longo do processo de aquisição linguística.',
+    'estrategia-4-titulo': 'Total Physical Response (TPR)',
+    'estrategia-4-paragrafo':
+      'Integração de movimento corporal ao aprendizado linguístico, especialmente efetiva com crianças, promovendo conexão entre linguagem, cognição e ação física.',
+    'cta-titulo': 'Agende uma Aula Experimental',
+    'cta-whatsapp': 'Agendar pelo WhatsApp',
+  },
   // Conteúdo site-wide (aparece em todas as páginas via RootLayout/Footer ou é
   // compartilhado entre seções). Átomos de contato ficam aqui para serem fonte
   // única — editar o telefone uma vez reflete onde quer que seja exibido.
