@@ -27,10 +27,11 @@ async function main() {
     server.on('exit', (c) => reject(new Error(`servidor saiu antes de subir (${c})`)));
   });
 
-  let code = 1;
+  let code = 0;
   try {
-    await run('node', ['scripts/e2e-smoke.mjs']);
-    code = 0;
+    await run('node', ['scripts/e2e-smoke.mjs']); // abre cada tela (render)
+    await run('node', [...ENV_TSX, 'scripts/seed-e2e.ts']); // base limpa p/ os fluxos
+    await run('node', ['scripts/e2e-flows.mjs']); // dirige os modais (preencher/enviar)
   } catch {
     code = 1;
   } finally {

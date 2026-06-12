@@ -37,7 +37,8 @@ async function visit(page, label, url, after) {
 }
 
 async function main() {
-  const browser = await chromium.launch();
+  const headed = !!process.env.HEADED; // HEADED=1 abre o Chrome visível
+  const browser = await chromium.launch({ headless: !headed, slowMo: headed ? 250 : 0 });
   const page = await browser.newPage();
 
   // login

@@ -4,7 +4,7 @@
    Uso: node --env-file=.env.test --import tsx scripts/seed-e2e.ts */
 import { eq } from 'drizzle-orm';
 import { db } from '../server/db/client';
-import { users, enrollments, students, responsibles, addresses, contracts } from '../server/db/schema';
+import { users, enrollments, students, responsibles, addresses, contracts, contractEvents, announcements, announcementRecipients } from '../server/db/schema';
 import { hashPassword } from '../server/lib/password';
 
 // trava: este seed APAGA/insere dados — só roda em banco local.
@@ -26,15 +26,16 @@ async function main() {
     role: 'director', mustChangePassword: false,
   });
 
-  // matrícula de exemplo (limpa a anterior pelo submissionId)
-  const old = await db.select({ id: enrollments.id }).from(enrollments).where(eq(enrollments.submissionId, SUB));
-  for (const e of old) {
-    await db.delete(contracts).where(eq(contracts.enrollmentId, e.id));
-    await db.delete(students).where(eq(students.enrollmentId, e.id));
-    await db.delete(responsibles).where(eq(responsibles.enrollmentId, e.id));
-    await db.delete(addresses).where(eq(addresses.enrollmentId, e.id));
-    await db.delete(enrollments).where(eq(enrollments.id, e.id));
-  }
+  // base limpa a cada run (banco LOCAL) → E2E determinístico (import/contagens).
+  // ordem respeita as FKs.
+  await db.delete(announcementRecipients);
+  await db.delete(announcements);
+  await db.delete(contractEvents);
+  await db.delete(contracts);
+  await db.delete(students);
+  await db.delete(responsibles);
+  await db.delete(addresses);
+  await db.delete(enrollments);
 
   const e = await db.insert(enrollments).values({
     source: 'manual', submissionId: SUB, classFormat: 'sede', paymentMethod: 'boleto-6x',

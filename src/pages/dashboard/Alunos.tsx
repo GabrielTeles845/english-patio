@@ -635,6 +635,7 @@ function Row({
     <button
       onClick={(e) => onMenu(e, s.id)}
       data-tip="Todas as ações"
+      aria-label="Todas as ações"
       className="w-9 h-9 rounded-lg border border-[var(--border)] grid place-content-center hover:bg-[var(--card)] transition shrink-0"
     >
       <MoreVertical className="w-4 h-4 text-[var(--muted)]" />
