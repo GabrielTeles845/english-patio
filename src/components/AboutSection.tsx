@@ -2,28 +2,13 @@ import { BuildingOffice2Icon, SparklesIcon, UserGroupIcon } from '@heroicons/rea
 import { useState, useEffect } from 'react';
 import img from '../config/cloudinary';
 import OptimizedImage from './OptimizedImage';
+import { c } from '../content/site';
 
 const highlights = [
-  {
-    name: 'Salas Interativas',
-    description: 'Layout com mesas redondas, livros literários, decoração lúdica e climatização',
-    icon: BuildingOffice2Icon,
-  },
-  {
-    name: 'Ambiente Imersivo',
-    description: 'Murais artísticos e decoração temática que remetem à cultura de língua inglesa',
-    icon: SparklesIcon,
-  },
-  {
-    name: 'Fun Space',
-    description: 'Sala multiuso com karaokê, cozinha e palco para apresentações em inglês',
-    icon: SparklesIcon,
-  },
-  {
-    name: 'Pátio Amplo',
-    description: 'Espaço acolhedor com bancos, música ambiente, cesta de basquete e pergolado',
-    icon: UserGroupIcon,
-  },
+  { name: c('home', 'about-destaque-1-titulo'), description: c('home', 'about-destaque-1-descricao'), icon: BuildingOffice2Icon },
+  { name: c('home', 'about-destaque-2-titulo'), description: c('home', 'about-destaque-2-descricao'), icon: SparklesIcon },
+  { name: c('home', 'about-destaque-3-titulo'), description: c('home', 'about-destaque-3-descricao'), icon: SparklesIcon },
+  { name: c('home', 'about-destaque-4-titulo'), description: c('home', 'about-destaque-4-descricao'), icon: UserGroupIcon },
 ];
 
 // Carrossel de infraestrutura - Imagens da pasta Home - Carrossel Estrutura
@@ -60,10 +45,10 @@ const AboutSection = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-bold text-primary mb-4">
-            Infraestrutura que Estimula o Aprendizado
+            {c('home', 'about-titulo')}
           </h2>
           <p className="mt-4 max-w-3xl text-lg text-gray-600 mx-auto">
-            A English Patio oferece um ambiente cuidadosamente planejado para promover o aprendizado com conforto, criatividade e acolhimento.
+            {c('home', 'about-paragrafo')}
           </p>
         </div>
 

@@ -33,6 +33,21 @@ export const siteDefaults = {
     'hero-feature-4-titulo': 'Espaço que Inspira',
     'hero-feature-4-descricao':
       'Infraestrutura que integra conforto, funcionalidade e foco no aprendizado.',
+    'about-titulo': 'Infraestrutura que Estimula o Aprendizado',
+    'about-paragrafo':
+      'A English Patio oferece um ambiente cuidadosamente planejado para promover o aprendizado com conforto, criatividade e acolhimento.',
+    'about-destaque-1-titulo': 'Salas Interativas',
+    'about-destaque-1-descricao':
+      'Layout com mesas redondas, livros literários, decoração lúdica e climatização',
+    'about-destaque-2-titulo': 'Ambiente Imersivo',
+    'about-destaque-2-descricao':
+      'Murais artísticos e decoração temática que remetem à cultura de língua inglesa',
+    'about-destaque-3-titulo': 'Fun Space',
+    'about-destaque-3-descricao':
+      'Sala multiuso com karaokê, cozinha e palco para apresentações em inglês',
+    'about-destaque-4-titulo': 'Pátio Amplo',
+    'about-destaque-4-descricao':
+      'Espaço acolhedor com bancos, música ambiente, cesta de basquete e pergolado',
   },
 } as const;
 
