@@ -16,6 +16,7 @@ if (!/@(localhost|127\.0\.0\.1)[:/]/.test(DBURL)) {
 
 const ADMIN_EMAIL = 'admin@email.com';
 const ADMIN_PASS = 'Senh@12345';
+const ROLE_PASS = 'Senh@12345';
 const SUB = 'e2e-seed-familia';
 
 async function main() {
@@ -26,6 +27,17 @@ async function main() {
     name: 'Admin E2E', email: ADMIN_EMAIL, passwordHash: await hashPassword(ADMIN_PASS),
     role: 'director', mustChangePassword: false,
   });
+  // Supervisor + Secretaria para os testes de permissão por papel (RBAC do front).
+  await db.insert(users).values([
+    {
+      name: 'Supervisor E2E', email: 'e2e-supervisor@example.com',
+      passwordHash: await hashPassword(ROLE_PASS), role: 'supervisor', mustChangePassword: false,
+    },
+    {
+      name: 'Secretaria E2E', email: 'e2e-secretaria@example.com',
+      passwordHash: await hashPassword(ROLE_PASS), role: 'secretary', mustChangePassword: false,
+    },
+  ]);
 
   // base limpa a cada run (banco LOCAL) → E2E determinístico (import/contagens).
   // ordem respeita as FKs.

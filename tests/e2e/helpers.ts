@@ -6,6 +6,9 @@ import type { Browser, BrowserContext, Page, Locator } from '@playwright/test';
 
 export const BASE = process.env.BASE || 'http://localhost:4321';
 export const ADMIN = { email: 'admin@email.com', password: 'Senh@12345' };
+// papéis não-Diretor semeados pelo seed-e2e (para os testes de permissão).
+export const SUPERVISOR = { email: 'e2e-supervisor@example.com', password: 'Senh@12345' };
+export const SECRETARIA = { email: 'e2e-secretaria@example.com', password: 'Senh@12345' };
 
 // CAUSA RAIZ das travas da suíte: o tour guiado abre sozinho ~560ms depois de
 // entrar em cada tela (Diretor, 1ª visita) e o overlay (zIndex 95) engole os
@@ -67,10 +70,10 @@ export async function routeCep(page: Page): Promise<void> {
   }
 }
 
-export async function login(page: Page): Promise<void> {
+export async function loginWith(page: Page, email: string, password: string): Promise<void> {
   await page.goto(`${BASE}/dashboard/entrar`, { waitUntil: 'networkidle' });
-  await page.fill('input[type=email]', ADMIN.email);
-  await page.fill('input[type=password]', ADMIN.password);
+  await page.fill('input[type=email]', email);
+  await page.fill('input[type=password]', password);
   await Promise.all([
     page.waitForURL((u) => !u.pathname.endsWith('/entrar'), { timeout: 20000 }).catch(() => {}),
     page.click('button[type=submit]'),
@@ -79,14 +82,24 @@ export async function login(page: Page): Promise<void> {
   if (page.url().endsWith('/entrar')) throw new Error('login falhou');
 }
 
+export async function login(page: Page): Promise<void> {
+  await loginWith(page, ADMIN.email, ADMIN.password);
+}
+
 // Sessão limpa para um arquivo de teste: reseta o banco, abre um contexto novo,
 // intercepta CEP e loga. Cada spec roda em série sobre a mesma página.
 export async function freshSession(browser: Browser): Promise<Page> {
+  return freshSessionAs(browser, ADMIN);
+}
+
+// Igual ao freshSession, mas loga como o papel escolhido (Diretor/Supervisor/
+// Secretaria) — base dos testes de permissão. O reseed recria os 3 usuários.
+export async function freshSessionAs(browser: Browser, creds: { email: string; password: string }): Promise<Page> {
   reseed();
   const ctx = await cleanContext(browser);
   const page = await ctx.newPage();
   await routeCep(page);
-  await login(page);
+  await loginWith(page, creds.email, creds.password);
   return page;
 }
 

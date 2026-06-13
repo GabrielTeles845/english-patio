@@ -1,7 +1,7 @@
 /* Usuários: criar, e-mail duplicado, campos vazios, editar, desativar e a guarda
    do último Diretor. Serial: edita/desativa o usuário criado no 1º teste. */
 import { test, expect, type Page } from '@playwright/test';
-import { freshSession, jclick, BASE } from './helpers';
+import { freshSession, jclick, BASE, ADMIN } from './helpers';
 
 const email = `e2e-${Math.floor(Math.random() * 1e6)}@example.com`;
 
@@ -13,6 +13,17 @@ test.describe.serial('Usuários', () => {
   test.afterAll(async () => {
     await page.context().close();
   });
+
+  // O seed tem vários usuários (Diretor + Supervisor + Secretaria), então
+  // first()/last() é ambíguo. Localiza o botão "Ações do usuário" pela LINHA que
+  // contém o e-mail do usuário (o div mais interno = .last() na cadeia de ancestrais).
+  const actionsFor = (mail: string) =>
+    page
+      .locator('div')
+      .filter({ hasText: mail })
+      .filter({ has: page.getByRole('button', { name: 'Ações do usuário' }) })
+      .last()
+      .getByRole('button', { name: 'Ações do usuário' });
 
   test('criar usuário (Secretaria)', async () => {
     await page.goto(`${BASE}/dashboard/usuarios`, { waitUntil: 'networkidle' });
@@ -57,8 +68,8 @@ test.describe.serial('Usuários', () => {
 
   test('editar usuário', async () => {
     await page.goto(`${BASE}/dashboard/usuarios`, { waitUntil: 'networkidle' });
-    await page.getByRole('button', { name: 'Ações do usuário' }).last().click();
-    await page.getByRole('menuitem', { name: /editar usuário/i }).click();
+    await jclick(actionsFor(email));
+    await jclick(page.getByRole('menuitem', { name: /editar usuário/i }));
     const dlg = page.getByRole('dialog');
     const nome = dlg.getByRole('textbox').first();
     await nome.waitFor({ timeout: 8000 });
@@ -69,10 +80,8 @@ test.describe.serial('Usuários', () => {
 
   test('desativar acesso do usuário criado', async () => {
     await page.goto(`${BASE}/dashboard/usuarios`, { waitUntil: 'networkidle' });
-    await page.getByRole('button', { name: 'Ações do usuário' }).last().click();
-    const desativar = page.getByRole('menuitem', { name: /desativar acesso/i });
-    await desativar.waitFor({ timeout: 5000 });
-    await desativar.click();
+    await jclick(actionsFor(email));
+    await jclick(page.getByRole('menuitem', { name: /desativar acesso/i }));
     await page.waitForTimeout(500);
     const conf = page.getByRole('dialog').getByRole('button', { name: /desativar/i });
     if (await conf.count()) await jclick(conf);
@@ -81,8 +90,8 @@ test.describe.serial('Usuários', () => {
 
   test('remover o ÚNICO Diretor é bloqueado', async () => {
     await page.goto(`${BASE}/dashboard/usuarios`, { waitUntil: 'networkidle' });
-    await page.getByRole('button', { name: 'Ações do usuário' }).first().click();
-    await page.getByRole('menuitem', { name: /remover acesso/i }).click();
+    await jclick(actionsFor(ADMIN.email));
+    await jclick(page.getByRole('menuitem', { name: /remover acesso/i }));
     await page.waitForTimeout(600);
     await expect(page.getByRole('dialog')).toContainText(/único|Diretor|promova|n(ã|a)o|bloque/i);
     const fechar = page.getByRole('dialog').getByRole('button', { name: /entendi|fechar|cancelar|ok/i });
