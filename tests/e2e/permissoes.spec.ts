@@ -78,4 +78,13 @@ test.describe.serial('Permissões — Secretaria', () => {
     await page.goto(`${BASE}/dashboard/alunos`, { waitUntil: 'networkidle' });
     await expect(page.getByRole('button', { name: /nova matrícula/i }).first()).toBeVisible({ timeout: 8000 });
   });
+
+  test('menu ⋮ não oferece "Marcar como" (override de status é só do Diretor)', async () => {
+    await page.goto(`${BASE}/dashboard/alunos`, { waitUntil: 'networkidle' });
+    await page.getByRole('button', { name: 'Todas as ações' }).first().click();
+    // a Secretaria envia/cobra pelo WhatsApp, mas não faz o override manual de status
+    // (clicar levaria a 403 no backend) — o item nem aparece.
+    await expect(page.getByRole('menuitem', { name: /enviar contrato no whatsapp/i })).toBeVisible({ timeout: 6000 });
+    await expect(page.getByRole('menuitem', { name: /marcar como/i })).toHaveCount(0);
+  });
 });

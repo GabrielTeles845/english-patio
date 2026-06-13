@@ -166,4 +166,16 @@ describe('POST /api/webhooks/autentique', () => {
     assert.equal(c[0].status, 'signed');
     assert.ok(c[0].signedAt);
   });
+
+  it('evento atrasado NÃO rebaixa contrato terminal (signed continua signed)', async () => {
+    // cWebhook já está 'signed' (terminal). Um 'signature.viewed' fora de ordem,
+    // chegando depois, não pode reabrir o contrato assinado.
+    const res = mkRes();
+    const payload = { eventId: 'cs-ev-late-viewed', type: 'signature.viewed', documentId: DOC_ID };
+    await webhook(whReq(payload, sign(payload)), res);
+    assert.equal(res._status, 200);
+    assert.equal(res._body.data.ignored, true);
+    const c = await db.select().from(contracts).where(eq(contracts.id, cWebhook)).limit(1);
+    assert.equal(c[0].status, 'signed'); // manteve o estado terminal
+  });
 });

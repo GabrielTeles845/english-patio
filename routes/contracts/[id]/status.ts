@@ -10,6 +10,7 @@ import { ok, fail, zodFields, clientIp } from '../../../server/lib/http';
 import { getSession, csrfValid } from '../../../server/lib/auth';
 import { hasRole } from '../../../server/lib/rbac';
 import { contractDTO } from '../../../server/lib/serializers';
+import { canManualTransition } from '../../../server/lib/contracts';
 
 const Body = z.object({ status: z.enum(contractStatus.enumValues) });
 
@@ -35,6 +36,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
 
   const found = await db.select().from(contracts).where(eq(contracts.id, id)).limit(1);
   if (!found.length) return fail(res, 404, 'NOT_FOUND', 'Contrato não encontrado.');
+
+  // Override manual tem trilho: não dá para reabrir um contrato assinado nem
+  // pular etapas inválidas (a autoridade é o servidor, não só o menu do front).
+  if (!canManualTransition(found[0].status, status)) {
+    return fail(res, 422, 'INVALID_TRANSITION', `Não dá para mudar o contrato de "${found[0].status}" para "${status}".`);
+  }
 
   const set: Record<string, unknown> = { status };
   const field = FIELD[status];

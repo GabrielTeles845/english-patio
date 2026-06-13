@@ -102,6 +102,7 @@ export default function Alunos() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const canWrite = effectiveRole !== 'Supervisor'; // Supervisor: alunos só leitura (PLAN §4)
+  const isDirector = effectiveRole === 'Diretor'; // override manual de status é só do Diretor
   const who = effectiveUser?.name ?? 'Equipe';
 
   const [f, setFState] = useState<AlunoFilters>(cache.filters);
@@ -243,29 +244,46 @@ export default function Alunos() {
       logAct(who, `Marcou o contrato de <b>${s.kids[0].n}</b> como assinado`);
       toast('Contrato marcado como assinado!');
     };
+    /* "Marcar como…"/"Reenviar (marcar…)" são override manual de status → só
+       Diretor (o backend recusa com 403 pros outros). A Secretaria mantém o
+       botão verde de WhatsApp (enviar/cobrar), que ela pode usar. */
     const statusActions: RowMenuEntry[] =
       s.status === 'pending'
         ? [
             wa('Enviar contrato no WhatsApp'),
-            'divider',
-            item(<Send className="w-4 h-4 text-[var(--muted)]" />, 'Marcar como enviado', markSent),
-            item(<CheckCircle2 className="w-4 h-4 text-[var(--muted)]" />, 'Marcar como assinado', markSigned),
+            ...(isDirector
+              ? ([
+                  'divider',
+                  item(<Send className="w-4 h-4 text-[var(--muted)]" />, 'Marcar como enviado', markSent),
+                  item(<CheckCircle2 className="w-4 h-4 text-[var(--muted)]" />, 'Marcar como assinado', markSigned),
+                ] as RowMenuEntry[])
+              : []),
           ]
         : s.status === 'sent' || s.status === 'viewed'
           ? [
               wa('Cobrar assinatura no WhatsApp'),
-              'divider',
-              item(<CheckCircle2 className="w-4 h-4 text-[var(--muted)]" />, 'Marcar como assinado', markSigned),
+              ...(isDirector
+                ? ([
+                    'divider',
+                    item(<CheckCircle2 className="w-4 h-4 text-[var(--muted)]" />, 'Marcar como assinado', markSigned),
+                  ] as RowMenuEntry[])
+                : []),
             ]
           : s.status === 'failed'
             ? [
                 /* falha na entrega: a ação válida é reenviar (volta pro caminho feliz como "enviado") */
                 wa('Reenviar link no WhatsApp'),
-                'divider',
-                item(<RotateCcw className="w-4 h-4 text-[var(--muted)]" />, 'Reenviar contrato (marcar como enviado)', markSent),
+                ...(isDirector
+                  ? ([
+                      'divider',
+                      item(<RotateCcw className="w-4 h-4 text-[var(--muted)]" />, 'Reenviar contrato (marcar como enviado)', markSent),
+                    ] as RowMenuEntry[])
+                  : []),
               ]
             : s.status === 'rejected'
-              ? [/* recusado: só faz sentido refazer/reenviar o contrato */ item(<RotateCcw className="w-4 h-4 text-[var(--muted)]" />, 'Reenviar contrato (marcar como enviado)', markSent)]
+              ? isDirector
+                ? [/* recusado: só faz sentido refazer/reenviar o contrato */ item(<RotateCcw className="w-4 h-4 text-[var(--muted)]" />, 'Reenviar contrato (marcar como enviado)', markSent)]
+                : []
               : [];
     /* desligar / reativar / excluir — Diretor e Secretaria fazem isso direto pela dashboard */
     const exitActions: RowMenuEntry[] = [

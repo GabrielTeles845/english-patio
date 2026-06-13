@@ -32,7 +32,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
 
   const kid = await db.select({ name: students.name }).from(students).where(eq(students.enrollmentId, contract.enrollmentId)).limit(1);
   const aluno = kid.length ? kid[0].name : 'seu filho(a)';
-  const message = `Olá, ${resp.name}! Tudo bem? Notamos que o contrato de matrícula de ${aluno} ainda está pendente de assinatura. Você pode finalizar pelo link que enviamos. Qualquer dúvida, estamos à disposição. — English Patio`;
+  // A mensagem muda conforme o status: cobrar assinatura de quem RECUSOU (ou de
+  // quem nem recebeu, por falha de entrega) seria errado e constrangedor.
+  const message =
+    contract.status === 'rejected'
+      ? `Olá, ${resp.name}! Tudo bem? Vimos que houve um problema com o contrato de matrícula de ${aluno}. Podemos conversar para entender e ajustar o que for preciso? Estamos à disposição. — English Patio`
+      : contract.status === 'failed'
+        ? `Olá, ${resp.name}! Tudo bem? Tivemos uma falha no envio do contrato de matrícula de ${aluno} e vamos reenviar o link de assinatura. Qualquer dúvida, estamos à disposição. — English Patio`
+        : `Olá, ${resp.name}! Tudo bem? Notamos que o contrato de matrícula de ${aluno} ainda está pendente de assinatura. Você pode finalizar pelo link que enviamos. Qualquer dúvida, estamos à disposição. — English Patio`;
   const phone = onlyDigits(resp.phone);
   const waLink = `https://wa.me/55${phone}?text=${encodeURIComponent(message)}`;
 

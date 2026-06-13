@@ -11,6 +11,7 @@ import { db } from '../../server/db/client';
 import { contracts, contractEvents, activityLog } from '../../server/db/schema';
 import { ok, fail } from '../../server/lib/http';
 import { verifyWebhookSignature, EVENT_TRANSITIONS } from '../../server/lib/autentique';
+import { isTerminalContractStatus } from '../../server/lib/contracts';
 import { sendPushToRoles } from '../../server/lib/webpush';
 
 const STATUS_LABEL: Record<string, string> = {
@@ -44,6 +45,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     .onConflictDoNothing({ target: contractEvents.eventId })
     .returning({ id: contractEvents.id });
   if (!inserted.length) return ok(res, { duplicate: true });
+
+  // Entrega fora de ordem: um evento atrasado (ex.: 'viewed' chegando depois do
+  // 'signed') NÃO pode rebaixar um contrato já assinado/recusado. O evento fica
+  // registrado em contract_events (auditoria), mas o status terminal é mantido.
+  if (isTerminalContractStatus(contract.status)) {
+    return ok(res, { ignored: true, reason: 'status terminal', status: contract.status });
+  }
 
   await db.update(contracts).set({ status: tr.status, [tr.field]: new Date() }).where(eq(contracts.id, contract.id));
 
