@@ -16,7 +16,7 @@
     "test:content": "node --import tsx --test \"tests/content/*.test.ts\"",
     "test:e2e:app": "node scripts/e2e.mjs",
     "test:regression": "npm run test:db:up && playwright test",
-    "test:regression:watch": "npm run test:db:up && SLOWMO=350 playwright test --headed",
+    "test:regression:watch": "npm run test:db:up && SLOWMO=600 playwright test --headed",
     "test:regression:ui": "npm run test:db:up && playwright test --ui",
     "test:regression:report": "playwright show-report",
     "db:generate": "drizzle-kit generate",

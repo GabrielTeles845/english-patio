@@ -2,10 +2,33 @@
    provada dos scripts scripts/e2e-*.mjs: clique via DOM, interceptação de CEP,
    login e reset do banco LOCAL entre os arquivos de teste. */
 import { execFileSync } from 'node:child_process';
-import type { Browser, Page, Locator } from '@playwright/test';
+import type { Browser, BrowserContext, Page, Locator } from '@playwright/test';
 
 export const BASE = process.env.BASE || 'http://localhost:4321';
 export const ADMIN = { email: 'admin@email.com', password: 'Senh@12345' };
+
+// CAUSA RAIZ das travas da suíte: o tour guiado abre sozinho ~560ms depois de
+// entrar em cada tela (Diretor, 1ª visita) e o overlay (zIndex 95) engole os
+// cliques seguintes — o teste então estoura o actionTimeout. Aqui ligamos o
+// opt-out global ANTES do app React montar, em todo contexto novo, para que
+// NENHUM tour suba. Chave/valor conferem com src/lib/dashboard/tours.ts.
+export async function killTours(ctx: BrowserContext): Promise<void> {
+  await ctx.addInitScript(() => {
+    try {
+      localStorage.setItem('ep-tours-off', '1');
+    } catch {
+      /* about:blank pode não ter storage — ignora */
+    }
+  });
+}
+
+// Contexto novo já com os tours desligados. Use sempre isto no lugar de
+// browser.newContext() cru, senão os tours voltam a travar os cliques.
+export async function cleanContext(browser: Browser): Promise<BrowserContext> {
+  const ctx = await browser.newContext();
+  await killTours(ctx);
+  return ctx;
+}
 
 // Reseta o banco LOCAL para o estado base (1 Diretor + 1 família + contrato
 // pending). Recria o admin com novo id → quem chamar deve relogar em seguida.
@@ -60,7 +83,7 @@ export async function login(page: Page): Promise<void> {
 // intercepta CEP e loga. Cada spec roda em série sobre a mesma página.
 export async function freshSession(browser: Browser): Promise<Page> {
   reseed();
-  const ctx = await browser.newContext();
+  const ctx = await cleanContext(browser);
   const page = await ctx.newPage();
   await routeCep(page);
   await login(page);

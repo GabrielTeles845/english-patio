@@ -19,14 +19,14 @@ export default defineConfig({
   testDir: './tests/e2e',
   fullyParallel: false,
   workers: 1, // série: um Chrome só, um teste por vez — fácil de assistir
-  timeout: 60_000,
-  expect: { timeout: 10_000 },
+  timeout: 90_000, // teto por teste — folga p/ o slowMo do modo assistir
+  expect: { timeout: 12_000 },
   forbidOnly: !!process.env.CI,
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
     baseURL: BASE,
-    actionTimeout: 15_000, // teto por clique/preenchimento — não pendura numa tela inesperada
-    navigationTimeout: 20_000, // teto por navegação de página
+    actionTimeout: 25_000, // teto por clique/preenchimento — não pendura numa tela inesperada
+    navigationTimeout: 30_000, // teto por navegação de página
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
