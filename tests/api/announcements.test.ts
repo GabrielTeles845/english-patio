@@ -175,4 +175,24 @@ describe('resolveAudience — segmentos da tela (via preview)', () => {
     assert.equal(await previewCount({ period: PERIOD, pendingContract: true }), 0);
     await db.update(contracts).set({ status: 'pending' }).where(eq(contracts.id, contractId));
   });
+
+  it('period escopa a audiência: sem period vaza para outros semestres, com period não', async () => {
+    // uma família ATIVA num semestre ANTIGO (mesmo status:active, outro período)
+    const old = await db.insert(enrollments).values({
+      source: 'manual', submissionId: `${SUB}-old`, classFormat: 'sede', financialResponsibleType: 'legal',
+      authorizationContract: true, scheduleConfirmed: true, period: '2000.1',
+    }).returning();
+    await db.insert(students).values({ enrollmentId: old[0].id, name: 'Aluno Antigo', birthDate: '2016-05-10', isActive: true });
+    await db.insert(responsibles).values({ enrollmentId: old[0].id, type: 'legal', name: 'Resp Antigo', email: 'antigo@example.com', phone: '62999990000' });
+    try {
+      const semPeriod = await previewCount({ status: 'active' });
+      const comPeriod = await previewCount({ period: PERIOD, status: 'active' });
+      assert.ok(semPeriod > comPeriod, 'sem period a audiência atinge outros semestres');
+      assert.equal(comPeriod, 1, 'com period só entra a família do semestre corrente');
+    } finally {
+      await db.delete(students).where(eq(students.enrollmentId, old[0].id));
+      await db.delete(responsibles).where(eq(responsibles.enrollmentId, old[0].id));
+      await db.delete(enrollments).where(eq(enrollments.id, old[0].id));
+    }
+  });
 });

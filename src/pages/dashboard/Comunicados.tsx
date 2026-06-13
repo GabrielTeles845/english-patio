@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { sendAnnouncement, useDash } from '../../lib/dashboard/store';
 import { listAnnouncementsApi, type AnnChannel, type AnnouncementItem, type AudienceFilter } from '../../lib/dashboard/announcementsApi';
+import { currentPeriod } from '../../lib/dashboard/dataApi';
 import {
   listTemplatesApi,
   createTemplateApi,
@@ -199,8 +200,19 @@ export default function Comunicados() {
 
   /* mapeia a escolha da tela para o que o backend espera */
   const channelsOf = (ch: Channel): AnnChannel[] => (ch === 'email' ? ['email'] : ch === 'wa' ? ['whatsapp'] : ['email', 'whatsapp']);
-  const audienceOf = (v: string): AudienceFilter =>
-    v === 'sq' ? { dayPair: 'seg-qua' } : v === 'tq' ? { dayPair: 'ter-qui' } : v === 'pend' ? { pendingContract: true } : { status: 'active' };
+  const audienceOf = (v: string): AudienceFilter => {
+    // escopa SEMPRE ao período corrente: sem isso o backend resolveria a
+    // audiência sobre todos os semestres e o comunicado atingiria famílias
+    // antigas (a contagem da tela é só do período atual).
+    const period = currentPeriod();
+    return v === 'sq'
+      ? { period, dayPair: 'seg-qua' }
+      : v === 'tq'
+        ? { period, dayPair: 'ter-qui' }
+        : v === 'pend'
+          ? { period, pendingContract: true }
+          : { period, status: 'active' };
+  };
 
   /* port applyEmailTpl (l.4455) */
   const applyTpl = (k: string) => {

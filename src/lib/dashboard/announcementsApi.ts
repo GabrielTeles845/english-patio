@@ -9,6 +9,7 @@ export type AnnChannel = 'email' | 'whatsapp';
 /* filtro de público resolvido no servidor (resolveAudience). Sem período = base
    inteira (mesma que a tela carrega); dayPair/pendingContract já implicam ativos. */
 export interface AudienceFilter {
+  period?: string; // escopa o comunicado ao semestre corrente (evita atingir períodos antigos)
   status?: 'active' | 'inactive' | 'all';
   dayPair?: 'seg-qua' | 'ter-qui';
   pendingContract?: boolean;
