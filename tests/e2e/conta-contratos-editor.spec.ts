@@ -48,3 +48,29 @@ test.describe.serial('Conta · Contratos · Editor', () => {
     await expect(page.getByText(novo).first()).toBeVisible({ timeout: 6000 });
   });
 });
+
+test.describe.serial('Contrato assinado não oferece WhatsApp', () => {
+  let page: Page;
+  test.beforeAll(async ({ browser }) => {
+    page = await freshSession(browser);
+  });
+  test.afterAll(async () => {
+    await page.context().close();
+  });
+
+  test('ao marcar como assinado, o botão verde some da tela Contratos', async () => {
+    // marca o único contrato (pending) como assinado pelo menu ⋮ de Alunos
+    await page.goto(`${BASE}/dashboard/alunos`, { waitUntil: 'networkidle' });
+    await page.getByRole('button', { name: 'Todas as ações' }).first().click();
+    await page.getByRole('menuitem', { name: /marcar como assinado/i }).click();
+    await expect(page.getByText('Assinado', { exact: false }).first()).toBeVisible({ timeout: 10000 });
+    // na tela Contratos, contrato assinado é caminho encerrado: sem botão de WhatsApp
+    // (clicar levaria a /remind, que o backend recusa com 422 ALREADY_SIGNED).
+    await page.goto(`${BASE}/dashboard/contratos`, { waitUntil: 'networkidle' });
+    await expect(page.getByText(/assinado/i).first()).toBeVisible({ timeout: 10000 });
+    await expect(
+      page.locator('button[data-tip$="no WhatsApp"]'),
+      'contrato assinado não pode ter botão verde de WhatsApp',
+    ).toHaveCount(0);
+  });
+});

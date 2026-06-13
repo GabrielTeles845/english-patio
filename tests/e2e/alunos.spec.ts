@@ -13,6 +13,12 @@ test.describe.serial('Alunos & matrículas', () => {
     await page.context().close();
   });
 
+  test('cabeçalho concorda no singular com 1 aluno / 1 matrícula', async () => {
+    await page.goto(`${BASE}/dashboard/alunos`, { waitUntil: 'networkidle' });
+    // estado fresco tem 1 família/1 aluno → singular, não "1 alunos em 1 matrículas".
+    await expect(page.getByText('1 aluno em 1 matrícula ativa')).toBeVisible({ timeout: 8000 });
+  });
+
   test('editar matrícula (⋮ → Editar dados → Salvar persiste)', async () => {
     await page.goto(`${BASE}/dashboard/alunos`, { waitUntil: 'networkidle' });
     await page.getByRole('button', { name: 'Todas as ações' }).first().click();

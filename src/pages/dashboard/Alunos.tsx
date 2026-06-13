@@ -302,7 +302,7 @@ export default function Alunos() {
       <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
         <div>
           <h1 className="font-heading text-2xl sm:text-3xl font-semibold">Alunos</h1>
-          <p className="text-[var(--muted)] text-sm mt-0.5">{`${allKids} alunos em ${allAct.length} matrículas ativas`}</p>
+          <p className="text-[var(--muted)] text-sm mt-0.5">{`${allKids} ${allKids === 1 ? 'aluno' : 'alunos'} em ${allAct.length} ${allAct.length === 1 ? 'matrícula ativa' : 'matrículas ativas'}`}</p>
         </div>
         <div className="flex items-center gap-2">
           {canWrite && (

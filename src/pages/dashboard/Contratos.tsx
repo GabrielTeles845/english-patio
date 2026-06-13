@@ -339,14 +339,16 @@ export default function Contratos() {
                   >
                     <Download className="w-4 h-4" />
                   </button>
-                  <button
-                    onClick={() => contractWhatsApp(s, toast)}
-                    data-tip={waTitle(s)}
-                    className="w-9 h-9 rounded-lg grid place-content-center text-white transition hover:brightness-105"
-                    style={{ background: '#25D366' }}
-                  >
-                    <WAIcon className="w-4 h-4" />
-                  </button>
+                  {s.status !== 'signed' && (
+                    <button
+                      onClick={() => contractWhatsApp(s, toast)}
+                      data-tip={waTitle(s)}
+                      className="w-9 h-9 rounded-lg grid place-content-center text-white transition hover:brightness-105"
+                      style={{ background: '#25D366' }}
+                    >
+                      <WAIcon className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
               </div>
             );
@@ -400,15 +402,17 @@ export default function Contratos() {
                   >
                     <Download className="w-4 h-4" />
                   </button>
-                  <button
-                    onClick={() => contractWhatsApp(s, toast)}
-                    data-tip={waTitle(s)}
-                    aria-label={waTitle(s)}
-                    className="w-8 h-8 rounded-lg grid place-content-center text-white transition hover:brightness-105"
-                    style={{ background: '#25D366' }}
-                  >
-                    <WAIcon className="w-4 h-4" />
-                  </button>
+                  {s.status !== 'signed' && (
+                    <button
+                      onClick={() => contractWhatsApp(s, toast)}
+                      data-tip={waTitle(s)}
+                      aria-label={waTitle(s)}
+                      className="w-8 h-8 rounded-lg grid place-content-center text-white transition hover:brightness-105"
+                      style={{ background: '#25D366' }}
+                    >
+                      <WAIcon className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
               </div>
             );

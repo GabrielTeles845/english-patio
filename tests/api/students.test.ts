@@ -226,12 +226,17 @@ describe('PATCH /api/students/:id/class', () => {
     assert.equal(res._body.error.code, 'CLASS_FULL');
   });
 
-  it('turma cheia COM vaga extra (cap<9) → 200', async () => {
+  it('turma cheia COM vaga extra (cap<9) → 200 e a capacidade sobe de 1 para 2', async () => {
     const sid = await addStudent(null);
     const res = mkRes();
     await moveClass(mkReq('PATCH', { classId: cCap1, extraSeat: true }, { cookie: dir.cookies, csrf: dir.csrf, query: { id: String(sid) } }), res);
     assert.equal(res._status, 200);
     assert.equal(res._body.data.classId, cCap1);
+    // Regressão: "abrir vaga extra" precisa SUBIR o limite da turma (a UI promete
+    // que o limite passa de N para N+1 e a turma deixa de aparecer como cheia).
+    // Antes a capacidade ficava em 1 e a turma seguia mostrando 2/1 "sem vaga".
+    const cls = await db.select().from(classes).where(eq(classes.id, cCap1)).limit(1);
+    assert.equal(cls[0].capacity, 2);
   });
 
   it('vaga extra mas já em 9 lugares → 422 ROOM_OVERFLOW', async () => {

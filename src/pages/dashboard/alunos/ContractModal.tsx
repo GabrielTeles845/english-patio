@@ -149,13 +149,15 @@ export function ContractModal({ sid, onClose, onOpenDetail }: { sid: number; onC
         >
           <Download className="w-4 h-4" /> Baixar PDF
         </button>
-        <button
-          onClick={() => contractWhatsApp(s, toast)}
-          className="h-11 px-4 rounded-xl text-white font-semibold text-sm flex items-center justify-center gap-2"
-          style={{ background: '#25D366' }}
-        >
-          <WAIcon className="w-4 h-4" /> {s.status === 'pending' || s.status === 'failed' ? 'Enviar' : 'Cobrar'}
-        </button>
+        {s.status !== 'signed' && (
+          <button
+            onClick={() => contractWhatsApp(s, toast)}
+            className="h-11 px-4 rounded-xl text-white font-semibold text-sm flex items-center justify-center gap-2"
+            style={{ background: '#25D366' }}
+          >
+            <WAIcon className="w-4 h-4" /> {s.status === 'pending' || s.status === 'failed' ? 'Enviar' : 'Cobrar'}
+          </button>
+        )}
         {onOpenDetail && (
           <button
             onClick={() => {

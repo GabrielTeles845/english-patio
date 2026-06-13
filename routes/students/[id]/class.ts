@@ -63,9 +63,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     const occ = await classOccupancy(classId, id);
     if (occ >= dest[0].capacity) {
       if (!extraSeat) return fail(res, 422, 'CLASS_FULL', 'Turma cheia — abra uma vaga extra para mover.');
-      if (occ >= ROOM_MAX_SEATS) {
+      if (dest[0].capacity >= ROOM_MAX_SEATS) {
         return fail(res, 422, 'ROOM_OVERFLOW', 'A turma já está com 9 lugares — passaria do que cabe na sala.');
       }
+      // "Abrir vaga extra": sobe o limite da turma em 1 (a UI promete que o
+      // limite passa de N para N+1 e a turma deixa de aparecer como cheia).
+      await db
+        .update(classes)
+        .set({ capacity: dest[0].capacity + 1 })
+        .where(eq(classes.id, classId));
     }
   }
 
